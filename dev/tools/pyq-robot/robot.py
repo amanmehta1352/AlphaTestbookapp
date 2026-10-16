@@ -103,10 +103,14 @@ def paper_to_txt(pdf, work):
     if r.returncode: raise RuntimeError('PDF का format नहीं पहचाना (शायद SSC response sheet नहीं है): ' + (r.stderr.strip().splitlines() or ['?'])[-1][:200])
     subprocess.run([sys.executable, '-I', os.path.join(V2, 'gaps.py'), pdf, js], check=True, capture_output=True)
     d = json.load(open(js, encoding='utf-8')); h = d['header']
-    m = re.search(r'(\d{4})\s+(Civil|Electrical|Mechanical)', h.get('subject') or '')
+    m = re.search(r'(?:(\d{4})\s+)?(Civil|Electrical|Mechanical)', h.get('subject') or '')
+    year = (m and m.group(1)) or h.get('exam_year')  # 2021 sheets: "Examination,2020" in the title
     sh = shift_of(h.get('time'))
-    if not (m and h.get('date') and sh): raise RuntimeError(f'Paper header अधूरा: {h}')
-    year, branch = m.group(1), m.group(2)
+    if not (m and year and h.get('date') and sh): raise RuntimeError(f'Paper header अधूरा: {h}')
+    branch = m.group(2)
+    alltext = ' '.join(q['text'] for q in d['questions'])
+    if len(re.findall(r'\b(?:t he|t o|o f|io n|at io|ent ly)\b', alltext)) > 30:
+        raise RuntimeError('PDF का text टूटा हुआ है (जैसे "t he co rrect") — import नहीं किया')
     dd, mm, yy = h['date'].split('/')
     shift = f'{dd} {MON[int(mm) - 1]} {yy} Shift {sh}'
     src = f"SSC JE {year} {branch} Paper I · {shift} ({h['time'].split('-')[0].strip()}) · official SSC response sheet (PDF via Oliveboard) · answer = SSC key"

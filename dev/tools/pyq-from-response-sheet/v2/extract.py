@@ -9,11 +9,15 @@ txt = subprocess.run(['pdftotext', '-layout', pdf_path, '-'], capture_output=Tru
 
 # header
 hdr = {}
-for k, pat in [('date', r'Exam Date\s+(\d\d/\d\d/\d{4})'), ('time', r'Exam Time\s+(.+?)\s*\n'), ('subject', r'Subject\s+(.+?)\s*\n')]:
+for k, pat in [('date', r'(?:Exam|Test) Date\s+(\d\d/\d\d/\d{4})'), ('time', r'(?:Exam|Test) Time\s+(.+?)\s*\n'), ('subject', r'Subject\s+(.+?)\s*\n'),
+               ('exam_year', r'Examination\s*,?\s*(\d{4})')]:
     m = re.search(pat, txt); hdr[k] = m.group(1).strip() if m else None
 
 # text layout parse (parse2)
 lines = txt.replace('\f', '\n').split('\n')
+if 'ssc.digialm.com' in txt:  # browser-printed sheets (2018): drop page header/footer (date + URL + page no.)
+    lines = [l for l in lines if not l.strip() or not re.match(r'^\s*(\d{1,2}/\d{1,2}/\d{4}\s*)?(https://ssc\.digialm\.com\S*.*)?$', l)]
+    lines = [re.sub(r'\s*https://ssc\.digialm\.com\S*.*$', '', l) for l in lines]
 qs = []; section = None; cur = None; mode = None
 for raw in lines:
     s = raw.rstrip()
@@ -46,11 +50,22 @@ assert len(qs) == 200, len(qs)
 # geometry (parse + parse3)
 pdf = pdfplumber.open(pdf_path)
 marks, figs, starts = [], [], []
+import hashlib
+mark_hash = {}  # older sheets (2018): tick and cross are both 31x21, told apart by image content
+for page in pdf.pages:
+    for im in page.images:
+        if tuple(im['srcsize']) == (31, 21): mark_hash.setdefault(hashlib.md5(im['stream'].get_data()).hexdigest(), []).append(1)
+has_small_tick = any(tuple(im['srcsize']) == (16, 16) for page in pdf.pages for im in page.images)
+tick_hash = None
+if not has_small_tick:
+    one = [h for h, v in mark_hash.items() if len(v) == len(qs)]
+    if len(one) == 1 and any(len(v) == 3 * len(qs) for v in mark_hash.values()): tick_hash = one[0]
 for pi, page in enumerate(pdf.pages):
     for im in page.images:
         w, h = im['srcsize']
         if (w, h) == (16, 16): marks.append((pi, im['top'], 'tick'))
-        elif (w, h) == (31, 21): marks.append((pi, im['top'], 'cross'))
+        elif (w, h) == (31, 21):
+            marks.append((pi, im['top'], 'tick' if tick_hash and hashlib.md5(im['stream'].get_data()).hexdigest() == tick_hash else 'cross'))
         elif (w, h) == (411, 488): pass
         else: figs.append((pi, im['top'], im['bottom'], im['x0'], im['x1'], (w, h)))
     for w in page.extract_words():
