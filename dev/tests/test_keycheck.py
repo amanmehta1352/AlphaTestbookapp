@@ -24,6 +24,13 @@ check('empty option -> A1', codes(kc.audit([row('x', 'Q one?', ['a', 'b', '', 'd
 check('3 options -> A1', codes(kc.audit([{'id': 'x', 'question_en': 'Q?', 'answer': 'A', 'options': [{'letter': 'A', 'en': 'a'}] * 3}])[0], 'x') == ['A1'])
 check('two same options -> A2', codes(kc.audit([row('x', 'Q one?', ['Same', 'same.', 'c', 'd'], 'C')])[0], 'x') == ['A2'])
 
+# symbols and Hindi matras are real differences (Mathematical Operations / Hindi options must NOT be flagged)
+check('math-sign options are different', kc.audit([row('m1', 'Which sign replaces * in 6 * 2 = 8?', ['+', '\u2212', '\u00d7', '\u00f7'], 'A')])[0] == [])
+check('same digits, different signs are different', kc.audit([row('m2', 'Pick the true statement', ['6 + 2 = 8', '6 \u00d7 2 = 8', '6 \u2212 2 = 8', '6 \u00f7 2 = 8'], 'A')])[0] == [])
+check('Hindi matra options are different', kc.audit([row('h1', 'सही रूप चुनिए', ['का', 'की', 'के', 'को'], 'B')])[0] == [])
+check('ligature/case/space/end-dot are the same option', codes(kc.audit([row('x', 'Q one?', ['Office', 'Of\ufb01ce.', 'c', 'd'], 'C')])[0], 'x') == ['A2'])
+check('questions differing only by a sign are NOT a conflict', kc.audit([row('s1', 'Value of 6 + 2?', ['8', '4', '12', '3'], 'A'), row('s2', 'Value of 6 \u2212 2?', ['8', '4', '12', '3'], 'B')])[0] == [])
+
 # same question in two papers: options shuffled but SAME answer text -> fine; different answer text -> B
 p1 = row('p1', 'Unit of power is?', ['Watt', 'Joule', 'Newton', 'Pascal'], 'A')
 p2 = row('p2', 'Unit of power is?', ['Joule', 'Pascal', 'Watt', 'Newton'], 'C')

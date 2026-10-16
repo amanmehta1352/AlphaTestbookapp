@@ -13,7 +13,7 @@ Only question text + options go to Gemini. No student data ever leaves the serve
 Secrets come only from env (SUPABASE_SECRET_KEY, GEMINI_API_KEY) and are never printed.
 Exit code: 0 normally; with --strict, 2 if any hard flag (A/B) exists, so a later auto-publish step can stop.
 """
-import json, os, re, sys, time, urllib.parse, urllib.request
+import json, os, re, sys, time, unicodedata, urllib.parse, urllib.request
 from collections import Counter, defaultdict
 
 SUPABASE_URL = os.environ.get('SUPABASE_URL', 'https://fzkvwkrbtykucjfdqiin.supabase.co').rstrip('/')
@@ -36,7 +36,10 @@ def say(line=''):
 
 
 def norm(s):
-    return re.sub(r'[\W_]+', '', (s or '').lower())
+    """Compare text ignoring case, spaces and end punctuation ONLY. Math signs (+ − × ÷ < >) and Hindi matras must
+    stay: options like "6 + 2" / "6 × 2" or "का" / "की" are different answers."""
+    s = re.sub(r'\s+', '', unicodedata.normalize('NFKC', s or '').lower())
+    return s.strip('.,;:।?!')
 
 
 def opt_text(o):
