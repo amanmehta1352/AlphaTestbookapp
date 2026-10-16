@@ -1,0 +1,38 @@
+import subprocess, time, json, sys
+from playwright.sync_api import sync_playwright
+srv = subprocess.Popen(['python3', '-m', 'http.server', '8765', '--bind', '127.0.0.1'], cwd='/home/claude/work/pwa290', stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+time.sleep(1)
+res = []
+def rec(n, ok, d=''): res.append(ok); print('PASS' if ok else 'FAIL', n, str(d)[:300])
+try:
+    with sync_playwright() as p:
+        b = p.chromium.launch()
+        ctx = b.new_context(viewport={'width': 390, 'height': 844})
+        page = ctx.new_page(); errs = []; page.on('pageerror', lambda e: errs.append(str(e)))
+        page.goto('http://127.0.0.1:8765/'); page.wait_for_selector('.sj-dash', timeout=15000)
+        cdp = ctx.new_cdp_session(page)
+        m = cdp.send('Page.getAppManifest')
+        rec('manifest found and parses without errors', m.get('url', '').endswith('manifest.webmanifest') and not m.get('errors'), m.get('errors'))
+        page.wait_for_function("navigator.serviceWorker && navigator.serviceWorker.controller !== undefined", timeout=5000)
+        page.wait_for_timeout(1500)
+        reg = page.evaluate("navigator.serviceWorker.getRegistration().then(r=>!!(r&&(r.active||r.installing||r.waiting)))")
+        rec('service worker registered', reg)
+        ie = cdp.send('Page.getInstallabilityErrors')
+        rec('Chrome install check: no installability errors', ie.get('installabilityErrors') == [], ie)
+        page.reload(); page.wait_for_selector('.sj-dash', timeout=15000)
+        rec('page is controlled by the service worker', page.evaluate("!!navigator.serviceWorker.controller"))
+        ctx.set_offline(True)
+        page.reload(); page.wait_for_selector('.sj-dash', timeout=15000)
+        rec('opens without internet (offline reload)', page.locator('.gx-card').count() > 5)
+        ctx.set_offline(False)
+        rec('install button hidden until Chrome offers install', page.evaluate("InstallPrompt===null") == (not page.locator('#drwInstall').is_visible()), page.evaluate('!!InstallPrompt'))
+        page.evaluate("InstallPrompt={prompt(){window.__p=1},userChoice:Promise.resolve({outcome:'accepted'})};pwaPaintInstall()")
+        page.click('#btnMenu'); page.wait_for_timeout(300)
+        rec('install button appears in menu when offered', page.locator('#drwInstall').is_visible())
+        page.click('#drwInstall'); page.wait_for_timeout(200)
+        rec('tapping it opens Chrome install dialog', page.evaluate("window.__p===1"))
+        rec('no page errors', not errs, errs)
+        b.close()
+finally:
+    srv.terminate()
+print('TOTAL', len(res), 'FAIL', res.count(False))

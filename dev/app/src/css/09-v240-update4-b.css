@@ -1,0 +1,31 @@
+/* V2.4.0 Update 4 — Stage B: revision, reasons, bookmarks, practice filters */
+.rv-hero{background:linear-gradient(135deg,#4c1d95 0%,#6d28d9 45%,#2563eb 100%);color:#fff;border-radius:var(--radius-xl);padding:18px;margin-bottom:10px;box-shadow:var(--shadow-md)}
+.rv-hero h1{margin:8px 0 4px;font-size:22px;font-weight:900}
+.rv-hero p{margin:0;font-size:13px;opacity:.95}
+.rv-start{margin-top:14px;width:100%;min-height:48px;background:#fff!important;color:#4c1d95!important;border-color:#fff!important}
+.rv-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px;box-shadow:var(--shadow-sm)}
+.rv-head{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;font-weight:800;color:var(--text-muted)}
+.rv-head>span:nth-child(2){flex:1;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rv-progress{height:4px;border-radius:999px;background:var(--surface-alt);margin:8px 0 12px;overflow:hidden}
+.rv-progress span{display:block;height:100%;background:var(--accent-purple)}
+.rv-kind{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;color:var(--accent-purple);margin-bottom:6px}
+.rv-front{font-size:16px;font-weight:800;line-height:1.5}
+.rv-sub{font-size:14px;color:var(--text-muted);margin-top:4px;line-height:1.5}
+.rv-back{margin-top:12px;padding:12px;border-radius:var(--radius-md);background:var(--primary-light);font-size:15px;font-weight:700;line-height:1.5}
+.rv-rate{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:6px;margin-top:12px}
+.rv-r{min-height:56px;border-radius:12px;border:1.5px solid var(--border);background:var(--surface);color:var(--text-main);font-size:14px;font-weight:900;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.rv-r small{font-size:10px;font-weight:700;color:var(--text-muted)}
+.rv-r.hard{border-color:var(--danger)}.rv-r.okay{border-color:var(--warning)}.rv-r.easy{border-color:var(--success)}
+.rv-done{text-align:center}.rv-done h2{margin:6px 0;font-size:20px}.rv-emoji{font-size:40px}
+.bm-btn{width:36px;height:36px;min-width:36px;border:1px solid var(--border);border-radius:9px;background:var(--surface);color:var(--text-muted);font-size:18px;line-height:1;display:inline-flex;align-items:center;justify-content:center}
+.bm-btn.on{color:#f59e0b;border-color:#f59e0b;background:var(--warning-bg)}
+.test-fixed-viewport .q-badge .cbt-bm{width:32px;height:32px;min-width:32px;font-size:16px;margin-left:4px}
+.bm-row{display:flex;gap:6px;align-items:center}.bm-row .sj-action{flex:1}
+.mr-chips{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin:0 0 10px}
+.mr-label{font-size:11px;font-weight:900;color:var(--text-muted);margin-right:2px}
+.mr-chip{min-height:34px;padding:4px 10px;border:1px solid var(--border);border-radius:999px;background:var(--surface);color:var(--text-main);font-size:11px;font-weight:800}
+.mr-chip.on{border-color:var(--accent-purple);background:var(--accent-purple);color:#fff}
+.pf-bar{margin:0 0 10px;border:1px solid var(--border);border-radius:12px;background:var(--surface);padding:6px 10px}
+.pf-bar>summary{cursor:pointer;min-height:36px;display:flex;align-items:center;font-size:12px;font-weight:900;color:var(--text-main)}
+.pf-bar .filter-pill{min-height:36px}
+.sj-card-head h2{margin:0;font-size:14px;font-weight:900;color:var(--text-main)}

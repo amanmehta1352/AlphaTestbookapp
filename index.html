@@ -1254,7 +1254,8 @@ body.native-builder-active .nb-wizard-nav .nb-row-meta{flex:1 1 auto;min-width:0
 .dc-edit-form input,.dc-edit-form textarea{max-width:100%;font-size:14px;line-height:1.5;user-select:text;}
 </style>
 <meta name="phase3" content="Profile-Driven Workspace + Data Airlock"><meta name="phase3-status" content="IMPLEMENTED"><meta name="phase3-frozen" content="Phase1A Storage; Phase2 QuestionUI; CBT scoring/timer"><meta name="master-testbook-candidate" content="V2.1.8 Smart Builder repair; child of V2.1.7; parent and data contracts preserved"><meta name="release-status" content="PARTIAL-HOLD-RUNTIME-VERIFICATION-PENDING">
-<meta name="master-testbook-candidate-version" content="V2.7.0_STUDENT_ACCOUNT_SYNC">
+<meta name="master-testbook-candidate-version" content="V2.9.0_DATA_CLEANUP">
+<meta name="app-version" content="V2.9.0">
 
 <style id="v2-3-2-deep-functional-repair">
 /* Root cause: display:contents exposed Previous, Clear, Mark and Next as four grid items for a three-column footer. */
@@ -1974,6 +1975,38 @@ details.ir-box summary{cursor:pointer;font-weight:800}
 .cl-prompt>span:nth-child(2){flex:1;display:flex;flex-direction:column}.cl-prompt b{font-size:15px}.cl-prompt small{font-size:12px;color:var(--text-muted)}
 .cl-prompt>span:last-child{font-size:22px;color:var(--text-muted)}
 </style>
+<style id="v280-foundation">
+/* V2.8.0 — Health Check + version */
+.hc{display:flex;flex-direction:column;gap:8px}
+.hc-sum{display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:14px;border:1.5px solid var(--success);background:var(--surface);color:var(--text-main)}
+.hc-sum.warn{border-color:var(--warning)}.hc-sum.bad{border-color:var(--danger)}
+.hc-sum b{font-size:16px}.hc-sum span{font-size:12px;color:var(--text-muted)}
+.hc-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text-main)}
+.hc-row.bad{border-color:var(--danger)}.hc-row.warn{border-color:var(--warning)}
+.hc-ic{flex:0 0 auto;width:22px;text-align:center;font-weight:900}
+.hc-row.ok .hc-ic{color:var(--success)}.hc-row.bad .hc-ic{color:var(--danger)}
+.hc-tx{flex:1;min-width:0;display:flex;flex-direction:column}
+.hc-tx b{font-size:13px}.hc-tx small{font-size:11px;color:var(--text-muted);line-height:1.45;overflow-wrap:anywhere}
+.hc-row .btn-action-sm{flex:0 0 auto;min-height:36px}
+.hc-text{width:100%;min-height:220px;font-size:12px;border:1px solid var(--border);border-radius:10px;padding:8px;background:var(--surface);color:var(--text-main)}
+.drawer-version{padding:12px 18px 18px;font-size:11px;font-weight:700;color:var(--text-muted)}
+/* V2.9.0 — data cleanup */
+.cl-group{border:1px solid var(--warning);border-radius:12px;background:var(--surface);color:var(--text-main);padding:10px 12px}
+.cl-group.manual{border-color:var(--border)}
+.cl-group summary{display:flex;gap:10px;align-items:flex-start;cursor:pointer;list-style:none}
+.cl-group summary::-webkit-details-marker{display:none}
+.cl-n{flex:0 0 auto;min-width:34px;height:28px;padding:0 8px;border-radius:999px;background:var(--warning);color:#111;font-weight:900;font-size:13px;display:grid;place-items:center}
+.cl-group.manual .cl-n{background:var(--surface-alt);color:var(--text-main)}
+.cl-group summary b{display:block;font-size:14px}.cl-group summary small{display:block;font-size:11px;color:var(--text-muted);line-height:1.45}
+.cl-group ul{margin:8px 0 6px;padding-left:18px;font-size:12px;line-height:1.5}.cl-group li{overflow-wrap:anywhere}
+.cl-group s{color:var(--danger)}
+.cl-fix{width:100%;min-height:44px;margin-top:6px}
+.cl-topic{margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);font-size:13px}
+.cl-topic small{color:var(--text-muted)}
+.cl-pick{display:grid;grid-template-columns:1fr 76px auto;gap:6px;margin-top:6px}
+.cl-pick input{min-height:40px;min-width:0;padding:6px 10px;border:1.5px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text-main);font-size:14px}
+.cl-pick .btn-action-sm{min-height:40px}
+</style>
 </head>
 <body>
 <div id="hydrationGate" aria-live="polite" aria-busy="true">
@@ -2023,12 +2056,15 @@ details.ir-box summary{cursor:pointer;font-weight:800}
     <div class="drawer-section-title" data-en="SETTINGS & DATA" data-hi="सेटिंग और डेटा">SETTINGS & DATA</div>
     <button class="drawer-item" onclick="openDisplaySettings()" data-en="Aa Display (language, text size)" data-hi="Aa डिस्प्ले (भाषा, अक्षर आकार)">Aa Display (language, text size)</button>
     <button class="drawer-item" onclick="openImportModal()" data-en="📥 Import questions" data-hi="📥 सवाल import करें">📥 Import questions</button>
+    <button class="drawer-item" onclick="openCleanup()" data-en="🧹 Data cleanup" data-hi="🧹 Data सफ़ाई">🧹 Data cleanup</button>
+    <button class="drawer-item" onclick="openHealthCheck()" data-en="🩺 Health Check" data-hi="🩺 Health Check">🩺 Health Check</button>
     <button class="drawer-item" onclick="openBackupCenter()" data-en="💾 Backup & Restore" data-hi="💾 Backup और Restore">💾 Backup &amp; Restore</button>
     <button class="drawer-item" onclick="openServerSync()" data-en="☁️ Server (Admin)" data-hi="☁️ Server (Admin)">☁️ Server (Admin)</button>
     <button class="drawer-item" id="drwInstall" hidden onclick="pwaInstall()" data-en="📲 Install app" data-hi="📲 ऐप install करें">📲 Install app</button>
     <button class="drawer-item" onclick="openDataControlModal()" data-en="🛡️ Data control" data-hi="🛡️ डेटा नियंत्रण">🛡️ Data control</button>
     <button class="drawer-item" onclick="resetAppData()" data-en="🗑️ Reset app data" data-hi="🗑️ ऐप डेटा रीसेट">🗑️ Reset app data</button>
   </nav>
+  <div class="drawer-version" id="drwVersion"></div>
 </aside>
 
 <!-- Main Dynamic Screen Surface -->
@@ -2095,25 +2131,12 @@ function checkStorageQuota(newData) {
 
 // Transaction & Undo Manager
 const TransactionManager = {
-  undoTransaction(transactionId) {
+  // Legacy entry point; goes through DataCore like every other change.
+  async undoTransaction(transactionId) {
     const history = getImportHistory();
-    const targetTxn = history.find(h => h.transactionId === transactionId);
-    if (!targetTxn) throw new Error("Transaction not found.");
-
-    AppModules.forEach(mod => {
-      mod.groups = (mod.groups || []).map(g => ({
-        ...g,
-        questions: (g.questions || []).filter(q => q.metadata?.transactionId !== transactionId)
-      })).filter(g => g.questions.length > 0);
-    });
-    
-    AppModules = AppModules.filter(m => (m.groups || []).length > 0);
-    
-    ImportHistory = history.filter(h => h.transactionId !== transactionId);
-    saveImportHistory();
-    
-    saveModules();
-    synchronizeTaxonomyEngine();
+    if (!history.find(h => h.transactionId === transactionId)) throw new Error("Transaction not found.");
+    const next = DataCore.copy().map(mod => ({ ...mod, groups: (mod.groups || []).map(g => ({ ...g, questions: (g.questions || []).filter(q => q.metadata?.transactionId !== transactionId) })).filter(g => g.questions.length > 0) })).filter(m => (m.groups || []).length > 0);
+    await DataCore.commit(next, { reason: 'Undo ' + transactionId, snapshot: 'Undo से पहले', importHistory: history.filter(h => h.transactionId !== transactionId), allowNewIssues: true });
     return true;
   }
 };
@@ -2228,7 +2251,7 @@ const MetadataEngine = {
     const rawExamName = raw.EXAM_NAME || raw.examInfo || raw.EXAM || fallbackDefaults.exam || 'Railway Official PYQ';
     const rawBoard = raw.EXAM_BOARD || raw.board || '';
     const year = String(raw.YEAR || raw.year || fallbackDefaults.year || '2024').trim();
-    const shift = raw.PAPER || raw.paperDate || raw.SHIFT || fallbackDefaults.shift || 'Shift-I';
+    const shift = raw.PAPER || raw.paperDate || raw.SHIFT || (fallbackDefaults.shift ?? 'Shift-I'); // V2.9.0: a cleared shift stays cleared
     
     const examProfile = UniversalExamRegistry.getOrRegisterExam(rawExamName, rawBoard, year, fallbackDefaults.examId || '');
     examProfile.subjects.add(subject);
@@ -3283,6 +3306,7 @@ async function initApp() {
     }
     releaseHydrationGate();
     DataSafety.paint();
+    paintVersion();
     try { if (navigator.storage?.persist) navigator.storage.persisted().then(p => p ? true : navigator.storage.persist()).then(v => { DataHealth.persisted = !!v; }).catch(() => {}); } catch (_) {}
     setTimeout(() => DataSafety.dailySnapshot(), 4000);
     setTimeout(() => { cloudBoot().catch(e => console.warn('[Cloud] start failed', e)); }, 200);
@@ -3317,7 +3341,7 @@ function synchronizeTaxonomyEngine() {
           concept: priorMeta.concept,
           exam: priorMeta.exam || q.examInfo || mod.examId,
           year: priorMeta.year || q.year || mod.examYear,
-          shift: priorMeta.shift || q.paperDate,
+          shift: priorMeta.shift ?? q.paperDate,
           difficulty: priorMeta.difficulty,
           type: priorMeta.theoryOrNumerical,
           qIndex: idx
@@ -3342,6 +3366,69 @@ function synchronizeTaxonomyEngine() {
   TaxonomyEngine.buildTree();
 }
 
+
+/* =========================================================================
+   DATA CORE — the one way to change questions (V2.8.0)
+   Every feature that adds, edits, moves or removes questions goes through
+   DataCore.commit / DataCore.mutate. One place that:
+     1. builds the new data on a copy (the live data is never half-changed),
+     2. checks it — a change may not ADD problems (old ones never block),
+     3. keeps an automatic backup first when asked,
+     4. saves it in one step (questions + import history together),
+     5. rebuilds the indexes, and rolls everything back if anything fails.
+   Rule for new features: do not assign AppModules or call saveModules()
+   for content changes — call DataCore.
+   ========================================================================= */
+const DataCore = {
+  log: [],
+  listeners: [],
+  onChange(fn) { this.listeners.push(fn); },
+  copy() { return JSON.parse(JSON.stringify(AppModules)); },
+  async commit(next, opts = {}) {
+    if (!Array.isArray(next)) throw new Error('DataCore.commit: module list required');
+    if (typeof DataHealth !== 'undefined' && DataHealth.readOnly) throw new Error('यह ऐप दूसरे tab में खुला है — यहाँ बदलाव save नहीं होंगे।');
+    const before = AppModules, beforeHistory = ImportHistory;
+    const issuesBefore = runDataIntegrityAudit().issueCount;
+    AppModules = next;
+    synchronizeTaxonomyEngine();
+    const after = runDataIntegrityAudit();
+    if (!opts.allowNewIssues && after.issueCount > issuesBefore) {
+      AppModules = before; synchronizeTaxonomyEngine();
+      const e = new Error(`Data जाँच में नई गड़बड़ी (duplicate ID: ${after.duplicateIds.length}, खाली सवाल: ${after.missingStem.length}, गलत options/उत्तर: ${after.malformedOptions.length})। पुराना data नहीं बदला गया।`);
+      e.audit = after; throw e;
+    }
+    if (opts.snapshot) {
+      try { await DataSafety.snapshot(typeof opts.snapshot === 'string' ? opts.snapshot : (opts.reason || 'बदलाव से पहले'), { modules: before, importHistory: beforeHistory }); }
+      catch (e) { console.warn('[DataCore] backup before change failed', e); }
+    }
+    try {
+      if (opts.importHistory) await AppStorage.commitValidatedImport({ modules: next, importHistory: opts.importHistory });
+      else await StorageWriteQueue.enqueue(() => AppStorage.setRawDirect(STORAGE_KEY, JSON.stringify(next)));
+    } catch (e) {
+      AppModules = before; ImportHistory = beforeHistory; synchronizeTaxonomyEngine();
+      throw e;
+    }
+    if (opts.importHistory) ImportHistory = opts.importHistory;
+    try { SBCache = null; } catch (_) {}
+    const entry = { at: new Date().toISOString(), reason: String(opts.reason || 'change').slice(0, 80), questions: after.total, issues: after.issueCount };
+    this.log.unshift(entry); this.log.length = Math.min(this.log.length, 30);
+    this.listeners.forEach(fn => { try { fn(entry); } catch (_) {} });
+    return after;
+  },
+  // Change a copy with fn(modules) and commit it. Returns whatever fn returns.
+  async mutate(reason, fn, opts = {}) {
+    const next = this.copy();
+    const result = fn(next);
+    await this.commit(next, { reason, ...opts });
+    return result;
+  },
+  // Questions of the active workspace in a module list, by id.
+  questionsById(mods, ws = WorkspaceManager.current()) {
+    const map = new Map();
+    (mods || []).forEach(m => { if (m.workspaceId !== ws.id || m.workspaceType !== ws.type) return; (m.groups || []).forEach(g => (g.questions || []).forEach(q => map.set(String(q.canonicalQId), { q, m }))); });
+    return map;
+  }
+};
 
 /* =========================================================================
    PHASE 5A — COMPETITIVE EXAM CONTEXT
@@ -4193,10 +4280,11 @@ async function dcApplyToSelected(kind) {
   if (targets.length !== ids.length) { dcShowStatus('Some selected questions are not in this workspace. Nothing was changed.', 'bad'); return; }
   const label = { pyq: 'mark as PYQ', practice: 'mark as practice (not PYQ)', clear: 'clear the PYQ mark', fixctx: "set exam/year to their topic's exam/year" }[kind];
   if (!confirm(`${targets.length} question(s): ${label}?`)) return;
-  const snapshot = JSON.stringify(AppModules);
   try {
     let changed = 0;
-    targets.forEach(q => {
+    await DataCore.mutate('Data Control: ' + label, mods => {
+    const byId = DataCore.questionsById(mods, ws);
+    ids.map(id => byId.get(id)?.q).filter(Boolean).forEach(q => {
       q.metadata = q.metadata || {};
       if (kind === 'pyq') { q.metadata.sourceType = 'PYQ'; changed++; }
       if (kind === 'practice') { q.metadata.sourceType = 'PRACTICE'; changed++; }
@@ -4210,18 +4298,12 @@ async function dcApplyToSelected(kind) {
         }
       }
     });
-    synchronizeTaxonomyEngine();
-    const audit = runDataIntegrityAudit();
-    if (!audit.healthy) throw new Error('Integrity audit failed after the change.');
-    await saveModules();
-    SBCache = null;
+    });
     openDataControlModal();
     dcShowStatus(`✓ ${changed} question(s) updated.`, 'good');
   } catch (e) {
-    try { AppModules = JSON.parse(snapshot); synchronizeTaxonomyEngine(); await saveModules(); } catch (_) {}
-    SBCache = null;
     openDataControlModal();
-    dcShowStatus('Change blocked; previous data restored. ' + (e.message || e), 'bad');
+    dcShowStatus('Change blocked; previous data kept. ' + (e.message || e), 'bad');
   }
 }
 // Status inside the Data Control sheet (a toast would replace the sheet).
@@ -4258,6 +4340,8 @@ function openDataControlModal() {
     <div class="dc-toolbar">
       <input id="dcSearch" class="search-input" placeholder="Search Q.No, question, topic, exam, path…" value="${escapeHtml(DataControlView.term)}">
       <button class="btn-action-sm" onclick="runAndShowDataAudit()">🔍 Audit</button>
+      <button class="btn-action-sm" onclick="closeModal();openHealthCheck()">🩺 Health</button>
+      <button class="btn-action-sm" onclick="closeModal();openCleanup()">🧹 सफ़ाई</button>
       <button class="btn-action-sm" onclick="closeModal();openBackupCenter()">💾 Backup</button>
       <button class="btn-action-sm" onclick="downloadDataSnapshot()">💾 Snapshot</button>
       <button class="btn-action-sm" style="color:var(--danger); border-color:var(--danger);" onclick="undoLastImportUI()">⏪ Undo Last Import</button>
@@ -5011,7 +5095,8 @@ function nbModalIsOpen() { return document.getElementById('modalSheet')?.classLi
 function nbFocusModal() {
   const sheet = document.getElementById('modalSheet'); if (!sheet) return;
   // A form field gets focus directly; otherwise the dialog itself (no stray focus ring on a button).
-  const first = sheet.querySelector('#modalSheetBody input:not([type=hidden]):not([disabled]), #modalSheetBody select, #modalSheetBody textarea');
+  // Sheets marked data-no-autofocus (long lists with inputs) should not pop the phone keyboard open.
+  const first = sheet.querySelector('[data-no-autofocus]') ? null : sheet.querySelector('#modalSheetBody input:not([type=hidden]):not([disabled]), #modalSheetBody select, #modalSheetBody textarea');
   try { (first || sheet).focus({ preventScroll: true }); } catch (_) {}
 }
 const _u5OpenModal = openModal, _u5CloseModal = closeModal;
@@ -5550,16 +5635,7 @@ const ImportEngine = {
         beforeModule: before
       };
       const nextHistory = [audit, ...ImportHistory.map((h, i) => (i >= 2 && h.beforeModule !== undefined ? { ...h, beforeModule: undefined, undoUnavailable: true } : h))].slice(0, 20);
-      const issuesBefore = runDataIntegrityAudit().issueCount;
-      AppModules = nextModules;
-      synchronizeTaxonomyEngine();
-      const after = runDataIntegrityAudit();
-      if (after.issueCount > issuesBefore) {
-        throw new Error(`Data जाँच में नई गड़बड़ी मिली (duplicate ID: ${after.duplicateIds.length}, खाली सवाल: ${after.missingStem.length}, गलत options: ${after.malformedOptions.length})। पुराना data नहीं बदला गया।`);
-      }
-      try { await DataSafety.snapshot('Import से पहले: ' + analysis.topicTitle, { modules: originalModules, importHistory: originalHistory }); } catch (e) { console.warn('[Import] pre-import snapshot failed', e); }
-      await AppStorage.commitValidatedImport({ modules: nextModules, importHistory: nextHistory });
-      ImportHistory = nextHistory;
+      await DataCore.commit(nextModules, { reason: 'Import: ' + analysis.topicTitle, snapshot: 'Import से पहले: ' + analysis.topicTitle, importHistory: nextHistory });
       const { beforeModule, ...publicAudit } = audit;
       return { ...publicAudit, totalQuestions: incoming.length, samplePath: analysis.samplePath, sampleExamPath: analysis.sampleExamPath };
     } catch (err) {
@@ -5811,20 +5887,15 @@ async function deleteOwnedQuestions(ids) {
   if (!owned.size) { openCustomToast('चयनित प्रश्न active workspace में नहीं हैं; कोई बदलाव नहीं किया गया।'); return false; }
   if (owned.size !== selected.size) { openCustomToast('कुछ चयनित प्रश्न active workspace के स्वामित्व में नहीं हैं; सुरक्षा के लिए पूरी deletion रोक दी गई।'); return false; }
   if (!confirm(`${owned.size} question(s) को active workspace (${workspace.name}) से delete करना है?\n\nDelete से पहले अपने-आप backup बनेगा।`)) return false;
-  const before = AppModules;
   try {
-    await DataSafety.snapshot(`Delete से पहले (${owned.size} सवाल)`);
-    AppModules = before.map(mod => {
+    const next = AppModules.map(mod => {
       if (mod?.workspaceId !== workspace.id || mod?.workspaceType !== workspace.type) return mod;
       return { ...mod, groups: (mod.groups || []).map(g => ({ ...g, questions: (g.questions || []).filter(q => !owned.has(String(q?.canonicalQId || ''))) })).filter(g => (g.questions || []).length) };
     }).filter(mod => mod?.workspaceId !== workspace.id || mod?.workspaceType !== workspace.type || (mod.groups || []).length);
-    await saveModules();
-    synchronizeTaxonomyEngine();
+    await DataCore.commit(next, { reason: `Delete ${owned.size}`, snapshot: `Delete से पहले (${owned.size} सवाल)`, allowNewIssues: true });
     openDataControlModal();
     return true;
   } catch (e) {
-    AppModules = before; synchronizeTaxonomyEngine();
-    try { await saveModules(); } catch (_) {}
     openCustomToast('Delete नहीं हुआ; पुराना data वैसा ही है।');
     return false;
   }
@@ -5840,18 +5911,14 @@ async function undoLastImportUI() {
   if (!entry) return openCustomToast('इस workspace में undo करने लायक कोई import नहीं है।');
   if (entry.beforeModule === undefined) return openCustomToast('यह पुराना import है — इसे undo नहीं कर सकते। "Backup और Restore" से पुराना backup वापस ला सकते हैं।');
   if (!confirm(`आख़िरी import वापस लें?\n\nFile: ${entry.sourceFile}\nTopic: ${entry.topicTitle}\n\n${entry.beforeModule ? 'Topic import से पहले जैसा हो जाएगा।' : 'यह topic हट जाएगा (यह इसी import से बना था)।'}`)) return;
-  const originalModules = AppModules, originalHistory = ImportHistory;
   try {
-    await DataSafety.snapshot('Undo से पहले: ' + entry.topicTitle);
     const idx = AppModules.findIndex(m => m.moduleId === entry.moduleId && WorkspaceManager.matches(m));
     const next = AppModules.slice();
     if (entry.beforeModule) { if (idx >= 0) next[idx] = entry.beforeModule; else next.push(entry.beforeModule); } else if (idx >= 0) next.splice(idx, 1);
     const nextHistory = history.filter(h => h !== entry);
-    await AppStorage.commitValidatedImport({ modules: next, importHistory: nextHistory });
-    AppModules = next; ImportHistory = nextHistory; synchronizeTaxonomyEngine();
+    await DataCore.commit(next, { reason: 'Undo import', snapshot: 'Undo से पहले: ' + entry.topicTitle, importHistory: nextHistory, allowNewIssues: true });
     openCustomToast('✅ Import वापस ले लिया गया।');
   } catch (e) {
-    AppModules = originalModules; ImportHistory = originalHistory; synchronizeTaxonomyEngine();
     openCustomToast('❌ Undo नहीं हुआ: ' + escapeHtml(e.message || e));
   }
 }
@@ -6082,6 +6149,7 @@ async function srvLogout() { await Server.logout(); ServerState.msg = 'Logout �
 function srvSelectedModules() { return Array.from(document.querySelectorAll('#srvSheet .srv-mod:checked'), x => x.value); }
 async function srvCheck() {
   const ids = srvSelectedModules(); if (!ids.length) return srvMsg('कम से कम एक topic चुनें।', 'bad');
+  if (isPristineDemo()) return srvMsg('रुकिए: इस ऐप में अभी सिर्फ़ demo सवाल हैं, आपका असली data नहीं। पहले "💾 Backup & Restore" से अपना backup वापस लाएँ, फिर भेजें — वरना demo सवाल server पर चले जाएँगे।', 'bad');
   ServerState.busy = true; ServerState.msg = ''; srvPaint();
   try { ServerState.plan = await srvBuildPlan(ids); const t = ServerState.plan.totals; ServerState.msg = `जाँच पूरी: ${t.new} नए, ${t.changed} बदले, ${t.same} पहले जैसे${t.skipped ? `, ${t.skipped} रुके (नीचे देखें)` : ''}।`; ServerState.msgKind = t.skipped || t.conflict ? 'warn' : 'good'; }
   catch (e) { ServerState.plan = null; ServerState.msg = e.message; ServerState.msgKind = 'bad'; }
@@ -6207,10 +6275,7 @@ async function cloudPullContent() {
   const next = [...keep, ...modules];
   const changed = JSON.stringify(before.filter(m => m.workspaceId === ws.id && m.source === 'server').map(m => [m.moduleId, m.groups.map(g => g.questions.map(q => q.contentHash))])) !== JSON.stringify(modules.map(m => [m.moduleId, m.groups.map(g => g.questions.map(q => q.contentHash))]));
   if (changed) {
-    try { await DataSafety.snapshot('Server से सवाल लाने से पहले'); } catch (_) {}
-    AppModules = next;
-    try { await saveModules(); } catch (e) { AppModules = before; throw e; }
-    synchronizeTaxonomyEngine();
+    await DataCore.commit(next, { reason: 'Server से सवाल', snapshot: 'Server से सवाल लाने से पहले', allowNewIssues: true });
   }
   CloudState.serverQuestions = rows.length; CloudState.lastContentAt = new Date().toISOString();
   return { questions: rows.length, topics: modules.length, changed };
@@ -9091,6 +9156,273 @@ function getWorkspaceModules(){return WorkspaceManager.filterModules(AppModules)
 function runPhase3WorkspaceAudit(){const w=WorkspaceManager.current();const all=AppModules||[];const untagged=all.filter(m=>!m.workspaceId||!m.workspaceType).length;const visible=WorkspaceManager.filterModules(all);const wrong=visible.filter(m=>m.workspaceId!==w.id).length;const indexWrong=Array.from(IndexEngine.registry.values()).filter(q=>!WorkspaceManager.matches(q)).length;return{activeWorkspace:w.id,activeType:w.type,totalModules:all.length,visibleModules:visible.length,untaggedModules:untagged,airlockViolations:wrong,indexedCrossWorkspaceEntries:indexWrong,pass:untagged===0&&wrong===0&&indexWrong===0}}
 
 /* =========================================================================
+   HEALTH CHECK + version (V2.8.0)
+   One screen that tells the admin, in plain words, whether the app's data
+   and connections are healthy — and a text report to send for support.
+   ========================================================================= */
+// Starter (demo) questions, remembered before anything can change them.
+const starterKey = (m, q) => m.moduleId + '|' + String(q.QUESTION_EN || q.QUESTION_HI || '').trim();
+const STARTER_SIGNATURE = DEFAULT_MODULES.flatMap(m => (m.groups || []).flatMap(g => (g.questions || []).map(q => starterKey(m, q)))).sort().join('\n');
+function appVersionShort() { return String(appVersionLabel()).split('_')[0]; }
+// True when this app still holds only the untouched demo questions (e.g. a new install before restoring a backup).
+function isPristineDemo(ws = WorkspaceManager.current()) {
+  const sig = WorkspaceManager.filterModules(AppModules).flatMap(m => (m.groups || []).flatMap(g => (g.questions || []).map(q => starterKey(m, q)))).sort().join('\n');
+  return !(ImportHistory || []).length && sig === STARTER_SIGNATURE;
+}
+function healthCollect() {
+  const items = [];
+  const add = (level, title, detail, action) => items.push({ level, title, detail, action });
+  const a = runDataIntegrityAudit();
+  const ws = WorkspaceManager.current();
+  const wsQs = WorkspaceManager.filterModules(AppModules).reduce((n, m) => n + (m.groups || []).reduce((x, g) => x + (g.questions || []).length, 0), 0);
+  add('ok', `Version ${appVersionShort()}`, `${ws.name} · इस workspace में ${wsQs} सवाल, कुल ${a.total}`);
+  // storage
+  const failed = DataHealth.failedKeys.size;
+  add(failed ? 'bad' : 'ok', failed ? 'कुछ बदलाव save नहीं हुए' : 'Data save हो रहा है', `Storage: ${AppStorage.useFallback ? 'छोटी (localStorage)' : 'IndexedDB'}${DataHealth.persisted === true ? ' · browser इसे नहीं हटाएगा' : ' · browser जगह कम होने पर हटा सकता है'}`, failed ? { label: 'फिर कोशिश करें', call: 'retryAllSaves();openHealthCheck()' } : null);
+  if (DataHealth.readOnly) add('warn', 'यह ऐप दूसरे tab में खुला है', 'यहाँ के बदलाव save नहीं होंगे।', { label: 'यहीं इस्तेमाल करें', call: 'tabGuardTakeOver()' });
+  if (DataHealth.corrupt.length) add('warn', `${DataHealth.corrupt.length} हिस्सा पढ़ा नहीं जा सका`, 'खराब copy सुरक्षित रखी है।', { label: 'देखें', call: 'openBackupCenter()' });
+  // question data
+  const bad = a.duplicateIds.length + a.missingStem.length + a.malformedOptions.length;
+  add(bad ? 'warn' : 'ok', bad ? `${bad} ${bad === 1 ? 'सवाल' : 'सवालों'} में गड़बड़ी` : 'सवालों का data ठीक है',
+    bad ? `duplicate ID ${a.duplicateIds.length} · खाली सवाल ${a.missingStem.length} · गलत options/उत्तर ${a.malformedOptions.length}${a.malformedOptions.length ? ' (जैसे ' + a.malformedOptions.slice(0, 3).join(', ') + ')' : ''}` : `${a.total} सवाल जाँचे: ID, सवाल, options और उत्तर सब ठीक`,
+    bad ? { label: 'Data Control', call: 'closeModal();openDataControlModal()' } : null);
+  const oldStyle = WorkspaceManager.filterModules(AppModules).reduce((n, m) => n + (m.groups || []).reduce((x, g) => x + (g.questions || []).filter(q => !['IMPORTED', 'SERVER', 'CLEANED'].includes(q.metadata?.status)).length, 0), 0);
+  if (oldStyle) add('info', `${oldStyle} सवाल पुराने तरीके से import हुए`, 'इनमें कुछ exam/year/shift अपने-आप भरे गए हो सकते हैं — सफ़ाई tool से जाँचें।', { label: 'सफ़ाई', call: 'openCleanup()' });
+  if (isPristineDemo()) add('warn', 'अभी सिर्फ़ demo सवाल हैं', 'अपना data लाने के लिए Backup restore करें या Google से login करें।', { label: 'Backup', call: 'openBackupCenter()' });
+  // backups
+  add(StudySettings.lastBackupAt ? 'ok' : 'info', 'Backup', `आख़िरी download: ${StudySettings.lastBackupAt ? fmtWhen(StudySettings.lastBackupAt) : 'कभी नहीं'} · अपने-आप backup: रोज़ + हर बड़े बदलाव से पहले`, { label: 'खोलें', call: 'openBackupCenter()' });
+  // account / sync
+  const s = ServerState.session;
+  const pending = AttemptHistory.filter(x => !x.synced && !x.syncSkip).length;
+  if (!s) add('info', 'Login नहीं है', cloudOnline() ? 'Google से login करने पर progress server पर सुरक्षित रहती है।' : 'Login सिर्फ़ install वाले ऐप / link में चलता है।', cloudOnline() ? { label: 'Login', call: 'openAccount()' } : null);
+  else add(pending > 50 ? 'warn' : 'ok', `${s.email || 'Login'}${CloudState.isAdmin ? ' · Admin' : ''}`, `आख़िरी sync: ${CloudState.lastSyncAt ? fmtWhen(CloudState.lastSyncAt) : '—'} · भेजने बाकी: ${pending}${CloudState.msg && CloudState.msgKind !== 'good' ? ' · ' + CloudState.msg : ''}`, { label: 'Sync', call: "cloudSync('manual').then(()=>openHealthCheck())" });
+  // app install
+  const standalone = window.matchMedia?.('(display-mode: standalone)').matches || navigator.standalone === true;
+  add(standalone ? 'ok' : 'info', standalone ? 'Install वाला ऐप' : 'Browser में खुला', `${navigator.serviceWorker?.controller ? 'बिना internet खुल सकता है' : 'Offline तैयारी नहीं (file या पहली बार)'} · ${navigator.onLine === false ? 'अभी internet नहीं' : 'internet चालू'}`);
+  // recent data changes
+  if (DataCore.log.length) add('info', 'हाल के बदलाव', DataCore.log.slice(0, 4).map(l => `${fmtWhen(l.at)} ${l.reason}`).join(' · '));
+  return { items, audit: a };
+}
+function healthReportText() {
+  const { items } = healthCollect();
+  const mark = { ok: '✓', warn: '⚠', bad: '✕', info: '•' };
+  return `TestBook Health Check — ${new Date().toLocaleString('hi-IN')}\n` + items.map(i => `${mark[i.level]} ${i.title}: ${i.detail}`).join('\n');
+}
+async function healthCopy() {
+  const t = healthReportText();
+  try { await navigator.clipboard.writeText(t); openCustomToast('रिपोर्ट copy हो गई — chat में paste कर दें।'); }
+  catch (_) { openModal('🩺 रिपोर्ट', `<textarea class="hc-text" readonly>${escapeHtml(t)}</textarea><p class="srv-note">ऊपर का text select करके copy करें।</p>`); }
+}
+async function healthServerPing() {
+  const el = document.getElementById('hcPing'); if (el) el.textContent = '⏳ जाँच…';
+  try {
+    const r = await fetch(ServerConfig.url + '/auth/v1/settings', { headers: { apikey: ServerConfig.key } });
+    if (el) el.textContent = r.ok ? '✓ Server से जुड़ाव ठीक' : `✕ Server ने मना किया (HTTP ${r.status})`;
+  } catch (_) { if (el) el.textContent = '✕ Server तक नहीं पहुँचे (internet?)'; }
+}
+function openHealthCheck() {
+  closeDrawer();
+  const { items } = healthCollect();
+  const worst = items.some(i => i.level === 'bad') ? 'bad' : items.some(i => i.level === 'warn') ? 'warn' : 'ok';
+  const icon = { ok: '✓', warn: '⚠️', bad: '✕', info: 'ℹ️' };
+  openModal('🩺 Health Check', `<div class="hc">
+    <div class="hc-sum ${worst}"><b>${worst === 'ok' ? '✓ सब ठीक है' : worst === 'warn' ? (n => `⚠️ ${n} ${n === 1 ? 'बात' : 'बातों'} पर ध्यान दें`)(items.filter(i => i.level === 'warn').length) : '✕ कुछ ज़रूरी ठीक करना है'}</b><span>नीचे हर हिस्से की हालत है।</span></div>
+    ${items.map(i => `<div class="hc-row ${i.level}"><span class="hc-ic" aria-hidden="true">${icon[i.level]}</span><span class="hc-tx"><b>${escapeHtml(i.title)}</b><small>${escapeHtml(i.detail)}</small></span>${i.action ? `<button type="button" class="btn-action-sm" onclick="${i.action.call}">${escapeHtml(i.action.label)}</button>` : ''}</div>`).join('')}
+    <div class="hc-row info"><span class="hc-ic" aria-hidden="true">☁️</span><span class="hc-tx"><b>Server</b><small id="hcPing">जाँचने के लिए बटन दबाएँ</small></span><button type="button" class="btn-action-sm" onclick="healthServerPing()">जाँचें</button></div>
+    <button type="button" class="btn-nav primary srv-wide" onclick="healthCopy()">📋 रिपोर्ट copy करें</button>
+    <p class="srv-note">कोई दिक्कत हो तो यह रिपोर्ट copy करके Claude को भेज दें — इसमें कोई password या निजी जवाब नहीं होता।</p>
+  </div>`);
+}
+function paintVersion() { const el = document.getElementById('drwVersion'); if (el) el.textContent = `TestBook ${appVersionShort()}`; }
+
+/* =========================================================================
+   DATA CLEANUP (V2.9.0) — find and fix problems left by the old import
+   engine (before V2.5.0): invented exam/year/shift, misread exam names,
+   bad answer format, English text in Hindi options, answer always "A".
+   Every fix goes through DataCore (copy → check → backup → save).
+   ========================================================================= */
+const CLEAN_INVENTED_EXAM = 'railway-official-pyq';
+const CLEAN_KEEP_LAST = /none of (these|the above)|all of (these|the above)|both|neither|cannot be determined|इनमें से कोई नहीं|उपरोक्त सभी|इनमें से सभी|दोनों/i;
+var CleanupState = { scan: null, didBackup: false, msg: '', msgKind: '' };
+
+function cleanSubjective(q) { return String(q.metadata?.questionFormat || q.questionFormat || '').toUpperCase() === 'SUBJECTIVE'; }
+function cleanModules(mods) { return WorkspaceManager.filterModules(mods || AppModules).filter(m => m.source !== 'server'); }
+function cleanRef(m, q) { return { moduleId: m.moduleId, id: String(q.canonicalQId), no: q.originalQNo, topic: m.topicTitle || m.moduleId }; }
+// Stable, per-question shuffle (same result every time for the same id).
+function cleanPermutation(id, n) {
+  const idx = [...Array(n).keys()]; let h = (parseInt(importHash(id).slice(0, 6), 36) | 0) || 1;
+  const next = () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return (h >>> 0); }; // xorshift32 — exact integer maths
+  for (let i = 0; i < 3; i++) next();
+  for (let i = n - 1; i > 0; i--) { const j = next() % (i + 1); [idx[i], idx[j]] = [idx[j], idx[i]]; }
+  return idx;
+}
+function cleanShuffled(q) {
+  const opts = q.options || []; if (opts.length !== 4) return null;
+  const movable = opts.map((o, i) => CLEAN_KEEP_LAST.test(`${o.en} ${o.hi}`) ? -1 : i).filter(i => i >= 0);
+  if (movable.length < 2) return null;
+  if (/\b(option|विकल्प)\s*\(?[a-d]\)?/i.test(q.EXPLANATION || '')) return null; // explanation names a letter — leave it
+  const perm = cleanPermutation(String(q.canonicalQId), movable.length);
+  const out = opts.map(o => ({ ...o }));
+  movable.forEach((slot, k) => { const from = opts[movable[perm[k]]]; out[slot] = { ...from, letter: opts[slot].letter }; });
+  const oldIdx = opts.findIndex(o => String(o.letter).toUpperCase() === String(q.answer).toUpperCase());
+  const newIdx = out.findIndex(o => o.en === opts[oldIdx]?.en && o.hi === opts[oldIdx]?.hi);
+  if (oldIdx < 0 || newIdx < 0) return null;
+  return { options: out, answer: out[newIdx].letter };
+}
+
+/* ---------- scan ---------- */
+function cleanupScan() {
+  const groups = {
+    answer: { title: 'उत्तर का format गलत', help: 'जैसे "(C)" या "b" — app इसे सही उत्तर नहीं मानता, इसलिए सवाल हमेशा गलत गिना जाता है।', fix: 'A–D में बदलें', items: [] },
+    answerManual: { title: 'उत्तर समझ नहीं आया', help: 'इन्हें Data Control में खोलकर सही उत्तर चुनें।', items: [], manual: true },
+    hindi: { title: 'Hindi option में अंग्रेज़ी/फ़ालतू text', help: 'पुराना import explanation की "A:" जैसी लाइन को Hindi option में डाल देता था।', fix: 'Hindi में English वाला option रखें', items: [] },
+    examMisread: { title: 'Exam गलत पहचाना गया', help: 'पुराना engine नाम के टुकड़े मिलाता था, जैसे "SSC MTS" को "SSC JE" मान लेना।', fix: 'सही exam रखें', items: [] },
+    examInvented: { title: 'Exam और year अपने-आप भरे गए', help: 'File में EXAM_NAME/YEAR नहीं था, तो पुराने engine ने "Railway Official PYQ 2024" भर दिया। हर topic के लिए सही exam और year चुनें।', items: [], perTopic: true },
+    yearBad: { title: 'Year सही नहीं', help: 'Year 4 अंकों का होना चाहिए, जैसे 2023।', items: [], perTopic: true },
+    shift: { title: '"Shift-I" अपने-आप भरा गया', help: 'File में shift नहीं था। गलत shift दिखाने से अच्छा है ख़ाली रखें।', fix: 'Shift ख़ाली करें', items: [] },
+    subtopic: { title: '"General Subtopic" अपने-आप भरा गया', help: 'File में sub-topic नहीं था।', fix: '"General" लिखें', items: [] },
+    sameLetter: { title: 'लगभग हर सही उत्तर एक ही option पर', help: 'Student अंदाज़े से वही option दबाकर नंबर ले सकता है। Options का क्रम बदलने से सही उत्तर भी साथ बदल जाता है; "None of these" जैसे options अपनी जगह रहते हैं।', fix: 'Options का क्रम बदलें', items: [], perTopicInfo: true },
+    duplicates: { title: 'एक जैसा सवाल दो topics में', help: 'देखकर तय करें कि कौन सा रखना है (Data Control में delete करें)।', items: [], manual: true }
+  };
+  const mods = cleanModules();
+  const fp = new Map();
+  mods.forEach(m => {
+    const qs = (m.groups || []).flatMap(g => g.questions || []);
+    const letters = {};
+    qs.forEach(q => {
+      const md = q.metadata || {}, ref = cleanRef(m, q);
+      if (!cleanSubjective(q) && !/^[A-D]$/.test(String(q.answer || ''))) {
+        const a = normalizeAnswerLetter(q.answer);
+        if (a.letter) groups.answer.items.push({ ...ref, from: String(q.answer), to: a.letter }); else groups.answerManual.items.push({ ...ref, from: String(q.answer || '(ख़ाली)') });
+      }
+      const badHi = (q.options || []).filter(o => o.hi && o.en && o.hi !== o.en && !/[ऀ-ॿ]/.test(o.hi) && /[A-Za-z]{3,}/.test(o.hi));
+      if (badHi.length) groups.hindi.items.push({ ...ref, from: badHi.map(o => `${o.letter}: ${o.hi}`).join(' · ').slice(0, 80), to: badHi.map(o => `${o.letter}: ${o.en}`).join(' · ').slice(0, 80) });
+      const raw = String(q.examInfo || '').trim();
+      if (md.examId === CLEAN_INVENTED_EXAM && (!raw || raw === 'Railway Official PYQ')) groups.examInvented.items.push({ ...ref, from: `${md.exam || 'Railway Official PYQ'} ${md.year || ''}`.trim() });
+      else if (raw && md.examId) {
+        const strict = deriveExamIdStrict(raw);
+        if (strict && strict !== md.examId && examDisplayName(md.examId, '') !== raw && UniversalExamRegistry.deriveExamIdLegacy(raw) === md.examId) groups.examMisread.items.push({ ...ref, from: md.exam || md.examId, to: examDisplayName(strict, raw), toId: strict, raw });
+      }
+      if (md.examId !== CLEAN_INVENTED_EXAM && md.year && !/^(19|20)\d{2}$/.test(String(md.year))) groups.yearBad.items.push({ ...ref, from: String(md.year) });
+      if ((md.shift === 'Shift-I') && (!q.paperDate || q.paperDate === 'Shift-I')) groups.shift.items.push({ ...ref, from: 'Shift-I', to: '(ख़ाली)' });
+      if (md.subtopic === 'General Subtopic') groups.subtopic.items.push({ ...ref, from: 'General Subtopic', to: 'General' });
+      if (!cleanSubjective(q) && /^[A-D]$/.test(String(q.answer || ''))) letters[q.answer] = (letters[q.answer] || 0) + 1;
+      const f = importFingerprint(q); if (f.length > 12) { if (fp.has(f) && fp.get(f).moduleId !== m.moduleId) groups.duplicates.items.push({ ...ref, from: `= ${fp.get(f).topic} Q.${fp.get(f).no}` }); else if (!fp.has(f)) fp.set(f, ref); }
+    });
+    const total = Object.values(letters).reduce((a, b) => a + b, 0), top = Object.entries(letters).sort((a, b) => b[1] - a[1])[0];
+    if (total >= 8 && top && top[1] / total >= 0.85) {
+      const can = qs.filter(q => cleanShuffled(q)).length;
+      if (can) groups.sameLetter.items.push({ moduleId: m.moduleId, topic: m.topicTitle || m.moduleId, id: m.moduleId, no: '', from: `${top[1]} / ${total} उत्तर "${top[0]}"`, to: `${can} सवालों के options बदलेंगे` });
+    }
+  });
+  const total = Object.values(groups).reduce((n, g) => n + g.items.length, 0);
+  CleanupState.scan = { groups, total, at: Date.now() };
+  return CleanupState.scan;
+}
+
+/* ---------- fixes ---------- */
+function cleanApplyTo(mods, kind, extra = {}) {
+  const scan = CleanupState.scan; const items = scan?.groups[kind]?.items || [];
+  const byId = DataCore.questionsById(mods);
+  const modById = new Map(mods.map(m => [m.moduleId, m]));
+  let n = 0;
+  const now = new Date().toISOString();
+  const touch = q => { q.metadata = q.metadata || {}; q.metadata.cleanedAt = now; n++; };
+  if (kind === 'sameLetter') {
+    items.forEach(it => { const m = modById.get(it.moduleId); (m?.groups || []).forEach(g => (g.questions || []).forEach(q => { const s = cleanShuffled(q); if (s) { q.options = s.options; q.answer = s.answer; touch(q); } })); });
+    return n;
+  }
+  if (kind === 'examInvented' || kind === 'yearBad') {
+    const { moduleId, examName, year } = extra;
+    const examId = deriveExamIdStrict(examName);
+    if (!examId) throw new Error('Exam का नाम लिखें।');
+    if (!/^(19|20)\d{2}$/.test(String(year))) throw new Error('Year 4 अंकों में लिखें, जैसे 2023।');
+    const name = examDisplayName(examId, examName);
+    items.filter(it => it.moduleId === moduleId).forEach(it => { const hit = byId.get(it.id); if (!hit) return; const q = hit.q; q.examInfo = name; q.year = String(year); q.metadata.examId = examId; q.metadata.exam = name; q.metadata.year = String(year); touch(q); });
+    const m = modById.get(moduleId);
+    if (m && (!m.examId || m.examId === CLEAN_INVENTED_EXAM || kind === 'examInvented')) { m.examId = examId; m.examYear = String(year); }
+    return n;
+  }
+  items.forEach(it => {
+    const hit = byId.get(it.id); if (!hit) return; const q = hit.q, m = hit.m;
+    if (kind === 'answer') { q.answer = it.to; touch(q); }
+    if (kind === 'hindi') { (q.options || []).forEach(o => { if (o.hi && o.en && o.hi !== o.en && !/[ऀ-ॿ]/.test(o.hi) && /[A-Za-z]{3,}/.test(o.hi)) o.hi = o.en; }); touch(q); }
+    if (kind === 'examMisread') {
+      const oldId = q.metadata.examId; q.metadata.examId = it.toId; q.metadata.exam = it.to; q.examInfo = it.to; touch(q);
+      if (m.examId === oldId) m.examId = it.toId;
+    }
+    if (kind === 'shift') { q.paperDate = ''; q.metadata.shift = ''; touch(q); }
+    if (kind === 'subtopic') { q.metadata.subtopic = 'General'; touch(q); }
+  });
+  return n;
+}
+async function cleanupFix(kind, extra) {
+  const label = CleanupState.scan?.groups[kind]?.title || kind;
+  try {
+    const n = await DataCore.mutate('सफ़ाई: ' + label, mods => cleanApplyTo(mods, kind, extra), { snapshot: CleanupState.didBackup ? false : 'सफ़ाई से पहले', allowNewIssues: false });
+    CleanupState.didBackup = true;
+    cleanupScan();
+    CleanupState.msg = `✓ ${n} सवाल ठीक किए: ${label}`; CleanupState.msgKind = 'good';
+  } catch (e) { CleanupState.msg = 'नहीं हुआ: ' + (e.message || e); CleanupState.msgKind = 'bad'; }
+  cleanupPaint();
+}
+async function cleanupFixTopic(kind, moduleId) {
+  const name = document.getElementById('clExam-' + moduleId)?.value.trim();
+  const year = document.getElementById('clYear-' + moduleId)?.value.trim();
+  return cleanupFix(kind, { moduleId, examName: name, year });
+}
+// Questions with nothing left to fix are marked as checked, so Health Check stops counting them.
+async function cleanupFinish() {
+  const scan = cleanupScan();
+  const open = new Set(Object.entries(scan.groups).filter(([k]) => k !== 'sameLetter' && k !== 'duplicates').flatMap(([, g]) => g.items.map(i => i.id)));
+  try {
+    const n = await DataCore.mutate('सफ़ाई पूरी', mods => {
+      let c = 0;
+      cleanModules(mods).forEach(m => (m.groups || []).forEach(g => (g.questions || []).forEach(q => { if (!open.has(String(q.canonicalQId)) && !['IMPORTED', 'SERVER', 'CLEANED'].includes(q.metadata?.status)) { q.metadata = q.metadata || {}; q.metadata.status = 'CLEANED'; c++; } })));
+      return c;
+    }, { allowNewIssues: false });
+    CleanupState.msg = `✓ ${n} सवाल जाँचे हुए माने गए।${open.size ? ` ${open.size} में अभी भी कुछ बाकी है।` : ''}`; CleanupState.msgKind = 'good';
+  } catch (e) { CleanupState.msg = 'नहीं हुआ: ' + (e.message || e); CleanupState.msgKind = 'bad'; }
+  cleanupPaint();
+}
+
+/* ---------- sheet ---------- */
+function cleanupPaint() { const el = document.getElementById('cleanSheet'); if (el) el.innerHTML = cleanupHtml(); }
+function cleanupHtml() {
+  const s = CleanupState.scan || cleanupScan();
+  const msg = CleanupState.msg ? `<div class="srv-msg ${CleanupState.msgKind}" role="status">${escapeHtml(CleanupState.msg)}</div>` : '';
+  const examOptions = [...new Set([...UniversalExamRegistry.getAllExams().map(e => e.examName), ...Object.values(UniversalExamRegistry.knownProfiles).map(p => p.name)])].filter(n => n && n !== 'Railway Official PYQ').sort();
+  const ex = it => `<li>${it.no ? `Q.${escapeHtml(it.no)} · ` : ''}${escapeHtml(it.topic)}: <s>${escapeHtml(it.from || '')}</s>${it.to ? ` → <b>${escapeHtml(it.to)}</b>` : ''}</li>`;
+  const block = (k, g) => {
+    if (!g.items.length) return '';
+    let body = '';
+    if (g.perTopic) {
+      const topics = [...new Map(g.items.map(i => [i.moduleId, i])).values()];
+      body = topics.map(t => { const n = g.items.filter(i => i.moduleId === t.moduleId).length; return `<div class="cl-topic"><b>${escapeHtml(t.topic)}</b> <small>(${n} सवाल, अभी: ${escapeHtml(t.from)})</small>
+        <div class="cl-pick"><input id="clExam-${escapeHtml(t.moduleId)}" list="clExamList" placeholder="Exam का नाम, जैसे RRB NTPC" aria-label="Exam"><input id="clYear-${escapeHtml(t.moduleId)}" inputmode="numeric" maxlength="4" placeholder="Year" aria-label="Year"><button type="button" class="btn-action-sm" onclick="cleanupFixTopic('${k}', ${nbJsAttr(t.moduleId)})">लागू करें</button></div></div>`; }).join('');
+    } else {
+      body = `<ul>${g.items.slice(0, 6).map(ex).join('')}${g.items.length > 6 ? `<li>… और ${g.items.length - 6}</li>` : ''}</ul>`;
+    }
+    const action = g.fix ? `<button type="button" class="btn-nav primary cl-fix" onclick="cleanupFix('${k}')">${escapeHtml(g.fix)} (${g.items.length})</button>` : (g.manual ? `<button type="button" class="btn-action-sm" onclick="closeModal();openDataControlModal()">Data Control खोलें</button>` : '');
+    return `<details class="cl-group ${g.manual || g.perTopic ? 'manual' : ''}" ${g.perTopic ? 'open' : ''}><summary><span class="cl-n">${g.items.length}</span><span><b>${escapeHtml(g.title)}</b><small>${escapeHtml(g.help)}</small></span></summary>${body}${action}</details>`;
+  };
+  const groupsHtml = Object.entries(s.groups).map(([k, g]) => block(k, g)).join('');
+  const oldStyle = cleanModules().reduce((n, m) => n + (m.groups || []).reduce((x, g) => x + (g.questions || []).filter(q => !['IMPORTED', 'SERVER', 'CLEANED'].includes(q.metadata?.status)).length, 0), 0);
+  return `${msg}
+    <datalist id="clExamList">${examOptions.map(n => `<option value="${escapeHtml(n)}">`).join('')}</datalist>
+    <div class="hc-sum ${s.total ? 'warn' : 'ok'}"><b>${s.total ? `${s.total} जगह सुधार की ज़रूरत` : '✓ कोई पुरानी गड़बड़ी नहीं मिली'}</b><span>${WorkspaceManager.current().name} · पुराने तरीके के ${oldStyle} सवाल जाँचे। हर सुधार से पहले अपने-आप backup बनता है।</span></div>
+    ${groupsHtml}
+    <div class="srv-actions"><button type="button" class="btn-nav" onclick="cleanupScan();cleanupPaint()">🔄 फिर जाँचें</button><button type="button" class="btn-nav primary" onclick="cleanupFinish()">✓ जाँच पूरी</button></div>
+    <p class="srv-note">सुधार के बाद students तक पहुँचाने के लिए <b>☁️ Server (Admin)</b> में "जाँचें → भेजें" करें — बदले हुए सवाल अपने-आप "बदले" में आएँगे।</p>
+    ${ServerState.session && CloudState.isAdmin !== false ? `<button type="button" class="btn-action-sm" onclick="closeModal();openServerSync()">☁️ Server (Admin) खोलें</button>` : ''}`;
+}
+function openCleanup() {
+  closeDrawer();
+  CleanupState.msg = ''; cleanupScan();
+  openModal('🧹 पुराने data की सफ़ाई', `<div id="cleanSheet" class="srv cl" data-no-autofocus>${cleanupHtml()}</div>`);
+}
+
+/* =========================================================================
    9. MODAL & DIALOG CONTROLLERS
    ========================================================================= */
 function openModal(title, contentHtml) { document.getElementById('modalSheetTitle').textContent = title; const mb = document.getElementById('modalSheetBody'); mb.innerHTML = contentHtml; delete mb.dataset.toastToken; document.getElementById('modalOverlay').classList.add('open'); document.getElementById('modalSheet').classList.add('open'); }
@@ -9149,9 +9481,16 @@ async function saveQuestionDNAChanges(canonicalQId){
   if(options.some(o=>!o.en&&!o.hi))return openCustomToast('Every option must contain English or Hindi text.');
   const owners=[];for(const mod of AppModules)for(const group of mod.groups||[])for(const item of group.questions||[])if(item.canonicalQId===canonicalQId)owners.push(item);
   if(owners.length!==1||owners[0]!==q)return openCustomToast('Edit blocked: ownership is missing or ambiguous.');
-  const snapshot=JSON.stringify(AppModules);
-  try{q.QUESTION_EN=next.QUESTION_EN;q.QUESTION_HI=next.QUESTION_HI;q.answer=next.answer;q.EXPLANATION=next.EXPLANATION;q.options=options;q.metadata={...(q.metadata||{}),subject:get('dcEditSubject').trim()||q.metadata?.subject,chapter:get('dcEditChapter').trim()||q.metadata?.chapter,topic:get('dcEditTopic').trim()||q.metadata?.topic,subtopic:get('dcEditSubtopic').trim()||q.metadata?.subtopic,canonicalQId};q.fingerprint=generateContentFingerprint(q.QUESTION_EN,q.QUESTION_HI);const audit=runDataIntegrityAudit();if(!audit.healthy)throw new Error('Integrity audit failed.');await saveModules();synchronizeTaxonomyEngine();closeModal();openDataControlModal();openCustomToast('Question saved; index rebuilt.');}
-  catch(e){try{AppModules=JSON.parse(snapshot);synchronizeTaxonomyEngine();await saveModules();}catch(rollbackError){console.error('Data Control rollback failed',rollbackError);}openCustomToast('Save blocked; previous data restored. '+String(e.message||e));}
+  const meta={subject:get('dcEditSubject').trim(),chapter:get('dcEditChapter').trim(),topic:get('dcEditTopic').trim(),subtopic:get('dcEditSubtopic').trim()};
+  try{
+    await DataCore.mutate('Edit '+canonicalQId,mods=>{
+      const hit=DataCore.questionsById(mods).get(String(canonicalQId));if(!hit)throw new Error('Question not in this workspace.');
+      const c=hit.q;c.QUESTION_EN=next.QUESTION_EN;c.QUESTION_HI=next.QUESTION_HI;c.answer=next.answer;c.EXPLANATION=next.EXPLANATION;c.options=options;
+      c.metadata={...(c.metadata||{}),subject:meta.subject||c.metadata?.subject,chapter:meta.chapter||c.metadata?.chapter,topic:meta.topic||c.metadata?.topic,subtopic:meta.subtopic||c.metadata?.subtopic,canonicalQId};
+      c.fingerprint=generateContentFingerprint(c.QUESTION_EN,c.QUESTION_HI);
+    });
+    closeModal();openDataControlModal();openCustomToast('Question saved; index rebuilt.');
+  }catch(e){openCustomToast('Save blocked; previous data kept. '+String(e.message||e));}
 }
 
 function viewQuestionMeta(canonicalQId) {
@@ -9212,7 +9551,6 @@ function syncDrawerVisibility(){
   ['drwExams','drwPYQ','drwTest','drwRevision'].forEach(id=>setVisible(id,!board));
   const sections=document.querySelectorAll('#sideDrawer .drawer-section-title');
   if(sections[0]) sections[0].hidden=false;
-  if(sections[1]) sections[1].hidden=board;
 }
 function closeDrawer() { document.getElementById('sideDrawer').classList.remove('open'); document.getElementById('drawerOverlay').classList.remove('open'); }
 document.getElementById('btnMenu').onclick = () => { syncDrawerVisibility(); document.getElementById('sideDrawer').classList.add('open'); document.getElementById('drawerOverlay').classList.add('open'); };

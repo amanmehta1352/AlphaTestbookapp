@@ -1,0 +1,274 @@
+{
+ "note": "Build order. Each part is joined with newlines; css parts get their <style> wrapper; js parts go inside one <script>.",
+ "parts": [
+  {
+   "file": "src/html/head-00.html"
+  },
+  {
+   "file": "src/css/01-base.css",
+   "wrap": [
+    "<style>",
+    "</style>"
+   ]
+  },
+  {
+   "file": "src/html/head-01.html"
+  },
+  {
+   "file": "src/css/02-v2-3-2-deep-functional-repair.css",
+   "wrap": [
+    "<style id=\"v2-3-2-deep-functional-repair\">",
+    "</style>"
+   ]
+  },
+  {
+   "file": "src/css/03-v233-compact-layout-repair.css",
+   "wrap": [
+    "<style id=\"v233-compact-layout-repair\">",
+    "</style>"
+   ]
+  },
+  {
+   "file": "src/html/head-03.html"
+  },
+  {
+   "file": "src/css/04-v236-student-journey-dashboard.css",
+   "wrap": [
+    "<style id=\"v236-student-journey-dashboard\">",
+    "</style>"
+   ]
+  },
+  {
+   "file": "src/html/head-04.html"
+  },
+  {
+   "file": "src/css/05-v237-update1.css",
+   "wrap": [
+    "<style id=\"v237-update1\">",
+    "</style>"
+   ]
+  },
+  {
+   "file": "src/html/head-05.html"
+  },
+  {
+   "file": "src/css/06-v238-smart-builder.css",
+   "wrap": [
+    "<style id=\"v238-smart-builder\">",
+    "</style>"
+   ]
+  },
+  {
+   "file": "src/html/head-06.html"
+  },
+  {
+   "file": "src/css/07-v239-cbt-subjects-results.css",
+   "wrap": [
+    "<style id=\"v239-cbt-subjects-results\">",
+    "</style>"
+   ]
+  },
+  {
+   "file": "src/html/head-07.html"
+  },
+  {
+   "file": "src/css/08-v240-update4.css",
+   "wrap": [
+    "<style id=\"v240-update4\">",
+    "</style>"
+   ]
+  },
+  {
+   "file": "src/html/head-08.html"
+  },
+  {
+   "file": "src/css/09-v240-update4-b.css",
+   "wrap": [
+    "<style id=\"v240-update4-b\">",
+    "</style>"
+   ]
+  },
+  {
+   "file": "src/html/head-09.html"
+  },
+  {
+   "file": "src/css/10-v240-update4-c.css",
+   "wrap": [
+    "<style id=\"v240-update4-c\">",
+    "</style>"
+   ]
+  },
+  {
+   "file": "src/html/head-10.html"
+  },
+  {
+   "file": "src/css/11-v241-update5.css",
+   "wrap": [
+    "<style id=\"v241-update5\">",
+    "</style>"
+   ]
+  },
+  {
+   "file": "src/html/head-11.html"
+  },
+  {
+   "file": "src/css/12-v250-phase-a.css",
+   "wrap": [
+    "<style id=\"v250-phase-a\">",
+    "</style>"
+   ]
+  },
+  {
+   "file": "src/html/head-12.html"
+  },
+  {
+   "file": "src/css/13-v260-server.css",
+   "wrap": [
+    "<style id=\"v260-server\">",
+    "</style>"
+   ]
+  },
+  {
+   "file": "src/html/head-13.html"
+  },
+  {
+   "file": "src/css/14-v270-account.css",
+   "wrap": [
+    "<style id=\"v270-account\">",
+    "</style>"
+   ]
+  },
+  {
+   "file": "src/css/16-v280-foundation.css",
+   "wrap": [
+    "<style id=\"v280-foundation\">",
+    "</style>"
+   ]
+  },
+  {
+   "file": "src/html/head-14.html"
+  },
+  {
+   "file": "src/html/body.html"
+  },
+  {
+   "file": "src/js/00-boot-navigate.js",
+   "script": true
+  },
+  {
+   "file": "src/js/01-globals.js",
+   "script": true
+  },
+  {
+   "file": "src/js/02-taxonomy-core.js",
+   "script": true
+  },
+  {
+   "file": "src/js/03-workspace.js",
+   "script": true
+  },
+  {
+   "file": "src/js/04-builtin-dataset.js",
+   "script": true
+  },
+  {
+   "file": "src/js/05-storage.js",
+   "script": true
+  },
+  {
+   "file": "src/js/06-sync-index.js",
+   "script": true
+  },
+  {
+   "file": "src/js/06b-data-core.js",
+   "script": true
+  },
+  {
+   "file": "src/js/07-competitive-context.js",
+   "script": true
+  },
+  {
+   "file": "src/js/08-routing.js",
+   "script": true
+  },
+  {
+   "file": "src/js/09-learning-data.js",
+   "script": true
+  },
+  {
+   "file": "src/js/10-revision.js",
+   "script": true
+  },
+  {
+   "file": "src/js/11-dashboard.js",
+   "script": true
+  },
+  {
+   "file": "src/js/12-display-a11y-subjects-qb.js",
+   "script": true
+  },
+  {
+   "file": "src/js/13-import-engine.js",
+   "script": true
+  },
+  {
+   "file": "src/js/14-data-safety.js",
+   "script": true
+  },
+  {
+   "file": "src/js/15-server-admin.js",
+   "script": true
+  },
+  {
+   "file": "src/js/16-pwa.js",
+   "script": true
+  },
+  {
+   "file": "src/js/17-cloud-account.js",
+   "script": true
+  },
+  {
+   "file": "src/js/18-cbt-subjects-results.js",
+   "script": true
+  },
+  {
+   "file": "src/js/19-smart-builder.js",
+   "script": true
+  },
+  {
+   "file": "src/js/20-competitive-hierarchy.js",
+   "script": true
+  },
+  {
+   "file": "src/js/21-pages.js",
+   "script": true
+  },
+  {
+   "file": "src/js/22-study-engines.js",
+   "script": true
+  },
+  {
+   "file": "src/js/23-search.js",
+   "script": true
+  },
+  {
+   "file": "src/js/24-import-ui.js",
+   "script": true
+  },
+  {
+   "file": "src/js/24b-health.js",
+   "script": true
+  },
+  {
+   "file": "src/js/24c-cleanup.js",
+   "script": true
+  },
+  {
+   "file": "src/js/25-modals-boot.js",
+   "script": true
+  },
+  {
+   "file": "src/html/tail.html"
+  }
+ ]
+}

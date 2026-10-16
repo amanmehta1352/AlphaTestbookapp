@@ -1,0 +1,29 @@
+/* V2.5.0 Phase A — data safety banner, backup centre, import review */
+#dsBanner{position:fixed;left:8px;right:8px;top:calc(var(--safe-top,0px) + 62px);z-index:9000;display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 12px;border-radius:14px;background:#7f1d1d;color:#fff;font-size:13px;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+#dsBanner span{flex:1 1 200px;line-height:1.4}
+#dsBanner button{min-height:36px;padding:4px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.6);background:rgba(255,255,255,.12);color:#fff;font-weight:800;font-size:12px}
+body.cbt-active #dsBanner,body.native-builder-active #dsBanner{top:calc(var(--safe-top,0px) + 8px)}
+.bk{display:flex;flex-direction:column;gap:10px}
+.bk h4{margin:8px 0 0;font-size:13px;font-weight:900;color:var(--text-main)}
+.bk-status{display:flex;flex-direction:column;gap:4px;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--surface-alt);color:var(--text-main);font-size:12px;line-height:1.45}
+.bk-status b{font-size:14px}
+.bk-status.good{border-color:var(--success)}.bk-status.bad{border-color:var(--danger)}.bk-status.warn{border-color:var(--warning)}
+.bk-status .btn-action-sm{align-self:flex-start;margin-top:4px}
+.bk-wide{width:100%;min-height:48px}
+.bk-file{display:flex;flex-direction:column;gap:6px;padding:12px;border:1.5px dashed var(--primary);border-radius:12px;font-size:14px;font-weight:800;color:var(--primary)}
+.bk-file input{font-size:12px;color:var(--text-main);max-width:100%}
+.bk-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:var(--surface)}
+.bk-row b{display:block;font-size:13px;color:var(--text-main)}.bk-row small{display:block;font-size:11px;color:var(--text-muted)}
+.bk-row .btn-action-sm{flex:0 0 auto;min-height:36px}
+.bk-note{margin:0;font-size:12px;color:var(--text-muted);line-height:1.45}
+.bk-actions{display:flex;gap:8px;margin-top:8px}.bk-actions .btn-nav{flex:1;min-height:44px}
+.ir-box{margin:8px 10px;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);font-size:12px;line-height:1.5;color:var(--text-main)}
+.ir-box ul{margin:6px 0 0;padding-left:18px}.ir-box li{margin:2px 0;overflow-wrap:anywhere}
+.ir-box.bad{border-color:var(--danger);background:var(--danger-bg,rgba(220,38,38,.06))}
+.ir-box.warn{border-color:var(--warning);background:var(--warning-bg,rgba(234,179,8,.08))}
+.ir-box.good{border-color:var(--success);background:var(--success-bg,rgba(22,163,74,.06))}
+details.ir-box summary{cursor:pointer;font-weight:800}
+.ir-remove{display:flex;gap:8px;align-items:flex-start;margin:8px 10px;padding:10px 12px;border:1.5px solid var(--danger);border-radius:10px;font-size:12px;line-height:1.5;color:var(--text-main)}
+.ir-remove input{width:20px;height:20px;flex:0 0 auto;margin-top:1px}
+.ir-tag{font-size:10px;font-weight:900;padding:1px 7px;border-radius:999px;background:var(--surface-alt);color:var(--text-muted);white-space:nowrap}
+.ir-tag.new{background:var(--success);color:#fff}.ir-tag.changed{background:var(--warning);color:#111}

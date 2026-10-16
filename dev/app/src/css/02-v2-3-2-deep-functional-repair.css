@@ -1,0 +1,37 @@
+/* Root cause: display:contents exposed Previous, Clear, Mark and Next as four grid items for a three-column footer. */
+@media(max-width:600px){
+  .test-fixed-viewport .test-fixed-header{padding:2px 4px!important;background:transparent!important;box-shadow:none!important;border-bottom:1px solid var(--border)!important;}
+  .test-fixed-viewport .test-header-row{gap:3px!important;min-height:28px!important;padding-bottom:2px!important;}
+  .test-fixed-viewport .test-header-row>div:first-child{gap:3px!important;min-width:0!important;}
+  .test-fixed-viewport .test-header-row .cbt-one-step-back{min-height:28px!important;padding:2px 5px!important;font-size:10px!important;}
+  .test-fixed-viewport .test-header-row .header-logo-box{width:24px!important;height:24px!important;min-width:24px!important;font-size:12px!important;}
+  .test-fixed-viewport .test-header-row .section-switcher-wrap{max-width:28vw!important;min-width:0!important;font-size:10px!important;line-height:1.1!important;}
+  .test-fixed-viewport .test-header-row .section-switcher-wrap>div{display:none!important;}
+  .test-fixed-viewport .test-header-row .section-switcher{width:100%!important;max-width:110px!important;min-width:0!important;font-size:10px!important;padding:2px!important;}
+  .test-fixed-viewport .test-header-row .proctor-status,.test-fixed-viewport .test-header-row .timer-badge{min-height:24px!important;padding:2px 4px!important;font-size:9px!important;gap:3px!important;}
+  .test-fixed-viewport .test-header-row .proctor-status .hidden{display:none!important;}
+  .test-fixed-viewport .cbt-header-submit{min-height:25px!important;padding:2px 5px!important;font-size:10px!important;}
+  .test-fixed-viewport .test-fixed-header .icon-btn{width:28px!important;height:28px!important;min-width:28px!important;}
+  .test-fixed-viewport .test-fixed-header .question-strip-wrap{height:31px!important;max-height:31px!important;min-width:0!important;padding-top:0!important;gap:4px!important;}
+  .test-fixed-viewport .test-fixed-header .strip-chip{min-width:28px!important;width:28px!important;min-height:28px!important;height:28px!important;padding:0!important;font-size:10px!important;}
+  .test-fixed-viewport .test-fixed-header .header-actions{gap:3px!important;padding-left:4px!important;}
+  .test-fixed-viewport .test-fixed-footer{padding:4px 5px max(6px,env(safe-area-inset-bottom,0px))!important;}
+  .test-fixed-viewport .test-footer-inner{display:grid!important;grid-template-columns:minmax(0,.92fr) minmax(0,1.65fr) minmax(0,1.28fr)!important;align-items:center!important;gap:6px!important;padding:0!important;}
+  .test-fixed-viewport .test-footer-inner>*{min-width:0!important;max-width:100%!important;margin:0!important;}
+  .test-fixed-viewport .test-footer-inner>div{display:flex!important;align-items:center!important;justify-content:stretch!important;gap:4px!important;min-width:0!important;max-width:100%!important;overflow:hidden!important;}
+  .test-fixed-viewport .test-footer-inner .footer-btn{box-sizing:border-box!important;min-width:0!important;max-width:100%!important;min-height:40px!important;padding:5px 4px!important;font-size:10px!important;line-height:1.12!important;white-space:normal!important;overflow-wrap:anywhere!important;text-align:center!important;}
+  .test-fixed-viewport .test-footer-inner .btn-nav-clear{flex:0 0 38px!important;width:38px!important;}
+  .test-fixed-viewport .test-footer-inner .btn-nav-mark{flex:1 1 auto!important;width:auto!important;min-width:0!important;}
+  .test-fixed-viewport .test-footer-inner .btn-nav-mark svg{display:none!important;}
+  .test-fixed-viewport .test-footer-inner .btn-nav-prev{width:100%!important;}
+  .test-fixed-viewport .test-footer-inner .btn-nav-next{width:100%!important;}
+}
+@media(max-width:350px){
+ .test-fixed-viewport .test-footer-inner{grid-template-columns:minmax(0,.85fr) minmax(0,1.5fr) minmax(0,1.2fr)!important;gap:4px!important;}
+ .test-fixed-viewport .test-footer-inner .btn-nav-clear{flex-basis:33px!important;width:33px!important;}
+ .test-fixed-viewport .test-footer-inner .footer-btn{font-size:9px!important;padding:4px 2px!important;}
+ .test-fixed-viewport .test-header-row .timer-badge{max-width:45px!important;overflow:hidden!important;}
+}
+.nb-mode-card:disabled{opacity:.48;cursor:not-allowed;border-style:dashed;}
+body.study-mode-active #appHeader,body.study-mode-active #bottomNav{display:none!important;}
+body.cbt-focus-mode .test-fixed-header{background:transparent!important;box-shadow:none!important;}

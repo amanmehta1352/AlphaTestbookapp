@@ -1,0 +1,64 @@
+
+
+<!-- MASTER TESTBOOK V2.1.5 — NUMBERED MANUAL ACCEPTANCE CHECKLIST
+Version: V2.1.5_REAL_INDEX_INTEGRATION_CANDIDATE | Source: V2.1.3 hash 9d9a45d5cf731140e03313e7c59f892e315eb0782368b476811c57fd8b85a6c6
+All manual results remain NOT RUN until a human/browser performs them. Expected/Actual/Status/Evidence fields are intentionally provided.
+01. [ ] Open app on a disposable profile; expected Init/Home load. Actual: ____ Status: NOT RUN Evidence: ____
+02. [ ] Open Digital Library > Create Custom Test; expected existing shell/navigation only, no placeholder subjects. Actual: ____ Status: NOT RUN Evidence: ____
+03. [ ] Check Index is empty; expected truthful no-questions state, zero fabricated counts. Actual: ____ Status: NOT RUN Evidence: ____
+04. [ ] Import approved real questions using current Import Agent; expected new valid registry rows appear without reloading/duplicating. Actual: ____ Status: NOT RUN Evidence: ____
+05. [ ] Confirm displayed subject/topic/question counts match current active workspace IndexEngine registry. Actual: ____ Status: NOT RUN Evidence: ____
+06. [ ] Select one subject/topic then deselect a child; expected count/distribution updates. Actual: ____ Status: NOT RUN Evidence: ____
+07. [ ] Exercise Select All, Clear, Invert on visible topics/questions; expected only stated visible scope changes. Actual: ____ Status: NOT RUN Evidence: ____
+08. [ ] Search and switch exam/year/difficulty filters; expected zero-results recovery and selection preservation. Actual: ____ Status: NOT RUN Evidence: ____
+09. [ ] Use Quick Test with valid selected exam/year; expected one-context automatically selected test. Actual: ____ Status: NOT RUN Evidence: ____
+10. [ ] Use Practice by Topic and Custom Test; expected same Builder/engine, no competing engine. Actual: ____ Status: NOT RUN Evidence: ____
+11. [ ] Request count below, equal to, and above availability; expected deterministic subset or explicit shortage; no unrelated substitution. Actual: ____ Status: NOT RUN Evidence: ____
+12. [ ] Select exact individual questions; expected de-duplicated canonical IDs and preserved source metadata. Actual: ____ Status: NOT RUN Evidence: ____
+13. [ ] Preview generated test; expected exact selected question order, question text/options/source and active settings. Actual: ____ Status: NOT RUN Evidence: ____
+14. [ ] Change selection after Preview; expected old preview invalidated and stale IDs rejected. Actual: ____ Status: NOT RUN Evidence: ____
+15. [ ] Start a single-topic test; expected host ActiveTestSession contains exactly preview IDs/order. Actual: ____ Status: NOT RUN Evidence: ____
+16. [ ] Start a multi-topic/multi-group test in same exam/year; expected exact IDs/order and per-question source refs. Actual: ____ Status: NOT RUN Evidence: ____
+17. [ ] Double-tap Start; expected only one host session/timer. Actual: ____ Status: NOT RUN Evidence: ____
+18. [ ] Answer/clear/navigate/mark/revisit questions; expected canonical answer and mark state persists across navigation. Actual: ____ Status: NOT RUN Evidence: ____
+19. [ ] Observe timer and submit; expected existing host timer reaches one submit and exact sequence is scored. Actual: ____ Status: NOT RUN Evidence: ____
+20. [ ] Verify score/right/wrong/unanswered and source/topic attribution; expected result answers match selected canonical IDs. Actual: ____ Status: NOT RUN Evidence: ____
+21. [ ] Confirm mistakes carry source module/group and canonical ID; expected no cross-group originalQNo collision. Actual: ____ Status: NOT RUN Evidence: ____
+22. [ ] Reload active custom test; expected exact sequence/order, answers, marked state, timer and source refs recover or safely reject. Actual: ____ Status: NOT RUN Evidence: ____
+23. [ ] Run a legacy one-group test; expected originalQNo-key behavior and recovery remain compatible. Actual: ____ Status: NOT RUN Evidence: ____
+24. [ ] Switch to BOARD/non-supported workspace; expected Builder not to expose or select questions from another workspace. Actual: ____ Status: NOT RUN Evidence: ____
+25. [ ] Test Android/mobile width, keyboard focus, light/dark theme and bottom navigation overlap. Actual: ____ Status: NOT RUN Evidence: ____
+26. [ ] Review browser console, app storage and new code paths in a disposable profile. Expected no new storage key/second engine, no unhandled errors or data mutation outside approved flow. Actual: ____ Status: NOT RUN Evidence: ____
+27. [ ] Review baseline-vs-candidate diff and hashes; expected only Builder/host lifecycle edits plus checklist. Actual: ____ Status: NOT RUN Evidence: ____
+Evidence categories: static, isolated automated, browser integration, user acceptance are separate; never convert NOT RUN into PASS without evidence.
+-->
+
+
+<!-- V2.2.5: embedded manual checklist removed from live app UI per user authorization; separate QA checklist/report remains external. -->
+<!-- V2.2.6 CBT defect repair candidate; source taxonomy used, separate manual checklist maintained outside the live UI. -->
+<!-- V2.2.7: timer tracking moved to render boundary; switchQuestion() restored byte-for-byte from V2.2.5 behavior. -->
+<!-- V2.3.0 candidate: Type click argument serialization and CBT submit/header mobile layout repair; parent V2.2.9 remains immutable. -->
+<!-- V2.3.1 candidate: multi-Type selection, metadata fallback, checkbox/nav mobile layout, guarded CBT back actions. -->
+</body>
+</html>
+
+<!--
+CONSOLIDATED MANUAL ACCEPTANCE CHECKLIST — CANDIDATE 02
+Source baseline: MASTER_TESTBOOK_NATIVE_BUILDER_CANDIDATE_V2.3.5_BUILDER_FLOW_AND_SETTINGS_REPAIR_PATCHED-2.html
+Status: NOT RUN by user; no PASS implied. Browser/device and actual evidence must be recorded by tester.
+1. [ ] Compare Maths subject count to valid question IDs; note count at Subject, Topic, Type, Settings, Preview.
+2. [ ] Inspect Number System topic card on mobile; label must remain readable and card sizing consistent.
+3. [ ] Verify Number System, Profit & Loss and Percentage parent chapters against approved source taxonomy; do not auto-migrate records.
+4. [ ] Select a topic and verify highlighted state and eligible question count.
+5. [ ] Open Type step; expected: actual type cards and counts appear for current subject/topic pool.
+6. [ ] Verify count changes across steps and identify the exact filter where 947 becomes 14 or another value.
+7. [ ] Test Next/back navigation and validation messages at each wizard step.
+8. [ ] Preview expected selected count and question list; no empty/stale preview.
+9. [ ] Confirm & Start Test in disposable setup; investigate "host start rejected" if shown. Do not mark launch PASS unless CBT actually opens.
+10. [ ] Verify Profit & Loss English/Hindi stems using the actual question record and language setting.
+11. [ ] Inspect affected question records for stray "A"; determine whether source content or renderer causes it.
+12. [ ] Test Auto Path with conceptual English, Hindi, explicit type, and numerical examples; verify all path segments.
+13. [ ] Run integrity/reload only on disposable data; record missing/wrong paths, count mismatch and any deletion. Stop immediately if real data appears at risk.
+Additional regression checks: import/export, backups, search/filter, workspace isolation, assessment scoring/timer, keyboard/focus, theme, console, mobile.
+Expected/actual/status/evidence: user to record. Static checks do not constitute runtime or user-device verification.
+-->

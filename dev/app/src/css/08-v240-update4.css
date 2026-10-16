@@ -1,0 +1,15 @@
+/* V2.4.0 Update 4 — Stage A */
+.mastery-badge.none{background:var(--surface-alt);color:var(--text-muted);border:1px dashed var(--border-strong)}
+.ms-levels{display:flex;flex-wrap:wrap;gap:6px}
+.lc-opts{display:flex;flex-direction:column;gap:6px;margin:10px 0 4px}
+.lc-opt{display:flex;align-items:center;gap:10px;width:100%;min-height:48px;padding:8px 10px;border:1.5px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text-main);text-align:left;font-size:14px;font-weight:600}
+.lc-opt small{display:block;color:var(--text-muted);font-size:12px;font-weight:500}
+.lc-opt.ok{border-color:var(--success);background:var(--success-bg)}
+.lc-opt.bad{border-color:var(--danger);background:var(--danger-bg)}
+.lc-opt:disabled{cursor:default;opacity:1}
+.lc-card{cursor:default}
+.dc-bulk{border:1px solid var(--border);border-radius:12px;padding:10px;margin-bottom:10px;background:var(--surface-alt)}
+.dc-bulk-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;margin-bottom:8px}
+.dc-bulk-head span{display:flex;gap:6px}
+.dc-bulk-actions{display:flex;gap:6px;flex-wrap:wrap}
+.dc-bulk-actions .btn-action-sm,.dc-bulk-head .btn-action-sm{min-height:38px}

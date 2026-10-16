@@ -1,0 +1,20 @@
+/* V2.6.0 Phase C1 — server (admin) sheet */
+.srv{display:flex;flex-direction:column;gap:10px}
+.srv h4{margin:6px 0 0;font-size:13px;font-weight:900;color:var(--text-main)}
+.srv-head{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;color:var(--text-muted);font-weight:700;overflow-wrap:anywhere}
+.srv-msg{padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:var(--surface-alt);font-size:13px;line-height:1.45;color:var(--text-main)}
+.srv-msg.good{border-color:var(--success)}.srv-msg.bad{border-color:var(--danger)}.srv-msg.warn{border-color:var(--warning)}
+.srv-login{display:flex;flex-direction:column;gap:10px}
+.srv-login label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:800;color:var(--text-muted)}
+.srv-login input{min-height:46px;padding:8px 12px;border:1.5px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text-main);font-size:15px}
+.srv-login .btn-nav,.srv-wide{width:100%;min-height:48px}
+.srv-list{display:flex;flex-direction:column;gap:6px}
+.srv-topic{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text-main)}
+.srv-topic input{width:20px;height:20px;margin-top:2px;flex:0 0 auto}
+.srv-topic b{display:block;font-size:14px}.srv-topic small{display:block;font-size:11px;color:var(--text-muted);line-height:1.45}
+.srv-topic .srv-counts{color:var(--text-main);font-weight:700}.srv-topic em{font-style:normal;color:var(--danger)}
+.srv-detail{font-size:12px;color:var(--text-main);border:1px solid var(--warning);border-radius:10px;padding:8px 10px}
+.srv-detail summary{cursor:pointer;font-weight:800}.srv-detail ul{margin:6px 0 0;padding-left:18px}.srv-detail li{overflow-wrap:anywhere}
+.srv-actions{display:flex;gap:8px}.srv-actions .btn-nav{flex:1;min-height:48px}
+.srv-note{margin:0;font-size:12px;color:var(--text-muted);line-height:1.45}
+.srv .ir-remove{margin:0}

@@ -1,0 +1,95 @@
+<body>
+<div id="hydrationGate" aria-live="polite" aria-busy="true">
+  <div class="hydration-card">
+    <div class="hydration-spinner">⏳</div>
+    <div class="hydration-title">Hydrating Learning Environment...</div>
+    <div class="hydration-status" id="hydrationStatus">Verifying secure local storage and restoring your session.</div>
+  </div>
+</div>
+
+<!-- Application Header -->
+<header id="appHeader">
+  <div class="header-left">
+    <button class="header-btn" id="btnMenu" aria-label="Menu" title="Menu">☰</button>
+    <button class="header-btn app-one-step-back" id="btnAppBack" aria-label="ONE STEP BACK" title="ONE STEP BACK" hidden onclick="appNavigateBack()">← Back</button>
+    <div class="header-title" id="txtHeaderTitle">📚 MASTER TEST-BOOK</div>
+  </div>
+  <div class="header-right">
+    <button class="header-btn" onclick="navigate('taxonomy_explorer')" aria-label="Question Bank" title="Question Bank">🔎</button>
+    <button class="header-btn ds-btn" id="btnTextSize" onclick="openDisplaySettings()" aria-label="Display settings: language, text size, theme" title="Display">Aa</button>
+    <button class="header-btn" id="btnTheme" aria-label="Toggle Theme" title="Theme">🌙</button>
+  </div>
+</header>
+
+<!-- Navigation Drawer Component -->
+<div id="drawerOverlay"></div>
+<aside id="sideDrawer" aria-label="Menu">
+  <div class="drawer-header">
+    <div class="drawer-title" data-en="MENU" data-hi="मेनू">MENU</div>
+    <button id="btnCloseDrawer" style="font-size:20px; font-weight:900;" aria-label="Close">✕</button>
+  </div>
+  <nav class="drawer-nav" aria-label="Main menu">
+    <div class="drawer-section-title" data-en="STUDY" data-hi="पढ़ाई">STUDY</div>
+    <button class="drawer-item" onclick="openAccount()" data-en="👤 My account" data-hi="👤 मेरा account">👤 My account</button>
+    <button class="drawer-item" id="drwHome" onclick="navigate('home')" data-en="🏠 Home" data-hi="🏠 होम">🏠 Home</button>
+    <button class="drawer-item" id="drwSubjects" onclick="navigate('subjects')" data-en="📚 Subjects" data-hi="📚 विषय">📚 Subjects</button>
+    <button class="drawer-item" id="drwNativeBuilder" onclick="navigate('native_builder')" data-en="🧩 Create a test" data-hi="🧩 टेस्ट बनाएँ">🧩 Create a test</button>
+    <button class="drawer-item" id="drwTest" onclick="navigate('test_hub')" data-en="⏱️ Tests" data-hi="⏱️ टेस्ट">⏱️ Tests</button>
+    <button class="drawer-item" id="drwExams" onclick="navigate('exam_hub')" data-en="🏛️ Exams" data-hi="🏛️ परीक्षाएँ">🏛️ Exams</button>
+    <button class="drawer-item" id="drwPYQ" onclick="navigate('pyq_hub')" data-en="🎯 PYQ archive" data-hi="🎯 PYQ संग्रह">🎯 PYQ archive</button>
+    <button class="drawer-item" id="drwLibrary" onclick="navigate('digital_library')" data-en="📖 Digital library" data-hi="📖 डिजिटल लाइब्रेरी">📖 Digital library</button>
+    <div class="drawer-section-title" data-en="REVIEW" data-hi="दोहराना">REVIEW</div>
+    <button class="drawer-item" id="drwRevision" onclick="navigate('revision_hub')" data-en="🔄 Revision" data-hi="🔄 रिवीज़न">🔄 Revision</button>
+    <button class="drawer-item" onclick="navigate('mistakes')" data-en="📕 Mistake book" data-hi="📕 गलतियों की किताब">📕 Mistake book</button>
+    <button class="drawer-item" id="drwTaxonomy" onclick="navigate('taxonomy_explorer')" data-en="🔎 Question bank" data-hi="🔎 प्रश्न बैंक">🔎 Question bank</button>
+    <button class="drawer-item" onclick="navigate('mastery')" data-en="🎯 Mastery" data-hi="🎯 महारत">🎯 Mastery</button>
+    <div class="drawer-section-title" data-en="SETTINGS & DATA" data-hi="सेटिंग और डेटा">SETTINGS & DATA</div>
+    <button class="drawer-item" onclick="openDisplaySettings()" data-en="Aa Display (language, text size)" data-hi="Aa डिस्प्ले (भाषा, अक्षर आकार)">Aa Display (language, text size)</button>
+    <button class="drawer-item" onclick="openImportModal()" data-en="📥 Import questions" data-hi="📥 सवाल import करें">📥 Import questions</button>
+    <button class="drawer-item" onclick="openCleanup()" data-en="🧹 Data cleanup" data-hi="🧹 Data सफ़ाई">🧹 Data cleanup</button>
+    <button class="drawer-item" onclick="openHealthCheck()" data-en="🩺 Health Check" data-hi="🩺 Health Check">🩺 Health Check</button>
+    <button class="drawer-item" onclick="openBackupCenter()" data-en="💾 Backup & Restore" data-hi="💾 Backup और Restore">💾 Backup &amp; Restore</button>
+    <button class="drawer-item" onclick="openServerSync()" data-en="☁️ Server (Admin)" data-hi="☁️ Server (Admin)">☁️ Server (Admin)</button>
+    <button class="drawer-item" id="drwInstall" hidden onclick="pwaInstall()" data-en="📲 Install app" data-hi="📲 ऐप install करें">📲 Install app</button>
+    <button class="drawer-item" onclick="openDataControlModal()" data-en="🛡️ Data control" data-hi="🛡️ डेटा नियंत्रण">🛡️ Data control</button>
+    <button class="drawer-item" onclick="resetAppData()" data-en="🗑️ Reset app data" data-hi="🗑️ ऐप डेटा रीसेट">🗑️ Reset app data</button>
+  </nav>
+  <div class="drawer-version" id="drwVersion"></div>
+</aside>
+
+<!-- Main Dynamic Screen Surface -->
+<main id="mainView"></main>
+
+<!-- 5-Tier Strict Global Bottom Navigation: Home, Subjects, PYQ, Test, Revision -->
+<nav id="bottomNav">
+  <button class="nav-tab active" id="tabHome" onclick="navigate('home')" aria-label="Home">
+    <span class="nav-tab-icon">🏠</span>
+    <span data-en="HOME" data-hi="होम">HOME</span>
+  </button>
+  <button class="nav-tab" id="tabSubjects" onclick="navigate('subjects')" aria-label="Subjects">
+    <span class="nav-tab-icon">📚</span>
+    <span data-en="SUBJECTS" data-hi="विषय">SUBJECTS</span>
+  </button>
+  <button class="nav-tab" id="tabPYQ" onclick="navigate('exam_hub')" aria-label="Exams">
+    <span class="nav-tab-icon">🏛️</span>
+    <span data-en="EXAMS" data-hi="परीक्षा">EXAMS</span>
+  </button>
+  <button class="nav-tab" id="tabTest" onclick="navigate('test_hub')" aria-label="Tests">
+    <span class="nav-tab-icon">⏱️</span>
+    <span data-en="TEST" data-hi="टेस्ट">TEST</span>
+  </button>
+  <button class="nav-tab" id="tabRevision" onclick="navigate('revision_hub')" aria-label="Revision">
+    <span class="nav-tab-icon">🔄</span>
+    <span data-en="REVISION" data-hi="रिवीज़न">REVISION</span>
+  </button>
+</nav>
+
+<!-- Modals & Sheets Surface -->
+<div id="modalOverlay"></div>
+<div id="modalSheet" role="dialog" aria-modal="true" aria-labelledby="modalSheetTitle" tabindex="-1">
+  <div class="modal-header">
+    <h3 id="modalSheetTitle"></h3>
+    <button class="modal-close" onclick="closeModal()" aria-label="Close modal">✕</button>
+  </div>
+  <div id="modalSheetBody"></div>
+</div>

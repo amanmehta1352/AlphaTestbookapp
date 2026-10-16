@@ -1,0 +1,52 @@
+=== QUESTION START ===
+EXAM_NAME: RRB NTPC
+YEAR: 2024
+SHIFT: 12-06-2024 Shift-1
+SUBJECT: Maths
+CHAPTER: Arithmetic
+TOPIC: Profit & Loss
+SUB_TOPIC: Discount
+SOURCE_QUESTION_NO: 1
+SOURCE_TYPE: PYQ
+DIFFICULTY: MODERATE
+QUESTION_EN: A shopkeeper gives 10% discount on a marked price of ₹500. What is the selling price?
+QUESTION_HI: एक दुकानदार ₹500 के अंकित मूल्य पर 10% छूट देता है। विक्रय मूल्य क्या है?
+A_EN: ₹400
+A_HI: ₹400
+B_EN: ₹450
+B_HI: ₹450
+C_EN: ₹480
+C_HI: ₹480
+D_EN: ₹490
+D_HI: ₹490
+ANSWER: B
+EXPLANATION_EN: Discount = 10% of 500 = 50.
+Selling price = 500 − 50 = ₹450.
+EXPLANATION_HI: छूट = 500 का 10% = 50।
+विक्रय मूल्य = 500 − 50 = ₹450।
+=== QUESTION END ===
+
+=== QUESTION START ===
+EXAM_NAME: RRB NTPC
+YEAR: 2024
+SUBJECT: Maths
+CHAPTER: Arithmetic
+TOPIC: Profit & Loss
+SOURCE_QUESTION_NO: 2
+QUESTION_EN: (यहाँ अगला सवाल)
+A_EN: …
+B_EN: …
+C_EN: …
+D_EN: …
+ANSWER: A
+=== QUESTION END ===
+
+---------------------------------------------------------------
+ज़रूरी (इनके बिना सवाल रुक जाएगा):
+  EXAM_NAME, YEAR, SUBJECT, CHAPTER, TOPIC,
+  QUESTION_EN या QUESTION_HI, चारों options (A_EN … D_EN), ANSWER
+वैकल्पिक:
+  SHIFT, SUB_TOPIC, SOURCE_QUESTION_NO, SOURCE_TYPE (PYQ / PRACTICE),
+  DIFFICULTY (EASY / MODERATE / HARD), EXPLANATION_EN, EXPLANATION_HI, QUESTION_ID
+ANSWER में: A, B, C, D  — (B), b, Option B, 2 भी चलेंगे
+Explanation कई लाइनों में लिख सकते हैं।
