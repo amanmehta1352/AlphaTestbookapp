@@ -1,11 +1,14 @@
 -- =====================================================================
 -- MASTER TESTBOOK — Server database, version 2 (Admin Studio, S1)
--- Run AFTER version 1. Only adds things; safe to run twice.
+-- Run AFTER version 1. Only adds/alters things (no DROP); safe to run twice.
+-- APPLIED on the live project 2026-10-16. Backup taken first into schema
+-- backup.*_20261016 (questions, topics, exams, import_batches).
 --   * questions.status: draft → reviewed → published
 --     (existing questions become 'published', so students see no change)
 --   * students read only published + active questions; admin reads all
 --   * solution fields (filled later by the Solution Studio, S3)
 --   * public storage bucket for solution images; only admin can upload
+--   * security: helper functions not callable without login
 -- =====================================================================
 
 -- ---------- status ----------
@@ -33,14 +36,10 @@ begin
   end if;
   return new;
 end; $$;
-drop trigger if exists questions_status_stamp on public.questions;
-create trigger questions_status_stamp before insert or update on public.questions for each row execute function public.questions_status_stamp();
+create or replace trigger questions_status_stamp before insert or update on public.questions for each row execute function public.questions_status_stamp();
 
--- ---------- students see only published ----------
-drop policy if exists "questions: students read active" on public.questions;
-drop policy if exists "questions: students read published" on public.questions;
-create policy "questions: students read published" on public.questions for select to authenticated
-  using ((is_active and status = 'published') or public.is_admin());
+-- ---------- students see only published (policy created in V1, changed here) ----------
+alter policy "questions: students read active" on public.questions using ((is_active and status = 'published') or public.is_admin());
 
 -- ---------- solution (structure filled in S3) ----------
 -- solution = {"answer_line":…, "concept":…, "steps_hi":[…], "steps_en":[…], "shortcut":…,
@@ -63,9 +62,15 @@ do $$ begin
     insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
     values ('solution-images', 'solution-images', true, 2097152, array['image/png', 'image/jpeg', 'image/webp'])
     on conflict (id) do nothing;
-    execute 'drop policy if exists "solution images: admin writes" on storage.objects';
-    execute $p$create policy "solution images: admin writes" on storage.objects for all to authenticated
-      using (bucket_id = 'solution-images' and public.is_admin())
-      with check (bucket_id = 'solution-images' and public.is_admin())$p$;
+    if not exists (select 1 from pg_policies where schemaname = 'storage' and tablename = 'objects' and policyname = 'solution images: admin writes') then
+      execute $p$create policy "solution images: admin writes" on storage.objects for all to authenticated
+        using (bucket_id = 'solution-images' and public.is_admin())
+        with check (bucket_id = 'solution-images' and public.is_admin())$p$;
+    end if;
   end if;
 end $$;
+
+-- ---------- security: no anonymous calls to helper functions ----------
+revoke execute on function public.is_admin() from anon;
+revoke execute on function public.handle_new_user() from public, anon, authenticated;
+revoke execute on function public.questions_status_stamp() from public, anon, authenticated;

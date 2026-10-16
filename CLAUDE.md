@@ -6,7 +6,8 @@ Student test-prep PWA (SSC/RRB). Served by GitHub Pages from the repo root.
 - Root (`index.html`, `sw.js`, `manifest.webmanifest`, icons): the LIVE release. Never hand-edit `index.html`.
 - `dev/app/`: source tree. Build: `cd dev/app && python3 build.py ../../index.html V2.x.y`.
 - `dev/tests/`: Playwright suites; `fake_supabase.py` runs the real schema/RLS on local Postgres 16.
-- `dev/server/SUPABASE_SCHEMA_V1.sql`: schema already applied on the live Supabase project.
+- `dev/server/SUPABASE_SCHEMA_V1.sql` + `V2.sql`: both applied on the live Supabase project (V2 = status/solutions, 2026-10-16).
+- Server changes: Claude applies them via the Supabase connector. Take a backup into schema `backup` first; avoid DROP (needs extra confirmation) — use ALTER / IF NOT EXISTS.
 
 ## Release rules
 1. Change source in `dev/app/src`, bump version (head-01.html meta + build arg).
