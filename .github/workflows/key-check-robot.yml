@@ -1,0 +1,58 @@
+# 🔑 Key-check Robot — checks answers of questions on the server. READ-ONLY: never changes a question.
+# Runs automatically after every "PYQ Robot" run (draft questions), or by hand: Actions → Key-check Robot → Run workflow.
+# Needs repo secret SUPABASE_SECRET_KEY. Optional free "second opinion": repo secret GEMINI_API_KEY (Google AI Studio, free tier).
+name: Key-check Robot
+on:
+  workflow_dispatch:
+    inputs:
+      scope:
+        description: 'कौन से सवाल: draft (नए) / published (live) / all'
+        default: 'draft'
+      gemini:
+        description: 'Gemini से दूसरी राय भी लें (मुफ़्त key चाहिए)'
+        type: boolean
+        default: true
+      limit:
+        description: 'Gemini कितने सवाल जाँचे (free सीमा के लिए)'
+        default: '150'
+      offset:
+        description: 'कितने सवाल छोड़कर शुरू करें (अगली बार के लिए)'
+        default: '0'
+  workflow_run:
+    workflows: ['PYQ Robot']
+    types: [completed]
+permissions:
+  contents: read
+concurrency:
+  group: key-check-robot
+  cancel-in-progress: false
+jobs:
+  check:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check answers
+        env:
+          SUPABASE_URL: https://fzkvwkrbtykucjfdqiin.supabase.co
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          SCOPE: ${{ inputs.scope || 'draft' }}
+          USE_GEMINI: ${{ github.event_name == 'workflow_dispatch' && inputs.gemini || 'true' }}
+          LIMIT: ${{ inputs.limit || '150' }}
+          OFFSET: ${{ inputs.offset || '0' }}
+          KEYCHECK_REPORT: ${{ runner.temp }}/keycheck-report.json
+        run: |
+          args="--scope $SCOPE --limit $LIMIT --offset $OFFSET"
+          if [ "$USE_GEMINI" = "true" ]; then args="$args --gemini"; fi
+          python3 dev/tools/key-check-robot/keycheck.py $args
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: keycheck-report
+          path: ${{ runner.temp }}/keycheck-report.json
+          if-no-files-found: ignore
