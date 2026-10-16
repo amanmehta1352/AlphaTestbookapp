@@ -274,6 +274,10 @@
    "script": true
   },
   {
+   "file": "src/js/22d-v3-hub-me.js",
+   "script": true
+  },
+  {
    "file": "src/js/23-search.js",
    "script": true
   },

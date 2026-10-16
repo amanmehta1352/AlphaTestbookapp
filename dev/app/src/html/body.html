@@ -15,6 +15,7 @@
     <div class="header-title" id="txtHeaderTitle">📚 MASTER TEST-BOOK</div>
   </div>
   <div class="header-right">
+    <button class="header-btn" id="btnMe" onclick="navigate('me')" aria-label="Me: progress and settings" title="Me">👤</button>
     <button class="header-btn" onclick="navigate('taxonomy_explorer')" aria-label="Question Bank" title="Question Bank">🔎</button>
     <button class="header-btn ds-btn" id="btnTextSize" onclick="openDisplaySettings()" aria-label="Display settings: language, text size, theme" title="Display">Aa</button>
     <button class="header-btn" id="btnTheme" aria-label="Toggle Theme" title="Theme">🌙</button>
@@ -30,7 +31,7 @@
   </div>
   <nav class="drawer-nav" aria-label="Main menu">
     <div class="drawer-section-title" data-en="STUDY" data-hi="पढ़ाई">STUDY</div>
-    <button class="drawer-item" onclick="openAccount()" data-en="👤 My account" data-hi="👤 मेरा account">👤 My account</button>
+    <button class="drawer-item" id="drwMe" onclick="navigate('me')" data-en="👤 Me (progress, settings)" data-hi="👤 मैं (progress, सेटिंग)">👤 Me (progress, settings)</button>
     <button class="drawer-item" id="drwHome" onclick="navigate('home')" data-en="🏠 Home" data-hi="🏠 होम">🏠 Home</button>
     <button class="drawer-item" id="drwSubjects" onclick="navigate('subjects')" data-en="📚 Subjects" data-hi="📚 विषय">📚 Subjects</button>
     <button class="drawer-item" id="drwNativeBuilder" onclick="navigate('native_builder')" data-en="🧩 Create a test" data-hi="🧩 टेस्ट बनाएँ">🧩 Create a test</button>

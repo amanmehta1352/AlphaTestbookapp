@@ -96,12 +96,12 @@ with sync_playwright() as p:
     rec('no hard-coded claims', '356 Qs' not in t and 'Mapped' not in t)
     page.screenshot(path=OUT + '/u5_subjects_390.png')
     page.locator('.sc-card').first.click()
-    chs = page.locator('.sc-card')
+    chs = page.locator('.sh-ch summary')
     zero = [c for c in chs.all_inner_texts() if ' 0 questions' in ' ' + c]
     rec('subject page lists only chapters with questions', chs.count() > 0 and not zero, chs.all_inner_texts()[:3])
     rec('no placeholder chapters', all(x not in page.inner_text('#mainView') for x in ['Number System', 'Non-Verbal Reasoning']) or page.evaluate("CurriculumContext.filterModules(AppModules).some(m=>/number system/i.test(m.chapter))"))
-    chs.first.click()
-    rec('chapter opens its topics', page.evaluate("Route.page") == 'chapter')
+    page.locator('.sh-ch[open] .sh-t-name').first.click()
+    rec('chapter accordion opens its topic', page.evaluate("Route.page") == 'topic')
 
     # --- Question Bank
     page.evaluate("navigate('taxonomy_explorer')")

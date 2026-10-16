@@ -1260,7 +1260,7 @@ body.native-builder-active .nb-wizard-nav .nb-row-meta{flex:1 1 auto;min-width:0
 </style>
 <meta name="phase3" content="Profile-Driven Workspace + Data Airlock"><meta name="phase3-status" content="IMPLEMENTED"><meta name="phase3-frozen" content="Phase1A Storage; Phase2 QuestionUI; CBT scoring/timer"><meta name="master-testbook-candidate" content="V2.1.8 Smart Builder repair; child of V2.1.7; parent and data contracts preserved"><meta name="release-status" content="PARTIAL-HOLD-RUNTIME-VERIFICATION-PENDING">
 <meta name="master-testbook-candidate-version" content="V2.11.0_ADMIN_STUDIO">
-<meta name="app-version" content="V3.1.0">
+<meta name="app-version" content="V3.2.0">
 
 <style id="v2-3-2-deep-functional-repair">
 /* Root cause: display:contents exposed Previous, Clear, Mark and Next as four grid items for a three-column footer. */
@@ -2292,6 +2292,66 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
 .cbt-pad-bar button{min-height:44px;min-width:44px;margin-left:8px;border-radius:var(--radius-md);border:1px solid var(--border);background:var(--surface);color:var(--text-main);font-weight:700}
 .cbt-pad canvas{flex:1;width:100%;touch-action:none;background:repeating-linear-gradient(transparent 0 31px,var(--border) 31px 32px)}
 
+/* ---------- V3.2 subject hub ---------- */
+.sh-chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}
+.sh-chips::-webkit-scrollbar{display:none}
+.sh-chip{flex:0 0 auto;min-height:44px;padding:6px 14px;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--text-main);font-weight:700;font-size:13px}
+.sh-chip b{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-left:2px}
+.sh-chip.on{background:var(--primary);border-color:var(--primary);color:#fff}.sh-chip.on b{color:#fff}
+.sh-list{display:grid;gap:10px}
+@media(min-width:900px){.sh-list{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}}
+.sh-ch{border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--surface);box-shadow:var(--shadow-sm);overflow:hidden}
+.sh-ch>summary{list-style:none;display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;min-height:56px}
+.sh-ch>summary::-webkit-details-marker{display:none}
+.sh-ch-main{flex:1;min-width:0;display:grid;gap:4px}
+.sh-ch-main strong{font-size:15px;line-height:1.3}
+.sh-ch-main small{font-size:12px;color:var(--text-muted)}
+.sh-bar{display:block;height:5px;border-radius:9px;background:var(--border);overflow:hidden}
+.sh-bar i{display:block;height:100%;background:var(--success);border-radius:9px}
+.sh-chev{font-size:18px;color:var(--text-muted);transition:transform .2s}
+.sh-ch[open] .sh-chev{transform:rotate(180deg)}
+.sh-topics{border-top:1px solid var(--border);display:grid}
+.sh-topic{padding:10px 14px;border-bottom:1px dashed var(--border);display:grid;gap:8px}
+.sh-topic:last-child{border-bottom:0}
+.sh-t-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.sh-t-name{background:none;border:0;padding:0;color:var(--text-main);font-weight:800;font-size:14px;text-align:left;min-height:32px}
+.sh-t-meta{font-size:12px;color:var(--text-muted);display:flex;gap:6px;align-items:center}
+.sh-tag{font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:999px}
+.sh-tag.pyq{background:var(--primary-light);color:var(--primary)}
+.sh-tag.weak{background:var(--danger-bg);color:var(--text-main)}
+.sh-acts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.sh-act{min-height:44px;border-radius:var(--radius-md);border:1px solid var(--border);background:var(--surface);color:var(--text-main);font-weight:700;font-size:13px;white-space:nowrap}
+.sh-act.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+
+/* ---------- V3.2 result time ---------- */
+.rs-pace-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.rs-pace-grid span{display:grid;gap:2px;padding:10px;border:1px solid var(--border);border-radius:var(--radius-md);font-size:12px;color:var(--text-muted)}
+.rs-pace-grid b{font-family:var(--font-mono);font-size:16px;color:var(--text-main)}
+.rs-pace-grid em{font-style:normal;font-weight:800}.rs-pace-grid em.ok{color:var(--success)}.rs-pace-grid em.slow{color:var(--text-main)}
+.rs-pace-slow{margin:10px 0 0;font-size:12.5px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.rs-pace-slow span{padding:3px 8px;border-radius:999px;background:var(--warning-bg);font-family:var(--font-mono);font-size:12px}
+
+/* ---------- V3.2 Me screen ---------- */
+.me-head{display:flex;align-items:center;gap:12px;padding:14px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--surface);box-shadow:var(--shadow-sm);margin-bottom:10px}
+.me-avatar{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:var(--primary);color:#fff;font-weight:800;font-size:22px;flex:0 0 auto}
+.me-id{flex:1;min-width:0}.me-id h1{margin:0;font-size:18px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.me-id p{margin:2px 0 0;font-size:12.5px;color:var(--text-muted);overflow-wrap:anywhere}
+.me-profile{display:flex;align-items:center;gap:8px;width:100%;min-height:48px;padding:10px 14px;border-radius:var(--radius-md);border:1.5px dashed var(--primary);background:var(--primary-light);color:var(--text-main);font-weight:700;margin-bottom:10px;text-align:left}
+.me-profile span{flex:1}.me-profile b{color:var(--primary);font-size:13px}
+.me-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:10px}
+@media(min-width:720px){.me-tiles{grid-template-columns:repeat(6,minmax(0,1fr))}}
+.me-tile{display:grid;gap:2px;padding:12px 8px;text-align:center;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--surface);font-size:11.5px;color:var(--text-muted)}
+.me-tile b{font-family:var(--font-mono);font-size:18px;color:var(--text-main)}
+.me-list{border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--surface);overflow:hidden;margin-bottom:10px}
+.me-row{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:10px 14px;background:none;border:0;border-bottom:1px solid var(--border);color:var(--text-main);text-align:left}
+.me-row:last-child{border-bottom:0}
+.me-ico{width:32px;text-align:center;font-size:18px;font-weight:800}
+.me-row-main{flex:1;display:grid;gap:2px}.me-row-main b{font-size:14px}.me-row-main small{font-size:12px;color:var(--text-muted)}
+.me-ver{text-align:center;font-size:11.5px;color:var(--text-muted);margin:14px 0 4px}
+/* CBT header: language button never wraps */
+.test-fixed-viewport .icon-btn{white-space:nowrap}
+.sh-t-name.sm{font-size:12.5px;color:var(--primary)}
+
 </style>
 </head>
 <body>
@@ -2311,6 +2371,7 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
     <div class="header-title" id="txtHeaderTitle">📚 MASTER TEST-BOOK</div>
   </div>
   <div class="header-right">
+    <button class="header-btn" id="btnMe" onclick="navigate('me')" aria-label="Me: progress and settings" title="Me">👤</button>
     <button class="header-btn" onclick="navigate('taxonomy_explorer')" aria-label="Question Bank" title="Question Bank">🔎</button>
     <button class="header-btn ds-btn" id="btnTextSize" onclick="openDisplaySettings()" aria-label="Display settings: language, text size, theme" title="Display">Aa</button>
     <button class="header-btn" id="btnTheme" aria-label="Toggle Theme" title="Theme">🌙</button>
@@ -2326,7 +2387,7 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
   </div>
   <nav class="drawer-nav" aria-label="Main menu">
     <div class="drawer-section-title" data-en="STUDY" data-hi="पढ़ाई">STUDY</div>
-    <button class="drawer-item" onclick="openAccount()" data-en="👤 My account" data-hi="👤 मेरा account">👤 My account</button>
+    <button class="drawer-item" id="drwMe" onclick="navigate('me')" data-en="👤 Me (progress, settings)" data-hi="👤 मैं (progress, सेटिंग)">👤 Me (progress, settings)</button>
     <button class="drawer-item" id="drwHome" onclick="navigate('home')" data-en="🏠 Home" data-hi="🏠 होम">🏠 Home</button>
     <button class="drawer-item" id="drwSubjects" onclick="navigate('subjects')" data-en="📚 Subjects" data-hi="📚 विषय">📚 Subjects</button>
     <button class="drawer-item" id="drwNativeBuilder" onclick="navigate('native_builder')" data-en="🧩 Create a test" data-hi="🧩 टेस्ट बनाएँ">🧩 Create a test</button>
@@ -9385,7 +9446,7 @@ function submitTestSession() {
     UserState.masteryMap[topicSlug]={score:parseFloat(newScore.toFixed(2)),level};
   }
   session.submissionState='COMMITTED'; session.sessionStatus='SUBMITTED';
-  const resultData={moduleId:session.moduleId,groupId:session.groupId,topicTitle:session.topicTitle,groupTitle:session.groupTitle,total,correct,wrong,unattempted,score:correct,accuracy,questions:session.questions.slice(),answers:{...session.answers},subjectiveState:{...(session.subjectiveState||{})},marked:{...(session.marked||{})},confidence:{...(session.confidence||{})},langMode:session.langMode,...(isCustom?{sessionContractVersion:1,questionIds:session.questionIds.slice(),questionSequenceFingerprint:session.questionSequenceFingerprint,sourceRefs:(session.sourceRefs||[]).map(x=>({...x}))}:{})};
+  const resultData={moduleId:session.moduleId,groupId:session.groupId,topicTitle:session.topicTitle,groupTitle:session.groupTitle,total,correct,wrong,unattempted,score:correct,accuracy,questions:session.questions.slice(),answers:{...session.answers},subjectiveState:{...(session.subjectiveState||{})},marked:{...(session.marked||{})},confidence:{...(session.confidence||{})},timeSpent:session.questions.map((_,i)=>{try{return getQuestionElapsedSeconds(i)}catch(_){return 0}}),durationSeconds:session.durationSeconds,langMode:session.langMode,...(isCustom?{sessionContractVersion:1,questionIds:session.questionIds.slice(),questionSequenceFingerprint:session.questionSequenceFingerprint,sourceRefs:(session.sourceRefs||[]).map(x=>({...x}))}:{})};
   try { resultData.historyId = LearningHistory.recordTest(session, resultData); } catch (e) { console.warn('[History] test record failed', e); }
   clearCbtRecoveryState(); saveUserState(); ActiveTestSession=null; SubjectiveResultStateBuffer={}; navigate('result',{result:resultData});
 }
@@ -9421,7 +9482,7 @@ function renderResultPage(v,res){
     });
   }
   const topicPerformanceHtml=[...topicStats].map(([label,x])=>`<div class="nb-row"><span class="nb-row-main"><span class="nb-row-title">${escapeHtml(label)}</span><span class="nb-row-meta">${x.correct} correct · ${x.wrong} incorrect · ${x.unanswered} unanswered</span></span><span class="nb-count">${x.total} Q</span></div>`).join('');
-  v.innerHTML=`<div class="nav-breadcrumb"><button onclick="navigate('home')">Home</button><span class="sep">/</span><button onclick="navigate('test_hub')">CBT Assessment</button><span class="sep">/</span><span>Result</span></div><div class="section-title"><span>📊 ${tx('RESULT','परिणाम')}</span><button class="btn-action-sm" onclick="navigate('home')">🏠 ${tx('Home','होम')}</button></div>${typeof resultSoftLanding==='function'?resultSoftLanding(res):''}<div class="student-hero-card rs-score" style="text-align:center;"><h1 style="font-size:32px;">${res.score} / ${res.total}</h1><p style="font-size:14px;font-weight:700;color:var(--text-main);">Score in ${escapeHtml(res.topicTitle||'Custom Test')} • ${escapeHtml(res.groupTitle||'')}</p></div>${typeof resultWhatIf==='function'?resultWhatIf(res, keyFor):''}<div class="goals-grid" style="margin-bottom:16px;"><div class="goal-box"><small>ACCURACY</small><strong style="color:var(--primary);">${res.accuracy}%</strong></div><div class="goal-box"><small>CORRECT</small><strong style="color:var(--success);">${res.correct}</strong></div><div class="goal-box"><small>WRONG</small><strong style="color:var(--danger);">${res.wrong}</strong></div><div class="goal-box"><small>SKIPPED</small><strong>${res.unattempted}</strong></div></div>${isCustom?`<section class="nb-panel"><h3>Performance by subject / topic</h3>${topicPerformanceHtml||'<p class="nb-row-meta">No topic performance data is available.</p>'}</section><p class="nb-row-meta">Topic-level figures come from this submitted question sequence. Mixed-topic mastery-map updates are not assigned to an arbitrary anchor topic.</p>`:''}<div class="nba-banner"><div><span style="font-size:10px;font-weight:900;color:var(--accent-cyan);text-transform:uppercase;">Next Step</span><div style="font-size:13px;font-weight:800;color:var(--text-main);">${res.wrong>0?`Revise your ${res.wrong} mistakes in the Mistake Book.`:'Review your results or create another test.'}</div></div><button class="btn-nav primary" style="min-height:38px;font-size:12px;padding:6px 12px;" onclick="${res.wrong>0?"navigate('mistakes')":"navigate('native_builder')"}">${res.wrong>0?'Review Mistakes ➔':'Create Another Test ➔'}</button></div><div class="section-title"><span>Detailed Question Solutions</span></div>${solutionsHtml}`;
+  v.innerHTML=`<div class="nav-breadcrumb"><button onclick="navigate('home')">Home</button><span class="sep">/</span><button onclick="navigate('test_hub')">CBT Assessment</button><span class="sep">/</span><span>Result</span></div><div class="section-title"><span>📊 ${tx('RESULT','परिणाम')}</span><button class="btn-action-sm" onclick="navigate('home')">🏠 ${tx('Home','होम')}</button></div>${typeof resultSoftLanding==='function'?resultSoftLanding(res):''}<div class="student-hero-card rs-score" style="text-align:center;"><h1 style="font-size:32px;">${res.score} / ${res.total}</h1><p style="font-size:14px;font-weight:700;color:var(--text-main);">Score in ${escapeHtml(res.topicTitle||'Custom Test')} • ${escapeHtml(res.groupTitle||'')}</p></div>${typeof resultWhatIf==='function'?resultWhatIf(res, keyFor):''}${typeof resultTimeCard==='function'?resultTimeCard(res, keyFor):''}<div class="goals-grid" style="margin-bottom:16px;"><div class="goal-box"><small>ACCURACY</small><strong style="color:var(--primary);">${res.accuracy}%</strong></div><div class="goal-box"><small>CORRECT</small><strong style="color:var(--success);">${res.correct}</strong></div><div class="goal-box"><small>WRONG</small><strong style="color:var(--danger);">${res.wrong}</strong></div><div class="goal-box"><small>SKIPPED</small><strong>${res.unattempted}</strong></div></div>${isCustom?`<section class="nb-panel"><h3>Performance by subject / topic</h3>${topicPerformanceHtml||'<p class="nb-row-meta">No topic performance data is available.</p>'}</section><p class="nb-row-meta">Topic-level figures come from this submitted question sequence. Mixed-topic mastery-map updates are not assigned to an arbitrary anchor topic.</p>`:''}<div class="nba-banner"><div><span style="font-size:10px;font-weight:900;color:var(--accent-cyan);text-transform:uppercase;">Next Step</span><div style="font-size:13px;font-weight:800;color:var(--text-main);">${res.wrong>0?`Revise your ${res.wrong} mistakes in the Mistake Book.`:'Review your results or create another test.'}</div></div><button class="btn-nav primary" style="min-height:38px;font-size:12px;padding:6px 12px;" onclick="${res.wrong>0?"navigate('mistakes')":"navigate('native_builder')"}">${res.wrong>0?'Review Mistakes ➔':'Create Another Test ➔'}</button></div><div class="section-title"><span>Detailed Question Solutions</span></div>${solutionsHtml}`;
   try { resultEnhance(v, res); } catch (e) { console.warn('[Result] enhance failed', e); }
 }
 
@@ -9604,6 +9665,156 @@ function cbtOpenPad() {
 }
 function cbtPadClear() { const c = document.getElementById('cbtPadCanvas'); if (c) c.getContext('2d').clearRect(0, 0, c.width, c.height); }
 function cbtClosePad() { const w = document.getElementById('cbtPad'); if (w) w.remove(); }
+
+/* =========================================================================
+   V3.2 (blueprint Lane B):
+   1. Subject hub — chapter accordions, each topic with Learn · Practice · Test,
+      filter chips All / PYQ / Weak / Unfinished.
+   2. Result — "Speed check" card (your pace vs allowed pace vs your usual pace).
+   3. "Me" screen — account, exam profile, progress tiles, shortcuts, settings.
+   Read-only over existing data (AttemptHistory, ResultHistory, UserState); no data-write paths changed.
+   ========================================================================= */
+var SubjectHubState = { filter: 'all', open: {} };
+
+function shTopicStats(m) {
+  const ws = WorkspaceManager.current().id;
+  const ids = new Set();
+  (m.groups || []).forEach(g => (g.questions || []).forEach(q => ids.add(String(q.canonicalQId || ''))));
+  const seen = new Set(); let answered = 0, correct = 0;
+  (AttemptHistory || []).forEach(a => { if (a.ws === ws && ids.has(String(a.cid || ''))) { seen.add(String(a.cid)); answered++; if (a.correct) correct++; } });
+  const total = ids.size || nbModuleQCount(m);
+  const pyq = (m.groups || []).some(g => (g.questions || []).some(q => pyqStatusOf(q) === 'PYQ'));
+  const mx = masteryFor(m.moduleId);
+  const acc = answered ? correct / answered : null;
+  const weak = (mx.enough && mx.score < 0.7) || (answered >= 5 && acc < 0.6);
+  return { total, done: seen.size, answered, correct, acc, pyq, weak, unfinished: seen.size > 0 && seen.size < total };
+}
+function shMatch(st) {
+  const f = SubjectHubState.filter;
+  return f === 'all' || (f === 'pyq' && st.pyq) || (f === 'weak' && st.weak) || (f === 'unfinished' && st.unfinished);
+}
+function shSetFilter(f) { SubjectHubState.filter = f; renderView(); }
+function shToggle(key, el) { SubjectHubState.open[key] = el.open; }
+
+function renderSubjectPage(v, subject) {
+  const key = String(subject || '').trim().toLowerCase();
+  const mods = (typeof profileVisible === 'function' ? profileVisible : (x => x))(CurriculumContext.filterModules(AppModules))
+    .filter(m => String(m.subject || '').trim().toLowerCase() === key && nbModuleQCount(m) > 0);
+  const chapters = new Map();
+  mods.forEach(m => {
+    const ch = String(m.chapter || m.topicTitle || '').trim() || tx('Other', 'अन्य');
+    const c = chapters.get(ch.toLowerCase()) || { name: ch, items: [] };
+    c.items.push({ m, st: shTopicStats(m) }); chapters.set(ch.toLowerCase(), c);
+  });
+  const all = Array.from(chapters.values());
+  const counts = { all: mods.length, pyq: 0, weak: 0, unfinished: 0 };
+  all.forEach(c => c.items.forEach(({ st }) => { if (st.pyq) counts.pyq++; if (st.weak) counts.weak++; if (st.unfinished) counts.unfinished++; }));
+  const name = subjectLabel(subject);
+  const chips = [['all', tx('All', 'सभी')], ['pyq', 'PYQ'], ['weak', tx('Weak', 'कमज़ोर')], ['unfinished', tx('Unfinished', 'अधूरे')]]
+    .map(([id, label]) => `<button type="button" class="sh-chip ${SubjectHubState.filter === id ? 'on' : ''}" aria-pressed="${SubjectHubState.filter === id}" onclick="shSetFilter('${id}')">${label} <b>${counts[id]}</b></button>`).join('');
+  const shown = all.map(c => ({ ...c, items: c.items.filter(x => shMatch(x.st)) })).filter(c => c.items.length);
+  const pct = n => Math.max(0, Math.min(100, Math.round(n)));
+  const chapterHtml = (c, i) => {
+    const qs = c.items.reduce((n, x) => n + x.st.total, 0), done = c.items.reduce((n, x) => n + x.st.done, 0);
+    const ans = c.items.reduce((n, x) => n + x.st.answered, 0), cor = c.items.reduce((n, x) => n + x.st.correct, 0);
+    const k = key + '|' + c.name.toLowerCase();
+    const open = SubjectHubState.open[k] ?? (i === 0 || SubjectHubState.filter !== 'all');
+    const accTxt = ans ? `${Math.round(cor / ans * 100)}%` : '—';
+    return `<details class="sh-ch" ${open ? 'open' : ''} ontoggle="shToggle(${nbJsAttr(k)}, this)">
+      <summary><span class="sh-ch-main"><strong>${escapeHtml(c.name)}</strong>
+        <small>${tx(`${qs} questions · ${c.items.length} topic${c.items.length === 1 ? '' : 's'} · accuracy ${accTxt}`, `${qs} सवाल · ${c.items.length} टॉपिक · सटीकता ${accTxt}`)}</small>
+        <span class="sh-bar" role="progressbar" aria-label="${tx('Done', 'हो गए')}" aria-valuenow="${pct(done / Math.max(1, qs) * 100)}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct(done / Math.max(1, qs) * 100)}%"></i></span></span>
+        <span class="sh-chev" aria-hidden="true">⌄</span></summary>
+      <div class="sh-topics">${c.items.map(({ m, st }) => `<div class="sh-topic">
+        <div class="sh-t-head">${c.items.length === 1 && String(m.topicTitle || '').trim().toLowerCase() === c.name.toLowerCase()
+          ? `<button type="button" class="sh-t-name sm" onclick="navigate('topic', {moduleId:${nbJsAttr(m.moduleId)}})">${tx('Open topic', 'टॉपिक खोलें')} ›</button>`
+          : `<button type="button" class="sh-t-name" onclick="navigate('topic', {moduleId:${nbJsAttr(m.moduleId)}})">${escapeHtml(m.topicTitle || m.topic || '')}</button>`}
+          <span class="sh-t-meta">${st.pyq ? '<span class="sh-tag pyq">PYQ</span>' : ''}${st.weak ? `<span class="sh-tag weak">${tx('Weak', 'कमज़ोर')}</span>` : ''}${tx(`${st.done}/${st.total} done`, `${st.done}/${st.total} हुए`)}${st.acc != null ? ` · ${Math.round(st.acc * 100)}%` : ''}</span></div>
+        <div class="sh-acts">
+          <button type="button" class="sh-act" onclick="navigate('learn', {moduleId:${nbJsAttr(m.moduleId)}})">📖 ${tx('Learn', 'सीखें')}</button>
+          <button type="button" class="sh-act" onclick="navigate('practice', {moduleId:${nbJsAttr(m.moduleId)}, qIndex:0})">✍️ ${tx('Practice', 'अभ्यास')}</button>
+          <button type="button" class="sh-act primary" onclick="sjTopicTest(${nbJsAttr(m.moduleId)})">⏱️ ${tx('Test', 'टेस्ट')}</button>
+        </div></div>`).join('')}</div>
+    </details>`;
+  };
+  v.innerHTML = `
+    <div class="nav-breadcrumb"><button onclick="navigate('home')">${tx('Home', 'होम')}</button><span class="sep">/</span><button onclick="navigate('subjects')">${tx('Subjects', 'विषय')}</button><span class="sep">/</span><span>${escapeHtml(name)}</span></div>
+    <div class="sc-head"><div><h1>${escapeHtml(name)}</h1><p>${tx(`${all.length} chapter${all.length === 1 ? '' : 's'} · ${mods.length} topics`, `${all.length} अध्याय · ${mods.length} टॉपिक`)}</p></div>
+      <button type="button" class="btn-action-sm" onclick="navigate('subjects')">← ${tx('Subjects', 'विषय')}</button></div>
+    <div class="sh-chips" role="group" aria-label="${tx('Filter topics', 'टॉपिक छाँटें')}">${chips}</div>
+    ${shown.length ? `<div class="sh-list">${shown.map(chapterHtml).join('')}</div>`
+      : `<div class="sc-empty"><strong>${all.length ? tx('Nothing here yet', 'यहाँ अभी कुछ नहीं') : tx('No chapters with questions', 'सवालों वाला कोई अध्याय नहीं')}</strong><span>${all.length ? tx('Try another filter.', 'दूसरा filter चुनें।') : tx('Import a topic for this subject to start.', 'शुरू करने के लिए इस विषय का topic import करें।')}</span>${all.length ? `<button type="button" class="btn-action-sm" onclick="shSetFilter('all')">${tx('Show all', 'सभी दिखाएँ')}</button>` : ''}</div>`}`;
+}
+
+/* ---------- Result: time card ---------- */
+function fmtSec(s) { s = Math.max(0, Math.round(Number(s) || 0)); return s >= 60 ? `${Math.floor(s / 60)}m ${String(s % 60).padStart(2, '0')}s` : `${s}s`; }
+function resultTimeCard(res, keyFor) {
+  const t = res && res.timeSpent; if (!t || !res.questions || !res.questions.length) return '';
+  const rows = res.questions.map((q, i) => { const k = keyFor(q); const a = res.answers?.[k]; return { i, sec: Number(t[i]) || 0, state: !a ? 'skip' : String(a).toUpperCase() === String(q.answer || '').toUpperCase() ? 'ok' : 'bad' }; });
+  const used = rows.reduce((n, r) => n + r.sec, 0); if (used <= 0) return '';
+  const n = rows.length, mine = used / n;
+  const pace = Number(res.durationSeconds) > 0 ? Number(res.durationSeconds) / n : null;
+  const ls = learningStats(); const usual = ls.answered >= 20 && ls.sec > 0 ? ls.sec / ls.answered : null;
+  const cmp = (a, b) => b == null ? '' : a <= b ? `<em class="ok">${tx('faster', 'तेज़')}</em>` : `<em class="slow">${tx('slower', 'धीमा')}</em>`;
+  return `<section class="rs-card rs-pace"><h3>🚀 ${tx('Speed check', 'रफ़्तार जाँच')}</h3>
+    <div class="rs-pace-grid">
+      <span><b>${fmtSec(mine)}</b>${tx('per question (you)', 'प्रति सवाल (आप)')}</span>
+      ${pace ? `<span><b>${fmtSec(pace)}</b>${tx('allowed pace', 'तय रफ़्तार')} ${cmp(mine, pace)}</span>` : ''}
+      ${usual ? `<span><b>${fmtSec(usual)}</b>${tx('your usual', 'आपका औसत')} ${cmp(mine, usual)}</span>` : ''}
+      <span><b>${fmtSec(used)}</b>${tx('total used', 'कुल समय')}${Number(res.durationSeconds) > 0 ? ` / ${fmtSec(res.durationSeconds)}` : ''}</span>
+    </div>
+  </section>`;
+}
+
+/* ---------- Me screen ---------- */
+function renderMePage(v) {
+  const s = (typeof ServerState !== 'undefined') ? ServerState.session : null;
+  const ls = learningStats();
+  const tests = (typeof ResultHistory !== 'undefined' ? ResultHistory : []).filter(r => r && r.ws === WorkspaceManager.current().id);
+  const st = typeof sjStreak === 'function' ? sjStreak() : { streak: 0, best: 0 };
+  const acc = ls.answered ? Math.round(ls.correct / ls.answered * 100) + '%' : '—';
+  const hrs = ls.sec >= 3600 ? (ls.sec / 3600).toFixed(1) + 'h' : Math.round(ls.sec / 60) + 'm';
+  const p = typeof studentProfile === 'function' ? studentProfile() : null;
+  const nameTxt = (typeof CloudState !== 'undefined' && CloudState.name) || (s && s.email) || tx('Guest', 'मेहमान');
+  const mistakes = (UserState.mistakeBook || []).length;
+  const marks = typeof bookmarkedIds === 'function' ? bookmarkedIds().size : 0;
+  const tile = (b, l) => `<span class="me-tile"><b>${b}</b>${l}</span>`;
+  const row = (ico, label, sub, on) => `<button type="button" class="me-row" onclick="${on}"><span class="me-ico" aria-hidden="true">${ico}</span><span class="me-row-main"><b>${label}</b>${sub ? `<small>${sub}</small>` : ''}</span><span aria-hidden="true">›</span></button>`;
+  v.innerHTML = `
+    <section class="me-head">
+      <span class="me-avatar" aria-hidden="true">${escapeHtml(String(nameTxt).trim().charAt(0).toUpperCase() || '?')}</span>
+      <div class="me-id"><h1>${escapeHtml(nameTxt)}</h1><p>${s ? escapeHtml(s.email || '') : tx('Not logged in — progress stays on this phone only', 'Login नहीं — progress सिर्फ़ इस phone में')}</p></div>
+      <button type="button" class="btn-action-sm" onclick="openAccount()">${s ? tx('Account', 'Account') : tx('Login', 'Login')}</button>
+    </section>
+    ${typeof profileLabel === 'function' ? `<button type="button" class="me-profile" onclick="${typeof openProfileSheet === 'function' ? 'openProfileSheet()' : ''}">🎯 <span>${p ? escapeHtml(profileLabel(p)) : tx('Choose your exam and branch', 'अपना exam और branch चुनें')}</span><b>${tx('Change', 'बदलें')} ›</b></button>` : ''}
+    <section class="me-tiles" aria-label="${tx('Your progress', 'आपकी progress')}">
+      ${tile(ls.answered, tx('answered', 'सवाल हल'))}${tile(acc, tx('accuracy', 'सटीकता'))}${tile(tests.length, tx('tests', 'टेस्ट'))}${tile(st.streak + '🔥', tx('day streak', 'दिन लगातार'))}${tile(hrs, tx('study time', 'पढ़ाई का समय'))}${tile(st.best, tx('best streak', 'सबसे लंबा'))}
+    </section>
+    <section class="me-list" aria-label="${tx('Shortcuts', 'शॉर्टकट')}">
+      ${row('📜', tx('Test history', 'टेस्ट इतिहास'), tx(`${tests.length} saved`, `${tests.length} सहेजे`), 'openTestHistoryModal()')}
+      ${row('📕', tx('Mistake book', 'गलतियों की किताब'), tx(`${mistakes} questions`, `${mistakes} सवाल`), "navigate('mistakes')")}
+      ${row('⭐', tx('Bookmarks test', 'Bookmark टेस्ट'), tx(`${marks} saved`, `${marks} सहेजे`), 'sbOpenBookmarkTest()')}
+      ${row('🎯', tx('Mastery', 'महारत'), '', "navigate('mastery')")}
+      ${row('🏁', tx('Daily goal', 'रोज़ का लक्ष्य'), StudySettings && StudySettings.dailyGoal ? tx(`${StudySettings.dailyGoal} questions a day`, `रोज़ ${StudySettings.dailyGoal} सवाल`) : tx('Not set', 'तय नहीं'), 'sjOpenGoalSettings()')}
+    </section>
+    <section class="me-list" aria-label="${tx('Settings', 'सेटिंग')}">
+      ${row('Aa', tx('Language & text size', 'भाषा और अक्षर आकार'), '', 'openDisplaySettings()')}
+      ${row(UserState.theme === 'dark' ? '☀️' : '🌙', tx('Dark mode', 'Dark mode'), UserState.theme === 'dark' ? tx('On', 'चालू') : tx('Off', 'बंद'), "document.getElementById('btnTheme').click(); renderView()")}
+      ${row('💾', tx('Backup & restore', 'Backup और Restore'), '', 'openBackupCenter()')}
+      ${s ? row('🔄', tx('Sync now', 'अभी sync करें'), '', "cloudSync('manual')") : ''}
+    </section>
+    <p class="me-ver">Master TestBook ${escapeHtml(document.querySelector('meta[name="app-version"]')?.content || '')}</p>`;
+}
+const _meRenderView = renderView;
+renderView = function () {
+  if (Route && Route.page === 'me') {
+    try { nbApplyShellForRoute('me'); updateAppBackButton(); } catch (_) {}
+    const t = document.getElementById('txtHeaderTitle'); if (t) t.textContent = '👤 ' + tx('ME', 'मैं');
+    const c = document.getElementById('mainView'); if (c) renderMePage(c);
+    return;
+  }
+  _meRenderView();
+};
 
 /* =========================================================================
    7. UNIVERSAL SEARCH (CONNECTED TO TAXONOMY ENGINE)
