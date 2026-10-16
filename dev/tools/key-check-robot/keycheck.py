@@ -5,7 +5,7 @@ Runs on GitHub Actions (.github/workflows/key-check-robot.yml), so it costs no C
 
 Checks (the official SSC key stays the truth; these only RAISE A FLAG for a human/Claude to look at):
   A  Structure   : answer is A-D, exactly 4 non-empty options, no two options identical (else "answer ambiguous").
-  B  Conflict    : the same question (same text) appears in two papers with a DIFFERENT answer text.
+  B  Conflict    : the same question (same text AND same set of options) appears in two papers with a DIFFERENT answer text.
   C  Skew        : one paper where a single letter is the answer for > 45 % of >= 20 questions (key may be shifted).
   D  Second opinion (only with --gemini and env GEMINI_API_KEY): Gemini answers the question alone;
                  if it disagrees with the key -> "जाँचो" flag. A disagreement is NOT proof the key is wrong.
@@ -21,9 +21,10 @@ KEY = os.environ.get('SUPABASE_SECRET_KEY', '').strip()
 GEMINI_KEY = os.environ.get('GEMINI_API_KEY', '').strip()
 GEMINI_MODEL = os.environ.get('GEMINI_MODEL', 'gemini-2.5-flash')
 SUMMARY = []
-HARD = {'A1', 'A2', 'B'}
+HARD = {'A1', 'A2', 'A3', 'B'}
 LABEL = {
     'A1': 'सवाल अधूरा (answer या options ठीक नहीं)',
+    'A3': 'सवाल का text बहुत छोटा/कटा हुआ',
     'A2': 'दो options एक जैसे — जवाब साफ़ नहीं',
     'B': 'यही सवाल दूसरे paper में है, पर जवाब अलग',
     'C': 'इस paper में एक ही option बहुत बार सही — key खिसकी हो सकती है',
@@ -61,11 +62,13 @@ def audit(rows):
         texts = [norm(opt_text(o)) for o in opts] if isinstance(opts, list) else []
         if ans not in ('A', 'B', 'C', 'D') or len(texts) != 4 or not all(texts) or not norm(qtext(r)):
             flags.append({'id': r['id'], 'code': 'A1', 'why': LABEL['A1']}); continue
+        if len(norm(qtext(r))) < 8:
+            flags.append({'id': r['id'], 'code': 'A3', 'why': LABEL['A3']})
         if len(set(texts)) < 4:
             flags.append({'id': r['id'], 'code': 'A2', 'why': LABEL['A2']})
         by_letter = {(o.get('letter') or 'ABCD'[i]): norm(opt_text(o)) for i, o in enumerate(opts)}
         key_text = by_letter.get(ans) or texts['ABCD'.index(ans)]
-        seen[norm(qtext(r))].append((r['id'], key_text))
+        seen[(norm(qtext(r)), tuple(sorted(texts)))].append((r['id'], key_text))
         if r.get('source_ref'): per_paper[r['source_ref']].append(ans)
     for qt, items in seen.items():
         if len({t for _, t in items}) > 1:

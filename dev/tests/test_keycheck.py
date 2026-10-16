@@ -31,6 +31,11 @@ check('Hindi matra options are different', kc.audit([row('h1', 'सही रू
 check('ligature/case/space/end-dot are the same option', codes(kc.audit([row('x', 'Q one?', ['Office', 'Of\ufb01ce.', 'c', 'd'], 'C')])[0], 'x') == ['A2'])
 check('questions differing only by a sign are NOT a conflict', kc.audit([row('s1', 'Value of 6 + 2?', ['8', '4', '12', '3'], 'A'), row('s2', 'Value of 6 \u2212 2?', ['8', '4', '12', '3'], 'B')])[0] == [])
 
+check('cut-off question text ("A") -> A3', codes(kc.audit([row('c1', 'A', ['10%', '20%', '30%', '40%'], 'B')])[0], 'c1') == ['A3'])
+g1 = row('n1', 'Which of the following is NOT a noble gas?', ['Argon', 'Boron', 'Krypton', 'Neon'], 'B')
+g2 = row('n2', 'Which of the following is NOT a noble gas?', ['Argon', 'Helium', 'Hydrogen', 'Xenon'], 'C')
+check('same stem but different options is NOT a conflict', kc.audit([g1, g2])[0] == [])
+
 # same question in two papers: options shuffled but SAME answer text -> fine; different answer text -> B
 p1 = row('p1', 'Unit of power is?', ['Watt', 'Joule', 'Newton', 'Pascal'], 'A')
 p2 = row('p2', 'Unit of power is?', ['Joule', 'Pascal', 'Watt', 'Newton'], 'C')
