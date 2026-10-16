@@ -19,6 +19,7 @@ Student test-prep PWA (SSC/RRB). Served by GitHub Pages from the repo root.
 - `src/css/18-v3-design.css` (loaded last) = design tokens (blueprint colours, Inter/Plus Jakarta/Noto Devanagari/JetBrains Mono), solid compact cards, glass only on header + floating dock, CBT/result styles. Fonts load non-blocking.
 - `src/js/17b-student-profile.js` = exam + branch profile; filter happens in `cloudPullContent` (other branches never reach the phone) + `profileVisible()` on Home/Subjects (hides demo/other-exam local topics). Data-write paths untouched.
 - `src/js/22b-cbt-confidence.js` = "How sure?" tags in CBT + result soft landing / what-if.
+- `src/js/22c-cbt-tools.js` = timer hide, 5-min alert, rough pad (palette 5 states in 22-study-engines). `src/js/22d-v3-hub-me.js` = subject hub accordions (overrides renderSubjectPage), result "Speed check" (`rs-pace*`; `rs-time` is taken), Me screen (route `me`).
 - Tests: `test_profile.py`, `test_v3.py` (overflow 360/412, tap ≥ 48/44 px, contrast ≥ 4.5 light+dark). CI: `.github/workflows/tests.yml` runs run_all.sh on every push.
 
 ## Release rules
