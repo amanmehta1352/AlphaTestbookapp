@@ -6,7 +6,7 @@ results = []
 def rec(name, ok, detail=''):
     results.append((name, 'PASS' if ok else 'FAIL', str(detail)[:300])); print('PASS' if ok else 'FAIL', name, str(detail)[:300])
 def counts(pg): return pg.evaluate("Object.fromEntries(Object.entries(cleanupScan().groups).map(([k,g])=>[k,g.items.length]).filter(x=>x[1]))")
-F.start('/home/claude/work/SUPABASE_SCHEMA_V1.sql'); fake = F.Fake()
+F.start(F.SCHEMA_V1); fake = F.Fake()
 try:
     with sync_playwright() as p:
         b = p.chromium.launch(); ctx = b.new_context(viewport={'width': 390, 'height': 844}); ctx.route(F.URL + '/**', fake.handle)

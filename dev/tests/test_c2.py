@@ -9,7 +9,7 @@ def db(sql): o = F.psql_raw(sql); return o.splitlines()[-1] if o else ''
 site = '/tmp/site_mtb'; shutil.rmtree(site, ignore_errors=True); shutil.copytree(os.environ.get('MTB_SITE', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))), site + '/AlphaTestbookapp')
 srv = subprocess.Popen(['python3', '-m', 'http.server', '8766', '--bind', '127.0.0.1'], cwd=site, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 APP = 'http://127.0.0.1:8766/AlphaTestbookapp/'
-F.start(F.SCHEMA_V1, F.SCHEMA_V2); fake = F.Fake()
+F.start(F.SCHEMA_V1, F.SCHEMA_V2, F.SCHEMA_V3); fake = F.Fake()
 try:
     with sync_playwright() as p:
         b = p.chromium.launch()

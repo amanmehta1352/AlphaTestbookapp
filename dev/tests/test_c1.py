@@ -7,7 +7,7 @@ def rec(name, ok, detail=''):
     results.append((name, 'PASS' if ok else 'FAIL', str(detail)[:260])); print('PASS' if ok else 'FAIL', name, str(detail)[:260])
 def db(sql): return F.psql_raw(sql).splitlines()[-1] if F.psql_raw(sql) else ''
 
-F.start(F.SCHEMA_V1, F.SCHEMA_V2)
+F.start(F.SCHEMA_V1, F.SCHEMA_V2, F.SCHEMA_V3)
 fake = F.Fake()
 try:
     with sync_playwright() as p:

@@ -21,7 +21,7 @@ site = '/tmp/site_mtb_studio'; shutil.rmtree(site, ignore_errors=True)
 shutil.copytree(os.environ.get('MTB_SITE', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))), site + '/AlphaTestbookapp', ignore=shutil.ignore_patterns('.git', 'dev'))
 srv = subprocess.Popen(['python3', '-m', 'http.server', '8767', '--bind', '127.0.0.1'], cwd=site, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 APP = 'http://127.0.0.1:8767/AlphaTestbookapp/'; STUDIO = APP + 'admin/'
-F.start(F.SCHEMA_V1, F.SCHEMA_V2); fake = F.Fake()
+F.start(F.SCHEMA_V1, F.SCHEMA_V2, F.SCHEMA_V3); fake = F.Fake()
 try:
     with sync_playwright() as p:
         b = p.chromium.launch(); errors = []
