@@ -1,6 +1,8 @@
 """Small Supabase stand-in for tests: Auth (password/refresh/logout) + a PostgREST subset,
 executed against a real local PostgreSQL that has the real schema and RLS rules."""
 import json, subprocess, re, os, urllib.parse, itertools
+SERVER_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'server'))
+SCHEMA_V1 = os.path.join(SERVER_DIR, 'SUPABASE_SCHEMA_V1.sql'); SCHEMA_V2 = os.path.join(SERVER_DIR, 'SUPABASE_SCHEMA_V2.sql')
 
 PG = '/usr/lib/postgresql/16/bin'
 D = '/tmp/pgtest_mtb'
@@ -13,13 +15,13 @@ PK = {'exams': 'id', 'topics': 'id', 'questions': 'id', 'import_batches': 'id', 
 def sh(cmd):
     return subprocess.run(['su', 'postgres', '-s', '/bin/bash', '-c', cmd], capture_output=True, text=True)
 
-def start(schema_path):
+def start(*schema_paths):
     sh(f'{PG}/pg_ctl -D {D}/data stop >/dev/null 2>&1'); subprocess.run(['rm', '-rf', D]); os.makedirs(D); subprocess.run(['chown', 'postgres', D])
     r = sh(f"{PG}/initdb -D {D}/data -A trust -U postgres >/dev/null && {PG}/pg_ctl -D {D}/data -o '-k {D} -c listen_addresses=' -l {D}/log start >/dev/null && sleep 1.5")
     assert r.returncode == 0, r.stderr
     psql_raw('create database mtb', db='postgres')
     psql_raw(open(os.path.join(os.path.dirname(__file__), 'stub.sql')).read())
-    psql_raw(open(schema_path).read())
+    for sp in schema_paths: psql_raw(open(sp).read())
     psql_raw(f"insert into auth.users(id,email,raw_user_meta_data) values ('{ADMIN[0]}','{ADMIN[1]}','{{}}'),('{STUDENT[0]}','{STUDENT[1]}','{{}}'); insert into public.admins(user_id) values ('{ADMIN[0]}');")
 
 def stop():

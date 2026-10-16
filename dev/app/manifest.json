@@ -146,6 +146,13 @@
    ]
   },
   {
+   "file": "src/css/17-admin-studio.css",
+   "wrap": [
+    "<style id=\"v2110-admin-studio\">",
+    "</style>"
+   ]
+  },
+  {
    "file": "src/html/head-14.html"
   },
   {
@@ -261,6 +268,10 @@
   },
   {
    "file": "src/js/24c-cleanup.js",
+   "script": true
+  },
+  {
+   "file": "src/js/24d-admin-studio.js",
    "script": true
   },
   {

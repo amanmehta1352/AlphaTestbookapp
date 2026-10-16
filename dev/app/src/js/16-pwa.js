@@ -16,6 +16,6 @@ async function pwaInstall() {
   try { await InstallPrompt.userChoice; } catch (_) {}
   InstallPrompt = null; pwaPaintInstall();
 }
-if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol) && !window.MTB_STUDIO) {
   window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(e => console.warn('[PWA] service worker not registered', e)); });
 }

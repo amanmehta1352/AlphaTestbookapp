@@ -41,9 +41,11 @@ const Server = {
     this.setSession(d); ServerState.isAdmin = null; return d;
   },
   async ensureFresh() {
-    const s = ServerState.session;
+    let s = ServerState.session;
     if (!s) throw new Error('पहले login करें।');
     if (Date.now() < Number(s.expires_at) - 60000) return;
+    // The app and the Admin Studio share one login: another page may already have renewed it.
+    try { const stored = JSON.parse(localStorage.getItem(SERVER_SESSION_KEY) || 'null'); if (stored && stored.refresh_token && Number(stored.expires_at) > Number(s.expires_at)) { ServerState.session = s = stored; if (Date.now() < Number(s.expires_at) - 60000) return; } } catch (_) {}
     ServerState.session = null;
     try { const d = await this.req('/auth/v1/token?grant_type=refresh_token', { method: 'POST', body: { refresh_token: s.refresh_token } }); this.setSession({ ...d, user: d.user || { email: s.email } }); }
     catch (e) { if (e.network) { ServerState.session = s; throw e; } await this.logout(true); throw new Error('Login की अवधि खत्म — दोबारा login करें।'); }

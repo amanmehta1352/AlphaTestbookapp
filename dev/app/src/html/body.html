@@ -45,11 +45,12 @@
     <button class="drawer-item" onclick="navigate('mastery')" data-en="🎯 Mastery" data-hi="🎯 महारत">🎯 Mastery</button>
     <div class="drawer-section-title" data-en="SETTINGS & DATA" data-hi="सेटिंग और डेटा">SETTINGS & DATA</div>
     <button class="drawer-item" onclick="openDisplaySettings()" data-en="Aa Display (language, text size)" data-hi="Aa डिस्प्ले (भाषा, अक्षर आकार)">Aa Display (language, text size)</button>
-    <button class="drawer-item" onclick="openImportModal()" data-en="📥 Import questions" data-hi="📥 सवाल import करें">📥 Import questions</button>
-    <button class="drawer-item" onclick="openCleanup()" data-en="🧹 Data cleanup" data-hi="🧹 Data सफ़ाई">🧹 Data cleanup</button>
+    <a class="drawer-item admin-only" id="drwStudio" href="admin/" data-en="🛠️ Admin Studio" data-hi="🛠️ Admin Studio">🛠️ Admin Studio</a>
+    <button class="drawer-item admin-only" onclick="openImportModal()" data-en="📥 Import questions" data-hi="📥 सवाल import करें">📥 Import questions</button>
+    <button class="drawer-item admin-only" onclick="openCleanup()" data-en="🧹 Data cleanup" data-hi="🧹 Data सफ़ाई">🧹 Data cleanup</button>
     <button class="drawer-item" onclick="openHealthCheck()" data-en="🩺 Health Check" data-hi="🩺 Health Check">🩺 Health Check</button>
     <button class="drawer-item" onclick="openBackupCenter()" data-en="💾 Backup & Restore" data-hi="💾 Backup और Restore">💾 Backup &amp; Restore</button>
-    <button class="drawer-item" onclick="openServerSync()" data-en="☁️ Server (Admin)" data-hi="☁️ Server (Admin)">☁️ Server (Admin)</button>
+    <button class="drawer-item admin-only" onclick="openServerSync()" data-en="☁️ Server (Admin)" data-hi="☁️ Server (Admin)">☁️ Server (Admin)</button>
     <button class="drawer-item" id="drwInstall" hidden onclick="pwaInstall()" data-en="📲 Install app" data-hi="📲 ऐप install करें">📲 Install app</button>
     <button class="drawer-item" onclick="openDataControlModal()" data-en="🛡️ Data control" data-hi="🛡️ डेटा नियंत्रण">🛡️ Data control</button>
     <button class="drawer-item" onclick="resetAppData()" data-en="🗑️ Reset app data" data-hi="🗑️ ऐप डेटा रीसेट">🗑️ Reset app data</button>

@@ -142,6 +142,7 @@ async function confirmResetAppData() {
 
 /* Drawer Controls */
 function syncDrawerVisibility(){
+  document.body.classList.toggle('mtb-admin-tools', adminToolsAllowed());
   const board=WorkspaceManager.current().type==='BOARD';
   const setVisible=(id,visible)=>{const el=document.getElementById(id);if(el)el.hidden=!visible;};
   // Keep tools/data controls available; hide only Competitive-specific global destinations in Board context.
@@ -153,5 +154,13 @@ function closeDrawer() { document.getElementById('sideDrawer').classList.remove(
 document.getElementById('btnMenu').onclick = () => { syncDrawerVisibility(); document.getElementById('sideDrawer').classList.add('open'); document.getElementById('drawerOverlay').classList.add('open'); };
 document.getElementById('btnCloseDrawer').onclick = closeDrawer; document.getElementById('drawerOverlay').onclick = closeDrawer; document.getElementById('modalOverlay').onclick = closeModal;
 
+// Admin tools (import, cleanup, server upload, Studio) show only for the admin login,
+// for this phone if it already holds admin-imported data, or when opened as a local file.
+function adminToolsAllowed() {
+  if (typeof CloudState !== 'undefined' && CloudState.isAdmin === true) return true;
+  if (typeof cloudOnline === 'function' && !cloudOnline()) return true;
+  const loggedInStudent = typeof ServerState !== 'undefined' && ServerState.session && typeof CloudState !== 'undefined' && CloudState.isAdmin === false;
+  return !loggedInStudent && (ImportHistory || []).length > 0;
+}
 /* Boot Application — Phase 1A hydration gate */
-initApp();
+if (window.MTB_STUDIO) studioBoot(); else initApp();

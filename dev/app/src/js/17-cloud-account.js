@@ -203,7 +203,7 @@ function cloudSheetHtml() {
   return `${msg}
     <div class="cl-user"><span class="cl-avatar" aria-hidden="true">${escapeHtml((CloudState.name || s.email || '?').trim().charAt(0).toUpperCase())}</span><span><b>${escapeHtml(CloudState.name || s.email || 'Login हो गया')}</b><small>${escapeHtml(s.email || '')}${CloudState.isAdmin ? ' · Admin' : ''}</small></span></div>
     <div class="cl-stats"><span><b>${CloudState.lastSyncAt ? fmtWhen(CloudState.lastSyncAt) : '—'}</b>आख़िरी sync</span><span><b>${CloudState.isAdmin ? '—' : (CloudState.serverQuestions || 0)}</b>server के सवाल</span><span><b>${AttemptHistory.filter(a => !a.synced && !a.syncSkip).length}</b>भेजने बाकी</span></div>
-    ${CloudState.isAdmin ? '<p class="srv-note">आप admin हैं: आपके फ़ोन के सवाल ही असली हैं, इसलिए यहाँ server से सवाल नहीं आते। सवाल भेजने के लिए "☁️ Server (Admin)" खोलें। आपकी progress यहाँ से sync होती है।</p>' : ''}
+    ${CloudState.isAdmin ? '<p class="srv-note">आप admin हैं: इस फ़ोन पर server से सवाल नहीं आते। सवाल डालने, जाँचने और publish करने के लिए <a href="admin/">🛠️ Admin Studio</a> खोलें। आपकी progress यहाँ से sync होती है।</p>' : ''}
     <button type="button" class="btn-nav primary srv-wide" onclick="cloudSync('manual')" ${CloudState.busy ? 'disabled' : ''}>${CloudState.busy ? '⏳ Sync हो रहा है…' : '🔄 अभी sync करें'}</button>
     <p class="srv-note">ऐप खुलते समय और हर 10 मिनट में अपने-आप sync होता है। बिना internet के जो करेंगे, वह internet आने पर भेजा जाएगा। (Revision cards अभी सिर्फ़ इसी फ़ोन में रहते हैं।)</p>
     <button type="button" class="btn-action-sm" onclick="cloudLogout()">Logout</button>`;
