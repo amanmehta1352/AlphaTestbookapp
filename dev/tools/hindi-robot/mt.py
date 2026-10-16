@@ -31,7 +31,8 @@ def needs_translation(s):
 _KEEPA = r'(?:is|and|or|was|has|had|stands|means|can|will|sits|sat|lives|are|were|ranks|gets|got|scored|faces|facing|of|to|in|on|at|from|who|whose|said)'
 _UNIT = r'(?:kN|MN|N|mm|cm|km|m|kg|g|mg|s|ms|min|hr|h|V|kV|mV|A|mA|kA|Ω|kΩ|W|kW|MW|kWh|VA|kVA|MVA|Hz|kHz|rpm|°C|°F|K|Pa|kPa|MPa|GPa|bar|J|kJ|cal|L|ml|m/s|km/h|%)'
 _PROT = re.compile(r"""(?x)
-   \(\?\)                                                # the question mark placeholder (?)
+   _{2,}                                                 # fill-in-the-blank ______
+ | \(\?\)                                                # the question mark placeholder (?)
  | \d+(?:\.\d+)?\s*""" + _UNIT + r"""(?:/""" + _UNIT + r""")?[²³]?(?![A-Za-z])   # 10 kN/m², 4 m, 220 V
  |   [‘'"“][^‘’'"“”\n]{1,40}[’'"”]                      # quoted codes / words: 'DHE', "FMG"
  | (?<![A-Za-z])(?:[A-Z]{2,}[a-z]?|[A-Z]\d+|\d+[A-Z]+)(?![A-Za-z])   # codes, acronyms: HPJ, RCC, SI, P1, 3D
