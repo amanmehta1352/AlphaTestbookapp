@@ -50,7 +50,11 @@ def join_lines(t):
     return '\n'.join(out)
 
 
+LIG = {'ﬀ': 'ff', 'ﬁ': 'fi', 'ﬂ': 'fl', 'ﬃ': 'ffi', 'ﬄ': 'ffl', 'ﬅ': 'st', 'ﬆ': 'st'}
+
+
 def fix(s):
+    for a, b in LIG.items(): s = s.replace(a, b)
     s = s.replace('‍', '').replace('​', '').replace(' ̊', '°').replace('̊', '°')
     s = re.sub(r'(?<![A-Za-z])((?:k?N|kg|m)/)?(mm|cm|km|m|sec|s)([23])(?![0-9A-Za-z])', lambda m: (m.group(1) or '') + m.group(2) + '²³'[int(m.group(3)) - 2], s)
     for a, b in [('H2O', 'H₂O'), ('CO2', 'CO₂'), ('NH3', 'NH₃'), ('C3S', 'C₃S'), ('C2S', 'C₂S'), ('C3A', 'C₃A'), ('C4AF', 'C₄AF')]:
@@ -120,6 +124,7 @@ def paper_to_txt(pdf, work):
         if not subj: skip['अनजान section'] += 1; continue
         if q['figs'] or q.get('gap', 0) > 30: skip['चित्र वाला'] += 1; continue
         if not q['answer']: skip['answer साफ़ नहीं'] += 1; continue
+        if re.search('[ऀ-ॿ]', q['text']): skip['टूटा Hindi text'] += 1; continue  # Hindi from these PDFs loses matras
         if len(q['opts']) != 4 or not all(q['opts'].get(n, '').strip() for n in '1234'): skip['options अधूरे'] += 1; continue
         if subj == 'Reasoning':
             t = rclass(q['text'][:400]); topic = t if t in RCH else UNTAGGED; chapter = RCH.get(t, UNTAGGED)

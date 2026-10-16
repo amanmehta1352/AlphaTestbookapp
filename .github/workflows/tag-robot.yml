@@ -1,0 +1,36 @@
+# 🏷️ Tag Robot — moves "Mixed (Untagged)" questions into chapters, learning from hand-tagged questions.
+# Runs after every "PYQ Robot" run, or by hand: Actions → Tag Robot → Run workflow. Needs secret SUPABASE_SECRET_KEY.
+name: Tag Robot
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'सिर्फ़ जाँच (कुछ न बदलें)'
+        type: boolean
+        default: false
+  workflow_run:
+    workflows: ['PYQ Robot']
+    types: [completed]
+permissions:
+  contents: read
+concurrency:
+  group: tag-robot
+  cancel-in-progress: false
+jobs:
+  tag:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -q scikit-learn
+      - name: Tag
+        env:
+          DRY: ${{ inputs.dry_run }}
+          SUPABASE_URL: https://fzkvwkrbtykucjfdqiin.supabase.co
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: |
+          if [ "$DRY" = "true" ]; then python3 dev/tools/tag-robot/tagger.py --dry-run; else python3 dev/tools/tag-robot/tagger.py; fi
