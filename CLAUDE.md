@@ -8,6 +8,7 @@ Student test-prep PWA (SSC/RRB). Served by GitHub Pages from the repo root.
 - `dev/tests/`: Playwright suites; `fake_supabase.py` runs the real schema/RLS on local Postgres 16.
 - `dev/server/SUPABASE_SCHEMA_V1.sql` + `V2.sql` + `V3.sql`: all applied on the live Supabase project (V2 = status/solutions, V3 = source_ref, 2026-10-16).
 - `dev/tools/pyq-from-response-sheet/`: PDF → PYQ pipeline (`v2/` = generic version used for all SSC JE 2024 papers).
+- `dev/tools/pyq-robot/robot.py` + `.github/workflows/pyq-robot.yml`: 🤖 PYQ Robot. User runs it from phone (Actions → PYQ Robot → paste SSC JE response-sheet links) — imports as draft with no Claude usage. Needs repo secret `SUPABASE_SECRET_KEY`. GA/Engineering land in topic "Mixed (Untagged)" (tag later); figure questions skipped. Test: `dev/tests/test_robot.py`.
 - Server changes: Claude applies them via the Supabase connector. Take a backup into schema `backup` first; avoid DROP (needs extra confirmation) — use ALTER / IF NOT EXISTS.
 
 ## Release rules

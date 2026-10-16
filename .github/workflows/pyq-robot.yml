@@ -1,0 +1,42 @@
+# 🤖 PYQ Robot — run from phone: GitHub → Actions → "PYQ Robot" → Run workflow → paste PDF links.
+# Puts official SSC JE response-sheet questions on the server as DRAFT (students don't see them until you Publish).
+# Needs repo secret SUPABASE_SECRET_KEY (Settings → Secrets and variables → Actions). Never commit the key.
+name: PYQ Robot
+on:
+  workflow_dispatch:
+    inputs:
+      links:
+        description: 'PDF links (एक या कई, space या नई line से अलग)'
+        required: true
+      dry_run:
+        description: 'सिर्फ़ जाँच (server पर कुछ न भेजें)'
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: pyq-robot
+  cancel-in-progress: false
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install tools
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+          pip install -q pdfplumber playwright
+          python -m playwright install --with-deps chromium
+      - name: Import papers
+        env:
+          LINKS: ${{ inputs.links }}
+          DRY: ${{ inputs.dry_run }}
+          SUPABASE_URL: https://fzkvwkrbtykucjfdqiin.supabase.co
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: |
+          if [ "$DRY" = "true" ]; then set -- --dry-run; else set --; fi
+          python3 dev/tools/pyq-robot/robot.py "$@" $LINKS
