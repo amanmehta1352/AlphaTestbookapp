@@ -1,0 +1,45 @@
+# 🌐 Hindi Robot — adds Hindi (machine translation, IndicTrans2) to server questions that have none.
+# Runs automatically after every "PYQ Robot" run, and can be run by hand: Actions → Hindi Robot → Run workflow.
+# Never overwrites existing Hindi. Needs repo secret SUPABASE_SECRET_KEY.
+name: Hindi Robot
+on:
+  workflow_dispatch:
+    inputs:
+      shards:
+        description: 'कितने हिस्सों में चलाना है'
+        default: '8'
+  workflow_run:
+    workflows: ['PYQ Robot']
+    types: [completed]
+permissions:
+  contents: read
+concurrency:
+  group: hindi-robot
+  cancel-in-progress: false
+jobs:
+  translate:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-indictrans2-1B-c44b2b1
+      - name: Install
+        run: |
+          pip install -q torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -q "transformers==4.46.3" sentencepiece einops IndicTransToolkit
+      - name: Translate shard ${{ matrix.shard }}
+        env:
+          SUPABASE_URL: https://fzkvwkrbtykucjfdqiin.supabase.co
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: python3 dev/tools/hindi-robot/hindi.py --shard ${{ matrix.shard }} --of 8
