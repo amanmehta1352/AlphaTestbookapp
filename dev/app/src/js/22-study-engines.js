@@ -484,12 +484,13 @@ function renderTestPage(v, moduleId, groupId, qIndex) {
   const mins = String(Math.floor(ActiveTestSession.timeRemaining / 60)).padStart(2, '0');
   const secs = String(ActiveTestSession.timeRemaining % 60).padStart(2, '0');
 
+  (ActiveTestSession.visited = ActiveTestSession.visited || {})[nbQuestionKey(q)] = true;
   const chipsHtml = ActiveTestSession.questions.map((item, idx) => {
     const isCurrent = idx === qIndex;
     const isAnswered = !!ActiveTestSession.answers[nbQuestionKey(item)] || ActiveTestSession.subjectiveState?.[nbQuestionKey(item)] === 'ATTEMPTED';
     const isItemMarked = !!ActiveTestSession.marked[nbQuestionKey(item)];
     let cls = 'strip-chip';
-    if (isCurrent) cls += ' active'; else if (isItemMarked) cls += ' marked'; else if (isAnswered) cls += ' answered';
+    if (isCurrent) cls += ' active'; else if (isItemMarked) cls += (isAnswered ? ' marked ans-rev' : ' marked'); else if (isAnswered) cls += ' answered'; else if (ActiveTestSession.visited[nbQuestionKey(item)]) cls += ' skipped';
     const status=isCurrent?'current question':isItemMarked?'marked for review':isAnswered?'answered':'not answered';
     return `<button type="button" class="${cls}" onclick="switchQuestion(${idx})" aria-label="Question ${idx+1}, ${status}" ${isCurrent?'aria-current="step"':''}>${idx + 1}</button>`;
   }).join('');
@@ -519,7 +520,7 @@ function renderTestPage(v, moduleId, groupId, qIndex) {
           </div>
           <div style="display:flex; align-items:center; gap:6px;">
              <div class="proctor-status" title="Live Sync"><div class="proctor-dot"></div><span class="hidden sm:inline">LIVE</span></div>
-            <div class="timer-badge"><span style="color:var(--text-muted);">⏱</span><span id="testTimerDisplay">${mins}:${secs}</span></div>
+            <div class="timer-badge" role="button" tabindex="0" onclick="cbtToggleTimer()" title="Tap to hide/show time"><span style="color:var(--text-muted);">⏱</span><span id="testTimerDisplay">${mins}:${secs}</span></div>
             <button type="button" class="cbt-header-submit" onclick="confirmSubmitTest()">Submit</button>
           </div>
         </div>
@@ -527,6 +528,7 @@ function renderTestPage(v, moduleId, groupId, qIndex) {
         <div class="cbt-compact-tools-row">
             <button type="button" class="question-palette-toggle" id="questionPaletteToggle" onclick="toggleQuestionPalette()" aria-expanded="false" aria-controls="questionPaletteDrawer" title="Open question numbers">▦ <span>Q${qIndex + 1} / ${total}</span></button>
             <div class="header-actions shrink-0">
+               <button class="icon-btn" onclick="cbtOpenPad()" title="Rough pad" aria-label="Rough pad">✏️</button>
                <button class="icon-btn" onclick="toggleCbtLang()" title="Toggle Language">A/अ</button>
                <button class="icon-btn" onclick="toggleCbtDark()" title="Dark Mode Toggle">🌙</button>
                <button class="icon-btn" onclick="toggleCbtFullscreen()" title="Focus Mode (Full Screen)" id="btnFullscreen"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M216,48V88a8,8,0,0,1-16,0V56H168a8,8,0,0,1,0-16h40A8,8,0,0,1,216,48ZM88,200H56V168a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H88a8,8,0,0,0,0-16Zm120-40a8,8,0,0,0-8,8v32H168a8,8,0,0,0,8,8h40a8,8,0,0,0,8-8V168A8,8,0,0,0,208,160ZM48,88a8,8,0,0,0,8-8V48h40a8,8,0,0,0,0-16H48a8,8,0,0,0-8,8V96A8,8,0,0,0,48,104Z"></path></svg></button>
@@ -535,7 +537,7 @@ function renderTestPage(v, moduleId, groupId, qIndex) {
         <div class="question-palette-drawer" id="questionPaletteDrawer" role="dialog" aria-label="Question palette" hidden>
           <div class="question-palette-head"><strong>Question palette</strong><span>${total} questions</span><button type="button" class="question-palette-close" onclick="closeQuestionPalette()" aria-label="Close question palette">×</button></div>
           <div class="question-palette-grid" id="stripContainer">${cbtPaletteHtml(qIndex, chipsHtml)}</div>
-          <div class="question-palette-legend"><span><i class="palette-dot current"></i>Current</span><span><i class="palette-dot answered"></i>Answered</span><span><i class="palette-dot marked"></i>Review</span></div>
+          <div class="question-palette-legend"><span><i class="palette-dot current"></i>Current</span><span><i class="palette-dot answered"></i>Answered</span><span><i class="palette-dot marked"></i>Review</span><span><i class="palette-dot skipped"></i>Not answered</span><span><i class="palette-dot"></i>Not visited</span></div>
         </div>
       </div>
       <div class="test-scrollable-body" id="testScrollableContainer">

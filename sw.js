@@ -1,7 +1,7 @@
 /* Master TestBook service worker — lets the installed app open without internet.
    The page itself is fetched fresh when online (so updates arrive at once) and
    taken from the cache only when offline. Server (Supabase) calls are never cached. */
-const CACHE = 'mtb-shell-v7';
+const CACHE = 'mtb-shell-v8';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png', './apple-touch-icon.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));

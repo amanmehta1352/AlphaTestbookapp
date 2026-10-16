@@ -1260,7 +1260,7 @@ body.native-builder-active .nb-wizard-nav .nb-row-meta{flex:1 1 auto;min-width:0
 </style>
 <meta name="phase3" content="Profile-Driven Workspace + Data Airlock"><meta name="phase3-status" content="IMPLEMENTED"><meta name="phase3-frozen" content="Phase1A Storage; Phase2 QuestionUI; CBT scoring/timer"><meta name="master-testbook-candidate" content="V2.1.8 Smart Builder repair; child of V2.1.7; parent and data contracts preserved"><meta name="release-status" content="PARTIAL-HOLD-RUNTIME-VERIFICATION-PENDING">
 <meta name="master-testbook-candidate-version" content="V2.11.0_ADMIN_STUDIO">
-<meta name="app-version" content="V3.0.0">
+<meta name="app-version" content="V3.1.0">
 
 <style id="v2-3-2-deep-functional-repair">
 /* Root cause: display:contents exposed Previous, Clear, Mark and Next as four grid items for a three-column footer. */
@@ -2272,6 +2272,25 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
 .gx-quick .sj-quick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 .gx-quick .sj-quick-btn{min-height:68px;padding:8px 4px;word-break:normal;overflow-wrap:normal;hyphens:none;font-size:11.5px;line-height:1.25;border-radius:var(--radius-md)}
 @media(max-width:340px){.gx-quick .sj-quick{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+/* ---------- CBT palette: 5 states, timer hide, banner, rough pad ---------- */
+.question-palette-grid .strip-chip{background:var(--surface);color:var(--text-muted);border:1.5px solid var(--border-strong)}
+.question-palette-grid .strip-chip.skipped{background:var(--danger-bg,#fde8e8);color:var(--text-main)!important;border-color:var(--danger,#d92d20)!important}
+.question-palette-grid .strip-chip.marked{background:#7550DB!important;border-color:#7550DB!important;color:#fff!important}
+.question-palette-grid .strip-chip.marked.ans-rev{box-shadow:inset 0 0 0 3px var(--success)}
+.palette-dot{border:1px solid var(--border-strong);background:var(--surface)}
+.palette-dot.skipped{background:var(--danger,#d92d20);border-color:var(--danger,#d92d20)}
+.palette-dot.answered{background:var(--success)}.palette-dot.current{background:var(--primary)}
+.question-palette-legend{flex-wrap:wrap;row-gap:6px}
+.timer-badge{cursor:pointer;min-height:44px;min-width:44px;display:inline-flex;align-items:center;justify-content:center}
+.timer-badge.timer-hidden #testTimerDisplay{display:none}
+.timer-badge.timer-hidden::after{content:"••:••";font-family:var(--font-mono);font-size:12px;color:var(--text-muted)}
+.cbt-banner{position:fixed;left:12px;right:12px;top:calc(env(safe-area-inset-top,0px) + 64px);z-index:60;background:var(--warning-bg);color:var(--text-main);border:1.5px solid var(--warning);border-radius:var(--radius-md);padding:12px 14px;font-weight:800;font-size:14px;text-align:center;box-shadow:var(--shadow-sm)}
+.cbt-banner[hidden]{display:none}
+.cbt-pad{position:fixed;inset:0;z-index:90;background:var(--surface);display:flex;flex-direction:column}
+.cbt-pad-bar{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid var(--border)}
+.cbt-pad-bar button{min-height:44px;min-width:44px;margin-left:8px;border-radius:var(--radius-md);border:1px solid var(--border);background:var(--surface);color:var(--text-main);font-weight:700}
+.cbt-pad canvas{flex:1;width:100%;touch-action:none;background:repeating-linear-gradient(transparent 0 31px,var(--border) 31px 32px)}
 
 </style>
 </head>
@@ -9165,12 +9184,13 @@ function renderTestPage(v, moduleId, groupId, qIndex) {
   const mins = String(Math.floor(ActiveTestSession.timeRemaining / 60)).padStart(2, '0');
   const secs = String(ActiveTestSession.timeRemaining % 60).padStart(2, '0');
 
+  (ActiveTestSession.visited = ActiveTestSession.visited || {})[nbQuestionKey(q)] = true;
   const chipsHtml = ActiveTestSession.questions.map((item, idx) => {
     const isCurrent = idx === qIndex;
     const isAnswered = !!ActiveTestSession.answers[nbQuestionKey(item)] || ActiveTestSession.subjectiveState?.[nbQuestionKey(item)] === 'ATTEMPTED';
     const isItemMarked = !!ActiveTestSession.marked[nbQuestionKey(item)];
     let cls = 'strip-chip';
-    if (isCurrent) cls += ' active'; else if (isItemMarked) cls += ' marked'; else if (isAnswered) cls += ' answered';
+    if (isCurrent) cls += ' active'; else if (isItemMarked) cls += (isAnswered ? ' marked ans-rev' : ' marked'); else if (isAnswered) cls += ' answered'; else if (ActiveTestSession.visited[nbQuestionKey(item)]) cls += ' skipped';
     const status=isCurrent?'current question':isItemMarked?'marked for review':isAnswered?'answered':'not answered';
     return `<button type="button" class="${cls}" onclick="switchQuestion(${idx})" aria-label="Question ${idx+1}, ${status}" ${isCurrent?'aria-current="step"':''}>${idx + 1}</button>`;
   }).join('');
@@ -9200,7 +9220,7 @@ function renderTestPage(v, moduleId, groupId, qIndex) {
           </div>
           <div style="display:flex; align-items:center; gap:6px;">
              <div class="proctor-status" title="Live Sync"><div class="proctor-dot"></div><span class="hidden sm:inline">LIVE</span></div>
-            <div class="timer-badge"><span style="color:var(--text-muted);">⏱</span><span id="testTimerDisplay">${mins}:${secs}</span></div>
+            <div class="timer-badge" role="button" tabindex="0" onclick="cbtToggleTimer()" title="Tap to hide/show time"><span style="color:var(--text-muted);">⏱</span><span id="testTimerDisplay">${mins}:${secs}</span></div>
             <button type="button" class="cbt-header-submit" onclick="confirmSubmitTest()">Submit</button>
           </div>
         </div>
@@ -9208,6 +9228,7 @@ function renderTestPage(v, moduleId, groupId, qIndex) {
         <div class="cbt-compact-tools-row">
             <button type="button" class="question-palette-toggle" id="questionPaletteToggle" onclick="toggleQuestionPalette()" aria-expanded="false" aria-controls="questionPaletteDrawer" title="Open question numbers">▦ <span>Q${qIndex + 1} / ${total}</span></button>
             <div class="header-actions shrink-0">
+               <button class="icon-btn" onclick="cbtOpenPad()" title="Rough pad" aria-label="Rough pad">✏️</button>
                <button class="icon-btn" onclick="toggleCbtLang()" title="Toggle Language">A/अ</button>
                <button class="icon-btn" onclick="toggleCbtDark()" title="Dark Mode Toggle">🌙</button>
                <button class="icon-btn" onclick="toggleCbtFullscreen()" title="Focus Mode (Full Screen)" id="btnFullscreen"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M216,48V88a8,8,0,0,1-16,0V56H168a8,8,0,0,1,0-16h40A8,8,0,0,1,216,48ZM88,200H56V168a8,8,0,0,0-16,0v40a8,8,0,0,0,8,8H88a8,8,0,0,0,0-16Zm120-40a8,8,0,0,0-8,8v32H168a8,8,0,0,0,8,8h40a8,8,0,0,0,8-8V168A8,8,0,0,0,208,160ZM48,88a8,8,0,0,0,8-8V48h40a8,8,0,0,0,0-16H48a8,8,0,0,0-8,8V96A8,8,0,0,0,48,104Z"></path></svg></button>
@@ -9216,7 +9237,7 @@ function renderTestPage(v, moduleId, groupId, qIndex) {
         <div class="question-palette-drawer" id="questionPaletteDrawer" role="dialog" aria-label="Question palette" hidden>
           <div class="question-palette-head"><strong>Question palette</strong><span>${total} questions</span><button type="button" class="question-palette-close" onclick="closeQuestionPalette()" aria-label="Close question palette">×</button></div>
           <div class="question-palette-grid" id="stripContainer">${cbtPaletteHtml(qIndex, chipsHtml)}</div>
-          <div class="question-palette-legend"><span><i class="palette-dot current"></i>Current</span><span><i class="palette-dot answered"></i>Answered</span><span><i class="palette-dot marked"></i>Review</span></div>
+          <div class="question-palette-legend"><span><i class="palette-dot current"></i>Current</span><span><i class="palette-dot answered"></i>Answered</span><span><i class="palette-dot marked"></i>Review</span><span><i class="palette-dot skipped"></i>Not answered</span><span><i class="palette-dot"></i>Not visited</span></div>
         </div>
       </div>
       <div class="test-scrollable-body" id="testScrollableContainer">
@@ -9539,6 +9560,50 @@ function resultSoftLanding(res) {
   else { head = tx('Every attempt counts','हर कोशिश गिनती है'); sub = tx('Read the solutions, then try 10 easy questions.','Solutions पढ़ें, फिर 10 आसान सवाल करें।'); }
   return `<section class="rs-card rs-land"><span class="rs-land-ico" aria-hidden="true">🌱</span><div><strong>${head}</strong><small>${sub}</small></div></section>`;
 }
+
+/* CBT tools: hide timer, 5-minute alert, rough pad (V3.1) */
+var CbtToolsState = { hide: false, warned: false, padOpen: false };
+function cbtToggleTimer() {
+  CbtToolsState.hide = !CbtToolsState.hide;
+  cbtApplyTimerHide();
+}
+function cbtApplyTimerHide() {
+  const t = document.getElementById('testTimerDisplay'); if (!t) return;
+  t.parentElement.classList.toggle('timer-hidden', CbtToolsState.hide);
+}
+function cbtBanner(msg) {
+  const v = document.getElementById('cbtViewport'); if (!v) return;
+  let b = document.getElementById('cbtBanner');
+  if (!b) { b = document.createElement('div'); b.id = 'cbtBanner'; b.className = 'cbt-banner'; b.setAttribute('role', 'alert'); v.appendChild(b); }
+  b.textContent = msg; b.hidden = false;
+  clearTimeout(cbtBanner._t); cbtBanner._t = setTimeout(() => { b.hidden = true; }, 6000);
+}
+setInterval(() => {
+  const s = (typeof ActiveTestSession !== 'undefined') ? ActiveTestSession : null;
+  if (!s || s.sessionStatus !== 'ACTIVE') { CbtToolsState.warned = false; return; }
+  cbtApplyTimerHide();
+  if (!CbtToolsState.warned && s.durationSeconds > 600 && s.timeRemaining <= 300 && s.timeRemaining > 0) {
+    CbtToolsState.warned = true;
+    CbtToolsState.hide = false; cbtApplyTimerHide();
+    cbtBanner('⏰ सिर्फ़ 5 मिनट बचे हैं · Only 5 minutes left');
+  }
+}, 1000);
+/* rough pad: finger / mouse drawing, cleared on close */
+function cbtOpenPad() {
+  if (document.getElementById('cbtPad')) return;
+  const w = document.createElement('div'); w.id = 'cbtPad'; w.className = 'cbt-pad'; w.setAttribute('role', 'dialog'); w.setAttribute('aria-label', 'Rough pad');
+  w.innerHTML = '<div class="cbt-pad-bar"><strong>✏️ Rough pad</strong><span><button type="button" onclick="cbtPadClear()">Clear</button><button type="button" onclick="cbtClosePad()" aria-label="Close rough pad">✕</button></span></div><canvas id="cbtPadCanvas"></canvas>';
+  document.body.appendChild(w);
+  const c = document.getElementById('cbtPadCanvas'); const r = c.getBoundingClientRect(); c.width = Math.round(r.width); c.height = Math.round(r.height);
+  const x = c.getContext('2d'); x.lineWidth = 2.5; x.lineCap = 'round'; x.strokeStyle = getComputedStyle(document.body).color || '#111';
+  let down = false;
+  const pos = e => { const b = c.getBoundingClientRect(); return [e.clientX - b.left, e.clientY - b.top]; };
+  c.addEventListener('pointerdown', e => { down = true; c.setPointerCapture(e.pointerId); const [px, py] = pos(e); x.beginPath(); x.moveTo(px, py); x.lineTo(px + .1, py); x.stroke(); });
+  c.addEventListener('pointermove', e => { if (!down) return; const [px, py] = pos(e); x.lineTo(px, py); x.stroke(); });
+  ['pointerup', 'pointercancel'].forEach(n => c.addEventListener(n, () => { down = false; }));
+}
+function cbtPadClear() { const c = document.getElementById('cbtPadCanvas'); if (c) c.getContext('2d').clearRect(0, 0, c.width, c.height); }
+function cbtClosePad() { const w = document.getElementById('cbtPad'); if (w) w.remove(); }
 
 /* =========================================================================
    7. UNIVERSAL SEARCH (CONNECTED TO TAXONOMY ENGINE)
