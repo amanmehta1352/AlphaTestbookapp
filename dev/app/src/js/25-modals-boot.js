@@ -16,7 +16,7 @@ function openImportModal() {
       <div style="font-size:28px;">📥</div><div style="font-weight:900;font-size:14px;margin:4px 0;">Import Source File</div><div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">TXT • Question blocks with === QUESTION START ===</div>
       <input type="file" id="impFileInput" accept=".txt" style="width:100%;font-size:12px;"><div id="selectedFileInfo" style="margin-top:8px;font-size:11px;color:var(--text-muted);"></div>
     </div>
-    <div style="margin:12px 0;"><label style="display:block;font-size:12px;font-weight:800;color:var(--text-muted);margin-bottom:6px;">Topic Name (Optional)</label><input type="text" id="impTopicName" class="search-input" style="padding-left:14px;margin:0;" placeholder="e.g. Profit & Loss"></div>
+    ${renderImportDefaults()}
     <div style="padding:10px 12px;background:var(--surface-alt);border-radius:var(--radius-md);border:1px solid var(--border);font-size:11px;color:var(--text-muted);line-height:1.45;">🔐 <b>Safe Transaction Mode:</b> File पहले analyze होगा. Analyze के बाद preview में दिखेगा कि कितने questions, groups, duplicates और validation issues हैं. <b>Confirm & Commit</b> दबाए बिना permanent storage नहीं बदलेगा।</div>
     <button id="btnStartImport" class="btn-nav primary" style="width:100%;margin-top:12px;">🔎 Analyze File — Do Not Import Yet</button>
     <div id="importStatusReport" style="margin-top:10px;"></div>
@@ -26,11 +26,32 @@ function openImportModal() {
   document.getElementById('btnStartImport').onclick = executeSmartImport;
 }
 
+const IMPORT_DEFAULTS_STORE = 'mtb-import-defaults-v1';
+function loadImportDefaults() { try { return JSON.parse(localStorage.getItem(IMPORT_DEFAULTS_STORE) || '{}') || {}; } catch (_) { return {}; } }
+function saveImportDefaults(d) { try { localStorage.setItem(IMPORT_DEFAULTS_STORE, JSON.stringify(d)); } catch (_) {} }
+function readImportDefaults() { const d = {}; IMPORT_DEFAULT_KEYS.forEach(k => { const v = document.getElementById('impDef_' + k)?.value.trim(); if (v) d[k] = v; }); return d; }
+function clearImportDefaults() { IMPORT_DEFAULT_KEYS.forEach(k => { const el = document.getElementById('impDef_' + k); if (el) el.value = ''; }); saveImportDefaults({}); }
+function renderImportDefaults() {
+  const d = loadImportDefaults();
+  const isBoard = WorkspaceManager.current().type === 'BOARD';
+  const exams = Array.from(new Set(Object.values(UniversalExamRegistry.knownProfiles || {}).map(p => p && p.name).filter(Boolean))).sort();
+  const f = (k, label, ph, extra = '') => `<label class="imp-def-f"><span>${label}</span><input id="impDef_${k}" value="${escapeHtml(d[k] || '')}" placeholder="${escapeHtml(ph)}" ${extra} autocomplete="off"></label>`;
+  return `<details class="imp-def" open>
+    <summary>📝 सब सवालों के लिए एक बार भरें <small>(file में खाली हो तो यही लगेगा)</small></summary>
+    <div class="imp-def-grid">
+      ${isBoard ? '' : f('EXAM_NAME', 'Exam', 'जैसे SSC CGL', 'list="impExamList"') + f('YEAR', 'Year', 'जैसे 2024', 'inputmode="numeric" maxlength="4"') + f('SHIFT', 'Shift / Paper', 'जैसे 12 Sep Shift 1')}
+      ${f('SUBJECT', 'Subject', 'जैसे Maths')}${f('CHAPTER', 'Chapter', 'जैसे Arithmetic')}${f('TOPIC', 'Topic', 'जैसे Profit & Loss')}
+    </div>
+    <datalist id="impExamList">${exams.map(n => `<option value="${escapeHtml(n)}">`).join('')}</datalist>
+    <p class="imp-def-note">File में जो लिखा है वही माना जाएगा; ये मान सिर्फ़ खाली जगह भरते हैं। अगली बार के लिए याद रहते हैं। <button type="button" class="imp-def-clear" onclick="clearImportDefaults()">साफ़ करें</button></p>
+  </details>`;
+}
+
 async function executeSmartImport() {
   const file = document.getElementById('impFileInput')?.files?.[0]; const reportBox = document.getElementById('importStatusReport');
   if (!file) { reportBox.innerHTML = `<div class="dc-health bad">⚠️ पहले source TXT file select करें.</div>`; return; }
   reportBox.innerHTML = `<div class="dc-health">⏳ File analyze हो रही है… अभी storage में कुछ commit नहीं हुआ है.</div>`;
-  try { const manualTopic = document.getElementById('impTopicName')?.value.trim(); const result = await ImportEngine.analyzeTxt(file, manualTopic); PendingImportTransaction = result; renderImportReview(result); } 
+  try { const defaults = readImportDefaults(); if (defaults.YEAR && !/^(19|20)\d{2}$/.test(defaults.YEAR)) throw new Error(`ऊपर भरा Year "${defaults.YEAR}" सही नहीं (जैसे 2024 लिखें)`); saveImportDefaults(defaults); const result = await ImportEngine.analyzeTxt(file, '', defaults); PendingImportTransaction = result; renderImportReview(result); } 
   catch(err) { reportBox.innerHTML = `<div class="dc-health bad">❌ ${escapeHtml(err.message)}</div>`; }
 }
 

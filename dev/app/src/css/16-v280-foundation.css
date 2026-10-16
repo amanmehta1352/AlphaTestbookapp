@@ -28,3 +28,13 @@
 .cl-pick{display:grid;grid-template-columns:1fr 76px auto;gap:6px;margin-top:6px}
 .cl-pick input{min-height:40px;min-width:0;padding:6px 10px;border:1.5px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text-main);font-size:14px}
 .cl-pick .btn-action-sm{min-height:40px}
+/* V2.10.0 import defaults */
+.imp-def{margin:12px 0;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--surface-alt);padding:10px 12px}
+.imp-def summary{cursor:pointer;font-weight:800;font-size:13px;color:var(--text-main)}
+.imp-def summary small{font-weight:600;color:var(--text-muted)}
+.imp-def-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.imp-def-f{display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:800;color:var(--text-muted);min-width:0}
+.imp-def-f input{width:100%;padding:9px 10px;border:1px solid var(--border-strong);border-radius:10px;background:var(--surface);color:var(--text-main);font-size:14px}
+.imp-def-note{margin:8px 0 0;font-size:11px;color:var(--text-muted);line-height:1.45}
+.imp-def-clear{border:0;background:none;color:var(--primary);font-weight:800;font-size:11px;padding:0;cursor:pointer;text-decoration:underline}
+@media (max-width:360px){.imp-def-grid{grid-template-columns:1fr}}

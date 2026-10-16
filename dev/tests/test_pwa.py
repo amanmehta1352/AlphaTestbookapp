@@ -1,6 +1,6 @@
-import subprocess, time, json, sys
+import os, subprocess, time, json, sys
 from playwright.sync_api import sync_playwright
-srv = subprocess.Popen(['python3', '-m', 'http.server', '8765', '--bind', '127.0.0.1'], cwd='/home/claude/work/pwa290', stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+srv = subprocess.Popen(['python3', '-m', 'http.server', '8765', '--bind', '127.0.0.1'], cwd=os.environ.get('MTB_SITE', os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 time.sleep(1)
 res = []
 def rec(n, ok, d=''): res.append(ok); print('PASS' if ok else 'FAIL', n, str(d)[:300])

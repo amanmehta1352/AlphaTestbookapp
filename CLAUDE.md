@@ -11,7 +11,7 @@ Student test-prep PWA (SSC/RRB). Served by GitHub Pages from the repo root.
 ## Release rules
 1. Change source in `dev/app/src`, bump version (head-01.html meta + build arg).
 2. Bump `CACHE` name in `sw.js` (mtb-shell-vN) on every release.
-3. Run all test suites; push only when all pass.
+3. Run `dev/tests/run_all.sh` (all suites); push only when all pass.
 4. Questions change only through `DataCore.commit/mutate` — never assign AppModules directly.
 
 ## Never

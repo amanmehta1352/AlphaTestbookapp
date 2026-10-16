@@ -78,6 +78,20 @@ UniversalExamRegistry.rebuildFromIndex = function () {
 };
 
 /* ---------- block parser ---------- */
+// Import-screen defaults (V2.10.0): values the admin types once on the import
+// screen fill only the fields a block leaves empty. The file always wins.
+const IMPORT_DEFAULT_KEYS = ['EXAM_NAME', 'YEAR', 'SHIFT', 'SUBJECT', 'CHAPTER', 'TOPIC'];
+const IMPORT_DEFAULT_LABEL = { EXAM_NAME: 'Exam', YEAR: 'Year', SHIFT: 'Shift', SUBJECT: 'Subject', CHAPTER: 'Chapter', TOPIC: 'Topic' };
+function importApplyDefaults(f, defaults, bi, warnings, filledCount) {
+  const alias = { EXAM_NAME: ['EXAM_NAME', 'EXAM'], SHIFT: ['SHIFT', 'PAPER', 'PAPER_DATE'] };
+  IMPORT_DEFAULT_KEYS.forEach(k => {
+    const def = String((defaults || {})[k] || '').trim(); if (!def) return;
+    const keys = alias[k] || [k];
+    const have = keys.map(x => String(f[x] || '').trim()).find(Boolean);
+    if (!have) { f[k] = def; filledCount[k] = (filledCount[k] || 0) + 1; }
+    else if (k !== 'TOPIC' && importNormText(have) !== importNormText(def)) warnings.push(`Block ${bi + 1}: file में ${IMPORT_DEFAULT_LABEL[k]} "${have.slice(0, 40)}" है, ऊपर "${def.slice(0, 40)}" भरा — file वाला लिया`);
+  });
+}
 const IMPORT_FIELDS = new Set(['SOURCE_QUESTION_NO', 'QUESTION_NO', 'Q_NO', 'QUESTION_ID', 'EXAM_NAME', 'EXAM', 'EXAM_BOARD', 'YEAR', 'SHIFT', 'PAPER', 'PAPER_DATE',
   'SUBJECT', 'CHAPTER', 'TOPIC', 'SUB_TOPIC', 'SUBTOPIC', 'SUB_CONCEPT', 'CONCEPT', 'FORMULA', 'COURSE', 'TYPE', 'QUESTION_BASE', 'CATEGORY', 'DIFFICULTY',
   'SOURCE_TYPE', 'QUESTION_SOURCE', 'SOURCE', 'QUESTION_EN', 'QUESTION_HI', 'QUESTION', 'A_EN', 'B_EN', 'C_EN', 'D_EN', 'A_HI', 'B_HI', 'C_HI', 'D_HI', 'A', 'B', 'C', 'D',
@@ -138,7 +152,7 @@ function importQuestionIdFor({ examId, year, shift, subject, topicSlug, qno, fp,
 const ImportEngine = {
   version: '4.0-STRICT-MERGE',
 
-  async analyzeTxt(file, manualTopicOverride = '') {
+  async analyzeTxt(file, manualTopicOverride = '', defaults = {}) {
     if (isImportEngineLocked) throw new Error('दूसरा import अभी चल रहा है। थोड़ी देर बाद कोशिश करें।');
     isImportEngineLocked = true;
     try {
@@ -152,6 +166,7 @@ const ImportEngine = {
       const lineAt = idx => text.slice(0, idx).split('\n').length;
       const manualTopic = String(manualTopicOverride || '').trim();
       const errors = [], warnings = [], items = [];
+      const filledCount = {};
 
       starts.forEach((s, bi) => {
         const nextStart = bi + 1 < starts.length ? starts[bi + 1].index : text.length;
@@ -161,6 +176,7 @@ const ImportEngine = {
         const blockLine = lineAt(s.index);
         const { fields: f, warnings: w } = importParseBlock(body, lineAt(s.end));
         w.forEach(x => warnings.push(`Block ${bi + 1} — ${x}`));
+        importApplyDefaults(f, defaults, bi, warnings, filledCount);
         const errs = [];
         const need = (ok, msg) => { if (!ok) errs.push(msg); };
         const examRaw = f.EXAM_NAME || f.EXAM || '';
@@ -191,6 +207,8 @@ const ImportEngine = {
         items.push({ bi, blockLine, f, errs, examRaw, yearRaw, subjectRaw, topicRaw, stemEn, stemHi, options, answer, subjective, qno, explicitId });
       });
 
+      const filledMsg = Object.entries(filledCount).map(([k, n]) => `${IMPORT_DEFAULT_LABEL[k]} ${n}`).join(', ');
+      if (filledMsg) warnings.unshift(`ऊपर भरे मान से लिया (file में खाली था): ${filledMsg} सवाल`);
       const firstOk = items.find(x => !x.errs.length) || items[0];
       const moduleSubject = normalizeSubjectKey(firstOk.subjectRaw) || 'general';
       const topicTitle = manualTopic || String(firstOk.topicRaw || '').trim() || file.name.replace(/\.[^.]+$/, '');
