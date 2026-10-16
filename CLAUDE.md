@@ -13,6 +13,12 @@ Student test-prep PWA (SSC/RRB). Served by GitHub Pages from the repo root.
 - `dev/tools/tag-robot/tagger.py` + `.github/workflows/tag-robot.yml`: 🏷️ Tag Robot. TF-IDF + logistic regression learns from hand-tagged questions per subject; moves Mixed questions only if subject CV accuracy ≥ 80 % and prob ≥ 0.55; changes only topic_id/chapter/topic/content_hash. Runs after PYQ Robot. Test: `dev/tests/test_tagger.py`.
 - Server changes: Claude applies them via the Supabase connector. Take a backup into schema `backup` first; avoid DROP (needs extra confirmation) — use ALTER / IF NOT EXISTS.
 
+## V3 design (16 Oct 2026)
+- `src/css/18-v3-design.css` (loaded last) = design tokens (blueprint colours, Inter/Plus Jakarta/Noto Devanagari/JetBrains Mono), solid compact cards, glass only on header + floating dock, CBT/result styles. Fonts load non-blocking.
+- `src/js/17b-student-profile.js` = exam + branch profile; filter happens in `cloudPullContent` (other branches never reach the phone) + `profileVisible()` on Home/Subjects (hides demo/other-exam local topics). Data-write paths untouched.
+- `src/js/22b-cbt-confidence.js` = "How sure?" tags in CBT + result soft landing / what-if.
+- Tests: `test_profile.py`, `test_v3.py` (overflow 360/412, tap ≥ 48/44 px, contrast ≥ 4.5 light+dark). CI: `.github/workflows/tests.yml` runs run_all.sh on every push.
+
 ## Release rules
 1. Change source in `dev/app/src`, bump version (head-01.html meta + build arg).
 2. Bump `CACHE` name in `sw.js` (mtb-shell-vN) on every release.

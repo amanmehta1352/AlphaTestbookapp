@@ -62,8 +62,11 @@ async function cloudPullContent() {
   const ws = cloudTargetWorkspace();
   const exams = await cloudPullAll('exams', 'id,name', 'id');
   const topics = await cloudPullAll('topics', 'id,subject,chapter,title,exam_id,year', 'id');
-  const rows = await cloudPullAll('questions', 'id,topic_id,exam_id,year,shift,subject,chapter,topic,subtopic,question_no,format,question_en,question_hi,options,answer,explanation_en,explanation_hi,source_type,difficulty,content_hash', 'topic_id,question_no,id');
+  let rows = await cloudPullAll('questions', 'id,topic_id,exam_id,year,shift,subject,chapter,topic,subtopic,question_no,format,question_en,question_hi,options,answer,explanation_en,explanation_hi,source_type,difficulty,content_hash', 'topic_id,question_no,id');
   const examName = new Map(exams.map(e => [e.id, e.name]));
+  CloudState.profileIndex = typeof profileIndex === 'function' ? profileIndex(rows, examName) : null;
+  const allCount = rows.length;
+  if (typeof profileFilterRows === 'function') rows = profileFilterRows(rows);
   const byTopic = new Map(); rows.forEach(r => { if (!byTopic.has(r.topic_id)) byTopic.set(r.topic_id, []); byTopic.get(r.topic_id).push(r); });
   const modules = [];
   topics.forEach(t => {
@@ -86,7 +89,7 @@ async function cloudPullContent() {
   if (changed) {
     await DataCore.commit(next, { reason: 'Server से सवाल', snapshot: 'Server से सवाल लाने से पहले', allowNewIssues: true });
   }
-  CloudState.serverQuestions = rows.length; CloudState.lastContentAt = new Date().toISOString();
+  CloudState.serverQuestions = rows.length; CloudState.serverQuestionsAll = allCount; CloudState.lastContentAt = new Date().toISOString();
   return { questions: rows.length, topics: modules.length, changed };
 }
 

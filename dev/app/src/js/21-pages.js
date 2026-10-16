@@ -146,7 +146,7 @@ function sjModuleQuestionCount(m) {
 }
 function sjCollectDashboardData() {
   const workspace = WorkspaceManager.current();
-  const modules = WorkspaceManager.filterModules(AppModules || []).filter(m => sjModuleQuestionCount(m) > 0);
+  const modules = (typeof profileVisible==='function'?profileVisible:(x=>x))(WorkspaceManager.filterModules(AppModules || [])).filter(m => sjModuleQuestionCount(m) > 0);
   const subjects = new Map();
   let totalQuestions = 0;
   modules.forEach(m => {

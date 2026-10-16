@@ -145,7 +145,7 @@ function nbAccuracyLine(a) {
 }
 function nbSubjectGroups() {
   const map = new Map();
-  CurriculumContext.filterModules(AppModules).forEach(m => {
+  (typeof profileVisible==='function'?profileVisible:(x=>x))(CurriculumContext.filterModules(AppModules)).forEach(m => {
     const raw = String(m.subject || '').trim(); if (!raw) return;
     const k = raw.toLowerCase();
     const g = map.get(k) || { key: raw, mods: [], chapters: new Map(), qs: 0 };
@@ -178,7 +178,7 @@ function renderSubjectsCatalog(v) {
 }
 function renderSubjectPage(v, subject) {
   const key = String(subject || '').trim().toLowerCase();
-  const mods = CurriculumContext.filterModules(AppModules).filter(m => String(m.subject || '').trim().toLowerCase() === key && nbModuleQCount(m) > 0);
+  const mods = (typeof profileVisible==='function'?profileVisible:(x=>x))(CurriculumContext.filterModules(AppModules)).filter(m => String(m.subject || '').trim().toLowerCase() === key && nbModuleQCount(m) > 0);
   const chapters = new Map();
   mods.forEach(m => { const ch = String(m.chapter || '').trim(); if (!ch) return; const c = chapters.get(ch.toLowerCase()) || { name: ch, mods: [], qs: 0 }; c.mods.push(m); c.qs += nbModuleQCount(m); chapters.set(ch.toLowerCase(), c); });
   const list = Array.from(chapters.values());

@@ -153,6 +153,13 @@
    ]
   },
   {
+   "file": "src/css/18-v3-design.css",
+   "wrap": [
+    "<style id=\"v2110-admin-studio\">",
+    "</style>"
+   ]
+  },
+  {
    "file": "src/html/head-14.html"
   },
   {
@@ -235,6 +242,10 @@
    "script": true
   },
   {
+   "file": "src/js/17b-student-profile.js",
+   "script": true
+  },
+  {
    "file": "src/js/18-cbt-subjects-results.js",
    "script": true
   },
@@ -252,6 +263,10 @@
   },
   {
    "file": "src/js/22-study-engines.js",
+   "script": true
+  },
+  {
+   "file": "src/js/22b-cbt-confidence.js",
    "script": true
   },
   {

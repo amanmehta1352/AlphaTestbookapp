@@ -270,7 +270,7 @@ function sjNextActions(d) {
   const due = reviewDue();
   if (d.resume) actions.push({ icon: '▶', title: tx(`Resume ${d.resume.module.topicTitle}`,`${d.resume.module.topicTitle} जारी रखें`), why: tx(`You were at question ${d.resume.qIndex + 1} in practice this session.`,`आप practice में सवाल ${d.resume.qIndex + 1} पर थे।`), cta: tx('Resume','जारी रखें'), call: `navigate('practice',{moduleId:${nbJsAttr(d.resume.module.moduleId)},qIndex:${d.resume.qIndex}})` });
   if (due.length) actions.push({ icon: '🔄', title: tx(`Revise ${due.length} card${due.length === 1 ? '' : 's'}`,`${due.length} card दोहराएँ`), why: tx('They are due today on your spaced schedule.','आपके revision schedule के हिसाब से आज बाकी हैं।'), cta: tx('Revise','दोहराएँ'), call: `navigate('revision_hub');revisionStart(null)` });
-  const weak = WorkspaceManager.filterModules(AppModules || []).map(m => ({ m, x: masteryFor(m.moduleId) })).filter(o => o.x.enough && o.x.score < 0.7).sort((a, b) => a.x.score - b.x.score)[0];
+  const weak = (typeof profileVisible==='function'?profileVisible:(x=>x))(WorkspaceManager.filterModules(AppModules || [])).map(m => ({ m, x: masteryFor(m.moduleId) })).filter(o => o.x.enough && o.x.score < 0.7).sort((a, b) => a.x.score - b.x.score)[0];
   if (weak) actions.push({ icon: '🎯', title: tx(`10-question test: ${weak.m.topicTitle}`,`10 सवाल का test: ${weak.m.topicTitle}`), why: tx(`Your recent accuracy here is ${Math.round(weak.x.score * 100)}% — your weakest topic.`,`यहाँ हाल की accuracy ${Math.round(weak.x.score * 100)}% है — सबसे कमज़ोर topic।`), cta: tx('Start','शुरू'), call: `sjTopicTest(${nbJsAttr(weak.m.moduleId)})` });
   else { const wt = d.weakTopics.find(t => t.count >= 2 && getWorkspaceModule(t.moduleId)); if (wt) actions.push({ icon: '🎯', title: tx(`10-question test: ${wt.topic}`,`10 सवाल का test: ${wt.topic}`), why: tx(`${wt.count} unresolved mistakes in this topic.`,`इस topic में ${wt.count} गलतियाँ बाकी।`), cta: tx('Start','शुरू'), call: `sjTopicTest(${nbJsAttr(wt.moduleId)})` }); }
   if (!d.totalQuestions) actions.push({ icon: '📥', title: tx('Add questions','सवाल जोड़ें'), why: tx('This workspace has no questions yet. Import a question file to begin.','इस workspace में अभी सवाल नहीं हैं। शुरू करने के लिए सवालों की file import करें।'), cta: 'Import', call: `openImportModal()` });
@@ -293,7 +293,7 @@ function renderHomePage(v) {
   const cov = sjCoverage();
   const perDay = daysLeft && daysLeft > 0 ? Math.ceil((cov.total - cov.done) / daysLeft) : null;
   const s = sjStreak();
-  const masteredCount = WorkspaceManager.filterModules(AppModules || []).filter(m => masteryFor(m.moduleId).level === 'mastered').length;
+  const masteredCount = (typeof profileVisible==='function'?profileVisible:(x=>x))(WorkspaceManager.filterModules(AppModules || [])).filter(m => masteryFor(m.moduleId).level === 'mastered').length;
   const stages = [
     { icon: '📖', label: tx('Learn','सीखें'), evidence: d.modules.length ? `${d.modules.length} topic${d.modules.length === 1 ? '' : 's'}` : tx('No topics','कोई topic नहीं'), active: false, call: firstModule ? `navigate('learn',{moduleId:${nbJsAttr(firstModule.moduleId)}})` : '' },
     { icon: '✍️', label: 'Practice', evidence: d.practiceToday ? tx(`${d.practiceToday} today`,`आज ${d.practiceToday}`) : tx('None today','आज नहीं'), active: d.practiceToday > 0, call: practiceCall },
@@ -301,7 +301,7 @@ function renderHomePage(v) {
     { icon: '🔄', label: tx('Review','दोहराई'), evidence: reviewDue().length ? tx(`${reviewDue().length} due`,`${reviewDue().length} बाकी`) : tx('Caught up','पूरा'), active: reviewDue().length > 0, call: `navigate('revision_hub')` },
     { icon: '🏆', label: tx('Master','महारत'), evidence: tx(`${masteredCount} mastered`,`${masteredCount} पक्के`), active: masteredCount > 0, call: `navigate('mastery')` }
   ];
-  const weakTopics = WorkspaceManager.filterModules(AppModules || []).map(m => ({ m, x: masteryFor(m.moduleId), mis: d.weakTopics.find(t => t.moduleId === m.moduleId)?.count || 0 }))
+  const weakTopics = (typeof profileVisible==='function'?profileVisible:(x=>x))(WorkspaceManager.filterModules(AppModules || [])).map(m => ({ m, x: masteryFor(m.moduleId), mis: d.weakTopics.find(t => t.moduleId === m.moduleId)?.count || 0 }))
     .filter(o => (o.x.enough && o.x.score < 0.7) || o.mis > 0).sort((a, b) => (a.x.enough ? a.x.score : 1) - (b.x.enough ? b.x.score : 1) || b.mis - a.mis).slice(0, 4);
   const recent = [];
   d.results.slice(0, 3).forEach(r => recent.push({ icon: '⏱️', title: `Test · ${r.topicTitle || 'Custom Test'}`, meta: `Score ${Number(r.score) || 0}/${Number(r.total) || 0} · ${Number(r.accuracy) || 0}% · ${sjFormatWhen(r.ts)}`, call: `openStoredResult(${nbJsAttr(r.id)})` }));
@@ -319,7 +319,7 @@ function renderHomePage(v) {
 
   v.innerHTML = `<div class="sj-dash gx">
     <section class="gx-card gx-hero" aria-labelledby="sjHeroTitle">
-      <div class="gx-hero-top"><span class="gx-pill">🏛️ ${examLine}</span><button type="button" class="gx-link" onclick="navigate('exam_hub')">${tx('Change exam','Exam बदलें')}</button></div>
+      <div class="gx-hero-top">${typeof profileHeroChip === 'function' ? profileHeroChip(examLine) : `<span class="gx-pill">🏛️ ${examLine}</span>`}</div>
       <h1 id="sjHeroTitle">${greeting}</h1>
       <p>${d.totalQuestions ? tx(`${d.totalQuestions} questions · ${d.subjects.length} subject${d.subjects.length === 1 ? '' : 's'} · ${d.modules.length} topic${d.modules.length === 1 ? '' : 's'} in ${escapeHtml(d.workspace.name)}`,`${d.totalQuestions} सवाल · ${d.subjects.length} विषय · ${d.modules.length} topic — ${escapeHtml(d.workspace.name)}`) : tx(`No questions in ${escapeHtml(d.workspace.name)} yet. Import a question file to start.`,`${escapeHtml(d.workspace.name)} में अभी सवाल नहीं हैं। शुरू करने के लिए file import करें।`)}</p>
       <div class="gx-hero-facts">
@@ -327,33 +327,33 @@ function renderHomePage(v) {
         ${daysLeft !== null ? (daysLeft >= 0 ? `<span>📅 <b>${daysLeft}</b> ${tx(`day${daysLeft === 1 ? '' : 's'} to exam`,'दिन exam में')}${perDay ? tx(` · ~${perDay} new questions/day covers the bank`,` · रोज़ ~${perDay} नए सवाल से पूरा bank हो जाएगा`) : ''}</span>` : `<span>📅 ${tx('Exam date has passed','Exam की तारीख निकल गई')}</span>`) : `<button type="button" class="gx-link" onclick="sjOpenGoalSettings()">📅 ${tx('Add exam date','Exam की तारीख जोड़ें')}</button>`}
       </div>
     </section>
-    ${gxGoalWidget(d)}
-    ${gxTodayWidget(d)}
+    <section class="gx-card gx-search"><div class="search-box-wrap" style="margin:0;"><span class="search-icon">🔍</span><input type="search" class="search-input" id="inpGlobalSearch" aria-label="Search questions" placeholder="सवाल नंबर, परीक्षा (SSC, NTPC, JE), टॉपिक सर्च करें..." oninput="onGlobalSearch(this.value)"></div><div id="globalSearchResults"></div></section>
     ${primary ? `<section class="gx-card gx-next" aria-label="Next best action"><div class="gx-next-icon" aria-hidden="true">${primary.icon}</div><div class="gx-next-copy"><small>${tx('Next best action','अगला सबसे अच्छा काम')}</small><strong>${escapeHtml(primary.title)}</strong><span>${escapeHtml(primary.why)}</span></div><button type="button" class="gx-btn" onclick="${primary.call}">${escapeHtml(primary.cta)} →</button></section>` : ''}
-    ${gxBackupBanner()}
     <section class="gx-card gx-continue" aria-labelledby="sjContinueH"><div class="gx-head"><h2 id="sjContinueH">${tx('Continue','जारी रखें')}</h2></div>
       ${d.resume ? `<div class="sj-resume"><div><strong>${escapeHtml(d.resume.module.topicTitle)}</strong><span>${escapeHtml(subjectDisplayName(d.resume.module.subject))} · Practice · ${tx('Question','सवाल')} ${d.resume.qIndex + 1} / ${sjModuleQuestionCount(d.resume.module)}</span></div><button type="button" class="gx-btn" onclick="${practiceCall}">${tx('Resume →','जारी रखें →')}</button></div>`
-        : `<div class="gx-empty"><strong>${tx('No unfinished activity','कोई अधूरा काम नहीं')}</strong><span>${tx('Practice you leave mid-way appears here.','बीच में छोड़ी practice यहाँ दिखेगी।')}</span>${firstModule ? `<button type="button" class="gx-btn ghost" onclick="${practiceCall}">${tx('Practise','Practice:')} ${escapeHtml(firstModule.topicTitle)}</button>` : `<button type="button" class="gx-btn ghost" onclick="openImportModal()">${tx('Import questions','सवाल import करें')}</button>`}</div>`}
+        : `<div class="gx-empty"><strong>${tx('No unfinished activity','कोई अधूरा काम नहीं')}</strong><span>${tx('Practice you leave mid-way appears here.','बीच में छोड़ी practice यहाँ दिखेगी।')}</span>${actions.length > 1 ? '' : (firstModule ? `<button type="button" class="gx-btn ghost" onclick="${practiceCall}">${tx('Practise','Practice:')} ${escapeHtml(firstModule.topicTitle)}</button>` : `<button type="button" class="gx-btn ghost" onclick="openImportModal()">${tx('Import questions','सवाल import करें')}</button>`)}</div>`}
       ${actions.length > 1 ? `<div class="sj-actions-list">${actions.slice(1).map(a => `<button type="button" class="sj-action" onclick="${a.call}"><span aria-hidden="true">${a.icon}</span><span class="sj-action-copy"><strong>${escapeHtml(a.title)}</strong><small>${escapeHtml(a.why)}</small></span><span class="sj-action-go" aria-hidden="true">›</span></button>`).join('')}</div>` : ''}
     </section>
-    ${gxRevisionWidget()}
-    ${gxPomodoroWidget()}
-    ${gxStreakWidget()}
-    ${gxTrendWidget(d.results)}
+    <section class="gx-card gx-quick"><div class="gx-head"><h2>${tx('Quick actions','जल्दी के काम')}</h2></div><div class="sj-quick">${quick.map(q => `<button type="button" class="sj-quick-btn" ${q.call ? `onclick="${q.call}"` : 'disabled aria-disabled="true" title="No questions available"'}><span aria-hidden="true">${q.icon}</span>${escapeHtml(q.label)}</button>`).join('')}</div></section>
     ${gxSubjectWidget()}
-    ${gxWeeklyWidget()}
-    ${gxCoverageWidget()}
-    <section class="gx-card gx-journey"><div class="gx-head"><h2>${tx('Your learning journey','आपकी पढ़ाई का सफ़र')}</h2></div><ol class="sj-journey">${stages.map(x => `<li class="sj-stage ${x.active ? 'has-evidence' : ''}">${x.call ? `<button type="button" onclick="${x.call}">` : '<div>'}<span class="sj-stage-dot" aria-hidden="true">${x.icon}</span><strong>${x.label}</strong><small>${escapeHtml(x.evidence)}</small>${x.call ? '</button>' : '</div>'}</li>`).join('')}</ol></section>
+    ${gxGoalWidget(d)}
+    ${gxTodayWidget(d)}
+    ${gxRevisionWidget()}
     <section class="gx-card gx-attn"><div class="gx-head"><h2>${tx('Needs attention','ध्यान दें')}</h2><button type="button" class="gx-link" onclick="navigate('mastery')">${tx('Mastery','महारत')}</button></div>
       ${weakTopics.length ? `<div class="sj-recent">${weakTopics.map(o => `<div class="gx-attn-row"><span class="gx-attn-txt"><strong>${escapeHtml(o.m.topicTitle)}</strong><small>${o.x.enough ? tx(`${Math.round(o.x.score * 100)}% recent accuracy`,`हाल की accuracy ${Math.round(o.x.score * 100)}%`) : tx(`${o.x.answered} answers`,`${o.x.answered} जवाब`)}${o.mis ? tx(` · ${o.mis} mistake${o.mis === 1 ? '' : 's'}`,` · ${o.mis} गलतियाँ`) : ''}</small></span><button type="button" class="gx-btn ghost" onclick="sjTopicTest(${nbJsAttr(o.m.moduleId)})">${tx('10-Q test','10 सवाल test')}</button></div>`).join('')}</div>`
         : `<div class="gx-empty"><strong>${tx('Nothing flagged','सब ठीक')}</strong><span>${tx(`Topics appear here when recent accuracy drops below 70% (after ${MASTERY_MIN_ANSWERS} answers) or mistakes pile up.`,`जब किसी topic की accuracy 70% से नीचे जाए (${MASTERY_MIN_ANSWERS} जवाबों के बाद) या गलतियाँ बढ़ें, वह यहाँ दिखेगा।`)}</span></div>`}
       ${d.otherExamMistakes ? `<p class="gx-note">${tx(`${d.otherExamMistakes} more mistake(s) belong to other exams.`,`${d.otherExamMistakes} गलतियाँ दूसरे exams की हैं।`)} <button type="button" class="sj-inline-link" onclick="sjOpenAllExamMistakes()">${tx('Show all exams','सारे exams दिखाएँ')}</button></p>` : ''}
     </section>
+    ${gxTrendWidget(d.results)}
+    ${gxStreakWidget()}
+    ${gxWeeklyWidget()}
+    ${gxCoverageWidget()}
+    ${gxPomodoroWidget()}
+    <section class="gx-card gx-journey"><div class="gx-head"><h2>${tx('Your learning journey','आपकी पढ़ाई का सफ़र')}</h2></div><ol class="sj-journey">${stages.map(x => `<li class="sj-stage ${x.active ? 'has-evidence' : ''}">${x.call ? `<button type="button" onclick="${x.call}">` : '<div>'}<span class="sj-stage-dot" aria-hidden="true">${x.icon}</span><strong>${x.label}</strong><small>${escapeHtml(x.evidence)}</small>${x.call ? '</button>' : '</div>'}</li>`).join('')}</ol></section>
     <section class="gx-card gx-recent"><div class="gx-head"><h2>${tx('Recent activity','हाल की गतिविधि')}</h2>${d.results.length ? `<button type="button" class="gx-link" onclick="openTestHistoryModal()">${tx('All tests','सारे test')}</button>` : ''}</div>
       ${recent.length ? `<div class="sj-recent">${recent.map(r => `<button type="button" class="sj-action" onclick="${r.call}"><span aria-hidden="true">${r.icon}</span><span class="sj-action-copy"><strong>${escapeHtml(r.title)}</strong><small>${escapeHtml(r.meta)}</small></span><span class="sj-action-go" aria-hidden="true">›</span></button>`).join('')}</div>` : `<div class="gx-empty"><strong>${tx('Nothing yet','अभी कुछ नहीं')}</strong><span>${tx('Imports and submitted tests appear here.','Import और दिए गए test यहाँ दिखेंगे।')}</span></div>`}
     </section>
-    <section class="gx-card gx-quick"><div class="gx-head"><h2>${tx('Quick actions','जल्दी के काम')}</h2></div><div class="sj-quick">${quick.map(q => `<button type="button" class="sj-quick-btn" ${q.call ? `onclick="${q.call}"` : 'disabled aria-disabled="true" title="No questions available"'}><span aria-hidden="true">${q.icon}</span>${escapeHtml(q.label)}</button>`).join('')}</div></section>
-    <section class="gx-card gx-search"><div class="search-box-wrap" style="margin:0;"><span class="search-icon">🔍</span><input type="search" class="search-input" id="inpGlobalSearch" aria-label="Search questions" placeholder="सवाल नंबर, परीक्षा (SSC, NTPC, JE), टॉपिक सर्च करें..." oninput="onGlobalSearch(this.value)"></div><div id="globalSearchResults"></div></section>
+    ${gxBackupBanner()}
   </div>`;
   pomoPaint();
 }
