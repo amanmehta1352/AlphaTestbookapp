@@ -178,6 +178,8 @@ def main(argv):
               open(os.environ.get('KEYCHECK_REPORT', 'keycheck-report.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     if os.environ.get('GITHUB_STEP_SUMMARY'):
         open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8').write('\n'.join(SUMMARY) + '\n')
+    if os.environ.get('OPS_COUNTS'):
+        json.dump({'processed': len(rows), 'changed': 0, 'note': f'{len(flags)} flags (read-only)'}, open(os.environ['OPS_COUNTS'], 'w'), ensure_ascii=False)
     return 2 if strict and any(f['code'] in HARD for f in flags) else 0
 
 

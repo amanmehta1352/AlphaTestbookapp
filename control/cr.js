@@ -227,7 +227,7 @@ function robotCard(w) {
     <div class="dots" aria-label="पिछले runs">${(w.history || []).map(h => `<a class="${esc(h.c)}" href="${esc(h.url)}" target="_blank" rel="noopener" title="${esc(h.c)} · ${when(h.at)} · ${esc(h.ev)}${h.n > 1 ? ' · retry ' + h.n : ''}"></a>`).join('')}</div>
     <div class="sched"><span>Trigger: <b>${esc(trig || '—')}</b></span><span>अगली run: <b>${w.next_run ? when(w.next_run) + ' (' + ago(w.next_run) + ')' : 'schedule नहीं'}</b> · आख़िरी सफल: <b>${ago(w.last_success_at)}</b></span>
       <span>Concurrency: <b>${esc(w.concurrency || '—')}</b> · Timeout: <b>${w.timeout ? w.timeout + ' मिनट' : '—'}</b> · Retries: <b>${n(w.retries)}</b></span>
-      ${last ? `<span>पिछला काम: <b>${n(last.processed)} देखे · ${n(last.changed)} बदले</b> ${last.note ? '· ' + esc(String(last.note).slice(0, 80)) : ''}</span>` : ''}
+      ${last && (last.processed != null || last.changed != null) ? `<span>पिछला काम: <b>${n(last.processed)} देखे · ${n(last.changed)} बदले</b> ${last.note ? '· ' + esc(String(last.note).slice(0, 80)) : ''}</span>` : ''}
       ${rr ? `<span>30 दिन: <b>${n(rr.runs)} runs · ${n(rr.changed)} बदलाव</b></span>` : ''}</div>
     ${w.diagnosis ? `<div class="diag"><b>🧠 ${esc(w.diagnosis.cause)}</b><span>👉 ${esc(w.diagnosis.fix)} · जोखिम: ${esc(w.diagnosis.risk)}</span></div>` : ''}
     ${w.error_log ? `<details><summary class="muted">Error log</summary><pre class="log">${esc(w.error_log)}</pre></details>` : ''}

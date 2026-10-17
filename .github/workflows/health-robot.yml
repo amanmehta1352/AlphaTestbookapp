@@ -12,7 +12,7 @@ on:
 permissions:
   contents: write
   issues: write
-  actions: read
+  actions: write
 concurrency:
   group: health-robot
   cancel-in-progress: false
@@ -28,6 +28,14 @@ jobs:
           SUPABASE_URL: https://fzkvwkrbtykucjfdqiin.supabase.co
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
         run: python3 dev/tools/ops/opslib.py gate health
+      - name: Do Control Room requests too (backup for the 10-minute Ops Robot)
+        if: steps.gate.outputs.run == 'true'
+        continue-on-error: true
+        env:
+          SUPABASE_URL: https://fzkvwkrbtykucjfdqiin.supabase.co
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 dev/tools/ops/ops_robot.py
       - name: Get previous history
         if: steps.gate.outputs.run == 'true'
         run: |
