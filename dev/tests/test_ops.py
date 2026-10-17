@@ -80,6 +80,18 @@ def main():
         P(F.as_user(STU, ''.join(f"insert into public.ops_client_errors(message,page) values ('e{i}','home');" for i in range(32))))
         check('client errors rate-limited to 30/hour/user', P('select count(*) from public.ops_client_errors') == '30')
         # ---------------- 2. robots
+        import glob, yaml
+        class Strict(yaml.SafeLoader): pass
+        def no_dupes(loader, node, deep=False):
+            keys = [loader.construct_object(k, deep=deep) for k, _ in node.value]
+            if len(keys) != len(set(keys)): raise ValueError('duplicate key ' + str([k for k in keys if keys.count(k) > 1][0]))
+            return yaml.SafeLoader.construct_mapping(loader, node, deep)
+        Strict.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, no_dupes)
+        badwf = []
+        for f in glob.glob(os.path.join(HERE, '..', '..', '.github', 'workflows', '*.yml')):
+            try: yaml.load(open(f), Loader=Strict)
+            except Exception as e: badwf.append(os.path.basename(f) + ': ' + str(e)[:80])
+        check('all GitHub workflows are valid YAML (no duplicate keys)', not badwf, badwf)
         on = {'robots.paused': False, 'data.frozen': False}
         check('gate: writer runs normally', opslib.decide('hindi', on)[0] is True)
         check('gate: global pause stops writers + keycheck, not backup/health', not opslib.decide('pyq', {**on, 'robots.paused': True})[0] and not opslib.decide('keycheck', {**on, 'robots.paused': True})[0] and opslib.decide('backup', {**on, 'robots.paused': True})[0] and opslib.decide('health', {**on, 'robots.paused': True})[0])

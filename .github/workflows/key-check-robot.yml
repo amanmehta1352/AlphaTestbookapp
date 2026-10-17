@@ -60,8 +60,7 @@ jobs:
           if [ "$USE_GEMINI" = "true" ]; then args="$args --gemini"; fi
           python3 dev/tools/key-check-robot/keycheck.py $args
       - uses: actions/upload-artifact@v4
-        if: steps.gate.outputs.run == 'true'
-        if: always()
+        if: always() && steps.gate.outputs.run == 'true'
         with:
           name: keycheck-report
           path: ${{ runner.temp }}/keycheck-report.json
