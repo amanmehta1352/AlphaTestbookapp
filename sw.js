@@ -1,7 +1,7 @@
 /* Master TestBook service worker — lets the installed app open without internet.
    The page itself is fetched fresh when online (so updates arrive at once) and
    taken from the cache only when offline. Server (Supabase) calls are never cached. */
-const CACHE = 'mtb-shell-v9';
+const CACHE = 'mtb-shell-v10';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png', './apple-touch-icon.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
@@ -14,7 +14,7 @@ self.addEventListener('fetch', e => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;           // never touch server / CDN calls
-  if (url.pathname.includes('/admin/')) return;              // Admin Studio: always from the network, never cached as the app
+  if (url.pathname.includes('/admin/') || url.pathname.includes('/control/')) return;              // Admin Studio: always from the network, never cached as the app
   if (req.mode === 'navigate' || url.pathname.endsWith('/') || url.pathname.endsWith('.html')) {
     e.respondWith(fetch(req).then(res => {
       if (res.ok) { const copy = res.clone(); caches.open(CACHE).then(c => c.put('./index.html', copy)); }

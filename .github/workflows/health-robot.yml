@@ -1,0 +1,40 @@
+# 🩺 Health Robot — every 2 hours (and after every robot/test run) checks the live app, GitHub robots and the Supabase server.
+# Writes status.json to branch `status`; the Control Room page (…/control/) shows it. Something red → opens issue "🚨 App health".
+# READ-ONLY on the server. Report holds counts only (no names/emails). No Claude usage.
+name: Health Robot
+on:
+  schedule:
+    - cron: '23 */2 * * *'
+  workflow_dispatch:
+  workflow_run:
+    workflows: ['Tests', 'PYQ Robot', 'Hindi Robot', 'Tag Robot', 'Key-check Robot']
+    types: [completed]
+permissions:
+  contents: write
+  issues: write
+  actions: read
+concurrency:
+  group: health-robot
+  cancel-in-progress: false
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get previous history
+        run: |
+          git fetch --depth=1 origin status 2>/dev/null && git show origin/status:history.json > "$RUNNER_TEMP/history.json" 2>/dev/null || echo '[]' > "$RUNNER_TEMP/history.json"
+      - name: Check everything
+        env:
+          SUPABASE_URL: https://fzkvwkrbtykucjfdqiin.supabase.co
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 dev/tools/health-robot/health.py --out "$RUNNER_TEMP/status.json" --history "$RUNNER_TEMP/history.json"
+      - name: Publish to branch "status"
+        run: |
+          cd "$RUNNER_TEMP" && rm -rf pub && mkdir pub && cd pub
+          git init -q -b status && cp ../status.json ../history.json .
+          git config user.name "health-robot" && git config user.email "health-robot@users.noreply.github.com"
+          git add . && git commit -qm "health $(date -u +%FT%TZ)"
+          git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" status

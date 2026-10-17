@@ -116,7 +116,7 @@ try:
         # ---- admin in the student app sees the Studio link ----
         ap = page(ac, APP, '.sj-dash'); ap.wait_for_function("CloudState.isAdmin===true", timeout=20000)
         ap.click('#btnMenu'); ap.wait_for_timeout(200)
-        rec('admin menu shows Admin Studio + tools', ap.locator('#drwStudio:visible').count() == 1 and ap.locator('#sideDrawer .admin-only:visible').count() == 4)
+        rec('admin menu shows Admin Studio, Control Room + tools', ap.locator('#drwStudio:visible').count() == 1 and ap.locator('#drwControl:visible').count() == 1 and ap.locator('#sideDrawer .admin-only:visible').count() == 5)
 
         # ---- a student opening the studio is refused ----
         s2 = page(sc, STUDIO, '#studioRoot'); s2.wait_for_function("ServerState.isAdmin===false", timeout=20000); s2.wait_for_timeout(200)
