@@ -45,3 +45,4 @@ renderView = function () { _opsRenderView(); try { opsMaintenanceBanner(); } cat
 const _opsCloudSync = cloudSync;
 cloudSync = async function (...args) { const r = await _opsCloudSync(...args); opsFetchMaintenance(); return r; };
 setTimeout(opsFetchMaintenance, 1500);
+

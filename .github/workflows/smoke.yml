@@ -1,0 +1,35 @@
+# 🔥 Smoke Test — after every successful Tests run on main (i.e. a release): waits until the new version is live,
+# then opens the app, Admin Studio and Control Room in a real browser. Fail = Health Robot raises an incident.
+name: Smoke Test
+on:
+  workflow_run:
+    workflows: ['Tests']
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: smoke
+  cancel-in-progress: true
+jobs:
+  smoke:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install browser
+        run: pip install -q playwright && python -m playwright install --with-deps chromium
+      - name: Smoke test the live app
+        run: python3 dev/tools/design-audit/audit.py --smoke --out "$RUNNER_TEMP/smoke.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: smoke
+          path: ${{ runner.temp }}/smoke.json
+          if-no-files-found: ignore
+          retention-days: 30

@@ -31,7 +31,7 @@ def sql_api(method, path, body=None, prefer=None):
     return None
 
 def main():
-    fs.start(fs.SCHEMA_V1, fs.SCHEMA_V2, fs.SCHEMA_V3)
+    fs.start(fs.SCHEMA_V1, fs.SCHEMA_V2, fs.SCHEMA_V3, fs.SCHEMA_V4, fs.SCHEMA_V5)
     try:
         robot.api = sql_api; robot.KEY = 'test'
         work = tempfile.mkdtemp()
@@ -48,6 +48,7 @@ def main():
         st = fs.psql_raw("select string_agg(distinct status||'|'||source_type||'|'||source_ref, ';') from public.questions").strip()
         check('rows are draft PYQ with source_ref', st == 'draft|PYQ|SSC JE 2023 Civil Paper I · test source')
         check('batch row exists', fs.psql_raw("select count(*) from public.import_batches where id like 'ROBOT-%'").strip() == '1')
+        check('batch reconciliation report saved', fs.psql_raw("select (report->>'extracted')||'/'||(report->>'added') from public.import_batches where id like 'ROBOT-%'").strip() == '8/8')
         fs.psql_raw("update public.questions set status='published', question_en='edited by admin' where question_no=1")
         added2, existed2 = robot.upload(paper, data, dry=False)
         check('second run adds 0, sees 8', (added2, existed2) == (0, 8))

@@ -163,7 +163,7 @@ const SECTIONS = [
   { id: 'usage', ico: '📈', label: 'Usage + Cost', group: 'Insights' },
   { id: 'settings', ico: '⚙️', label: 'Policies + Settings', group: 'Insights' },
 ];
-const DOCK = ['overview', 'robots', 'questions', 'emergency', 'more'];
+const DOCK = ['overview', 'command', 'robots', 'tasks', 'more'];
 
 function wfList() {
   const st = S.status || {}; const wf = (st.github?.workflows || []).map(w => ({ ...w }));
@@ -619,9 +619,13 @@ function render() {
   const { side, dock } = shell();
   document.getElementById('side').innerHTML = side; document.getElementById('dock').innerHTML = dock;
   if (!S.status) { root.innerHTML = S.err ? `<div class="card"><div class="lock" style="background:var(--bad-bg)"><span>⚠️</span><span><b>रिपोर्ट नहीं मिली</b><small>${esc(S.err)} — Health Robot एक बार चलना चाहिए या internet नहीं है।</small></span></div><a class="btn pri" href="${GH}/actions/workflows/health-robot.yml" target="_blank" rel="noopener">🩺 Health Robot चलाओ</a></div>` : '<div class="card"><div class="skel" style="width:60%"></div><div style="height:10px"></div><div class="skel"></div></div>'; return; }
-  const V = { overview: vOverview, robots: vRobots, emergency: vEmergency, alerts: vAlerts, questions: vQuestions, quality: vQuality, publish: vPublish, deploy: vDeploy, tests: vTests, database: vDatabase, backup: vBackup, repair: vRepair, students: vStudents, security: vSecurity, audit: vAudit, usage: vUsage, settings: vSettings }[S.route] || vOverview;
-  try { root.innerHTML = V(); } catch (e) { root.innerHTML = `<div class="card"><b>यह हिस्सा नहीं खुला</b><pre class="log">${esc(e.stack || e.message)}</pre></div>`; console.error(e); }
+  const V = VIEWS[S.route] || vOverview;
+  const age = (Date.now() - new Date(S.status.at)) / 60000;
+  const stale = age > 180 ? `<div class="lock" style="background:var(--warn-bg)"><span>⏳</span><span><b>यह रिपोर्ट ${ago(S.status.at)} की है</b><small>पुरानी जानकारी को अभी की हालत न समझें। 🩺 अभी जाँच करवाएँ।</small></span><button class="btn sm" data-act="health-now">🩺 जाँचो</button></div>` : '';
+  try { root.innerHTML = stale + V(); } catch (e) { root.innerHTML = `<div class="card"><b>यह हिस्सा नहीं खुला</b><pre class="log">${esc(e.stack || e.message)}</pre></div>`; console.error(e); }
 }
+const VIEWS = { overview: vOverview, robots: vRobots, emergency: vEmergency, alerts: vAlerts, questions: vQuestions, quality: vQuality, publish: vPublish, deploy: vDeploy, tests: vTests, database: vDatabase, backup: vBackup, repair: vRepair, students: vStudents, security: vSecurity, audit: vAudit, usage: vUsage, settings: vSettings };
+const ON_GO = {};
 function go(id) {
   if (id === 'more') return openMore();
   S.route = id; S.sel.clear(); try { history.replaceState(null, '', '#' + id); } catch (_) {}
@@ -629,6 +633,7 @@ function go(id) {
   if (id === 'questions' && S.admin && !S.q.rows.length) loadQuestions();
   if (id === 'publish' && S.admin) loadPublishQueue();
   if (id === 'audit' && S.admin) loadAudit();
+  if (ON_GO[id]) ON_GO[id]();
 }
 function openMore() {
   sheet('सारे हिस्से', `<div class="kpis">${SECTIONS.map(s => `<button class="kpi" style="text-align:left;cursor:pointer" data-gox="${s.id}"><span class="ki">${s.ico}</span><small style="margin-top:8px;font-size:12.5px;color:var(--text);font-weight:700">${esc(s.label)}</small></button>`).join('')}</div>`,
@@ -652,8 +657,10 @@ function openLogin() {
 }
 
 /* ---------------------------------------------------------------- actions */
+const EXTRA_ACT = {};
 async function act(btn) {
   const a = btn.dataset.act; const wf = btn.dataset.wf;
+  if (EXTRA_ACT[a]) { try { return await EXTRA_ACT[a](btn); } catch (e) { return toast(e.message, 4000); } }
   if (a === 'login') return openLogin();
   if (a === 'pub-reload') return loadPublishQueue();
   if (needAdmin()) return;
@@ -747,6 +754,7 @@ async function refresh(force) {
   if (S.route === 'questions' && S.admin && !S.q.rows.length) loadQuestions();
   if (S.route === 'publish' && S.admin && !S.pub.rows.length) loadPublishQueue();
   if (S.route === 'audit' && S.admin && !Array.isArray(S.live.audit)) loadAudit();
+  if (ON_GO[S.route]) ON_GO[S.route](true);
 }
-window.CR = { S, render, go, validate, cron: null };
-boot();
+window.CR = { S, render, go, validate, api, rpc, toast, sheet, ask, request, setSetting, settingsMap, needAdmin, esc, n, ago, when, bytes, pretty, pill, kpi, bars, gauge, lineChart, loginLock, wfList, SECTIONS, VIEWS, ON_GO, DOCK, CFG, GH, ICON, itemHtml, reqTable, EXTRA_ACT, boot, openLogin, refresh: () => refresh(true), validate };
+if (!window.__CR_DEFER_BOOT) setTimeout(boot, 0);

@@ -1,0 +1,57 @@
+# 🎨 Design Audit Robot — real browser checks of every main screen at phone/tablet/desktop, light + dark:
+# sideways scroll, small buttons, low contrast, overlap, Hindi font, page errors + screenshots. REPORT ONLY.
+# Runs every Monday 06:41 IST, after every Smoke Test, and from the Control Room. Free (public repo runners).
+name: Design Audit
+on:
+  schedule:
+    - cron: '11 1 * * 1'
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'live (असली साइट) या build (code से)'
+        default: 'live'
+permissions:
+  contents: read
+concurrency:
+  group: design-audit
+  cancel-in-progress: true
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: 🚦 Control Room check
+        id: gate
+        env:
+          SUPABASE_URL: https://fzkvwkrbtykucjfdqiin.supabase.co
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: python3 dev/tools/ops/opslib.py gate design
+      - uses: actions/setup-python@v5
+        if: steps.gate.outputs.run == 'true'
+        with:
+          python-version: '3.12'
+      - name: Install browser
+        if: steps.gate.outputs.run == 'true'
+        run: pip install -q playwright && python -m playwright install --with-deps chromium
+      - name: Audit
+        if: steps.gate.outputs.run == 'true'
+        env:
+          OPS_COUNTS: ${{ runner.temp }}/ops_counts.json
+          TARGET: ${{ inputs.target || 'live' }}
+        run: python3 dev/tools/design-audit/audit.py --target "$TARGET" --out "$RUNNER_TEMP/design-audit.json" --shots "$RUNNER_TEMP/shots"
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.gate.outputs.run == 'true'
+        with:
+          name: design-audit
+          path: |
+            ${{ runner.temp }}/design-audit.json
+            ${{ runner.temp }}/shots
+          if-no-files-found: ignore
+          retention-days: 30
+      - name: 📒 Record run in Control Room
+        if: always() && steps.gate.outputs.run == 'true'
+        env:
+          SUPABASE_URL: https://fzkvwkrbtykucjfdqiin.supabase.co
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: python3 dev/tools/ops/opslib.py record design "${{ job.status }}" "$RUNNER_TEMP/ops_counts.json"

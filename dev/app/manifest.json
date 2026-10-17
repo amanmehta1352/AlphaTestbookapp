@@ -282,6 +282,10 @@
    "script": true
   },
   {
+   "file": "src/js/22e-ops-events.js",
+   "script": true
+  },
+  {
    "file": "src/js/23-search.js",
    "script": true
   },

@@ -1,0 +1,94 @@
+# 🧩 Selective Restore — puts back ONLY the chosen source files (a broken section) from an older commit,
+# keeps every newer change, rebuilds, runs ALL tests, and pushes branch restore/<name>. Main is NOT changed.
+# The owner approves the merge in the Control Room (Tasks); the Ops Robot then merges and the Smoke Test checks live.
+name: Selective Restore
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: 'पुराना commit (sha) जिससे वापस लाना है'
+        required: true
+      paths:
+        description: 'files (dev/app/src/... या control/...), space/नई line से अलग'
+        required: true
+      branch:
+        description: 'नई branch (restore/...)'
+        required: true
+      reason:
+        description: 'क्यों'
+        default: ''
+permissions:
+  contents: write
+concurrency:
+  group: selective-restore
+  cancel-in-progress: false
+jobs:
+  restore:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check inputs
+        env:
+          SHA: ${{ inputs.sha }}
+          PATHS: ${{ inputs.paths }}
+          BRANCH: ${{ inputs.branch }}
+        run: |
+          set -e
+          echo "$SHA" | grep -Eq '^[0-9a-f]{7,40}$' || { echo "❌ गलत sha"; exit 1; }
+          echo "$BRANCH" | grep -Eq '^restore/[A-Za-z0-9._-]+$' || { echo "❌ branch restore/... होनी चाहिए"; exit 1; }
+          git merge-base --is-ancestor "$SHA" HEAD || { echo "❌ commit main का हिस्सा नहीं"; exit 1; }
+          for p in $PATHS; do
+            case "$p" in dev/app/src/*|control/*) ;; *) echo "❌ $p की अनुमति नहीं (सिर्फ़ dev/app/src/ या control/)"; exit 1;; esac
+            git cat-file -e "$SHA:$p" || { echo "❌ $p उस commit में नहीं"; exit 1; }
+          done
+      - name: Restore only those files + rebuild
+        env:
+          SHA: ${{ inputs.sha }}
+          PATHS: ${{ inputs.paths }}
+          BRANCH: ${{ inputs.branch }}
+          REASON: ${{ inputs.reason }}
+        run: |
+          set -e
+          git checkout -b "$BRANCH"
+          for p in $PATHS; do git checkout "$SHA" -- "$p"; done
+          v=$(grep -oE 'content="V[0-9]+\.[0-9]+\.[0-9]+' dev/app/src/html/head-01.html | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          IFS=. read -r a b c <<< "$v"; nv="V$a.$b.$((c+1))"
+          sed -i -E "s/content=\"V[0-9]+\.[0-9]+\.[0-9]+\"/content=\"$nv\"/" dev/app/src/html/head-01.html
+          n=$(grep -oE "mtb-shell-v[0-9]+" sw.js | head -1 | grep -oE "[0-9]+$"); sed -i -E "s/mtb-shell-v[0-9]+[a-z0-9-]*/mtb-shell-v$((n+1))/" sw.js
+          (cd dev/app && python3 build.py ../../index.html "$nv" >/dev/null && python3 build.py ../../admin/index.html "$nv" --studio >/dev/null)
+          echo "NV=$nv" >> "$GITHUB_ENV"
+          git diff --stat main -- $PATHS > "$RUNNER_TEMP/diff.txt" || true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test tools
+        run: |
+          ls /usr/lib/postgresql/16/bin/initdb || (sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-16)
+          pip install -q playwright pdfplumber scikit-learn pyyaml
+          python -m playwright install --with-deps chromium
+      - name: Run ALL tests on the restored code
+        env:
+          TEST_SUMMARY: ${{ runner.temp }}/test-summary.json
+        run: sudo -E env "PATH=$PATH" bash dev/tests/run_all.sh
+      - name: Push branch (main untouched)
+        env:
+          SHA: ${{ inputs.sha }}
+          BRANCH: ${{ inputs.branch }}
+          REASON: ${{ inputs.reason }}
+        run: |
+          git config user.name "restore-robot"; git config user.email "restore-robot@users.noreply.github.com"
+          git checkout -q -- dev/tests/__pycache__ 2>/dev/null || true
+          git add -A && git commit -qm "🧩 Selective restore $NV: files from ${SHA:0:7} — ${REASON:-Control Room}"
+          git push -q origin "$BRANCH"
+          { echo "### 🧩 Branch $BRANCH तैयार ($NV) — सारे tests पास"; echo '```'; cat "$RUNNER_TEMP/diff.txt"; echo '```'; echo "Merge के लिए Control Room → Tasks में Approve करें।"; } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: restore-report
+          path: |
+            ${{ runner.temp }}/diff.txt
+            ${{ runner.temp }}/test-summary.json
+          if-no-files-found: ignore

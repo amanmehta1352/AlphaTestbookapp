@@ -233,3 +233,17 @@ textarea.input{min-height:90px;resize:vertical}
 .skel{height:14px;border-radius:7px;background:linear-gradient(90deg,var(--surface2),var(--border),var(--surface2));background-size:200% 100%;animation:sk 1.2s infinite}
 @keyframes sk{to{background-position:-200% 0}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* V3.4 Command Center */
+.cmd-box{background:linear-gradient(135deg,color-mix(in srgb,var(--primary) 10%,var(--surface)),var(--surface));border-color:color-mix(in srgb,var(--primary) 35%,var(--border))}
+.cmd-box textarea{min-height:64px;font-size:15px;resize:vertical}
+.cmd-q{display:flex;justify-content:space-between;gap:8px;align-items:baseline;margin-top:16px;padding:10px 14px;border-radius:14px 14px 4px 14px;background:var(--primary);color:#fff;font-weight:700;margin-left:12%}
+.cmd-q small{color:rgba(255,255,255,.85)}
+.cmd-ans h3{font-size:13px;margin:12px 0 6px;color:var(--muted)}
+.steps{margin:6px 0 0;padding-left:22px;display:grid;gap:6px}.steps li{line-height:1.45}
+.steps li.done{color:var(--ok)}.steps li.failed{color:var(--bad)}.steps li.running{font-weight:800}
+.filters{display:flex;flex-wrap:wrap;gap:6px}
+.cal{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.cal-day{display:flex;flex-direction:column;gap:3px;padding:10px;border-radius:12px;border:1px solid var(--border);background:var(--surface2);font-size:12px;min-width:0}
+.cal-day b{font-size:12.5px;margin-bottom:2px}.cal-day span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item>span{min-width:0}.item .faint,.item .mono,.item .msg{overflow-wrap:anywhere}
+.filters .chip{white-space:normal;text-align:left;max-width:100%}.cmd-ans .row .chip{white-space:normal;text-align:left;max-width:100%}

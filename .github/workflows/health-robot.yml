@@ -7,7 +7,7 @@ on:
     - cron: '23 */2 * * *'
   workflow_dispatch:
   workflow_run:
-    workflows: ['Tests', 'PYQ Robot', 'Hindi Robot', 'Tag Robot', 'Key-check Robot', 'Backup Robot', 'Rollback']
+    workflows: ['Tests', 'PYQ Robot', 'Hindi Robot', 'Tag Robot', 'Key-check Robot', 'Backup Robot', 'Rollback', 'Design Audit', 'Smoke Test', 'Selective Restore']
     types: [completed]
 permissions:
   contents: write
@@ -35,7 +35,7 @@ jobs:
           SUPABASE_URL: https://fzkvwkrbtykucjfdqiin.supabase.co
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python3 dev/tools/ops/ops_robot.py
+        run: python3 dev/tools/ops/ops_robot.py --budget 60
       - name: Get previous history
         if: steps.gate.outputs.run == 'true'
         run: |

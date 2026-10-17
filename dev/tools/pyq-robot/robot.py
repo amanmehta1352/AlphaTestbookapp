@@ -179,7 +179,9 @@ def upload(paper, data, dry):
     ign = 'resolution=ignore-duplicates,return=minimal'
     api('POST', '/rest/v1/exams?on_conflict=id', list(data['exams'].values()), ign)
     api('POST', '/rest/v1/topics?on_conflict=id', list(data['topics'].values()), ign)
-    api('POST', '/rest/v1/import_batches', [{'id': batch, 'file_name': paper['title'][:120], 'added': len(fresh)}], 'return=minimal')
+    report = {'extracted': len(rows), 'already_on_server': len(have), 'added': len(fresh), 'skipped': paper.get('skip') or {},
+              'subjects': dict(Counter(r.get('subject') for r in rows)), 'source_ref': paper.get('src'), 'title': paper.get('title')}
+    api('POST', '/rest/v1/import_batches', [{'id': batch, 'file_name': paper['title'][:120], 'added': len(fresh), 'source_url': paper.get('url'), 'report': report}], 'return=minimal')
     for i in range(0, len(fresh), 200):
         chunk = [{**r, 'status': 'draft', 'source_ref': paper['src'], 'import_batch_id': batch} for r in fresh[i:i + 200]]
         api('POST', '/rest/v1/questions?on_conflict=id', chunk, ign)
@@ -212,6 +214,7 @@ def main(argv):
                 with urllib.request.urlopen(req, timeout=120) as r, open(pdf, 'wb') as f: f.write(r.read())
                 if open(pdf, 'rb').read(5) != b'%PDF-': raise RuntimeError('यह link PDF नहीं देता')
                 paper = paper_to_txt(pdf, work)
+                paper['url'] = url
                 say(f"- Paper: **{paper['title']}**")
                 if KEY and server_count('source_ref=eq.' + urllib.parse.quote(paper['src'])):
                     say('- ⏭️ यह paper पहले से server पर है — छोड़ दिया।'); continue

@@ -53,7 +53,7 @@ def sql_rpc(fn, args=None):
     return json.loads(P(f'select to_jsonb(public.{fn}())'))
 
 def main():
-    F.start(F.SCHEMA_V1, F.SCHEMA_V2, F.SCHEMA_V3, F.SCHEMA_V4)
+    F.start(F.SCHEMA_V1, F.SCHEMA_V2, F.SCHEMA_V3, F.SCHEMA_V4, F.SCHEMA_V5)
     try:
         seed()
         # ---------------- 1. SQL
@@ -97,6 +97,35 @@ def main():
         check('gate: global pause stops writers + keycheck, not backup/health', not opslib.decide('pyq', {**on, 'robots.paused': True})[0] and not opslib.decide('keycheck', {**on, 'robots.paused': True})[0] and opslib.decide('backup', {**on, 'robots.paused': True})[0] and opslib.decide('health', {**on, 'robots.paused': True})[0])
         check('gate: freeze stops data writers only', not opslib.decide('tag', {**on, 'data.frozen': True})[0] and opslib.decide('keycheck', {**on, 'data.frozen': True})[0])
         check('gate: per-robot disable', not opslib.decide('hindi', {**on, 'robot.hindi.enabled': False})[0])
+        # ---------------- 1b. V5 roles + tasks
+        check('roles: first admin is owner', P(F.as_user(ADM, 'select public.ops_role()')).splitlines()[-1] == 'owner')
+        P(f"insert into public.admins(user_id) values ('{STU}')")
+        P(F.as_user(ADM, f"select public.ops_set_role('{F.STUDENT[1]}','readonly')"))
+        for stmt in ["select public.ops_question_action(array['q-live0'],'hide')", "select public.ops_task_create('x','x','x','execute','ops','[]'::jsonb)", "update public.ops_settings set value='true' where key='robots.paused'"]:
+            try: P(F.as_user(STU, stmt)); blocked = P("select value::text from public.ops_settings where key='robots.paused'") == 'false' and 'update' in stmt
+            except Exception: blocked = True
+            check('readonly admin blocked: ' + stmt[:40], blocked)
+        P(F.as_user(ADM, f"select public.ops_set_role('{F.STUDENT[1]}','operator')"))
+        try: P(F.as_user(STU, "select public.ops_question_action(array['q-live0'],'hide')")); check('operator cannot edit questions', False)
+        except Exception: check('operator cannot edit questions', True)
+        tid = int(P(F.as_user(STU, "select public.ops_task_create('op task','cmd','run_robot','execute','robots','[{\"type\":\"note\"}]'::jsonb)")).splitlines()[-1])
+        check('operator can create a run task (queued)', P(f'select status from public.ops_tasks where id={tid}') == 'queued')
+        try: P(F.as_user(STU, f"select public.ops_set_role('{F.STUDENT[1]}','owner')")); check('only owner changes roles', False)
+        except Exception: check('only owner changes roles', True)
+        try: P(F.as_user(ADM, f"select public.ops_set_role('{F.ADMIN[1]}','readonly')")); check('last owner cannot be demoted', False)
+        except Exception: check('last owner cannot be demoted', True)
+        P(f"delete from public.admins where user_id='{STU}'")
+        hid = int(P(F.as_user(ADM, "select public.ops_task_create('publish','publish','publish','execute','publish','[{\"type\":\"note\"}]'::jsonb,'high',2,'pub:1')")).splitlines()[-1])
+        dup = int(P(F.as_user(ADM, "select public.ops_task_create('publish','publish','publish','execute','publish','[]'::jsonb,'high',2,'pub:1')")).splitlines()[-1])
+        check('high-risk task waits for approval; duplicate returns -id', P(f'select status from public.ops_tasks where id={hid}') == 'waiting_approval' and dup == -hid, (hid, dup))
+        P(F.as_user(ADM, f"select public.ops_task_control({hid},'approve','ok')"))
+        check('owner approve -> queued + approval recorded', P(f"select status||'|'||(approval->>'by') from public.ops_tasks where id={hid}") == 'queued|' + F.ADMIN[1])
+        P(F.as_user(ADM, f"select public.ops_task_control({hid},'cancel')"))
+        check('plan mode = planned (nothing runs)', P(F.as_user(ADM, "select public.ops_task_create('p','p','x','plan','ops','[]'::jsonb)")) and P("select status from public.ops_tasks order by id desc limit 1") == 'planned')
+        P(F.as_user(STU, "insert into public.ops_events(name,page,ms) values ('view','home',1200),('view','subjects',800),('test:start','test_hub',null)"))
+        us = json.loads(P("select public.ops_usage_stats(14)"))
+        check('usage stats aggregate events (no user ids)', us['pages']['home']['views'] == 1 and us['funnel_test']['started'] == 1 and STU not in json.dumps(us), us)
+        P("update public.ops_tasks set status='cancelled' where status in ('queued','planned')")
         check('gate: settings unreadable -> writers do not run', not opslib.decide('pyq', None)[0] and opslib.decide('health', None)[0])
         calls = []
         ops_robot.gh = lambda path, method='GET', body=None: (calls.append((method, path, body)) or ({'workflow_runs': [{'id': 7}]} if method == 'GET' else None))
@@ -104,8 +133,50 @@ def main():
         check('ops: unknown workflow rejected', ops_robot.handle({'action': 'run', 'target': 'deploy-everything.yml', 'params': {}})[0] == 'rejected')
         check('ops: PYQ without links rejected', ops_robot.handle({'action': 'run', 'target': 'pyq-robot.yml', 'params': {}})[0] == 'rejected')
         calls.clear(); st, msg = ops_robot.handle({'action': 'cancel', 'target': 'all', 'params': {}})
-        check('ops: emergency stop cancels every robot run', st == 'done' and sum(1 for c in calls if c[1].endswith('/cancel')) == 5 * 3, (st, msg, len(calls)))
+        check('ops: emergency stop cancels every robot run', st == 'done' and sum(1 for c in calls if c[1].endswith('/cancel')) == len(ops_robot.CANCELLABLE) * 3, (st, msg, len(calls)))
         check('ops: rollback needs a real sha', ops_robot.handle({'action': 'rollback', 'target': '', 'params': {'sha': 'main; rm -rf'}})[0] == 'rejected')
+        # ---------------- 2b. task engine (ops_robot.do_tasks against the real DB)
+        def fake_sb(method, path, body=None, actor='robot', prefer=None, timeout=60):
+            if path.startswith('/rest/v1/ops_tasks?select=*'):
+                return json.loads(P("select coalesce(json_agg(t order by priority,id),'[]') from public.ops_tasks t where status in ('queued','running')"))
+            if path.startswith('/rest/v1/ops_tasks?id=eq.') and method == 'PATCH':
+                i = int(path.split('eq.')[1]); sets = ','.join(f"{k} = {F.q(json.dumps(v, ensure_ascii=False) if isinstance(v, (dict, list)) else v)}" + ('::jsonb' if isinstance(v, (dict, list)) else '') for k, v in body.items())
+                P(f'update public.ops_tasks set {sets} where id={i}'); return None
+            if path.startswith('/rest/v1/import_batches'): return [{'source_url': 'https://ssc.example/old.pdf'}]
+            if path == '/rest/v1/rpc/ops_backup_list': return sql_rpc('ops_backup_list')
+            if path == '/rest/v1/rpc/ops_backup_verify': return P(f"select public.ops_backup_verify({body['p_id']})")
+            if path.startswith('/rest/v1/ops_settings?key=eq.') and method == 'PATCH':
+                P(f"update public.ops_settings set value={F.q(json.dumps(body['value']))}::jsonb where key={F.q(path.split('eq.')[1])}"); return None
+            raise RuntimeError('unexpected ' + method + ' ' + path)
+        real_sb, real_lease, real_vl = opslib.sb, ops_robot.lease, ops_robot.verify_links
+        opslib.sb = fake_sb; ops_robot.lease = lambda take=True: True
+        ops_robot.verify_links = lambda urls: [{'url': u, 'ok': 'bad' not in u, 'already_imported': 'old' in u, 'why': ''} for u in urls]
+        run_state = {'status': 'in_progress'}; calls.clear()
+        def gh2(path, method='GET', body=None):
+            calls.append((method, path, body))
+            if '/runs?event=workflow_dispatch' in path: return {'workflow_runs': [{'id': 99, 'created_at': '2999-01-01T00:00:00Z', 'html_url': 'https://github.com/run/99', 'status': 'completed' if run_state['status'] == 'done' else 'in_progress', 'conclusion': 'success'}]}
+            if path == '/actions/runs/99': return {'id': 99, 'status': 'completed' if run_state['status'] == 'done' else 'in_progress', 'conclusion': 'success', 'html_url': 'https://github.com/run/99'}
+            return None
+        ops_robot.gh = gh2
+        steps = json.dumps([{'type': 'verify_links', 'urls': ['https://ssc.example/new.pdf', 'https://ssc.example/old.pdf', 'https://ssc.example/bad.pdf'], 'label': 'links'},
+                            {'type': 'workflow', 'file': 'pyq-robot.yml', 'inputs': {'dry_run': False}, 'use_verified': True, 'label': 'import'},
+                            {'type': 'verify_backup', 'label': 'verify'}, {'type': 'setting', 'key': 'publish.auto', 'value': False, 'label': 's'}])
+        tk = int(P(F.as_user(ADM, f"select public.ops_task_create('import','import','import','execute','pyq',{F.q(steps)}::jsonb,'medium')")).splitlines()[-1])
+        L = []; ops_robot.do_tasks(False, L, 0)
+        t1 = json.loads(P(f'select row_to_json(t) from public.ops_tasks t where id={tk}'))
+        check('engine: verified links -> only the new good link goes to PYQ Robot', t1['steps'][1]['inputs'].get('links') == 'https://ssc.example/new.pdf' and t1['steps'][0]['result']['bad'] == 1, t1['steps'][:2])
+        check('engine: workflow step waits (running) with checkpoint saved', t1['status'] == 'running' and t1['steps'][1]['status'] == 'running' and t1['steps'][0]['status'] == 'done', t1['status'])
+        run_state['status'] = 'done'; ops_robot.do_tasks(False, L, 0)
+        t1 = json.loads(P(f'select row_to_json(t) from public.ops_tasks t where id={tk}'))
+        check('engine: resumes from checkpoint -> completed + report + evidence', t1['status'] == 'completed' and 'प्रमाण' in (t1['report'] or '') and t1['verification']['all_steps_done'] and t1['verification']['evidence'] == ['https://github.com/run/99'], (t1['status'], [(s.get('status'), s.get('error')) for s in t1['steps']]))
+        check('engine: dispatched PYQ exactly once', sum(1 for c in calls if c[1].endswith('pyq-robot.yml/dispatches')) == 1)
+        bad = int(P(F.as_user(ADM, "select public.ops_task_create('m','m','x','execute','design','[{\"type\":\"merge_branch\",\"branch\":\"main\"}]'::jsonb)")).splitlines()[-1])
+        ops_robot.do_tasks(False, L, 0)
+        check('engine: merge only allowed for restore/* branches', P(f'select status from public.ops_tasks where id={bad}') == 'failed')
+        P(F.as_user(ADM, f"select public.ops_task_control({bad},'retry')"))
+        check('retry re-queues failed task and clears failed step', P(f"select status||'|'||coalesce(steps->0->>'status','-')||'|'||retry_count from public.ops_tasks where id={bad}") == 'queued|-|1')
+        P(f"update public.ops_tasks set status='cancelled' where id={bad}")
+        opslib.sb, ops_robot.lease, ops_robot.verify_links = real_sb, real_lease, real_vl
         # ---------------- 3. health report from the fake server
         health.SB_KEY = 'test'; health.sb_get_all = sql_get_all; health.sb_count = sql_count; health.sb_rpc = sql_rpc
         health.collect_site = lambda: {'ok': True, 'ms': 210, 'version': 'V3.3.0', 'source_version': 'V3.3.0', 'size_kb': 800, 'sw_cache': 'mtb-shell-v11', 'admin_ok': True}
@@ -149,10 +220,10 @@ def main():
             # public (no login): all sections render
             c, pg, errs = page_for(b, False, 360)
             bad = []
-            for s in ['overview', 'robots', 'emergency', 'alerts', 'questions', 'quality', 'publish', 'deploy', 'tests', 'database', 'backup', 'repair', 'students', 'security', 'audit', 'usage', 'settings']:
+            for s in ['command', 'overview', 'tasks', 'robots', 'emergency', 'alerts', 'questions', 'quality', 'publish', 'imports', 'deploy', 'design', 'tests', 'database', 'backup', 'repair', 'students', 'security', 'audit', 'usage', 'finance', 'settings']:
                 pg.evaluate(f"CR.go('{s}')"); pg.wait_for_timeout(120)
                 if pg.locator('#app .card, #app .kpi, #app .lock').count() == 0 or 'नहीं खुला' in pg.inner_text('#app') or pg.evaluate('document.documentElement.scrollWidth > innerWidth + 1'): bad.append(s)
-            check('public: all 17 sections render at 360px without sideways scroll', not bad, bad)
+            check('public: all 22 sections render at 360px without sideways scroll', not bad, bad)
             pg.evaluate("CR.go('robots')"); pg.wait_for_timeout(100); pg.locator('[data-act=run]').first.click(); pg.wait_for_timeout(200)
             check('public: action asks for admin login', pg.locator('.sheet h2').first.inner_text().startswith('🔑'))
             check('public: tap targets ≥ 44px (dock, buttons)', pg.evaluate("[...document.querySelectorAll('.dock button,.btn,.chip,.toggle,.tbtn')].filter(e=>e.offsetParent).every(e=>e.getBoundingClientRect().height>=40)"))
@@ -161,7 +232,7 @@ def main():
             for dark in (False, True):
                 c, pg, errs = page_for(b, True, 1280, dark)
                 pg.wait_for_function("CR.S.admin === true", timeout=10000)
-                bad = [s for s in ['overview', 'robots', 'questions', 'publish', 'backup', 'audit', 'database', 'settings'] if (pg.evaluate(f"CR.go('{s}')") or pg.wait_for_timeout(500) or 'नहीं खुला' in pg.inner_text('#app'))]
+                bad = [s for s in ['command', 'tasks', 'overview', 'robots', 'questions', 'publish', 'imports', 'design', 'finance', 'students', 'security', 'backup', 'audit', 'database', 'settings'] if (pg.evaluate(f"CR.go('{s}')") or pg.wait_for_timeout(500) or 'नहीं खुला' in pg.inner_text('#app'))]
                 check(f'admin {"dark" if dark else "light"}: sections render on desktop', not bad and not errs, (bad, errs)); c.close()
             c, pg, errs = page_for(b, True, 390); pg.wait_for_function("CR.S.admin === true", timeout=10000)
             check('admin: header shows Admin', 'Admin' in pg.inner_text('#who'))
@@ -201,6 +272,33 @@ def main():
             # settings
             pg.evaluate("CR.go('settings')"); pg.wait_for_timeout(300); pg.fill('[data-num="backup.keep"]', '20'); pg.locator('[data-num="backup.keep"]').dispatch_event('change'); pg.wait_for_timeout(600)
             check('admin: policy setting saved + audited', P("select value::text from public.ops_settings where key='backup.keep'") == '20' and P("select count(*) from public.ops_audit where table_name='ops_settings'") >= '4')
+            # command console: ASK with evidence, PLAN, EXECUTE -> real task
+            pg.evaluate("CR.go('command')"); pg.wait_for_timeout(300)
+            pg.fill('#cmdIn', 'कौन-से Robots फेल हुए हैं?'); pg.keyboard.press('Enter'); pg.wait_for_timeout(300)
+            a1 = pg.inner_text('#cmdOut')
+            check('console: ASK answers from real data with source', 'tag' in a1.lower() and 'स्रोत' in a1, a1[:200])
+            pg.fill('#cmdIn', 'hindi robot चलाओ'); pg.keyboard.press('Enter'); pg.wait_for_timeout(300)
+            check('console: EXECUTE command shows a plan first', pg.locator('[data-act=cmd-exec]').count() >= 1 and 'Hindi Robot' in pg.inner_text('#cmdOut'))
+            pg.locator('[data-act=cmd-exec]').first.click(); pg.wait_for_timeout(200); pg.locator('[data-yes]').click(); pg.wait_for_timeout(900)
+            check('console: EXECUTE creates a queued task with the workflow step', P("select status||'|'||(steps->0->>'file') from public.ops_tasks order by id desc limit 1") == 'queued|hindi-robot.yml')
+            pg.fill('#cmdIn', 'publish करो'); pg.keyboard.press('Enter'); pg.wait_for_timeout(300)
+            pg.locator('[data-act=cmd-exec]').first.click(); pg.wait_for_timeout(900)
+            check('console: publish = high risk -> waiting approval', P("select status||'|'||risk from public.ops_tasks order by id desc limit 1") == 'waiting_approval|high')
+            pg.fill('#cmdIn', '₹199 subscription का हिसाब'); pg.keyboard.press('Enter'); pg.wait_for_timeout(300)
+            check('console: finance answer is labelled estimate', '₹199' in pg.inner_text('#cmdOut') and 'अनुमान' in pg.inner_text('#cmdOut'))
+            check('console: classify Hindi/English intents', pg.evaluate("['पूरे सिस्टम का audit करो','PYQ import status','backup की integrity जाँचो','emergency stop','design audit करो','इसे ठीक करो','प्रमाण दिखाओ'].map(t => (CRX.classify(t)||{}).id).join(',')") == 'status,pyq_status,backup_verify,estop,design_audit,fix,proof')
+            # tasks: list + approve
+            pg.evaluate("CR.go('tasks')"); pg.wait_for_timeout(800)
+            check('tasks: list shows the tasks', pg.locator('[data-task]').count() >= 2)
+            hid2 = P("select id from public.ops_tasks where status='waiting_approval' order by id desc limit 1")
+            pg.locator(f'[data-task="{hid2}"]').click(); pg.wait_for_timeout(200); pg.locator('[data-tc=approve]').click(); pg.wait_for_timeout(200); pg.locator('[data-yes]').click(); pg.wait_for_timeout(900)
+            check('tasks: owner approves from the phone', P(f'select status from public.ops_tasks where id={hid2}') == 'queued')
+            P("update public.ops_tasks set status='cancelled' where status in ('queued','waiting_approval','running')")
+            # finance save -> server setting
+            pg.evaluate("CR.go('finance')"); pg.wait_for_timeout(300); pg.fill('[data-fin=conversion]', '5'); pg.locator('[data-act=fin-save]').click(); pg.wait_for_timeout(900)
+            check('finance: assumptions saved on server', json.loads(P("select value::text from public.ops_settings where key='finance.assumptions'"))['conversion'] == 5)
+            check('finance: break-even math', pg.evaluate("CRX.finCalc({price:118,conversion:10,fee_pct:0,gst_pct:18,refund_pct:0,fixed_monthly:1000,ai_per_user:0,infra_per_user:0},100).breakEven") == 10)
+            check('calendar: cron next runs', pg.evaluate("CRX.cronNext('37 21 * * *', Date.parse('2026-10-17T00:00:00Z'), 2).join(',')") == '2026-10-17T21:37:00.000Z,2026-10-18T21:37:00.000Z')
             check('admin: no page errors', not errs, errs)
             b.close()
     finally:

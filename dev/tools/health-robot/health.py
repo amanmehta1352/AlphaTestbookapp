@@ -32,6 +32,9 @@ WORKFLOWS = [  # file, label, what it does (Hindi), kind, robot id (Control Room
     ('health-robot.yml', '🩺 Health Robot', 'यह रिपोर्ट', 'system', 'health'),
     ('ops-robot.yml', '⚙️ Ops Robot', 'Control Room के बटनों का काम', 'system', 'ops'),
     ('rollback.yml', '⏪ Rollback', 'पुराने version पर वापस', 'system', None),
+    ('design-audit.yml', '🎨 Design Audit', 'हर screen की design जाँच', 'robot', 'design'),
+    ('smoke.yml', '🔥 Smoke Test', 'release के बाद live जाँच', 'test', None),
+    ('selective-restore.yml', '🧩 Selective Restore', 'सिर्फ़ खराब हिस्सा वापस', 'system', None),
 ]
 PRIVATE_TABLES = ['questions', 'profiles', 'attempts', 'results', 'bookmarks', 'review_cards', 'admins', 'ops_audit', 'ops_requests', 'ops_incidents', 'ops_client_errors', 'ops_runs', 'import_batches']
 SECRET_PATTERNS = [(r'sb_secret_[A-Za-z0-9_-]{10,}', 'Supabase secret key'), (r'ghp_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}', 'GitHub token'),
@@ -276,6 +279,58 @@ def collect_tests(github):
         return {'error': str(e)[:160]}
 
 
+def latest_artifact(wf, name):
+    """-> (json, run) of the newest completed run of `wf` that has artifact `name` (first .json inside)."""
+    runs = (gh(f'/actions/workflows/{wf}/runs?per_page=6&status=completed') or {}).get('workflow_runs', [])
+    for r in runs:
+        arts = (gh(f"/actions/runs/{r['id']}/artifacts") or {}).get('artifacts', [])
+        a = next((x for x in arts if x['name'] == name and not x.get('expired')), None)
+        if not a: continue
+        z = zipfile.ZipFile(io.BytesIO(gh_download(f"/actions/artifacts/{a['id']}/zip")))
+        js = [n for n in z.namelist() if n.endswith('.json')]
+        if js: return json.loads(z.read(js[0])), r
+    return None, None
+
+
+def collect_design():
+    out = {}
+    try:
+        d, r = latest_artifact('design-audit.yml', 'design-audit')
+        if d: out['audit'] = {**d.get('summary', {}), 'target': d.get('target'), 'at': d.get('at'), 'url': r['html_url'],
+                              'worst': sorted([{'route': x['route'], 'size': x['size'], 'theme': x.get('theme'), 'small': len(x.get('small') or []), 'lowc': len(x.get('lowc') or []),
+                                                'overflow': bool(x.get('overflow')), 'samples': (x.get('lowc') or [])[:2] + (x.get('small') or [])[:2]} for x in d.get('screens', [])],
+                                              key=lambda y: -(y['small'] + y['lowc'] + 10 * y['overflow']))[:8]}
+    except Exception as e:
+        out['audit'] = {'note': 'अभी नहीं चला'} if '404' in str(e) else {'error': str(e)[:120]}
+    try:
+        d, r = latest_artifact('smoke.yml', 'smoke')
+        if d: out['smoke'] = {**d, 'url': r['html_url']}
+    except Exception as e:
+        out['smoke'] = {'note': 'अभी नहीं चला'} if '404' in str(e) else {'error': str(e)[:120]}
+    try:
+        hist = []
+        for c in gh('/commits?sha=main&path=dev/app/src&per_page=12') or []:
+            det = gh(f"/commits/{c['sha']}") or {}
+            files = [f['filename'] for f in det.get('files', []) if f['filename'].startswith(('dev/app/src/', 'control/'))]
+            hist.append({'sha': c['sha'][:7], 'full': c['sha'], 'msg': c['commit']['message'].split('\n')[0][:120], 'at': c['commit']['author']['date'], 'url': c['html_url'],
+                         'files': files[:20], 'sections': sorted({SECTION_OF(f) for f in files})[:8]})
+        out['history'] = hist
+    except Exception as e:
+        out['history'] = []
+    files = []
+    for base in ('dev/app/src/css', 'dev/app/src/js', 'dev/app/src/html', 'control'):
+        d = os.path.join(ROOT, base)
+        if os.path.isdir(d): files += [f'{base}/{f}' for f in sorted(os.listdir(d)) if re.search(r'\.(css|js|html)$', f)]
+    out['files'] = [{'path': f, 'section': SECTION_OF(f)} for f in files]
+    return out
+
+
+SECTIONS = [(r'18-v3-design|01-base|0[2-9]-v2', 'Design system / theme'), (r'22b-cbt|22c-cbt|22-study|18-cbt', 'CBT test room + result'), (r'22d-v3-hub', 'Subject hub · Me · Speed check'),
+            (r'11-dashboard', 'Home dashboard'), (r'17b-student-profile', 'Exam/branch profile'), (r'17c-ops|17-cloud', 'Login, sync, maintenance'), (r'19-smart-builder|08-routing', 'Test builder + navigation'),
+            (r'21-pages|12-display', 'Subjects, topics, pages'), (r'24d-admin|17-admin', 'Admin Studio'), (r'10-revision|09-learning', 'Revision + learning data'), (r'^control/', 'Control Room'), (r'head-|body', 'App shell (HTML)')]
+SECTION_OF = lambda f: next((name for pat, name in SECTIONS if re.search(pat, f)), os.path.basename(f))
+
+
 def collect_keycheck():
     try:
         runs = (gh('/actions/workflows/key-check-robot.yml/runs?per_page=5&status=completed') or {}).get('workflow_runs', [])
@@ -298,7 +353,7 @@ def collect_supabase():
     out = {}
     t0 = time.time()
     try:
-        qs = sb_get_all('questions', 'id,subject,status,is_active,question_en,question_hi,options,answer,topic_id,source_type,created_at,explanation_en,explanation_hi')
+        qs = sb_get_all('questions', 'id,subject,status,is_active,question_en,question_hi,options,answer,topic_id,source_type,created_at,explanation_en,explanation_hi,import_batch_id,source_ref')
     except Exception as e:
         return {'ok': False, 'error': str(e)[:160]}
     out['ok'] = True; out['ms'] = round((time.time() - t0) * 1000)
@@ -386,9 +441,43 @@ def collect_supabase():
             if not a['last']: a['last'] = {'at': r['finished_at'], 'ok': r['ok'], 'processed': r['processed'], 'changed': r['changed'], 'note': mask(r.get('note'))[:160]}
         return agg
     out['robot_runs'] = safe(runs, {})
-    out['audit'] = safe(lambda: [{'id': a['id'], 'at': a['at'], 'table': a['table_name'], 'row': a['row_id'], 'action': a['action'], 'actor': mask(a.get('actor')),
+    out['audit'] = safe(lambda: [{'id': a['id'], 'at': a['at'], 'table': a['table_name'], 'row': 'admin' if a['table_name'] == 'admins' else mask(a['row_id']), 'action': a['action'], 'actor': mask(a.get('actor')),
                                   'reason': mask(a.get('reason'))[:120], 'fields': list((a.get('changed') or {}).keys())[:6]}
                                  for a in sb_get_all('ops_audit', 'id,at,table_name,row_id,action,actor,reason,changed', '&order=id.desc')[:25]], [])
+    def batches():
+        bs = sb_get_all('import_batches', 'id,file_name,source_url,added,report,created_at', '&order=created_at.desc')[:25]
+        per = defaultdict(Counter)
+        for q in qs:
+            if q.get('import_batch_id'):
+                c = per[q['import_batch_id']]; c['total'] += 1
+                c['live' if q['status'] == 'published' and q['is_active'] else 'hidden' if not q['is_active'] else 'pending'] += 1
+                if not (q['question_hi'] or '').strip(): c['no_hindi'] += 1
+                if 'mixed-untagged' in (q['topic_id'] or ''): c['untagged'] += 1
+                if broken(q): c['broken'] += 1
+        return [{'id': b['id'], 'title': b.get('file_name'), 'url': b.get('source_url'), 'at': b.get('created_at'), 'added': b.get('added'), 'report': b.get('report'), 'now': dict(per.get(b['id'], {}))} for b in bs]
+    out['imports'] = safe(batches, [])
+    def sources():
+        agg = defaultdict(Counter)
+        for q in qs:
+            k = (q.get('source_ref') or 'Unknown').split(' · ')[0][:90]; c = agg[k]; c['total'] += 1
+            c['live' if q['status'] == 'published' and q['is_active'] else 'hidden' if not q['is_active'] else 'pending'] += 1
+            if not (q['question_hi'] or '').strip(): c['no_hindi'] += 1
+        return sorted([{'source': k, **dict(v)} for k, v in agg.items()], key=lambda x: -x['total'])[:60]
+    out['sources'] = safe(sources, [])
+    def tasks():
+        ts = sb_get_all('ops_tasks', 'id,title,intent,status,risk,mode,created_at,updated_at,started_at,finished_at,retry_count', '&order=id.desc')[:40]
+        c = Counter(t['status'] for t in ts)
+        stuck = [t['id'] for t in ts if t['status'] == 'running' and t.get('updated_at') and NOW - datetime.fromisoformat(t['updated_at'].replace('Z', '+00:00')) > timedelta(minutes=60)]
+        return {'by_status': dict(c), 'recent': ts[:15], 'stuck': stuck}
+    out['tasks'] = safe(tasks, {})
+    out['usage_stats'] = safe(lambda: sb_rpc('ops_usage_stats', {'p_days': 14}), {})
+    out['roles'] = safe(lambda: dict(Counter(a['role'] for a in (sb_rpc('ops_admin_list') or []))), {})
+    def queue():
+        rq = sb_get_all('ops_requests', 'id,status,requested_at,handled_at', '&order=id.desc')[:60]
+        waits = [(datetime.fromisoformat(r['handled_at'].replace('Z', '+00:00')) - datetime.fromisoformat(r['requested_at'].replace('Z', '+00:00'))).total_seconds() / 60 for r in rq if r.get('handled_at')]
+        old = [r['id'] for r in rq if r['status'] == 'queued' and NOW - datetime.fromisoformat(r['requested_at'].replace('Z', '+00:00')) > timedelta(minutes=30)]
+        return {'avg_wait_min': round(sum(waits) / len(waits), 1) if waits else None, 'max_wait_min': round(max(waits), 1) if waits else None, 'stuck': old, 'queued': sum(r['status'] == 'queued' for r in rq)}
+    out['queue'] = safe(queue, {})
     out['incidents'] = safe(lambda: sb_get_all('ops_incidents', 'id,key,severity,area,title,suggestion,status,opened_at,last_seen,resolved_at,seen_count', '&order=id.desc')[:30], [])
     out['client_errors'] = safe(lambda: [{'at': e['at'], 'v': e.get('app_version'), 'page': e.get('page'), 'msg': mask(e['message'])[:160]}
                                          for e in sb_get_all('ops_client_errors', 'at,app_version,page,message', f'&at=gte.{ENC(d7)}&order=id.desc')[:20]], [])
@@ -434,8 +523,12 @@ def collect_usage(s):
 # ---------------------------------------------------------------- verdict
 def evaluate(s):
     C = []
+    SRC = {'ऐप': 'live site (HTTP)', 'Robots': 'GitHub Actions API', 'Tests': 'test-summary artifact', 'Server': 'Supabase (service key)', 'सवाल': 'Supabase questions',
+           'Database': 'ops_db_stats()', 'Backup': 'backup.snapshots', 'Students': 'Supabase attempts/results', 'Security': 'anon probe + repo scan', 'Control': 'ops_settings',
+           'GitHub': 'GitHub API', 'Usage': 'ops_db_stats()', 'Tasks': 'ops_tasks', 'Design': 'design-audit artifact', 'Deploy': 'smoke artifact'}
     def add(cid, area, level, msg, todo='', link='', diag=None):
-        C.append({'id': cid, 'area': area, 'level': level, 'msg': msg, 'todo': todo, 'link': link, **({'diagnosis': diag} if diag else {})})
+        C.append({'id': cid, 'area': area, 'level': level, 'msg': msg, 'todo': todo, 'link': link, 'source': SRC.get(area, area), 'checked_at': NOW.isoformat(timespec='seconds'),
+                  **({'diagnosis': diag} if diag else {})})
     site, g, sb = s.get('site', {}), s.get('github', {}), s.get('supabase', {})
     sec, tests = s.get('security') or {}, s.get('tests') or {}
     if not site.get('ok'): add('site-down', 'ऐप', 'bad', 'Live ऐप नहीं खुल रहा', 'GitHub Pages जाँचो — Claude को बताओ', SITE)
@@ -484,6 +577,26 @@ def evaluate(s):
             if pct > 80: add('db-size', 'Usage', 'bad' if pct > 95 else 'warn', f'Database {round(pct)}% भर गया (free 500 MB)', 'पुराने backup कम करो (backup.keep) या Claude को बताओ')
             if (db.get('auth') or {}).get('admins', 1) > 1: add('admins', 'Security', 'warn', f"{db['auth']['admins']} admins हैं — क्या सब आपके हैं?", 'Supabase में admins table जाँचो')
         elif isinstance(db, dict) and db.get('error'): add('db-stats', 'Database', 'warn', 'Database stats नहीं मिले', 'Claude: V4 schema जाँचो')
+    tk = (sb.get('tasks') or {})
+    if tk.get('stuck'): add('tasks-stuck', 'Tasks', 'warn', f"{len(tk['stuck'])} task 1 घंटे से अटके: #{', #'.join(map(str, tk['stuck'][:5]))}", 'Control Room → Tasks → Pause/Retry')
+    if (tk.get('by_status') or {}).get('waiting_approval'): add('tasks-approval', 'Tasks', 'warn', f"{tk['by_status']['waiting_approval']} task आपकी मंज़ूरी का इंतज़ार कर रहे", 'Control Room → Tasks → Approve / Reject', SITE + 'control/#tasks')
+    if (tk.get('by_status') or {}).get('failed'): add('tasks-failed', 'Tasks', 'warn', f"{tk['by_status']['failed']} task fail हुए (हाल के 40 में)", 'Control Room → Tasks → Retry')
+    qu = sb.get('queue') or {}
+    if qu.get('stuck'): add('queue-stuck', 'Robots', 'warn', f"{len(qu['stuck'])} request 30 मिनट से कतार में", 'Ops Robot का schedule देर से चल रहा — Robots → Ops Robot → Run')
+    for w in g.get('workflows', []):
+        if w.get('running') and w.get('timeout') and w.get('history'):
+            r0 = w['history'][0]
+            try:
+                age = (NOW - datetime.fromisoformat(r0['at'].replace('Z', '+00:00'))).total_seconds() / 60
+                if r0['c'] in ('in_progress', 'queued') and age > w['timeout'] + 15: add('stuck-' + w['file'], 'Robots', 'warn', f"{w['label']} {round(age)} मिनट से चल रहा (timeout {w['timeout']})", 'Robots → रोको, फिर Retry', w['page'])
+            except Exception: pass
+    de = s.get('design') or {}
+    sm = de.get('smoke') or {}
+    if sm.get('ok') is False: add('smoke-fail', 'Deploy', 'bad', 'Deploy के बाद smoke test fail: ' + '; '.join(c['name'] for c in sm.get('checks', []) if not c['ok']), 'Rollback पर विचार करें / Claude को बताओ', sm.get('url', ''))
+    elif sm.get('ok'): add('smoke-ok', 'Deploy', 'ok', f"Deploy के बाद smoke test पास ({sm.get('want')})")
+    au = de.get('audit') or {}
+    if au.get('overflow'): add('design-overflow', 'Design', 'warn', f"{len(au['overflow'])} screens पर sideways scroll", 'Control Room → Design', SITE + 'control/#design')
+    if au.get('page_errors'): add('design-errors', 'Design', 'warn', f"Design audit में {len(au['page_errors'])} page errors", 'Control Room → Design')
     open_tables = [t for t, v in (sec.get('anon') or {}).items() if v == 'खुला!']
     if open_tables: add('sec-anon', 'Security', 'bad', f"बिना login के दिख रहा है: {', '.join(open_tables)}", 'तुरंत Claude को बताओ (RLS)')
     elif sec.get('anon'): add('sec-anon-ok', 'Security', 'ok', f"{len(sec['anon'])} private tables बिना login के बंद")
@@ -542,6 +655,7 @@ def main(a):
     s = {'at': NOW.isoformat(timespec='seconds'), 'repo': REPO, 'site_url': SITE, 'schema': 2}
     s['site'] = collect_site(); s['github'] = collect_github(); s['tests'] = collect_tests(s['github'])
     s['keycheck'] = collect_keycheck(); s['supabase'] = collect_supabase(); s['security'] = collect_security()
+    s['design'] = collect_design()
     s['usage'] = collect_usage(s)
     s['overall'], s['checks'] = evaluate(s)
     s['incidents_sync'] = sync_incidents(s['checks'], dry)

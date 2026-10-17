@@ -2,7 +2,7 @@
 executed against a real local PostgreSQL that has the real schema and RLS rules."""
 import json, subprocess, re, os, urllib.parse, itertools
 SERVER_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'server'))
-SCHEMA_V1 = os.path.join(SERVER_DIR, 'SUPABASE_SCHEMA_V1.sql'); SCHEMA_V2 = os.path.join(SERVER_DIR, 'SUPABASE_SCHEMA_V2.sql'); SCHEMA_V3 = os.path.join(SERVER_DIR, 'SUPABASE_SCHEMA_V3.sql'); SCHEMA_V4 = os.path.join(SERVER_DIR, 'SUPABASE_SCHEMA_V4.sql')
+SCHEMA_V1 = os.path.join(SERVER_DIR, 'SUPABASE_SCHEMA_V1.sql'); SCHEMA_V2 = os.path.join(SERVER_DIR, 'SUPABASE_SCHEMA_V2.sql'); SCHEMA_V3 = os.path.join(SERVER_DIR, 'SUPABASE_SCHEMA_V3.sql'); SCHEMA_V4 = os.path.join(SERVER_DIR, 'SUPABASE_SCHEMA_V4.sql'); SCHEMA_V5 = os.path.join(SERVER_DIR, 'SUPABASE_SCHEMA_V5.sql')
 
 PG = '/usr/lib/postgresql/16/bin'
 D = '/tmp/pgtest_mtb'
@@ -117,10 +117,11 @@ class Fake:
                     if v is None: return 'null'
                     if isinstance(v, bool): return 'true' if v else 'false'
                     if isinstance(v, (int, float)): return str(v)
-                    if isinstance(v, list): return 'array[' + ','.join(q(x) for x in v) + ']::text[]' if v else 'null'
+                    if isinstance(v, dict) or (isinstance(v, list) and any(isinstance(x, (dict, list)) for x in v)): return q(json.dumps(v, ensure_ascii=False)) + '::jsonb'
+                    if isinstance(v, list): return 'array[' + ','.join(q(x) for x in v) + ']::text[]' if v else ('\'[]\'::jsonb' if fn == 'ops_task_create' else 'null')
                     return q(v)
                 a = ', '.join(f'{k} => {lit(v)}' for k, v in args.items())
-                sql = (f"select coalesce(jsonb_agg(x),'[]'::jsonb) from public.{fn}({a}) x" if fn in ('ops_backup_list',) else f"select to_jsonb(public.{fn}({a}))")
+                sql = (f"select coalesce(jsonb_agg(x),'[]'::jsonb) from public.{fn}({a}) x" if fn in ('ops_backup_list', 'ops_admin_list') else f"select to_jsonb(public.{fn}({a}))")
                 out = psql_raw(as_user(uid, sql))
                 return reply(200, json.loads(out.splitlines()[-1]) if out else None)
             m = re.match(r'^/rest/v1/(\w+)$', path)
