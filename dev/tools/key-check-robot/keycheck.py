@@ -136,7 +136,7 @@ def fetch(scope, offset=0):
     if not KEY: raise RuntimeError('GitHub secret SUPABASE_SECRET_KEY नहीं मिला')
     flt = {'draft': '&status=in.(draft,reviewed)', 'published': '&status=eq.published', 'all': ''}[scope]
     cols = 'id,status,source_type,source_ref,question_en,question_hi,options,answer'
-    h = {'apikey': KEY}
+    h = {'apikey': KEY, 'x-actor': 'keycheck-robot'}
     if KEY.startswith('eyJ'): h['Authorization'] = 'Bearer ' + KEY
     out, off = [], offset
     while True:

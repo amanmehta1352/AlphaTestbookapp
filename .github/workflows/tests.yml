@@ -25,4 +25,14 @@ jobs:
           pip install -q playwright pdfplumber scikit-learn
           python -m playwright install --with-deps chromium
       - name: Run all suites
+        env:
+          TEST_SUMMARY: ${{ runner.temp }}/test-summary.json
         run: sudo -E env "PATH=$PATH" bash dev/tests/run_all.sh
+      - name: Test report for the Control Room
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-summary
+          path: ${{ runner.temp }}/test-summary.json
+          if-no-files-found: ignore
+          retention-days: 30

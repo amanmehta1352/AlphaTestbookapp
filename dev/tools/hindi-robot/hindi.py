@@ -19,7 +19,7 @@ MARK = ' · Hindi = machine translation (IndicTrans2)'
 
 
 def api(method, path, body=None, prefer=None):
-    h = {'apikey': KEY, 'Content-Type': 'application/json'}
+    h = {'apikey': KEY, 'Content-Type': 'application/json', 'x-actor': 'hindi-robot'}
     if KEY.startswith('eyJ'): h['Authorization'] = 'Bearer ' + KEY
     if prefer: h['Prefer'] = prefer
     req = urllib.request.Request(URL + path, method=method, headers=h, data=None if body is None else json.dumps(body, ensure_ascii=False).encode())
@@ -48,6 +48,13 @@ def fix_hi(h):
     h = re.sub(r"\s*'([^'\n]{1,40})'\s*", r" '\1' ", h)   # 'DHE'को -> 'DHE' को
     h = re.sub(r'हैः|हैंः', lambda m: m.group(0)[:-1] + ':', h)   # visarga mistaken for colon
     return re.sub(r'[ \t]+', ' ', h).strip()
+
+
+def _ops_counts(processed=None, changed=None, note=''):
+    p = os.environ.get('OPS_COUNTS')
+    if p:
+        import json as _j
+        _j.dump({'processed': processed, 'changed': changed, 'note': note}, open(p, 'w'), ensure_ascii=False)
 
 
 def main(a):
@@ -88,6 +95,7 @@ def main(a):
             done += 1
         print(f'  {min(k + 40, len(todo))}/{len(todo)} · {done} saved · {int(time.time() - t0)}s', flush=True)
     print(f'✅ shard {shard}: Hindi जोड़ा {done} सवालों में')
+    _ops_counts(len(todo), done, f'shard {shard}/{of}')
     if os.environ.get('GITHUB_STEP_SUMMARY'):
         open(os.environ['GITHUB_STEP_SUMMARY'], 'a').write(f'### 🌐 Hindi Robot shard {shard}/{of}: {done} सवालों में Hindi जोड़ा\n')
     return 0

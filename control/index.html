@@ -2,141 +2,29 @@
 <html lang="hi">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
-<meta name="theme-color" content="#4757E8">
+<meta name="theme-color" content="#4E5BF2">
 <title>Control Room · Master TestBook</title>
 <link rel="icon" href="../icon-192.png">
 <link rel="apple-touch-icon" href="../apple-touch-icon.png">
-<style>
-:root{--on-primary:#fff;--bg:#F4F6FB;--surface:#fff;--text:#141A2E;--muted:#5A6378;--border:#E2E6EF;--primary:#4757E8;--primary-l:#EEF0FE;
-  --ok:#12805C;--ok-bg:#E7F7F0;--warn:#9A6400;--warn-bg:#FFF5E1;--bad:#C02B28;--bad-bg:#FDECEC;--r:14px;
-  --mono:ui-monospace,"JetBrains Mono",Menlo,monospace;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans Devanagari",sans-serif}
-@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0D1120;--surface:#161B2E;--text:#EEF1F8;--muted:#A3ABC0;--border:#2A3149;--primary:#8C98FF;--primary-l:#232A4A;
-  --on-primary:#0D1120;--ok:#3DDC9F;--ok-bg:rgba(61,220,159,.12);--warn:#F5B83D;--warn-bg:rgba(245,184,61,.12);--bad:#FF7A77;--bad-bg:rgba(255,122,119,.12)}}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-size:14px;line-height:1.45}
-header{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:8px;padding:10px 16px;background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
-header h1{flex:1;margin:0;font-size:16px}
-main{max-width:1100px;margin:0 auto;padding:12px 16px 40px;display:grid;gap:12px}
-@media(min-width:900px){main{grid-template-columns:1fr 1fr}.full{grid-column:1/-1}}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px}
-.card h2{margin:0 0 10px;font-size:15px;display:flex;justify-content:space-between;align-items:center;gap:8px}
-.card h2 small{font-weight:600;color:var(--muted);font-size:12px}
-button,.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:8px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text);font:inherit;font-weight:700;text-decoration:none;cursor:pointer}
-.btn.primary{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
-.hero{display:flex;gap:14px;align-items:center}
-.light{width:56px;height:56px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;font-size:28px}
-.light.ok{background:var(--ok-bg)}.light.warn{background:var(--warn-bg)}.light.bad{background:var(--bad-bg)}.light.wait{background:var(--primary-l)}
-.hero strong{display:block;font-size:18px}.hero small{color:var(--muted)}
-.checks{list-style:none;margin:0;padding:0;display:grid;gap:8px}
-.chk{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;padding:10px 12px;border-radius:10px;border:1px solid var(--border)}
-.chk.bad{background:var(--bad-bg);border-color:transparent}.chk.warn{background:var(--warn-bg);border-color:transparent}
-.chk b{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
-.chk .todo{grid-column:2;font-size:13px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.chk .todo a{color:var(--primary);font-weight:700}
-.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.tile{border:1px solid var(--border);border-radius:10px;padding:10px 8px;text-align:center;font-size:11.5px;color:var(--muted)}
-.tile b{display:block;font-family:var(--mono);font-size:19px;color:var(--text)}
-.tile.bad b{color:var(--bad)}.tile.warn b{color:var(--warn)}
-.bars{display:grid;gap:6px;margin-top:10px}
-.bar{display:grid;grid-template-columns:minmax(0,150px) 1fr 52px;gap:8px;align-items:center;font-size:12.5px}
-.bar span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bar i{display:block;height:8px;border-radius:6px;background:var(--primary)}
-.bar em{font-style:normal;font-family:var(--mono);text-align:right}
-.robots{display:grid;gap:8px}
-.robot{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--border);border-radius:10px}
-.robot .rm{flex:1;min-width:0}.robot .rm b{display:block}.robot .rm small{color:var(--muted);font-size:12px}
-.pill{font-size:11.5px;font-weight:800;padding:3px 9px;border-radius:999px;white-space:nowrap}
-.pill.ok{background:var(--ok-bg);color:var(--ok)}.pill.bad{background:var(--bad-bg);color:var(--bad)}.pill.run{background:var(--primary-l);color:var(--primary)}.pill.none{background:var(--bg);color:var(--muted)}
-.links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-.say{display:grid;gap:8px}.say div{display:flex;gap:8px;align-items:center;border:1px dashed var(--border);border-radius:10px;padding:8px 10px}
-.say span{flex:1;font-size:13px}
-svg.spark{width:100%;height:56px;display:block}
-.note{font-size:12px;color:var(--muted);margin:8px 0 0}
-.err{padding:12px;border-radius:10px;background:var(--bad-bg)}
-</style>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="cr.css">
 </head>
 <body>
-<header><h1>🩺 Control Room</h1><button type="button" onclick="load(true)" aria-label="फिर से लाओ">🔄</button><a class="btn" href="../" aria-label="ऐप खोलो">📱</a></header>
-<main id="main"><section class="card full"><div class="hero"><span class="light wait">⏳</span><div><strong>रिपोर्ट आ रही है…</strong></div></div></section></main>
-<script>
-const REPO = 'amanmehta1352/AlphaTestbookapp';
-const RAW = `https://raw.githubusercontent.com/${REPO}/status/`;
-const ACT = f => `https://github.com/${REPO}/actions/workflows/${f}`;
-const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const ago = iso => { if (!iso) return '—'; const m = Math.round((Date.now() - new Date(iso)) / 60000); return m < 1 ? 'अभी' : m < 60 ? `${m} मिनट पहले` : m < 1440 ? `${Math.round(m / 60)} घंटे पहले` : `${Math.round(m / 1440)} दिन पहले`; };
-const ICON = { ok: '🟢', warn: '🟡', bad: '🔴' };
-const HEAD = { ok: 'सब ठीक चल रहा है', warn: 'चल रहा है, कुछ काम बाकी', bad: 'ध्यान दो — कुछ खराब है' };
-const SAY = [
-  'Control Room देखो और जो लाल/पीला है ठीक करो',
-  'Draft सवाल जाँचकर publish करो',
-  'टूटे सवाल ठीक करो (backup लेकर)',
-  'Mixed सवालों को chapter में डालो',
-];
-
-async function liveRuns() {   // fresher robot status straight from GitHub (no key needed, public repo)
-  try { const r = await fetch(`https://api.github.com/repos/${REPO}/actions/runs?per_page=40`); if (!r.ok) return null; return (await r.json()).workflow_runs || null; } catch (_) { return null; }
-}
-function spark(vals, label) {
-  const v = vals.filter(x => typeof x === 'number'); if (v.length < 2) return '';
-  const max = Math.max(...v), min = Math.min(...v), W = 300, H = 50, d = (max - min) || 1;
-  const pts = v.map((x, i) => `${(i / (v.length - 1) * W).toFixed(1)},${(H - 4 - (x - min) / d * (H - 8)).toFixed(1)}`).join(' ');
-  return `<div><small style="color:var(--muted)">${esc(label)} · अभी ${v[v.length - 1]}</small><svg class="spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-label="${esc(label)}"><polyline fill="none" stroke="var(--primary)" stroke-width="2" points="${pts}"/></svg></div>`;
-}
-function render(s, hist, runs) {
-  const q = s.supabase?.questions || {}, st = s.supabase?.students || {};
-  const todo = (s.checks || []).filter(c => c.level !== 'ok'), good = (s.checks || []).filter(c => c.level === 'ok');
-  const chk = c => `<li class="chk ${c.level}"><span>${ICON[c.level]}</span><span><b>${esc(c.area)}</b><br>${esc(c.msg)}</span>${c.todo || c.link ? `<span class="todo">${c.todo ? '👉 ' + esc(c.todo) : ''}${c.link ? ` <a href="${esc(c.link)}" target="_blank" rel="noopener">खोलो ›</a>` : ''}</span>` : ''}</li>`;
-  const tile = (n, l, cls = '') => `<span class="tile ${cls}"><b>${n ?? '—'}</b>${l}</span>`;
-  const subj = Object.entries(q.by_subject || {}); const smax = Math.max(1, ...subj.map(x => x[1]));
-  const byFile = {}; (runs || []).forEach(r => { const f = (r.path || '').split('/').pop(); if (f && !byFile[f]) byFile[f] = r; });
-  const robots = (s.github?.workflows || []).map(w => {
-    const r = byFile[w.file]; const running = r ? r.status !== 'completed' : w.running;
-    const concl = r && r.status === 'completed' ? r.conclusion : w.last_conclusion; const at = r ? r.updated_at : w.last_at;
-    const pill = running ? '<span class="pill run">⏳ चल रहा</span>' : concl === 'success' ? '<span class="pill ok">✓ ठीक</span>' : concl === 'failure' ? '<span class="pill bad">✕ fail</span>' : `<span class="pill none">${esc(concl || 'कभी नहीं')}</span>`;
-    return `<div class="robot"><div class="rm"><b>${esc(w.label)}</b><small>${esc(w.what)} · ${ago(at)}</small></div>${pill}<a class="btn" href="${ACT(w.file)}" target="_blank" rel="noopener" aria-label="${esc(w.label)} चलाओ/देखो">▶</a></div>`;
-  }).join('');
-  document.getElementById('main').innerHTML = `
-  <section class="card full"><div class="hero"><span class="light ${s.overall}">${ICON[s.overall]}</span><div><strong>${HEAD[s.overall]}</strong>
-    <small>आख़िरी जाँच ${ago(s.at)} · ऐप ${esc(s.site?.version || '?')} · हर 2 घंटे में अपने-आप</small></div></div>
-    <p class="note"><a class="btn primary" href="${ACT('health-robot.yml')}" target="_blank" rel="noopener">🩺 अभी जाँच करवाओ</a> &nbsp;GitHub खुलेगा → "Run workflow" → हरा बटन।</p></section>
-  <section class="card full"><h2>👉 क्या करना है <small>${todo.length ? todo.length + ' काम' : 'कुछ नहीं'}</small></h2>
-    <ul class="checks">${todo.length ? todo.map(chk).join('') : '<li class="chk ok"><span>🎉</span><span>अभी कोई काम बाकी नहीं।</span></li>'}</ul>
-    <details style="margin-top:10px"><summary>ठीक चल रही चीज़ें (${good.length})</summary><ul class="checks" style="margin-top:8px">${good.map(chk).join('')}</ul></details></section>
-  <section class="card"><h2>📚 सवाल <small>server पर</small></h2><div class="tiles">
-    ${tile(q.live, 'live')}${tile(q.draft + (q.reviewed || 0), 'publish बाकी', (q.draft + (q.reviewed || 0)) ? 'warn' : '')}${tile(q.hidden, 'छिपे')}
-    ${tile(q.pyq_live, 'PYQ')}${tile(q.practice_live, 'Practice')}${tile(q.added_7d, '7 दिन में नए')}
-    ${tile(q.broken_live, 'टूटे', q.broken_live ? 'bad' : '')}${tile(q.untagged_live, 'Mixed (बिना chapter)', q.untagged_live ? 'warn' : '')}${tile(q.no_hindi_live, 'बिना Hindi')}</div>
-    <div class="bars">${subj.map(([k, n]) => `<div class="bar"><span>${esc(k.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()))}</span><i style="width:${Math.max(2, n / smax * 100)}%"></i><em>${n}</em></div>`).join('')}</div></section>
-  <section class="card"><h2>👥 Students <small>सिर्फ़ गिनती</small></h2>${st.error ? `<div class="err">${esc(st.error)}</div>` : `<div class="tiles">
-    ${tile(st.total, 'कुल')}${tile(st.new_7d, '7 दिन में नए')}${tile(st.active_1d, 'आज active')}
-    ${tile(st.active_7d, '7 दिन active')}${tile(st.answers_1d, 'आज जवाब')}${tile(st.answers_7d, '7 दिन जवाब')}
-    ${tile(st.accuracy_7d != null ? st.accuracy_7d + '%' : '—', 'सटीकता (7 दिन)')}${tile(st.tests_7d, '7 दिन टेस्ट')}${tile(st.admins, 'admins')}</div>`}
-    ${(hist || []).length > 2 ? `<div style="margin-top:10px;display:grid;gap:6px">${spark(hist.map(h => h.live), 'Live सवाल')}${spark(hist.map(h => h.answers_1d), 'एक दिन के जवाब')}</div>` : ''}</section>
-  <section class="card full"><h2>🤖 Robots और Tests <small>▶ = GitHub पर खोलो/चलाओ</small></h2><div class="robots">${robots}</div>
-    <p class="note">चलाने के लिए: ▶ → "Run workflow" → हरा "Run workflow"। PYQ Robot में PDF links डालने होते हैं।</p></section>
-  <section class="card"><h2>🔗 जल्दी खोलो</h2><div class="links">
-    <a class="btn" href="../">📱 ऐप</a><a class="btn" href="../admin/">🛠️ Admin Studio</a>
-    <a class="btn" href="https://github.com/${REPO}/actions" target="_blank" rel="noopener">⚙️ GitHub Actions</a><a class="btn" href="https://github.com/${REPO}/issues" target="_blank" rel="noopener">🚨 Issues ${s.github?.issues ? '(' + s.github.issues + ')' : ''}</a>
-    <a class="btn" href="https://supabase.com/dashboard/project/fzkvwkrbtykucjfdqiin" target="_blank" rel="noopener">🗄️ Supabase</a><a class="btn" href="https://claude.ai" target="_blank" rel="noopener">💬 Claude</a></div></section>
-  <section class="card"><h2>💬 Claude को क्या बोलें <small>दबाओ = copy</small></h2><div class="say">${SAY.map((t, i) => `<div><span>${esc(t)}</span><button type="button" onclick="copySay(${i}, this)">📋</button></div>`).join('')}</div>
-    <p class="note">कुछ लाल हो तो GitHub आपको अपने-आप issue/email भेजेगा।</p></section>`;
-}
-function copySay(i, b) { try { navigator.clipboard.writeText(SAY[i]); b.textContent = '✓'; setTimeout(() => b.textContent = '📋', 1500); } catch (_) {} }
-async function load(force) {
-  const t = force ? '?t=' + Date.now() : '?t=' + Math.floor(Date.now() / 60000);
-  try {
-    const [s, h, runs] = await Promise.all([
-      fetch(RAW + 'status.json' + t).then(r => { if (!r.ok) throw new Error('status ' + r.status); return r.json(); }),
-      fetch(RAW + 'history.json' + t).then(r => r.ok ? r.json() : []).catch(() => []),
-      liveRuns()]);
-    render(s, h, runs);
-  } catch (e) {
-    document.getElementById('main').innerHTML = `<section class="card full"><div class="err"><b>रिपोर्ट नहीं मिली.</b> Health Robot एक बार चलना चाहिए या internet नहीं है.<br><a class="btn primary" style="margin-top:8px" href="${ACT('health-robot.yml')}" target="_blank" rel="noopener">🩺 Health Robot चलाओ</a></div></section>`;
-  }
-}
-window.__render = render;
-load(false); setInterval(() => load(false), 5 * 60 * 1000);
-</script>
+<header class="top">
+  <div class="brand"><span class="logo" aria-hidden="true">🩺</span><span style="min-width:0"><b>Control Room</b><small id="sub">Master TestBook · रिपोर्ट आ रही है…</small></span></div>
+  <button class="tbtn" id="refresh" aria-label="ताज़ा करो">🔄</button>
+  <button class="tbtn" id="theme" aria-label="Light / dark">🌓</button>
+  <button class="who" id="who" aria-label="Admin login"><i></i>Login</button>
+</header>
+<div class="layout">
+  <nav class="side" id="side" aria-label="Sections"></nav>
+  <main id="app" tabindex="-1"></main>
+</div>
+<nav class="dock" id="dock" aria-label="Sections"></nav>
+<script src="cr.js"></script>
 </body>
 </html>

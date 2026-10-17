@@ -7,7 +7,7 @@ on:
     - cron: '23 */2 * * *'
   workflow_dispatch:
   workflow_run:
-    workflows: ['Tests', 'PYQ Robot', 'Hindi Robot', 'Tag Robot', 'Key-check Robot']
+    workflows: ['Tests', 'PYQ Robot', 'Hindi Robot', 'Tag Robot', 'Key-check Robot', 'Backup Robot', 'Rollback']
     types: [completed]
 permissions:
   contents: write
@@ -22,16 +22,27 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+      - name: 🚦 Control Room check
+        id: gate
+        env:
+          SUPABASE_URL: https://fzkvwkrbtykucjfdqiin.supabase.co
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: python3 dev/tools/ops/opslib.py gate health
       - name: Get previous history
+        if: steps.gate.outputs.run == 'true'
         run: |
           git fetch --depth=1 origin status 2>/dev/null && git show origin/status:history.json > "$RUNNER_TEMP/history.json" 2>/dev/null || echo '[]' > "$RUNNER_TEMP/history.json"
       - name: Check everything
+        if: steps.gate.outputs.run == 'true'
         env:
           SUPABASE_URL: https://fzkvwkrbtykucjfdqiin.supabase.co
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python3 dev/tools/health-robot/health.py --out "$RUNNER_TEMP/status.json" --history "$RUNNER_TEMP/history.json"
+        run: |
+          pip install -q pyyaml
+          python3 dev/tools/health-robot/health.py --out "$RUNNER_TEMP/status.json" --history "$RUNNER_TEMP/history.json"
       - name: Publish to branch "status"
+        if: steps.gate.outputs.run == 'true'
         run: |
           cd "$RUNNER_TEMP" && rm -rf pub && mkdir pub && cd pub
           git init -q -b status && cp ../status.json ../history.json .

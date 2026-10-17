@@ -64,7 +64,7 @@ def fix(s):
 
 # ---------- server ----------
 def api(method, path, body=None, prefer=None):
-    h = {'apikey': KEY, 'Content-Type': 'application/json'}
+    h = {'apikey': KEY, 'Content-Type': 'application/json', 'x-actor': 'pyq-robot'}
     if KEY.startswith('eyJ'): h['Authorization'] = 'Bearer ' + KEY
     if prefer: h['Prefer'] = prefer
     req = urllib.request.Request(SUPABASE_URL + path, method=method, headers=h,
@@ -188,6 +188,13 @@ def upload(paper, data, dry):
     return len(fresh), len(have)
 
 
+def _ops_counts(processed=None, changed=None, note=''):
+    p = os.environ.get('OPS_COUNTS')
+    if p:
+        import json as _j
+        _j.dump({'processed': processed, 'changed': changed, 'note': note}, open(p, 'w'), ensure_ascii=False)
+
+
 def main(argv):
     dry = '--dry-run' in argv
     urls = [u for u in re.split(r'[\s,]+', ' '.join(a for a in argv if a != '--dry-run')) if u]
@@ -221,6 +228,7 @@ def main(argv):
     if not dry and total: say('\nअब Admin Studio → Review में देखकर Publish करें। तब तक students को नहीं दिखेंगे।')
     if os.environ.get('GITHUB_STEP_SUMMARY'):
         open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8').write('\n'.join(SUMMARY) + '\n')
+    _ops_counts(len(urls), 0 if dry else total, f'{len(urls)} papers, {bad} failed' + (' (dry run)' if dry else ''))
     return 1 if bad and not total else 0
 
 

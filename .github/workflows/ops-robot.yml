@@ -1,0 +1,44 @@
+# ⚙️ Ops Robot — every 10 minutes carries out what the admin asked in the Control Room (Run / Cancel / Emergency stop /
+# Backup / Rollback). Uses only GITHUB_TOKEN + SUPABASE_SECRET_KEY. No Claude usage. Can also be run by hand.
+name: Ops Robot
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+concurrency:
+  group: ops-robot
+  cancel-in-progress: false
+jobs:
+  ops:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: dev/tools/ops
+      - name: 🚦 Control Room check
+        id: gate
+        env:
+          SUPABASE_URL: https://fzkvwkrbtykucjfdqiin.supabase.co
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: python3 dev/tools/ops/opslib.py gate ops
+      - name: Do queued requests
+        if: steps.gate.outputs.run == 'true'
+        env:
+          SUPABASE_URL: https://fzkvwkrbtykucjfdqiin.supabase.co
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPS_COUNTS: ${{ runner.temp }}/ops_counts.json
+        run: python3 dev/tools/ops/ops_robot.py
+      - name: 📒 Record run (only when there was work)
+        if: always() && steps.gate.outputs.run == 'true'
+        env:
+          SUPABASE_URL: https://fzkvwkrbtykucjfdqiin.supabase.co
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: |
+          if [ -f "$RUNNER_TEMP/ops_counts.json" ] || [ "${{ job.status }}" != "success" ]; then
+            python3 dev/tools/ops/opslib.py record ops "${{ job.status }}" "$RUNNER_TEMP/ops_counts.json"
+          fi

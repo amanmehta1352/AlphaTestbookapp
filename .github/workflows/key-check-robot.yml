@@ -33,11 +33,20 @@ jobs:
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
+      - name: 🚦 Control Room check (pause / enable)
+        id: gate
+        env:
+          SUPABASE_URL: https://fzkvwkrbtykucjfdqiin.supabase.co
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: python3 dev/tools/ops/opslib.py gate keycheck
       - uses: actions/setup-python@v5
+        if: steps.gate.outputs.run == 'true'
         with:
           python-version: '3.12'
       - name: Check answers
+        if: steps.gate.outputs.run == 'true'
         env:
+          OPS_COUNTS: ${{ runner.temp }}/ops_counts.json
           SUPABASE_URL: https://fzkvwkrbtykucjfdqiin.supabase.co
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -51,8 +60,15 @@ jobs:
           if [ "$USE_GEMINI" = "true" ]; then args="$args --gemini"; fi
           python3 dev/tools/key-check-robot/keycheck.py $args
       - uses: actions/upload-artifact@v4
+        if: steps.gate.outputs.run == 'true'
         if: always()
         with:
           name: keycheck-report
           path: ${{ runner.temp }}/keycheck-report.json
           if-no-files-found: ignore
+      - name: 📒 Record run in Control Room
+        if: always() && steps.gate.outputs.run == 'true'
+        env:
+          SUPABASE_URL: https://fzkvwkrbtykucjfdqiin.supabase.co
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: python3 dev/tools/ops/opslib.py record keycheck "${{ job.status }}" "$RUNNER_TEMP/ops_counts.json"

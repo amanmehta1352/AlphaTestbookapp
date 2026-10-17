@@ -27,19 +27,36 @@ jobs:
         shard: [0, 1, 2, 3, 4, 5, 6, 7]
     steps:
       - uses: actions/checkout@v4
+      - name: 🚦 Control Room check (pause / enable)
+        id: gate
+        env:
+          SUPABASE_URL: https://fzkvwkrbtykucjfdqiin.supabase.co
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: python3 dev/tools/ops/opslib.py gate hindi
       - uses: actions/setup-python@v5
+        if: steps.gate.outputs.run == 'true'
         with:
           python-version: '3.12'
       - uses: actions/cache@v4
+        if: steps.gate.outputs.run == 'true'
         with:
           path: ~/.cache/huggingface
           key: hf-indictrans2-1B-c44b2b1
       - name: Install
+        if: steps.gate.outputs.run == 'true'
         run: |
           pip install -q torch --index-url https://download.pytorch.org/whl/cpu
           pip install -q "transformers==4.46.3" sentencepiece einops IndicTransToolkit
       - name: Translate shard ${{ matrix.shard }}
+        if: steps.gate.outputs.run == 'true'
         env:
+          OPS_COUNTS: ${{ runner.temp }}/ops_counts.json
           SUPABASE_URL: https://fzkvwkrbtykucjfdqiin.supabase.co
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
         run: python3 dev/tools/hindi-robot/hindi.py --shard ${{ matrix.shard }} --of 8
+      - name: 📒 Record run in Control Room
+        if: always() && steps.gate.outputs.run == 'true'
+        env:
+          SUPABASE_URL: https://fzkvwkrbtykucjfdqiin.supabase.co
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: python3 dev/tools/ops/opslib.py record hindi "${{ job.status }}" "$RUNNER_TEMP/ops_counts.json"

@@ -2,7 +2,7 @@
 executed against a real local PostgreSQL that has the real schema and RLS rules."""
 import json, subprocess, re, os, urllib.parse, itertools
 SERVER_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'server'))
-SCHEMA_V1 = os.path.join(SERVER_DIR, 'SUPABASE_SCHEMA_V1.sql'); SCHEMA_V2 = os.path.join(SERVER_DIR, 'SUPABASE_SCHEMA_V2.sql'); SCHEMA_V3 = os.path.join(SERVER_DIR, 'SUPABASE_SCHEMA_V3.sql')
+SCHEMA_V1 = os.path.join(SERVER_DIR, 'SUPABASE_SCHEMA_V1.sql'); SCHEMA_V2 = os.path.join(SERVER_DIR, 'SUPABASE_SCHEMA_V2.sql'); SCHEMA_V3 = os.path.join(SERVER_DIR, 'SUPABASE_SCHEMA_V3.sql'); SCHEMA_V4 = os.path.join(SERVER_DIR, 'SUPABASE_SCHEMA_V4.sql')
 
 PG = '/usr/lib/postgresql/16/bin'
 D = '/tmp/pgtest_mtb'
@@ -45,16 +45,31 @@ class Fake:
         n = next(self.n); a, r = f'tok-{n}', f'ref-{n}'
         self.tokens[a] = user; self.refresh[r] = user
         return {'access_token': a, 'refresh_token': r, 'expires_in': 3600, 'token_type': 'bearer', 'user': {'id': user[0], 'email': user[1]}}
+    @staticmethod
+    def cond(k, v):
+        col = k
+        if '->' in k:  # json path like changed->status->>1
+            parts = re.split(r'(->>|->)', k); col = parts[0] + ''.join((op + (x if x.isdigit() else q(x))) for op, x in zip(parts[1::2], parts[2::2]))
+        if v.startswith('eq.'): return f"{col} = {q(v[3:])}"
+        if v.startswith('neq.'): return f"{col} <> {q(v[4:])}"
+        if v.startswith('gte.'): return f"{col} >= {q(v[4:])}"
+        if v.startswith('lte.'): return f"{col} <= {q(v[4:])}"
+        if v.startswith('is.'): return f"{col} is {dict(null='null', true='true', false='false')[v[3:]]}"
+        if v.startswith('like.'): return f"{col}::text like {q(v[5:].replace('*', '%'))}"
+        if v.startswith('ilike.'): return f"{col}::text ilike {q(v[6:].replace('*', '%'))}"
+        if v.startswith('in.('):
+            items = [x.strip().strip('"').replace('\\"', '"') for x in re.findall(r'"(?:[^"\\]|\\.)*"|[^,()]+', v[4:-1])]
+            return f"{col} in ({','.join(q(x) for x in items)})"
+        raise ValueError('filter ' + k + '=' + v)
     def where(self, params):
         conds = []
         for k, vs in params.items():
             if k in ('select', 'on_conflict', 'order', 'limit', 'offset'): continue
-            v = vs[0]
-            if v.startswith('eq.'): conds.append(f"{k} = {q(v[3:])}")
-            elif v.startswith('in.('):
-                items = [x.strip().strip('"').replace('\\"', '"') for x in re.findall(r'"(?:[^"\\]|\\.)*"|[^,()]+', v[4:-1])]
-                conds.append(f"{k} in ({','.join(q(x) for x in items)})")
-            else: raise ValueError('filter ' + k + '=' + v)
+            for v in vs:
+                if k == 'or':
+                    parts = re.findall(r'[\w>-]+\.(?:[a-z]+)\.(?:\([^)]*\)|[^,()]*)', v[1:-1])
+                    conds.append('(' + ' or '.join(self.cond(p.split('.', 1)[0], p.split('.', 1)[1]) for p in parts) + ')')
+                else: conds.append(self.cond(k, v))
         return (' where ' + ' and '.join(conds)) if conds else ''
     def handle(self, route, request):
         if self.offline: return route.abort()
@@ -95,6 +110,19 @@ class Fake:
         try:
             if path == '/rest/v1/rpc/is_admin':
                 return reply(200, psql_raw(as_user(uid, 'select public.is_admin()')).splitlines()[-1] == 't')
+            m = re.match(r'^/rest/v1/rpc/(\w+)$', path)
+            if m:
+                fn = m.group(1); args = json.loads(body or '{}')
+                def lit(v):
+                    if v is None: return 'null'
+                    if isinstance(v, bool): return 'true' if v else 'false'
+                    if isinstance(v, (int, float)): return str(v)
+                    if isinstance(v, list): return 'array[' + ','.join(q(x) for x in v) + ']::text[]' if v else 'null'
+                    return q(v)
+                a = ', '.join(f'{k} => {lit(v)}' for k, v in args.items())
+                sql = (f"select coalesce(jsonb_agg(x),'[]'::jsonb) from public.{fn}({a}) x" if fn in ('ops_backup_list',) else f"select to_jsonb(public.{fn}({a}))")
+                out = psql_raw(as_user(uid, sql))
+                return reply(200, json.loads(out.splitlines()[-1]) if out else None)
             m = re.match(r'^/rest/v1/(\w+)$', path)
             if not m: return reply(404, {'message': 'not found'})
             t = m.group(1)
@@ -105,7 +133,11 @@ class Fake:
                 if 'limit' in params: tail += ' limit ' + str(int(params['limit'][0]))
                 if 'offset' in params: tail += ' offset ' + str(int(params['offset'][0]))
                 out = psql_raw(as_user(uid, f"select coalesce(jsonb_agg(x),'[]'::jsonb) from (select {cols} from public.{t}{self.where(params)}{tail}) x"))
-                return reply(200, json.loads(out.splitlines()[-1] if out else '[]'))
+                data_ = json.loads(out.splitlines()[-1] if out else '[]')
+                if 'count=exact' in hdr.get('prefer', ''):
+                    tot = int(psql_raw(as_user(uid, f"select count(*) from public.{t}{self.where(params)}")).splitlines()[-1])
+                    return route.fulfill(status=200, headers={**cors, 'content-type': 'application/json', 'content-range': f'0-{max(0, len(data_) - 1)}/{tot}', 'access-control-expose-headers': 'content-range'}, body=json.dumps(data_))
+                return reply(200, data_)
             data = json.loads(body or '[]'); rows = data if isinstance(data, list) else [data]
             j = '$J$' + json.dumps(rows, ensure_ascii=False) + '$J$'
             if request.method == 'POST':

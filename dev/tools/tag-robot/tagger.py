@@ -20,7 +20,7 @@ def say(s=''):
 
 
 def api(method, path, body=None, prefer=None):
-    h = {'apikey': KEY, 'Content-Type': 'application/json'}
+    h = {'apikey': KEY, 'Content-Type': 'application/json', 'x-actor': 'tag-robot'}
     if KEY.startswith('eyJ'): h['Authorization'] = 'Bearer ' + KEY
     if prefer: h['Prefer'] = prefer
     req = urllib.request.Request(URL + path, method=method, headers=h, data=None if body is None else json.dumps(body, ensure_ascii=False).encode())
@@ -47,9 +47,25 @@ def text_of(r):
     return re.sub(r'\s+', ' ', t.lower())
 
 
+def _ops_counts(processed=None, changed=None, note=''):
+    p = os.environ.get('OPS_COUNTS')
+    if p:
+        import json as _j
+        _j.dump({'processed': processed, 'changed': changed, 'note': note}, open(p, 'w'), ensure_ascii=False)
+
+
+def _setting(name, default):
+    try:
+        r = api('GET', '/rest/v1/ops_settings?select=value&key=eq.' + name) or []
+        return float(r[0]['value']) if r else default
+    except Exception:
+        return default
+
+
 def main(a):
     dry = '--dry-run' in a
-    minp = float(a[a.index('--min-prob') + 1]) if '--min-prob' in a else 0.55
+    minp = float(a[a.index('--min-prob') + 1]) if '--min-prob' in a else (_setting('tag.min_prob', 0.55) if KEY else 0.55)
+    mincv = _setting('tag.min_cv', 0.80) if KEY else 0.80
     if not KEY: say('❌ SUPABASE_SECRET_KEY नहीं मिला'); return 1
     from sklearn.feature_extraction.text import TfidfVectorizer
     from sklearn.linear_model import LogisticRegression
@@ -82,7 +98,7 @@ def main(a):
         for r, p in zip(mixed, P):
             k = p.argmax()
             if p[k] >= minp: moves.append((r, cls[k], p[k]))
-        ok = acc >= 0.80
+        ok = acc >= mincv
         say(f"- **{subj}**: tagged {len(train)} से सीखा · accuracy {acc:.0%} · Mixed {len(mixed)} → पक्के {len(moves)}" + ('' if ok else ' · ⚠️ accuracy कम, नहीं बदला'))
         if not ok: continue
         cnt = Counter(meta[t][0] for _, t, _ in moves)
@@ -95,6 +111,7 @@ def main(a):
             api('PATCH', '/rest/v1/questions?id=eq.' + urllib.parse.quote(r['id']) + '&topic_id=like.*mixed-untagged*', body, 'return=minimal')
             total_moved += 1
     say(f"\n**कुल chapter में गए: {total_moved}**" if not dry else '')
+    _ops_counts(sum(len([r for r in rs if 'mixed-untagged' in (r['topic_id'] or '')]) for rs in by_subj.values()), total_moved, 'dry run' if dry else '')
     if os.environ.get('GITHUB_STEP_SUMMARY'): open(os.environ['GITHUB_STEP_SUMMARY'], 'a').write('\n'.join(OUT) + '\n')
     return 0
 

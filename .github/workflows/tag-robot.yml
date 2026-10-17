@@ -23,14 +23,30 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+      - name: 🚦 Control Room check (pause / enable)
+        id: gate
+        env:
+          SUPABASE_URL: https://fzkvwkrbtykucjfdqiin.supabase.co
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: python3 dev/tools/ops/opslib.py gate tag
       - uses: actions/setup-python@v5
+        if: steps.gate.outputs.run == 'true'
         with:
           python-version: '3.12'
       - run: pip install -q scikit-learn
+        if: steps.gate.outputs.run == 'true'
       - name: Tag
+        if: steps.gate.outputs.run == 'true'
         env:
+          OPS_COUNTS: ${{ runner.temp }}/ops_counts.json
           DRY: ${{ inputs.dry_run }}
           SUPABASE_URL: https://fzkvwkrbtykucjfdqiin.supabase.co
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
         run: |
           if [ "$DRY" = "true" ]; then python3 dev/tools/tag-robot/tagger.py --dry-run; else python3 dev/tools/tag-robot/tagger.py; fi
+      - name: 📒 Record run in Control Room
+        if: always() && steps.gate.outputs.run == 'true'
+        env:
+          SUPABASE_URL: https://fzkvwkrbtykucjfdqiin.supabase.co
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: python3 dev/tools/ops/opslib.py record tag "${{ job.status }}" "$RUNNER_TEMP/ops_counts.json"

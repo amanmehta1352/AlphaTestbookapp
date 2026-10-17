@@ -1,0 +1,55 @@
+# ⏪ Rollback — puts the LIVE app files (index.html, admin/index.html) of an older, test-passed commit back on main.
+# Started from the Control Room (via Ops Robot) or by hand. Source code (dev/app) is NOT changed: Claude fixes the
+# source afterwards. The service-worker cache name is bumped so phones pick the old version up.
+name: Rollback
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: 'किस commit पर वापस जाना है (sha)'
+        required: true
+      reason:
+        description: 'क्यों (optional)'
+        default: ''
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: rollback
+  cancel-in-progress: false
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check the commit is a tested release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SHA: ${{ inputs.sha }}
+        run: |
+          set -e
+          echo "$SHA" | grep -Eq '^[0-9a-f]{7,40}$' || { echo "❌ गलत sha"; exit 1; }
+          git merge-base --is-ancestor "$SHA" HEAD || { echo "❌ यह commit main का हिस्सा नहीं"; exit 1; }
+          full=$(git rev-parse "$SHA")
+          ok=$(gh api "repos/${{ github.repository }}/actions/workflows/tests.yml/runs?head_sha=$full&status=success&per_page=1" --jq '.total_count')
+          [ "$ok" != "0" ] || { echo "❌ इस commit के tests पास नहीं हुए थे — rollback नहीं करेंगे"; exit 1; }
+          git cat-file -e "$full:index.html" || { echo "❌ उस commit में index.html नहीं"; exit 1; }
+          echo "FULL=$full" >> "$GITHUB_ENV"
+      - name: Put old live files back
+        env:
+          REASON: ${{ inputs.reason }}
+        run: |
+          set -e
+          git checkout "$FULL" -- index.html
+          git cat-file -e "$FULL:admin/index.html" 2>/dev/null && git checkout "$FULL" -- admin/index.html || true
+          n=$(grep -oE "mtb-shell-v[0-9]+" sw.js | head -1 | grep -oE "[0-9]+$")
+          sed -i -E "s/mtb-shell-v[0-9]+[a-z0-9-]*/mtb-shell-v$((n+1))-rb/" sw.js
+          ver=$(grep -oE 'name="app-version" content="[^"]+"' index.html | cut -d'"' -f4)
+          git config user.name "rollback-robot"; git config user.email "rollback-robot@users.noreply.github.com"
+          git add index.html admin/index.html sw.js
+          git commit -m "⏪ Rollback live app to $ver (${FULL:0:7}) — ${REASON:-from Control Room}"
+          git push origin HEAD:main
+          echo "### ⏪ Live ऐप $ver (${FULL:0:7}) पर वापस" >> "$GITHUB_STEP_SUMMARY"

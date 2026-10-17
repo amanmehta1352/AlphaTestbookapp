@@ -243,3 +243,7 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
 /* CBT header: language button never wraps */
 .test-fixed-viewport .icon-btn{white-space:nowrap}
 .sh-t-name.sm{font-size:12.5px;color:var(--primary)}
+
+/* ---------- V3.3 maintenance banner (Control Room) ---------- */
+.ops-maint{display:flex;gap:10px;align-items:flex-start;margin:0 0 10px;padding:12px 14px;border-radius:var(--radius-md);background:var(--warning-bg);border:1.5px solid var(--warning);color:var(--text-main)}
+.ops-maint b{display:block;font-size:14px}.ops-maint small{display:block;font-size:12.5px;color:var(--text-main);margin-top:2px}

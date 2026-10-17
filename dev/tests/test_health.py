@@ -38,6 +38,8 @@ def main():
         add('H1', 'civil-x', 'published', False, 'हिंदी')
         fs.psql_raw('insert into public.questions(id,topic_id,subject,chapter,topic,question_en,question_hi,options,answer,source_type,status,is_active) values ' + ','.join(rows) + ';')
         health.sb_get_all = sql_get_all; health.sb_count = sql_count
+        def no_rpc(*a, **k): raise RuntimeError('no rpc in this test')
+        health.sb_rpc = no_rpc
         sb = health.collect_supabase()
         q = sb.get('questions', {})
         check('server read ok on real schema', sb.get('ok') is True, sb)
@@ -63,27 +65,7 @@ def main():
     blob = json.dumps(sb, ensure_ascii=False)
     check('report has no email or uuid', not re.search(r'@|[0-9a-f]{8}-[0-9a-f]{4}-', blob))
 
-    # Control Room page
-    from playwright.sync_api import sync_playwright
-    s['site'] = {'ok': True, 'version': 'V3.2.1', 'ms': 300}
-    s['github']['workflows'] = [{'file': f, 'label': l, 'what': w, 'page': 'p', 'last_conclusion': 'success', 'last_at': '2026-10-17T00:00:00Z'} for f, l, w, _ in health.WORKFLOWS]
-    s['overall'], s['checks'] = health.evaluate(s); s['at'] = '2026-10-17T02:00:00+00:00'
-    page_path = os.path.abspath(os.path.join(HERE, '..', '..', 'control', 'index.html'))
-    with sync_playwright() as p:
-        b = p.chromium.launch(); errs = []
-        for dark in (False, True):
-            ctx = b.new_context(viewport={'width': 360, 'height': 780}, color_scheme='dark' if dark else 'light')
-            pg = ctx.new_page(); pg.on('pageerror', lambda e: errs.append(str(e)))
-            pg.route('https://raw.githubusercontent.com/**', lambda r: r.fulfill(status=200, content_type='application/json', body=json.dumps(s if 'status.json' in r.request.url else [{'live': 5, 'answers_1d': 1}, {'live': 9, 'answers_1d': 4}, {'live': 9, 'answers_1d': 7}])))
-            pg.route('https://api.github.com/**', lambda r: r.fulfill(status=200, content_type='application/json', body='{"workflow_runs":[]}'))
-            pg.goto('file://' + page_path); pg.wait_for_selector('.robot', timeout=10000)
-            tag = 'dark' if dark else 'light'
-            check(f'{tag}: page shows status, to-do list and all robots', pg.locator('.light.ok, .light.warn, .light.bad').count() == 1 and pg.locator('.robot').count() == len(health.WORKFLOWS))
-            check(f'{tag}: no sideways scroll at 360px', pg.evaluate('document.documentElement.scrollWidth <= innerWidth + 1'))
-            check(f'{tag}: buttons ≥ 44px tall', pg.evaluate("[...document.querySelectorAll('button,.btn')].filter(e=>e.offsetParent).every(e=>e.getBoundingClientRect().height>=44)"))
-            ctx.close()
-        check('no page errors', not errs, errs)
-        b.close()
+    # (the Control Room page itself is tested in test_ops.py)
     print('PASS all' if ok else 'FAIL some'); sys.exit(0 if ok else 1)
 
 if __name__ == '__main__':

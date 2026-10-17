@@ -1,0 +1,45 @@
+# 💾 Backup Robot — every night 02:37 IST (and by hand / from the Control Room) takes a full snapshot of the server
+# (questions, topics, exams + student progress) inside Supabase (schema backup), checks it (checksum + restore test)
+# and keeps the last N (setting backup.keep). Nothing leaves the server; the public repo never gets student data.
+name: Backup Robot
+on:
+  schedule:
+    - cron: '7 21 * * *'
+  workflow_dispatch:
+    inputs:
+      note:
+        description: 'Backup के साथ नोट (optional)'
+        default: ''
+permissions:
+  contents: read
+concurrency:
+  group: backup-robot
+  cancel-in-progress: false
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: dev/tools/ops
+      - name: 🚦 Control Room check
+        id: gate
+        env:
+          SUPABASE_URL: https://fzkvwkrbtykucjfdqiin.supabase.co
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: python3 dev/tools/ops/opslib.py gate backup
+      - name: Snapshot + verify
+        if: steps.gate.outputs.run == 'true'
+        env:
+          SUPABASE_URL: https://fzkvwkrbtykucjfdqiin.supabase.co
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          OPS_COUNTS: ${{ runner.temp }}/ops_counts.json
+          NOTE: ${{ inputs.note }}
+        run: python3 dev/tools/ops/backup_robot.py
+      - name: 📒 Record run in Control Room
+        if: always() && steps.gate.outputs.run == 'true'
+        env:
+          SUPABASE_URL: https://fzkvwkrbtykucjfdqiin.supabase.co
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: python3 dev/tools/ops/opslib.py record backup "${{ job.status }}" "$RUNNER_TEMP/ops_counts.json"
