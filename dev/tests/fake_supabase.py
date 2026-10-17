@@ -2,7 +2,7 @@
 executed against a real local PostgreSQL that has the real schema and RLS rules."""
 import json, subprocess, re, os, urllib.parse, itertools
 SERVER_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'server'))
-SCHEMA_V1 = os.path.join(SERVER_DIR, 'SUPABASE_SCHEMA_V1.sql'); SCHEMA_V2 = os.path.join(SERVER_DIR, 'SUPABASE_SCHEMA_V2.sql'); SCHEMA_V3 = os.path.join(SERVER_DIR, 'SUPABASE_SCHEMA_V3.sql'); SCHEMA_V4 = os.path.join(SERVER_DIR, 'SUPABASE_SCHEMA_V4.sql'); SCHEMA_V5 = os.path.join(SERVER_DIR, 'SUPABASE_SCHEMA_V5.sql')
+SCHEMA_V1 = os.path.join(SERVER_DIR, 'SUPABASE_SCHEMA_V1.sql'); SCHEMA_V2 = os.path.join(SERVER_DIR, 'SUPABASE_SCHEMA_V2.sql'); SCHEMA_V3 = os.path.join(SERVER_DIR, 'SUPABASE_SCHEMA_V3.sql'); SCHEMA_V4 = os.path.join(SERVER_DIR, 'SUPABASE_SCHEMA_V4.sql'); SCHEMA_V5 = os.path.join(SERVER_DIR, 'SUPABASE_SCHEMA_V5.sql'); SCHEMA_V6 = os.path.join(SERVER_DIR, 'SUPABASE_SCHEMA_V6.sql')
 
 PG = '/usr/lib/postgresql/16/bin'
 D = '/tmp/pgtest_mtb'

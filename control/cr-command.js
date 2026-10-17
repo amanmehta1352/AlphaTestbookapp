@@ -409,6 +409,10 @@ function openTask(id) {
 function vImports() {
   const im = sb().imports || []; const src = sb().sources || []; const pyq = (st().github?.workflows || []).find(w => w.file === 'pyq-robot.yml') || {};
   return `<div class="ph"><div><h1>📦 PYQ Import Control</h1><p>Links दो → जाँच → Import (Draft) → Hindi → Chapter → Answer जाँच → रिपोर्ट। हर batch का पूरा हिसाब।</p></div></div>
+  <section class="card"><h2>📤 PDF फ़ाइल upload <small>अगर link काम न करे (साइट 403 दे)</small></h2>
+    <p class="note" style="margin:0 0 8px">फ़ोन पर PDF डाउनलोड करो → यहाँ चुनो → Robot उसे इंपोर्ट करेगा। फ़ाइल सिर्फ़ admin देख/भेज सकता है, 20 MB तक।</p>
+    <input id="impFile" type="file" accept="application/pdf" class="input" style="padding:10px">
+    <div class="row" style="margin-top:8px"><button class="btn" data-act="imp-upload" data-dry="1">🧪 Upload + Dry run</button><button class="btn pri" data-act="imp-upload" data-dry="0">▶ Upload + Import</button></div></section>
   <section class="card"><h2>➕ नए papers <small>SSC JE response-sheet PDF links</small></h2>
     <textarea id="impLinks" class="input" rows="3" placeholder="https://… (एक line में एक link)">${esc(S.impDraft || '')}</textarea>
     <div class="row" style="margin-top:8px"><button class="btn" data-act="imp-plan" data-dry="1">🧪 Dry run (कुछ नहीं बदलेगा)</button><button class="btn pri" data-act="imp-plan" data-dry="0">▶ जाँचकर Import करो</button></div>
@@ -529,6 +533,22 @@ Object.assign(C.EXTRA_ACT, {
   'tasks-reload': () => loadTasks(),
   'task-ctl': async b => { const ns = await rpc('ops_task_control', { p_id: Number(b.dataset.id), p_action: b.dataset.a, p_note: 'Command Console' }); toast(`Task #${b.dataset.id}: ${ns}`); loadTasks(); },
   'imp-plan': b => { const t = document.getElementById('impLinks').value; if (!(t.match(LINK_RE) || []).length) return toast('https:// वाले PDF links डालें'); S.impDraft = ''; C.go('command'); runCommand(t + (b.dataset.dry === '1' ? ' dry run' : '')); },
+  'imp-upload': async b => {
+    const f = document.getElementById('impFile')?.files?.[0]; if (!f) return toast('पहले PDF चुनें');
+    if (!/\.pdf$/i.test(f.name) || f.type !== 'application/pdf') return toast('सिर्फ़ PDF फ़ाइल चुनें');
+    if (f.size > 20 * 1024 * 1024) return toast('फ़ाइल 20 MB से बड़ी है');
+    const dry = b.dataset.dry === '1';
+    if (!(await ask(dry ? '🧪 Upload + Dry run' : '▶ Upload + Import', `<b>${esc(f.name)}</b> (${Math.round(f.size / 1024)} KB)<br>${dry ? 'सिर्फ़ जाँच — server पर सवाल नहीं जाएँगे।' : 'सवाल Draft में आएँगे; publish आपकी मंज़ूरी से।'}`))) return;
+    const s = await C.Auth.fresh(); if (!s) return toast('पहले login करें');
+    const name = Date.now() + '-' + f.name.replace(/[^\w.-]/g, '_').slice(-80);
+    toast('📤 अपलोड हो रहा है…', 2500);
+    const r = await fetch(C.CFG.sb.url + '/storage/v1/object/pyq-uploads/' + encodeURIComponent(name), { method: 'POST', headers: { apikey: C.CFG.sb.key, Authorization: 'Bearer ' + s.access_token, 'Content-Type': 'application/pdf', 'x-upsert': 'false' }, body: f });
+    if (!r.ok) return toast('Upload नहीं हुआ: ' + (await r.text()).slice(0, 120), 5000);
+    const id = await createTask({ title: `📦 PYQ ${dry ? 'dry run' : 'import'}: ${f.name}`, command: 'upload ' + f.name, intent: 'import', module: 'pyq', risk: 'medium',
+      steps: [{ type: 'upload_link', object: name, label: 'Upload का सुरक्षित link बनाओ (1 घंटा)' }, { ...wfStep('pyq-robot.yml', dry ? 'Dry run (server पर कुछ नहीं)' : 'Import (Draft)', { dry_run: dry }), use_verified: true },
+        ...(dry ? [] : [wfStep('hindi-robot.yml', '🌐 Hindi'), wfStep('tag-robot.yml', '🏷️ Chapter'), wfStep('key-check-robot.yml', '🔑 Answer जाँच', { scope: 'draft', gemini: false }), wfStep('health-robot.yml', '🩺 रिपोर्ट')])] });
+    if (id) { f.value = ''; C.go('tasks'); }
+  },
   'sel-restore': b => { if (C.needAdmin()) return; selRestoreDialog(b.dataset.sha, b.dataset.ver); },
   'fin-save': async () => { const a = finAssume(); document.querySelectorAll('[data-fin]').forEach(i => { const v = Number(i.value); if (isFinite(v) && v >= 0) a[i.dataset.fin] = v; });
     try { localStorage.setItem('mtb_cr_fin', JSON.stringify(a)); } catch (_) {}

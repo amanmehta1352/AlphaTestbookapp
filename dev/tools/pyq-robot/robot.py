@@ -210,11 +210,12 @@ def main(argv):
             if not re.match(r'^https://[\w.-]+/', url): raise RuntimeError('link https:// से शुरू होना चाहिए')
             with tempfile.TemporaryDirectory() as work:
                 pdf = os.path.join(work, 'paper.pdf')
-                req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+                req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Mobile Safari/537.36', 'Accept': 'application/pdf,*/*;q=0.8', 'Accept-Language': 'en-IN,en;q=0.9,hi;q=0.8'})
                 with urllib.request.urlopen(req, timeout=120) as r, open(pdf, 'wb') as f: f.write(r.read())
                 if open(pdf, 'rb').read(5) != b'%PDF-': raise RuntimeError('यह link PDF नहीं देता')
                 paper = paper_to_txt(pdf, work)
-                paper['url'] = url
+                # uploaded files come as a temporary signed link: store only the file name, never the token
+                paper['url'] = ('upload:' + url.split('?')[0].rsplit('/', 1)[-1]) if '/object/sign/' in url else url
                 say(f"- Paper: **{paper['title']}**")
                 if KEY and server_count('source_ref=eq.' + urllib.parse.quote(paper['src'])):
                     say('- ⏭️ यह paper पहले से server पर है — छोड़ दिया।'); continue

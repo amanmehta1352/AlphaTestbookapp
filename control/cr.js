@@ -756,5 +756,5 @@ async function refresh(force) {
   if (S.route === 'audit' && S.admin && !Array.isArray(S.live.audit)) loadAudit();
   if (ON_GO[S.route]) ON_GO[S.route](true);
 }
-window.CR = { S, render, go, validate, api, rpc, toast, sheet, ask, request, setSetting, settingsMap, needAdmin, esc, n, ago, when, bytes, pretty, pill, kpi, bars, gauge, lineChart, loginLock, wfList, SECTIONS, VIEWS, ON_GO, DOCK, CFG, GH, ICON, itemHtml, reqTable, EXTRA_ACT, boot, openLogin, refresh: () => refresh(true), validate };
+window.CR = { S, render, go, validate, api, rpc, Auth, CFG, toast, sheet, ask, request, setSetting, settingsMap, needAdmin, esc, n, ago, when, bytes, pretty, pill, kpi, bars, gauge, lineChart, loginLock, wfList, SECTIONS, VIEWS, ON_GO, DOCK, CFG, GH, ICON, itemHtml, reqTable, EXTRA_ACT, boot, openLogin, refresh: () => refresh(true), validate };
 if (!window.__CR_DEFER_BOOT) setTimeout(boot, 0);

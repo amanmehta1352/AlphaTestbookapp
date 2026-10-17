@@ -161,6 +161,13 @@ def find_run(wf, since_iso):
     return sorted(cands, key=lambda r: r['created_at'])[0] if cands else None
 
 
+def browser_headers(u):
+    """Look like a normal phone browser: some government/coaching sites refuse plain robot requests (403)."""
+    m = re.match(r'^(https://[^/]+)', u); origin = m.group(1) if m else ''
+    return {'User-Agent': 'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Mobile Safari/537.36',
+            'Accept': 'application/pdf,*/*;q=0.8', 'Accept-Language': 'en-IN,en;q=0.9,hi;q=0.8', 'Range': 'bytes=0-1023', 'Referer': origin + '/'}
+
+
 def verify_links(urls):
     out = []
     try: known = {b.get('source_url') for b in (opslib.sb('GET', '/rest/v1/import_batches?select=source_url&source_url=not.is.null', actor=ACTOR) or [])}
@@ -169,11 +176,13 @@ def verify_links(urls):
         row = {'url': u}
         if not re.match(r'^https://[\w.-]+/', u): row.update(ok=False, why='https:// से शुरू नहीं'); out.append(row); continue
         try:
-            req = urllib.request.Request(u, headers={'User-Agent': 'Mozilla/5.0', 'Range': 'bytes=0-1023'})
+            req = urllib.request.Request(u, headers=browser_headers(u))
             with urllib.request.urlopen(req, timeout=40) as r:
                 head = r.read(1024); row['http'] = r.status
                 row['pdf'] = head.startswith(b'%PDF-'); row['size'] = r.headers.get('Content-Range', '').split('/')[-1] or r.headers.get('Content-Length')
             row['ok'] = row['pdf']; row['why'] = 'PDF ठीक' if row['pdf'] else 'यह link PDF नहीं देता'
+        except urllib.error.HTTPError as e:
+            row.update(ok=False, why=(f'साइट ने robot को रोका (HTTP {e.code}). PDF फ़ोन से डाउनलोड करके 📤 Upload करें' if e.code in (401, 403, 429) else f'खुला नहीं: HTTP {e.code}'))
         except Exception as e:
             row.update(ok=False, why=f'खुला नहीं: {str(e)[:80]}')
         row['already_imported'] = u in known
@@ -197,7 +206,14 @@ def run_step(task, i, step, dry):
         if run['conclusion'] == 'success': return 'done'
         step['error'] = f"run {run['conclusion']}"; return 'failed'
     if t == 'workflow':
-        step['inputs'] = dispatch(step['file'], step.get('inputs') or {}, dry)
+        real = dict(step.get('inputs') or {})
+        if str(real.get('links', '')).startswith('upload:'):   # resolve uploaded file → fresh 1-hour link (not saved)
+            obj = real['links'][7:]
+            if not re.fullmatch(r'[\w.-]{3,120}\.pdf', obj): raise ValueError('फ़ाइल का नाम ठीक नहीं')
+            signed = opslib.sb('POST', f'/storage/v1/object/sign/pyq-uploads/{obj}', {'expiresIn': 3600}, actor=ACTOR)
+            real['links'] = opslib.SB_URL + '/storage/v1' + (signed or {}).get('signedURL', '')
+        dispatch(step['file'], real, dry)
+        step['inputs'] = {k: v for k, v in (step.get('inputs') or {}).items()}   # what is saved: placeholder, never the token
         step['dispatched_at'] = ISO(NOW() - timedelta(seconds=5))
         return 'done' if dry else 'running'
     if t == 'backup':
@@ -220,6 +236,17 @@ def run_step(task, i, step, dry):
             if nxt.get('type') == 'workflow' and nxt.get('file') == 'pyq-robot.yml' and nxt.get('use_verified'):
                 nxt.setdefault('inputs', {})['links'] = '\n'.join(good)
                 if not good: nxt['status'] = 'skipped'; nxt['error'] = 'कोई नया सही link नहीं'
+        return 'done'
+    if t == 'upload_link':
+        obj = str(step.get('object') or '')
+        if not re.fullmatch(r'[\w.-]{3,120}\.pdf', obj): step['error'] = 'फ़ाइल का नाम ठीक नहीं'; return 'failed'
+        signed = opslib.sb('POST', f'/storage/v1/object/sign/pyq-uploads/{obj}', {'expiresIn': 3600}, actor=ACTOR)
+        full = opslib.SB_URL + '/storage/v1' + (signed or {}).get('signedURL', '')
+        if '/object/sign/' not in full: step['error'] = 'signed link नहीं बना'; return 'failed'
+        step['result'] = {'uploaded': obj}
+        for nxt in task['steps'][i + 1:]:   # placeholder only; the real signed link is made at dispatch time, never stored
+            if nxt.get('type') == 'workflow' and nxt.get('file') == 'pyq-robot.yml' and nxt.get('use_verified'):
+                nxt.setdefault('inputs', {})['links'] = 'upload:' + obj
         return 'done'
     if t == 'setting':
         if not dry: opslib.sb('PATCH', '/rest/v1/ops_settings?key=eq.' + step['key'], {'value': step['value']}, actor=ACTOR, prefer='return=minimal')

@@ -53,7 +53,7 @@ def sql_rpc(fn, args=None):
     return json.loads(P(f'select to_jsonb(public.{fn}())'))
 
 def main():
-    F.start(F.SCHEMA_V1, F.SCHEMA_V2, F.SCHEMA_V3, F.SCHEMA_V4, F.SCHEMA_V5)
+    F.start(F.SCHEMA_V1, F.SCHEMA_V2, F.SCHEMA_V3, F.SCHEMA_V4, F.SCHEMA_V5, F.SCHEMA_V6)
     try:
         seed()
         # ---------------- 1. SQL
@@ -135,6 +135,12 @@ def main():
         calls.clear(); st, msg = ops_robot.handle({'action': 'cancel', 'target': 'all', 'params': {}})
         check('ops: emergency stop cancels every robot run', st == 'done' and sum(1 for c in calls if c[1].endswith('/cancel')) == len(ops_robot.CANCELLABLE) * 3, (st, msg, len(calls)))
         check('ops: rollback needs a real sha', ops_robot.handle({'action': 'rollback', 'target': '', 'params': {'sha': 'main; rm -rf'}})[0] == 'rejected')
+        # ---------------- 2a. PDF upload bucket: private, admin-with-run only, PDF only, 20 MB
+        check('upload bucket is private, PDF-only, 20 MB', P("select public||'|'||allowed_mime_types::text||'|'||file_size_limit from storage.buckets where id='pyq-uploads'") == 'false|{application/pdf}|20971520')
+        try: P(F.as_user(STU, "insert into storage.objects(bucket_id,name) values ('pyq-uploads','s.pdf')")); check('student cannot upload', P("select count(*) from storage.objects where name='s.pdf'") == '0')
+        except Exception: check('student cannot upload', True)
+        P(F.as_user(ADM, "insert into storage.objects(bucket_id,name) values ('pyq-uploads','a.pdf')"))
+        check('admin (run permission) can upload', P("select count(*) from storage.objects where name='a.pdf'") == '1')
         # ---------------- 2b. task engine (ops_robot.do_tasks against the real DB)
         def fake_sb(method, path, body=None, actor='robot', prefer=None, timeout=60):
             if path.startswith('/rest/v1/ops_tasks?select=*'):
@@ -143,6 +149,7 @@ def main():
                 i = int(path.split('eq.')[1]); sets = ','.join(f"{k} = {F.q(json.dumps(v, ensure_ascii=False) if isinstance(v, (dict, list)) else v)}" + ('::jsonb' if isinstance(v, (dict, list)) else '') for k, v in body.items())
                 P(f'update public.ops_tasks set {sets} where id={i}'); return None
             if path.startswith('/rest/v1/import_batches'): return [{'source_url': 'https://ssc.example/old.pdf'}]
+            if path.startswith('/storage/v1/object/sign/pyq-uploads/'): return {'signedURL': '/object/sign/pyq-uploads/' + path.split('/')[-1] + '?token=SECRET-TOKEN'}
             if path == '/rest/v1/rpc/ops_backup_list': return sql_rpc('ops_backup_list')
             if path == '/rest/v1/rpc/ops_backup_verify': return P(f"select public.ops_backup_verify({body['p_id']})")
             if path.startswith('/rest/v1/ops_settings?key=eq.') and method == 'PATCH':
@@ -176,6 +183,21 @@ def main():
         P(F.as_user(ADM, f"select public.ops_task_control({bad},'retry')"))
         check('retry re-queues failed task and clears failed step', P(f"select status||'|'||coalesce(steps->0->>'status','-')||'|'||retry_count from public.ops_tasks where id={bad}") == 'queued|-|1')
         P(f"update public.ops_tasks set status='cancelled' where id={bad}")
+        # upload step: signed link goes to the PYQ step, token never stored in task logs
+        up = int(P(F.as_user(ADM, "select public.ops_task_create('upload','upload','import','execute','pyq','[{\"type\":\"upload_link\",\"object\":\"123-paper.pdf\"},{\"type\":\"workflow\",\"file\":\"pyq-robot.yml\",\"inputs\":{\"dry_run\":true},\"use_verified\":true}]'::jsonb)")).splitlines()[-1])
+        ops_robot.do_tasks(False, L, 0)
+        up_t = json.loads(P(f'select row_to_json(t) from public.ops_tasks t where id={up}'))
+        check('upload: task keeps only a placeholder for the PYQ link', up_t['steps'][1]['inputs'].get('links') == 'upload:123-paper.pdf' and up_t['steps'][0]['result'] == {'uploaded': '123-paper.pdf'}, up_t['steps'][:2])
+        check('upload: PYQ step dispatched with the signed link', any(c[1].endswith('pyq-robot.yml/dispatches') and c[2] and c[2]['inputs'].get('links', '').startswith(opslib.SB_URL + '/storage/v1/object/sign/pyq-uploads/123-paper.pdf') for c in calls))
+        check('upload: token not stored anywhere in the task', 'SECRET-TOKEN' not in json.dumps(up_t).replace(opslib.SB_URL, ''), 'token leaked')
+        import urllib.request as _ur, urllib.error as _ue
+        _real_open = _ur.urlopen
+        def _blocked(req, timeout=0): raise _ue.HTTPError(req.full_url, 403, 'Forbidden', {}, None)
+        _ur.urlopen = _blocked
+        try: r403 = real_vl(['https://www.adda247.com/x.pdf'])[0]
+        finally: _ur.urlopen = _real_open
+        check('403 link -> clear Hindi message, not a silent failure', r403['ok'] is False and 'रोका' in r403['why'] and 'Upload' in r403['why'], r403)
+        check('link check sends browser-like headers', 'Mobile' in ops_robot.browser_headers('https://x.gov.in/a.pdf')['User-Agent'] and ops_robot.browser_headers('https://x.gov.in/a.pdf')['Referer'] == 'https://x.gov.in/')
         opslib.sb, ops_robot.lease, ops_robot.verify_links = real_sb, real_lease, real_vl
         # ---------------- 3. health report from the fake server
         health.SB_KEY = 'test'; health.sb_get_all = sql_get_all; health.sb_count = sql_count; health.sb_rpc = sql_rpc
