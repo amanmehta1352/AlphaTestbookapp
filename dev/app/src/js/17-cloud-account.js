@@ -226,8 +226,8 @@ function cloudHomePrompt() {
   const v = document.getElementById('mainView'); if (!v) return;
   const syncCard = v.querySelector('.cl-sync-prompt');
   if (ServerState.session) {
-    const needsHelp = CloudState.msgKind === 'bad' ||
-      (CloudState.isAdmin === false && !!CloudState.lastSyncAt && Number(CloudState.serverQuestions || 0) === 0);
+    const needsHelp = CloudState.isAdmin !== true && (CloudState.msgKind === 'bad' ||
+      (CloudState.isAdmin === false && !!CloudState.lastSyncAt && Number(CloudState.serverQuestions || 0) === 0));
     if (!needsHelp) { syncCard?.remove(); return; }
     const hasFilteredOutQuestions = Number(CloudState.serverQuestionsAll || 0) > 0 && Number(CloudState.serverQuestions || 0) === 0;
     const title = CloudState.busy ? 'सवाल sync हो रहे हैं…' : 'सवाल लोड नहीं हुए';
