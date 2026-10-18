@@ -172,7 +172,7 @@ async function cloudSync(reason = 'manual') {
   if (!ServerState.session || DataHealth.readOnly) return null;
   if (CloudSyncRunning) return CloudSyncRunning;
   CloudSyncRunning = (async () => {
-    CloudState.busy = true; cloudPaint();
+    CloudState.busy = true; cloudPaint(); try { cloudHomePrompt(); } catch (_) {}
     try {
       await Server.ensureFresh();
       const uid = ServerState.session.user_id;
@@ -188,7 +188,7 @@ async function cloudSync(reason = 'manual') {
     } catch (e) {
       CloudState.msg = (reason === 'auto' ? 'Sync बाद में होगा: ' : '') + e.message; CloudState.msgKind = e.network ? 'warn' : 'bad';
       return null;
-    } finally { CloudState.busy = false; CloudSyncRunning = null; cloudPaint(); }
+    } finally { CloudState.busy = false; CloudSyncRunning = null; cloudPaint(); try { cloudHomePrompt(); } catch (_) {} }
   })();
   return CloudSyncRunning;
 }
@@ -220,10 +220,30 @@ async function cloudLogout() {
   if (!confirm('Logout करें? इस फ़ोन का data रहेगा; दोबारा login करने पर sync फिर से होगा।')) return;
   await Server.logout(); CloudState.isAdmin = null; CloudState.msg = 'Logout हो गया।'; CloudState.msgKind = ''; await cloudSaveState(); cloudPaint(); try { renderView(); } catch (_) {}
 }
-// Home: a gentle prompt until the student logs in
+// Home: explain why server questions are unavailable and provide a safe recovery action.
 function cloudHomePrompt() {
-  if (Route?.page !== 'home' || ServerState.session || !cloudOnline() || WorkspaceManager.current().type === 'BOARD') return;
-  const v = document.getElementById('mainView'); if (!v || v.querySelector('.cl-prompt')) return;
+  if (Route?.page !== 'home' || !cloudOnline() || WorkspaceManager.current().type === 'BOARD') return;
+  const v = document.getElementById('mainView'); if (!v) return;
+  const syncCard = v.querySelector('.cl-sync-prompt');
+  if (ServerState.session) {
+    const needsHelp = CloudState.msgKind === 'bad' ||
+      (CloudState.isAdmin === false && !!CloudState.lastSyncAt && Number(CloudState.serverQuestions || 0) === 0);
+    if (!needsHelp) { syncCard?.remove(); return; }
+    const hasFilteredOutQuestions = Number(CloudState.serverQuestionsAll || 0) > 0 && Number(CloudState.serverQuestions || 0) === 0;
+    const title = CloudState.busy ? 'सवाल sync हो रहे हैं…' : 'सवाल लोड नहीं हुए';
+    const detail = CloudState.msgKind === 'bad'
+      ? (CloudState.msg || 'Server से सवाल लाने में समस्या हुई।')
+      : hasFilteredOutQuestions
+        ? 'आपके चुने exam/branch में सवाल नहीं मिले। अपना exam और branch जाँचें।'
+        : 'इस account के लिए अभी कोई published सवाल उपलब्ध नहीं हैं।';
+    const card = syncCard || document.createElement('section');
+    card.className = 'cl-sync-prompt'; card.setAttribute('role', 'status'); card.setAttribute('aria-live', 'polite');
+    card.innerHTML = `<b>⚠️ ${escapeHtml(title)}</b><p>${escapeHtml(detail)}</p><div class="cl-sync-actions"><button type="button" class="cl-sync-retry" ${CloudState.busy ? 'disabled' : ''} onclick="cloudSync('manual')">${CloudState.busy ? 'Sync हो रहा है…' : 'फिर कोशिश करें'}</button>${profileAvailable() ? '<button type="button" class="cl-sync-change" onclick="openProfileSheet()">Exam बदलें</button>' : ''}<button type="button" class="cl-sync-account" onclick="openAccount()">Account विवरण</button></div>`;
+    if (!syncCard) v.prepend(card);
+    return;
+  }
+  if (syncCard) syncCard.remove();
+  if (!cloudOnline() || v.querySelector('.cl-prompt')) return;
   const el = document.createElement('button'); el.type = 'button'; el.className = 'cl-prompt'; el.onclick = openAccount;
   el.innerHTML = `<span class="g">G</span><span><b>Google से login करें</b><small>सारे सवाल पाएँ और progress सुरक्षित रखें</small></span><span aria-hidden="true">›</span>`;
   v.prepend(el);
