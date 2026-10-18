@@ -68,6 +68,10 @@ try:
         st.evaluate("profileApply(null)")
         idle(); st.wait_for_timeout(200)
         rec('recovery card clears after questions return', st.locator('.cl-sync-prompt').count() == 0 and len(subjects()) == 5, subjects())
+        st.evaluate("CloudState.isAdmin=null; CloudState.msgKind='warn'; CloudState.msg='Network timeout'; CloudState.lastSyncAt=''; CloudState.serverQuestions=0; renderView()")
+        rec('first-sync network warning is visible even without a prior successful sync', st.locator('.cl-sync-prompt').count() == 1 and 'Network timeout' in st.locator('.cl-sync-prompt').inner_text())
+        st.evaluate("CloudState.msgKind='good'; CloudState.msg=''; CloudState.serverQuestions=20; CloudState.serverQuestionsAll=20; renderView()")
+        rec('network warning card clears after successful recovery', st.locator('.cl-sync-prompt').count() == 0)
         rec('no page errors', not errors, errors)
         b.close()
 finally:
