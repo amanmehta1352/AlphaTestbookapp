@@ -96,11 +96,9 @@ def parse_text(text: str, source_name: str) -> dict:
             continue
 
         if re.fullmatch(r"\s*(?:official\s+)?(?:answer\s*key|correct\s*answers|official\s*answers)\s*", s, re.I):
-        if re.search(r"\b(answer\s*key|correct\s*answers|official\s*answers)\b", s, re.I):
             finish()
             in_answer_key = True
             continue
-
         if in_answer_key:
             # Only capture explicit numbered answer-key pairs; never infer from option text.
             for qno, ans in ANSWER_PAIR.findall(s):
