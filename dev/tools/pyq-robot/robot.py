@@ -255,7 +255,7 @@ def rrb_je_paper_to_txt(pdf, work, source_name, source_title, source_url, origin
             "EXAM_NAME": "RRB JE",
             "YEAR": year,
             "SHIFT": shift,
-            "SUBJECT": UNTAGGED,
+            "SUBJECT": "Mixed",
             "CHAPTER": UNTAGGED,
             "TOPIC": UNTAGGED,
             "SOURCE_TYPE": "PYQ",
@@ -266,7 +266,7 @@ def rrb_je_paper_to_txt(pdf, work, source_name, source_title, source_url, origin
             fields[letter + "_EN"] = fix(q["options_en"][letter])
             fields[letter + "_HI"] = fix(q["options_hi"][letter])
         fields["ANSWER"] = q["answer"]
-        blocks.setdefault((UNTAGGED, UNTAGGED), []).append(
+        blocks.setdefault(("Mixed", UNTAGGED), []).append(
             "=== QUESTION START ===\n" + "\n".join(f"{k}: {v}" for k, v in fields.items()) + "\n=== QUESTION END ===\n"
         )
 
