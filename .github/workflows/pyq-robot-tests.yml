@@ -39,10 +39,14 @@ jobs:
           sudo apt-get install -y -qq poppler-utils
           python -m pip install requests pdfplumber playwright
           python -m playwright install --with-deps chromium
-      - name: Dry-run a real public SSC JE PDF (no server writes)
+      - name: Verify English-only SSC PDF is safely blocked by bilingual gate
         env:
           PDF_URL: https://download.oliveboard.in/pdf/SSC-JE-Mechanical-Question-Paper-2024-in-English-07-06-2024-S2.pdf
         run: |
           set -o pipefail
+          set +e
           python3 dev/tools/pyq-robot/robot.py --dry-run "$PDF_URL" | tee "$RUNNER_TEMP/pyq-smoke.log"
-          grep -Eq 'भेजने लायक: \*\*[1-9][0-9]*\*\* सवाल' "$RUNNER_TEMP/pyq-smoke.log"
+          status=$?
+          set -e
+          test "$status" -ne 0
+          grep -qi 'bilingual gate' "$RUNNER_TEMP/pyq-smoke.log"
