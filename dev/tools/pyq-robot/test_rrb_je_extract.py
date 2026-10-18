@@ -77,6 +77,30 @@ Answer Key : A Your Response : C (Wrong)
         self.assertEqual(out["questions"][1]["answer"], "A")
         self.assertEqual(out["ready_for_import_count"], 2)
 
+    def test_dropped_inline_answer_does_not_stop_later_questions(self):
+        sample = """RRB JE Mechanical Engineering 2019
+Question No. 1
+First question?
+A)one B)two
+C)three D)four
+Answer Key : B Your Response : B (Correct)
+Question No. 2
+Dropped question?
+A)one B)two
+C)three D)four
+Answer Key : This Question is dropped and will not be considered during evaluation
+Question No. 3
+Third question?
+A)one B)two
+C)three D)four
+Answer Key : A Your Response : A (Correct)
+"""
+        out = parse_text(sample, "sample.pdf")
+        self.assertEqual(out["question_count"], 3)
+        self.assertEqual(out["questions"][0]["answer"], "B")
+        self.assertIn("answer_key_unavailable_or_dropped", out["questions"][1]["review_reasons"])
+        self.assertEqual(out["questions"][2]["answer"], "A")
+
     def test_does_not_invent_missing_option(self):
         sample = """RRB JE Electrical Engineering 2024
 1. Example question?
