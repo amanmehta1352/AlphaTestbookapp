@@ -16,7 +16,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-QUESTION_START = re.compile(r"^\s*(?:Question\s+No\.?\s*(?P<qno1>\d{1,3})|(?:Q(?:uestion)?\s*)?\(?\s*(?P<qno2>\d{1,3})\s*[).:])\s*(?P<text>.*)$", re.I)
+QUESTION_START = re.compile(r"^\s*(?:Question\s+No\.?\s*(?P<qno1>\d{1,3})|(?:Q(?:uestion)?\s*)?\(?\s*(?P<qno2>\d{1,3})\s*[).:])\s*(?P<text>.*)$", re.I | re.M)
 INLINE_ANSWER_KEY = re.compile(r"^\s*answer\s+key\s*:\s*([A-D])\b", re.I)
 OPTION_START = re.compile(r"^\s*(?:\(([A-D])\)|([A-D])[).:]|Option\s*([1-4])[).:]?)\s*(.*)$", re.I)
 INLINE_OPTION_MARKER = re.compile(r"(?<!\S)(?:\(([A-D])\)|([A-D])[).:])\s*", re.I)
