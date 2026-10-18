@@ -30,28 +30,32 @@
     <button id="btnCloseDrawer" style="font-size:20px; font-weight:900;" aria-label="Close">✕</button>
   </div>
   <nav class="drawer-nav" aria-label="Main menu">
-    <div class="drawer-section-title" data-en="STUDY" data-hi="पढ़ाई">STUDY</div>
-    <button class="drawer-item" id="drwMe" onclick="navigate('me')" data-en="👤 Me (progress, settings)" data-hi="👤 मैं (progress, सेटिंग)">👤 Me (progress, settings)</button>
+    <div class="drawer-section-title" data-en="PREPARE" data-hi="तैयारी शुरू करें">PREPARE</div>
     <button class="drawer-item" id="drwHome" onclick="navigate('home')" data-en="🏠 Home" data-hi="🏠 होम">🏠 Home</button>
-    <button class="drawer-item" id="drwSubjects" onclick="navigate('subjects')" data-en="📚 Subjects" data-hi="📚 विषय">📚 Subjects</button>
+    <button class="drawer-item" id="drwExams" onclick="navigate('exam_hub')" data-en="🏛️ Exam hub" data-hi="🏛️ परीक्षा केंद्र">🏛️ Exam hub</button>
+    <button class="drawer-item" id="drwTest" onclick="navigate('test_hub')" data-en="⏱️ Mock tests" data-hi="⏱️ मॉक टेस्ट">⏱️ Mock tests</button>
+    <button class="drawer-item" id="drwPYQ" onclick="navigate('pyq_hub')" data-en="🎯 Previous year papers (PYQ)" data-hi="🎯 पिछले वर्ष के पेपर (PYQ)">🎯 Previous year papers (PYQ)</button>
+    <button class="drawer-item" id="drwSubjects" onclick="navigate('subjects')" data-en="📚 Subjects & topic practice" data-hi="📚 विषय और टॉपिक अभ्यास">📚 Subjects &amp; topic practice</button>
+
+    <div class="drawer-section-title" data-en="LEARN & PRACTICE" data-hi="सीखें और अभ्यास करें">LEARN &amp; PRACTICE</div>
     <button class="drawer-item" id="drwNativeBuilder" onclick="navigate('native_builder')" data-en="🧩 Create a test" data-hi="🧩 टेस्ट बनाएँ">🧩 Create a test</button>
-    <button class="drawer-item" id="drwTest" onclick="navigate('test_hub')" data-en="⏱️ Tests" data-hi="⏱️ टेस्ट">⏱️ Tests</button>
-    <button class="drawer-item" id="drwExams" onclick="navigate('exam_hub')" data-en="🏛️ Exams" data-hi="🏛️ परीक्षाएँ">🏛️ Exams</button>
-    <button class="drawer-item" id="drwPYQ" onclick="navigate('pyq_hub')" data-en="🎯 PYQ archive" data-hi="🎯 PYQ संग्रह">🎯 PYQ archive</button>
-    <button class="drawer-item" id="drwLibrary" onclick="navigate('digital_library')" data-en="📖 Digital library" data-hi="📖 डिजिटल लाइब्रेरी">📖 Digital library</button>
-    <div class="drawer-section-title" data-en="REVIEW" data-hi="दोहराना">REVIEW</div>
-    <button class="drawer-item" id="drwRevision" onclick="navigate('revision_hub')" data-en="🔄 Revision" data-hi="🔄 रिवीज़न">🔄 Revision</button>
-    <button class="drawer-item" onclick="navigate('mistakes')" data-en="📕 Mistake book" data-hi="📕 गलतियों की किताब">📕 Mistake book</button>
+    <button class="drawer-item" id="drwLibrary" onclick="navigate('digital_library')" data-en="📖 Study library" data-hi="📖 स्टडी लाइब्रेरी">📖 Study library</button>
     <button class="drawer-item" id="drwTaxonomy" onclick="navigate('taxonomy_explorer')" data-en="🔎 Question bank" data-hi="🔎 प्रश्न बैंक">🔎 Question bank</button>
-    <button class="drawer-item" onclick="navigate('mastery')" data-en="🎯 Mastery" data-hi="🎯 महारत">🎯 Mastery</button>
-    <div class="drawer-section-title" data-en="SETTINGS & DATA" data-hi="सेटिंग और डेटा">SETTINGS & DATA</div>
+
+    <div class="drawer-section-title" data-en="REVISE & TRACK" data-hi="दोहराएँ और प्रगति देखें">REVISE &amp; TRACK</div>
+    <button class="drawer-item" id="drwRevision" onclick="navigate('revision_hub')" data-en="🔄 Revision centre" data-hi="🔄 रिवीज़न सेंटर">🔄 Revision centre</button>
+    <button class="drawer-item" onclick="navigate('mistakes')" data-en="📕 Mistake book" data-hi="📕 गलतियों की किताब">📕 Mistake book</button>
+    <button class="drawer-item" onclick="navigate('mastery')" data-en="🎯 Topic mastery" data-hi="🎯 टॉपिक महारत">🎯 Topic mastery</button>
+    <button class="drawer-item" id="drwMe" onclick="navigate('me')" data-en="👤 My progress & settings" data-hi="👤 मेरी प्रगति और सेटिंग">👤 My progress &amp; settings</button>
+
+    <div class="drawer-section-title" data-en="APP TOOLS & DATA" data-hi="ऐप टूल्स और डेटा">APP TOOLS &amp; DATA</div>
     <button class="drawer-item" onclick="openDisplaySettings()" data-en="Aa Display (language, text size)" data-hi="Aa डिस्प्ले (भाषा, अक्षर आकार)">Aa Display (language, text size)</button>
     <a class="drawer-item admin-only" id="drwControl" href="control/" data-en="🩺 Control Room (app health)" data-hi="🩺 Control Room (ऐप की सेहत)">🩺 Control Room (app health)</a>
     <a class="drawer-item admin-only" id="drwStudio" href="admin/" data-en="🛠️ Admin Studio" data-hi="🛠️ Admin Studio">🛠️ Admin Studio</a>
     <button class="drawer-item admin-only" onclick="openImportModal()" data-en="📥 Import questions" data-hi="📥 सवाल import करें">📥 Import questions</button>
     <button class="drawer-item admin-only" onclick="openCleanup()" data-en="🧹 Data cleanup" data-hi="🧹 Data सफ़ाई">🧹 Data cleanup</button>
-    <button class="drawer-item" onclick="openHealthCheck()" data-en="🩺 Health Check" data-hi="🩺 Health Check">🩺 Health Check</button>
-    <button class="drawer-item" onclick="openBackupCenter()" data-en="💾 Backup & Restore" data-hi="💾 Backup और Restore">💾 Backup &amp; Restore</button>
+    <button class="drawer-item" onclick="openHealthCheck()" data-en="🩺 Health check" data-hi="🩺 हेल्थ चेक">🩺 Health check</button>
+    <button class="drawer-item" onclick="openBackupCenter()" data-en="💾 Backup & restore" data-hi="💾 बैकअप और रीस्टोर">💾 Backup &amp; restore</button>
     <button class="drawer-item admin-only" onclick="openServerSync()" data-en="☁️ Server (Admin)" data-hi="☁️ Server (Admin)">☁️ Server (Admin)</button>
     <button class="drawer-item" id="drwInstall" hidden onclick="pwaInstall()" data-en="📲 Install app" data-hi="📲 ऐप install करें">📲 Install app</button>
     <button class="drawer-item" onclick="openDataControlModal()" data-en="🛡️ Data control" data-hi="🛡️ डेटा नियंत्रण">🛡️ Data control</button>
