@@ -31,6 +31,8 @@ jobs:
       - name: Run parser unit tests
         working-directory: dev/tools/pyq-robot
         run: python -m unittest -v test_rrb_je_extract.py
+      - name: Run PYQ robot CLI and bilingual gate tests
+        run: python -m unittest -v dev.tests.test_pyq_robot_cli
       - name: Extract a real public RRB JE 2019 PDF (no import)
         run: |
           curl -fsSL --retry 3 "https://cdn.aglasem.com/aglasem-doc/dcb05986-aab6-11e9-9a6b-02f21f5619c4/dcb05986-aab6-11e9-9a6b-02f21f5619c4.pdf" -o "$RUNNER_TEMP/rrb-je-2019.pdf"
