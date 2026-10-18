@@ -36,7 +36,7 @@ jobs:
       - name: Install tools
         if: steps.gate.outputs.run == 'true'
         run: |
-          sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+          sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils tesseract-ocr tesseract-ocr-hin
           pip install -q requests pdfplumber playwright
           python -m playwright install --with-deps chromium
       - name: Import papers
