@@ -1,6 +1,6 @@
 import unittest
 
-from rrb_je_extract import parse_text
+from rrb_je_extract import merge_parsed_sources, parse_text
 
 
 class RRBJEExtractTests(unittest.TestCase):
