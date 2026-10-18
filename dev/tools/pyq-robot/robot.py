@@ -15,6 +15,7 @@ Safety:
 """
 import json, os, re, subprocess, sys, tempfile, time, urllib.parse, urllib.request
 from collections import Counter
+import unicodedata
 from html import unescape
 from html.parser import HTMLParser
 from pathlib import Path
@@ -219,6 +220,10 @@ def rrb_je_paper_to_txt(pdf, work, source_name, source_title, source_url, origin
     src = f"RRB JE {year} {shift} · {source_title or source_name or 'CBT paper'} · bilingual answer-key PDF"[:220]
     title = f"RRB JE {year} · {shift}"
     blocks, skip = {}, Counter()
+    seen_question_numbers, seen_fingerprints = set(), set()
+    def fingerprint_text(value):
+        value = unicodedata.normalize("NFKC", str(value or "")).lower()
+        return " ".join(re.sub(r"[^\w]+", " ", value, flags=re.UNICODE).replace("_", " ").split())
     for q in data["questions"]:
         reasons = q.get("review_reasons") or []
         if q.get("status") != "EXTRACTED":
@@ -233,6 +238,16 @@ def rrb_je_paper_to_txt(pdf, work, source_name, source_title, source_url, origin
         if q.get("answer") not in set("ABCD"):
             skip["answer key missing"] += 1
             continue
+        qno = q.get("source_question_no")
+        if qno in seen_question_numbers:
+            skip["duplicate question number"] += 1
+            continue
+        fp = "|".join([fingerprint_text(q.get("question_en"))] + [fingerprint_text(q.get("options_en", {}).get(k)) for k in "ABCD"])
+        if fp in seen_fingerprints:
+            skip["duplicate question fingerprint"] += 1
+            continue
+        seen_question_numbers.add(qno)
+        seen_fingerprints.add(fp)
 
         fields = {
             "SOURCE_QUESTION_NO": q["source_question_no"],
