@@ -58,7 +58,8 @@ Ans 1. One 2. Two 3. Three 4. Four
         self.assertEqual(out["ready_for_import_count"], 0)
 
     def test_parses_aglasem_style_question_no_and_answer_key(self):
-        sample = """Exam Code : DEMO Exam Date : 01-06-2019
+        sample = """RRB JE Mechanical Engineering 2019
+Exam Code : DEMO Exam Date : 01-06-2019
 Question No. 1
 What is the SI unit of force?
 A)Joule B)Newton
