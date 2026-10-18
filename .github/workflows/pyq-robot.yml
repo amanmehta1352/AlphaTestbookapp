@@ -37,7 +37,7 @@ jobs:
         if: steps.gate.outputs.run == 'true'
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
-          pip install -q pdfplumber playwright
+          pip install -q requests pdfplumber playwright
           python -m playwright install --with-deps chromium
       - name: Import papers
         if: steps.gate.outputs.run == 'true'
