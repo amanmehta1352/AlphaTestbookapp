@@ -1,13 +1,16 @@
 # 🌐 Hindi Robot — adds Hindi (machine translation, IndicTrans2) to server questions that have none.
-# Runs automatically after every "PYQ Robot" run, and can be run by hand: Actions → Hindi Robot → Run workflow.
+# Runs automatically after every successful "PYQ Robot" run, or by hand from Actions.
 # Never overwrites existing Hindi. Needs repo secret SUPABASE_SECRET_KEY.
 name: Hindi Robot
 on:
   workflow_dispatch:
     inputs:
       shards:
-        description: 'कितने हिस्सों में चलाना है'
+        description: 'कितने हिस्सों में चलाना है (1–8)'
+        type: choice
+        options: ['1', '2', '3', '4', '5', '6', '7', '8']
         default: '8'
+        required: true
   workflow_run:
     workflows: ['PYQ Robot']
     types: [completed]
@@ -17,14 +20,35 @@ concurrency:
   group: hindi-robot
   cancel-in-progress: false
 jobs:
-  translate:
+  prepare:
     if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    outputs:
+      shards: ${{ steps.matrix.outputs.shards }}
+    steps:
+      - name: Build shard matrix
+        id: matrix
+        env:
+          SHARD_COUNT: ${{ inputs.shards || '8' }}
+        run: |
+          python3 - <<'PY'
+          import json, os, re
+          raw = os.environ["SHARD_COUNT"]
+          if not re.fullmatch(r"[1-8]", raw):
+              raise SystemExit("shards must be an integer from 1 to 8")
+          count = int(raw)
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as out:
+              out.write("shards=" + json.dumps(list(range(count))) + "\n")
+          PY
+  translate:
+    needs: prepare
+    if: needs.prepare.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 300
     strategy:
       fail-fast: false
       matrix:
-        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+        shard: ${{ fromJSON(needs.prepare.outputs.shards) }}
     steps:
       - uses: actions/checkout@v4
       - name: 🚦 Control Room check (pause / enable)
@@ -53,7 +77,8 @@ jobs:
           OPS_COUNTS: ${{ runner.temp }}/ops_counts.json
           SUPABASE_URL: https://fzkvwkrbtykucjfdqiin.supabase.co
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
-        run: python3 dev/tools/hindi-robot/hindi.py --shard ${{ matrix.shard }} --of 8
+          SHARD_COUNT: ${{ inputs.shards || '8' }}
+        run: python3 dev/tools/hindi-robot/hindi.py --shard ${{ matrix.shard }} --of "$SHARD_COUNT"
       - name: 📒 Record run in Control Room
         if: always() && steps.gate.outputs.run == 'true'
         env:
