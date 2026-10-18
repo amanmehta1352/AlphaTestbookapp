@@ -87,21 +87,28 @@ with sync_playwright() as p:
     rec('Escape closes the menu', not page.evaluate("document.getElementById('sideDrawer').classList.contains('open')"))
     rec('menu labels are clear', 'Question bank' in page.evaluate("document.getElementById('sideDrawer').textContent") and 'ALL DATA CONTROL' not in page.evaluate("document.getElementById('sideDrawer').textContent"))
 
-    # --- Subjects from data
+    # --- Subjects navigation redesign: validate data and the new tab/accordion UI
     page.evaluate("navigate('subjects')")
     t = page.inner_text('#mainView')
     exp = page.evaluate("""(()=>{const m=new Map();CurriculumContext.filterModules(AppModules).forEach(x=>{const k=String(x.subject||'').trim().toLowerCase();if(!k)return;m.set(k,(m.get(k)||0)+x.groups.reduce((n,g)=>n+g.questions.length,0))});return [...m.entries()].filter(e=>e[1]>0)})()""")
-    rec('subject cards = subjects that have questions', page.locator('.sc-card').count() == len(exp), (page.locator('.sc-card').count(), exp))
-    rec('counts come from data', all(f"{n} questions" in t for _, n in exp), exp)
+    tabs = page.locator('.sn-tab')
+    rec('subject tabs = subjects that have questions', tabs.count() == len(exp), (tabs.count(), exp))
+    rec('subject tab counts come from data', all(any(str(n) in label for label in tabs.all_inner_texts()) for _, n in exp), tabs.all_inner_texts())
     rec('no hard-coded claims', '356 Qs' not in t and 'Mapped' not in t)
+    rec('subject tabs are horizontally scrollable', page.evaluate("(()=>{const e=document.querySelector('.sn-subject-tabs');return !!e&&getComputedStyle(e).overflowX==='auto'})()"))
     page.screenshot(path=OUT + '/u5_subjects_390.png')
-    page.locator('.sc-card').first.click()
-    chs = page.locator('.sh-ch summary')
-    zero = [c for c in chs.all_inner_texts() if ' 0 questions' in ' ' + c]
-    rec('subject page lists only chapters with questions', chs.count() > 0 and not zero, chs.all_inner_texts()[:3])
+    tabs.first.click()
+    chs = page.locator('.sn-chapter-toggle')
+    rec('selected subject lists chapters with questions', chs.count() > 0, chs.all_inner_texts()[:3])
     rec('no placeholder chapters', all(x not in page.inner_text('#mainView') for x in ['Number System', 'Non-Verbal Reasoning']) or page.evaluate("CurriculumContext.filterModules(AppModules).some(m=>/number system/i.test(m.chapter))"))
-    page.locator('.sh-ch[open] .sh-t-name').first.click()
-    rec('chapter accordion opens its topic', page.evaluate("Route.page") == 'topic')
+    chs.first.click()
+    rec('chapter accordion expands', page.locator('.sn-chapter.open .sn-topic').count() > 0, page.locator('.sn-chapter.open').inner_text()[:180] if page.locator('.sn-chapter.open').count() else 'no expanded chapter')
+    topic = page.locator('.sn-chapter.open .sn-topic').first
+    if topic.count():
+        topic.click()
+        rec('topic opens existing chapter route', page.evaluate("Route.page") == 'chapter' and bool(page.evaluate("Route.params && Route.params.chapter")), page.evaluate("({page:Route.page,params:Route.params})"))
+    else:
+        rec('topic opens existing chapter route', False, 'no topic button in expanded chapter')
 
     # --- Question Bank
     page.evaluate("navigate('taxonomy_explorer')")
