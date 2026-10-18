@@ -55,6 +55,19 @@ ANSWER: A
             with self.subTest(title=title):
                 self.assertEqual(robot.detect_exam_name(title), expected)
 
+    def test_rrb_branch_routes_to_matching_subject_without_guessing_common_papers(self):
+        cases = {
+            "Mechanical Engineering": "Mechanical-Engineering",
+            "Civil Engineering": "Civil-Engineering",
+            "Electrical Engineering": "Electrical-Engineering",
+            "mechanical": "Mechanical-Engineering",
+            None: "Mixed",
+            "": "Mixed",
+            "unknown branch": "Mixed",
+        }
+        for branch, expected in cases.items():
+            with self.subTest(branch=branch):
+                self.assertEqual(robot.rrb_subject_from_branch(branch), expected)
     def test_does_not_guess_unknown_exam(self):
         self.assertIsNone(robot.detect_exam_name("random coaching PDF"))
 
