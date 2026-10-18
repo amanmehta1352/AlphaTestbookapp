@@ -35,7 +35,7 @@ def main():
                 text = pdf_text(pdf)
                 data = parse_text(text, urllib.parse.urlsplit(url).path.rsplit("/", 1)[-1])
                 qcount = int(data.get("question_count", 0))
-                answers = sum(1 for q in data.get("questions", []) if q.get("answer") in "ABCD")
+                answers = sum(1 for q in data.get("questions", []) if q.get("answer") in {"A", "B", "C", "D"})
                 if qcount < 80 or answers < 70:
                     failures.append(f"{title or url}: questions={qcount}, answers={answers}")
                 total_questions += qcount
