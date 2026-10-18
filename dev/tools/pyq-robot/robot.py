@@ -19,6 +19,7 @@ from collections import Counter
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.abspath(os.path.join(HERE, '..', '..', '..'))
 V2 = os.path.join(REPO, 'dev', 'tools', 'pyq-from-response-sheet', 'v2')
+sys.path.insert(0, REPO)
 sys.path.insert(0, V2)
 sys.path.insert(0, HERE)
 
@@ -273,9 +274,26 @@ def _ops_counts(processed=None, changed=None, note=''):
         import json as _j
         _j.dump({'processed': processed, 'changed': changed, 'note': note}, open(p, 'w'), ensure_ascii=False)
 
+def split_pdf_links(argv):
+    """Accept links separated by spaces, commas, or newlines."""
+    raw = " ".join(a for a in argv if a != "--dry-run")
+    return [u.strip() for u in re.split(r"[\s,]+", raw) if u.strip()]
+
+
+def validate_pdf_url(url):
+    """Validate a user-supplied HTTPS URL without a brittle hostname regex."""
+    parts = urllib.parse.urlsplit(url)
+    if parts.scheme.lower() != "https" or not parts.hostname:
+        raise RuntimeError("link https:// से शुरू होना चाहिए और उसमें valid hostname होना चाहिए")
+    if parts.username or parts.password:
+        raise RuntimeError("URL में embedded username/password स्वीकार नहीं है")
+    return parts
+def exit_code_for_results(total, failed_papers):
+    """Fail the workflow whenever any supplied PDF failed, even after partial success."""
+    return 1 if failed_papers else 0
 def main(argv):
     dry = '--dry-run' in argv
-    urls = [u for u in re.split(r'[\\s,]+', ' '.join(a for a in argv if a != '--dry-run')) if u]
+    urls = split_pdf_links(argv)
     if not urls:
         say('❌ कोई link नहीं मिला।')
         return 1
@@ -289,8 +307,7 @@ def main(argv):
     for n, url in enumerate(urls, 1):
         say(f'\n### {n}. {url.rsplit("/", 1)[-1]}')
         try:
-            if not re.match(r'^https://[\\w.-]+/', url):
-                raise RuntimeError('link https:// से शुरू होना चाहिए')
+            validate_pdf_url(url)
 
             with tempfile.TemporaryDirectory() as work:
                 pdf = os.path.join(work, 'paper.pdf')
@@ -340,7 +357,7 @@ def main(argv):
         open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8').write('\n'.join(SUMMARY) + '\n')
 
     _ops_counts(len(urls), 0 if dry else total, f'{len(urls)} papers, {bad} failed' + (' (dry run)' if dry else ''))
-    return 1 if bad and not total else 0
+    return exit_code_for_results(total, bad)
 
 if __name__ == '__main__':
     sys.exit(main(sys.argv[1:]))
