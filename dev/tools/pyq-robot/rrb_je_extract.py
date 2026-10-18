@@ -52,30 +52,52 @@ def ocr_pdf_text(path: Path) -> str:
         return "\n".join(text_pages).replace("\x00", "")
 
 
-def pdf_text(path: Path) -> str:
+def pdf_text_sources(path: Path) -> dict:
+    """Return embedded text and, when needed, OCR text so reliable answer keys can be merged."""
     p = subprocess.run(
         ["pdftotext", "-layout", str(path), "-"],
         capture_output=True, text=True, check=True,
     )
-    text = p.stdout.replace("\x00", "")
-    # A dependent Hindi vowel mark at the start of a word/line signals broken
-    # embedded-font mapping; empty text signals a scanned PDF. Prefer OCR in either case.
-    needs_ocr = not text.strip() or not QUESTION_START.search(text) or bool(
-        re.search(r"(?m)^\s*[\u093E-\u094D]", text)
+    embedded = p.stdout.replace("\x00", "")
+    broken_hindi = bool(re.search(r"(?m)^\s*[\u093E-\u094D]", embedded))
+    needs_ocr = not embedded.strip() or not QUESTION_START.search(embedded) or broken_hindi
+    ocr = ""
+    if needs_ocr:
+        try:
+            ocr = ocr_pdf_text(path)
+        except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired, RuntimeError):
+            ocr = ""
+    return {
+        "embedded": embedded,
+        "ocr": ocr,
+        "embedded_hindi_broken": broken_hindi,
+        "needs_ocr": needs_ocr,
+    }
+
+
+def _question_count(text: str) -> int:
+    if re.search(r"(?m)^\s*Question\s+No\.?\s*\d{1,3}", text, re.I):
+        return len(re.findall(r"(?m)^\s*Question\s+No\.?\s*\d{1,3}", text, re.I))
+    return sum(1 for line in text.splitlines() if QUESTION_START.match(line))
+
+
+def _prefer_ocr(sources: dict) -> bool:
+    embedded, ocr = sources.get("embedded", ""), sources.get("ocr", "")
+    if not ocr.strip():
+        return False
+    original_count = _question_count(embedded)
+    ocr_count = _question_count(ocr)
+    minimum_count = max(1, int(original_count * 0.8)) if original_count else 1
+    return bool(
+        QUESTION_START.search(ocr)
+        and ocr_count >= minimum_count
+        and len(ocr.strip()) >= max(1000, len(embedded.strip()) * 0.5)
     )
-    if not needs_ocr:
-        return text
-    try:
-        ocr = ocr_pdf_text(path)
-        original_count = len(re.findall(r"(?m)^\s*Question\s+No\.?\s*\d{1,3}", text, re.I))
-        ocr_count = len(re.findall(r"(?m)^\s*Question\s+No\.?\s*\d{1,3}", ocr, re.I))
-        minimum_count = max(1, int(original_count * 0.8))
-        # OCR may be shorter but more legible than a broken embedded Hindi font map.
-        if QUESTION_START.search(ocr) and ocr_count >= minimum_count and len(ocr.strip()) >= max(1000, len(text.strip()) * 0.5):
-            return ocr
-    except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired, RuntimeError):
-        pass
-    return text
+
+
+def pdf_text(path: Path) -> str:
+    sources = pdf_text_sources(path)
+    return sources["ocr"] if _prefer_ocr(sources) else sources["embedded"]
 
 
 def bilingual_body(raw_lines: list[str]) -> dict:
