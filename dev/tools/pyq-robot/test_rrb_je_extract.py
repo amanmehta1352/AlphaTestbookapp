@@ -6,13 +6,23 @@ from rrb_je_extract import parse_text
 class RRBJEExtractTests(unittest.TestCase):
     def test_extracts_numbered_question_and_explicit_answer_key(self):
         sample = """RRB JE Mechanical Engineering 2024
-1. What is the SI unit of force?
+1. बल का SI मात्रक क्या है?
+A. जूल
+B. न्यूटन
+C. वाट
+D. पास्कल
+What is the SI unit of force?
 A. Joule
 B. Newton
 C. Watt
 D. Pascal
 
-2. Which law relates pressure and volume?
+2. दाब और आयतन में कौन सा नियम संबंध बताता है?
+A) बॉयल नियम
+B) ओम नियम
+C) हुक नियम
+D) न्यूटन नियम
+Which law relates pressure and volume?
 A) Boyle law
 B) Ohm law
 C) Hooke law
@@ -61,11 +71,17 @@ Ans 1. One 2. Two 3. Three 4. Four
         sample = """RRB JE Mechanical Engineering 2019
 Exam Code : DEMO Exam Date : 01-06-2019
 Question No. 1
+बल का SI मात्रक क्या है?
+A)जूल B)न्यूटन
+C)वाट D)पास्कल
 What is the SI unit of force?
 A)Joule B)Newton
 C)Watt D)Pascal
 Answer Key : B Your Response : B (Correct)
 Question No. 2
+दाब और आयतन में कौन सा नियम संबंध बताता है?
+A)बॉयल नियम B)ओम नियम
+C)हुक नियम D)न्यूटन नियम
 Which law relates pressure and volume?
 A)Boyle law B)Ohm law
 C)Hooke law D)Newton law
