@@ -1,5 +1,5 @@
 # 🌐 Hindi Robot — adds Hindi (machine translation, IndicTrans2) to server questions that have none.
-# Runs automatically after every successful "PYQ Robot" run, or by hand from Actions.
+# Runs automatically after a successful real PYQ import (never after Dry Run), or by hand from Actions.
 # Never overwrites existing Hindi. Needs repo secret SUPABASE_SECRET_KEY.
 name: Hindi Robot
 on:
@@ -11,9 +11,8 @@ on:
         options: ['1', '2', '3', '4', '5', '6', '7', '8']
         default: '8'
         required: true
-  workflow_run:
-    workflows: ['PYQ Robot']
-    types: [completed]
+  repository_dispatch:
+    types: [pyq-imported]
 permissions:
   contents: read
 concurrency:
@@ -21,7 +20,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   prepare:
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'repository_dispatch'
     runs-on: ubuntu-latest
     outputs:
       shards: ${{ steps.matrix.outputs.shards }}
