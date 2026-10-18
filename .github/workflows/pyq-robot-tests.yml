@@ -1,0 +1,52 @@
+name: PYQ Robot CLI Tests
+
+on:
+  pull_request:
+    paths:
+      - "dev/tools/pyq-robot/robot.py"
+      - "dev/tests/test_pyq_robot_cli.py"
+      - ".github/workflows/pyq-robot-tests.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cli-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install robot runtime dependencies
+        run: python -m pip install requests pdfplumber
+      - name: Run CLI and URL validation regression tests
+        run: python -m unittest -v dev.tests.test_pyq_robot_cli
+
+
+  pdf-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install PDF and browser dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils
+          python -m pip install requests pdfplumber playwright
+          python -m playwright install --with-deps chromium
+      - name: Verify English-only SSC PDF is safely blocked by bilingual gate
+        env:
+          PDF_URL: https://download.oliveboard.in/pdf/SSC-JE-Mechanical-Question-Paper-2024-in-English-07-06-2024-S2.pdf
+        run: |
+          set -o pipefail
+          set +e
+          python3 dev/tools/pyq-robot/robot.py --dry-run "$PDF_URL" | tee "$RUNNER_TEMP/pyq-smoke.log"
+          status=$?
+          set -e
+          test "$status" -ne 0
+          grep -qi 'bilingual gate' "$RUNNER_TEMP/pyq-smoke.log"
