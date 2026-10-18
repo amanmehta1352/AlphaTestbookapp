@@ -37,7 +37,7 @@ Official Answer Key
         self.assertEqual(out["year"], "2024")
         self.assertEqual(out["questions"][0]["answer"], "B")
         self.assertEqual(out["questions"][1]["answer"], "A")
-        self.assertEqual(out["ready_for_import_count"], 2)
+        self.assertEqual(out["ready_for_import_count"], 2, out["questions"][0])
 
     def test_missing_answer_is_review_required(self):
         sample = """RRB JE Civil Engineering 2024
