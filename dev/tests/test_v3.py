@@ -50,6 +50,7 @@ with sync_playwright() as p:
     rec('dock tabs are at least 48px tall', pg.evaluate("[...document.querySelectorAll('#bottomNav .nav-tab')].every(t=>t.getBoundingClientRect().height>=48)"))
     pg.evaluate("navigate('taxonomy_explorer')"); pg.wait_for_timeout(250)
     rec('bookmark controls have 44px touch targets', pg.evaluate("[...document.querySelectorAll('.bm-btn')].length>0 && [...document.querySelectorAll('.bm-btn')].every(b=>b.getBoundingClientRect().width>=44 && b.getBoundingClientRect().height>=44)"))
+    rec('Question Bank stays within phone width after target increase', pg.evaluate(OVER))
     pg.evaluate("openModal('Touch target check','<p>Check close-button target.</p>')"); pg.wait_for_timeout(100)
     rec('modal close control has a 44px touch target', pg.evaluate("(()=>{const b=document.querySelector('#modalSheet .modal-close');return !!b && b.getBoundingClientRect().width>=44 && b.getBoundingClientRect().height>=44})()"))
     pg.evaluate("closeModal(); navigate('home')")
