@@ -38,6 +38,97 @@ def pdf_text(path: Path) -> str:
     return p.stdout.replace("\x00", "")
 
 
+def bilingual_body(raw_lines: list[str]) -> dict:
+    """Split bilingual question/options when the source repeats A-D in Hindi then English."""
+    segments = [[]]
+    groups = []
+    active = {}
+    last_option = None
+    option_labels = set("ABCD")
+    noise = re.compile(r"^(?:top|page\s+\d+|image\d*)$", re.I)
+
+    for raw in raw_lines:
+        line = raw.strip()
+        if not line or noise.fullmatch(line):
+            continue
+        markers = list(INLINE_OPTION_MARKER.finditer(line))
+        if markers:
+            for idx, marker in enumerate(markers):
+                label = (marker.group(1) or marker.group(2)).upper()
+                if label == "A" and active and set(active) == option_labels:
+                    groups.append(active)
+                    active = {}
+                end = markers[idx + 1].start() if idx + 1 < len(markers) else len(line)
+                value = line[marker.end():end].strip()
+                active[label] = (active.get(label, "") + " " + value).strip()
+                last_option = label
+                if set(active) == option_labels:
+                    groups.append(active)
+                    active = {}
+                    last_option = None
+                    segments.append([])
+            continue
+
+        if active and last_option and set(active) != option_labels:
+            active[last_option] = (active[last_option] + " " + line).strip()
+        else:
+            segments[-1].append(line)
+
+    if active:
+        groups.append(active)
+
+    def split_lines(lines):
+        hi, en = [], []
+        for item in lines:
+            has_hi = bool(re.search(r"[\u0900-\u097F]", item))
+            has_en = bool(re.search(r"[A-Za-z]{2,}", item))
+            if has_hi:
+                hi.append(item)
+            if has_en:
+                en.append(item)
+            if not has_hi and not has_en:
+                hi.append(item)
+                en.append(item)
+        return "\n".join(hi).strip(), "\n".join(en).strip()
+
+    q_hi, q_en = split_lines([line for segment in segments for line in segment])
+    options_hi, options_en = {}, {}
+    for gi, group in enumerate(groups):
+        all_values = " ".join(group.values())
+        has_hi = bool(re.search(r"[\u0900-\u097F]", all_values))
+        has_en = bool(re.search(r"[A-Za-z]{2,}", all_values))
+        if has_hi and not has_en:
+            language = "hi"
+        elif has_en and not has_hi:
+            language = "en"
+        elif len(groups) >= 2 and gi == 0:
+            language = "hi"
+        elif len(groups) >= 2 and gi == 1:
+            language = "en"
+        else:
+            language = "mixed"
+
+        for label, value in group.items():
+            if language == "hi":
+                options_hi[label] = value
+            elif language == "en":
+                options_en[label] = value
+            else:
+                v_hi, v_en = split_lines([value])
+                if v_hi:
+                    options_hi[label] = v_hi
+                if v_en:
+                    options_en[label] = v_en
+
+    return {
+        "question_hi": q_hi,
+        "question_en": q_en,
+        "options_hi": options_hi,
+        "options_en": options_en,
+        "option_group_count": len(groups),
+    }
+
+
 def parse_text(text: str, source_name: str) -> dict:
     lines = text.replace("\f", "\n").splitlines()
     header = "\n".join(lines[:100])
@@ -55,6 +146,9 @@ def parse_text(text: str, source_name: str) -> dict:
         nonlocal current
         if current is None:
             return
+        bilingual = bilingual_body(current.get("_raw_lines", []))
+        current.update(bilingual)
+        current.pop("_raw_lines", None)
         current["question"] = "\n".join(current.pop("_stem")).strip()
         current["options"] = {k: "\n".join(v).strip() for k, v in current.pop("_options").items()}
         current["answer"] = None
@@ -69,6 +163,10 @@ def parse_text(text: str, source_name: str) -> dict:
             current["review_reasons"].append("ambiguous_answer_format")
         if current.get("_answer_key_note"):
             current["review_reasons"].append("answer_key_unavailable_or_dropped")
+        if not current.get("question_hi") or not current.get("question_en"):
+            current["review_reasons"].append("bilingual_question_missing_language")
+        if not all(current.get("options_hi", {}).get(k, "").strip() for k in "ABCD") or not all(current.get("options_en", {}).get(k, "").strip() for k in "ABCD"):
+            current["review_reasons"].append("bilingual_options_missing_language")
         questions.append(current)
         current = None
 
@@ -116,11 +214,13 @@ def parse_text(text: str, source_name: str) -> dict:
                 "_stem": [qm.group("text").strip()] if qm.group("text").strip() else [],
                 "_options": {},
                 "_last_option": None,
+                "_raw_lines": [],
             }
             continue
 
         if current is None:
             continue
+        current["_raw_lines"].append(s)
         # Some PDFs place multiple options on one text line (e.g. "A)Joule B)Newton").
         # Split only when at least two explicit A-D markers are present.
         inline_options = list(INLINE_OPTION_MARKER.finditer(line))
@@ -169,7 +269,7 @@ def parse_text(text: str, source_name: str) -> dict:
         q["answer"] = answer
         if answer not in set("ABCD"):
             q["review_reasons"].append("official_answer_not_found")
-        if not branch:
+        if not branch and re.search(r"\bCBT\s*2\b", header, re.I):
             q["review_reasons"].append("branch_not_detected_from_header")
         if not year:
             q["review_reasons"].append("year_not_detected_from_header")
