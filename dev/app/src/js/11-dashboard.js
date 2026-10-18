@@ -306,15 +306,17 @@ function renderHomePage(v) {
   const recent = [];
   d.results.slice(0, 3).forEach(r => recent.push({ icon: '⏱️', title: `Test · ${r.topicTitle || 'Custom Test'}`, meta: `Score ${Number(r.score) || 0}/${Number(r.total) || 0} · ${Number(r.accuracy) || 0}% · ${sjFormatWhen(r.ts)}`, call: `openStoredResult(${nbJsAttr(r.id)})` }));
   d.imports.slice(0, 2).forEach(h => { const w = h.committedAt ? new Date(h.committedAt) : null; recent.push({ icon: '📥', title: `Imported · ${h.topicTitle || h.sourceFile || 'Questions'}`, meta: `${Number(h.committedQuestions) || 0} questions · ${w && !isNaN(w) ? w.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : 'date unknown'}`, call: `openDataControlModal()` }); });
+  // Testbook-inspired exam-first navigation; every tile targets an existing, working route.
+  // Features without a real data source (live classes/current affairs/AI doubt chat) are intentionally not faked.
   const quick = [
-    { icon: '✍️', label: 'Practice', call: practiceCall },
-    { icon: '🧩', label: tx('Test Builder','Test बनाएँ'), call: `navigate('native_builder')` },
-    { icon: '🗂️', label: tx('Question Bank','प्रश्न बैंक'), call: `navigate('taxonomy_explorer')` },
-    { icon: '🔄', label: tx('Revision','दोहराई'), call: `navigate('revision_hub')` },
-    { icon: '⏱️', label: tx('CBT Tests','CBT Test'), call: `navigate('test_hub')` },
-    { icon: '📕', label: tx('Mistakes','गलतियाँ'), call: `navigate('mistakes')` },
-    { icon: '📜', label: 'Test History', call: `openTestHistoryModal()` },
-    { icon: '🏆', label: tx('Mastery','महारत'), call: `navigate('mastery')` }
+    { icon: '🏛️', label: tx('Exams','परीक्षाएँ'), call: `navigate('exam_hub')` },
+    { icon: '⏱️', label: tx('Mock tests','मॉक टेस्ट'), call: `navigate('test_hub')` },
+    { icon: '🎯', label: tx('PYQ papers','PYQ पेपर'), call: `navigate('pyq_hub')` },
+    { icon: '✍️', label: tx('Topic practice','टॉपिक अभ्यास'), call: `navigate('subjects')` },
+    { icon: '🧩', label: tx('Test builder','टेस्ट बनाएँ'), call: `navigate('native_builder')` },
+    { icon: '📖', label: tx('Study library','स्टडी लाइब्रेरी'), call: `navigate('digital_library')` },
+    { icon: '🔎', label: tx('Question bank','प्रश्न बैंक'), call: `navigate('taxonomy_explorer')` },
+    { icon: '🔄', label: tx('Revision','दोहराई'), call: `navigate('revision_hub')` }
   ];
 
   v.innerHTML = `<div class="sj-dash gx">
@@ -328,13 +330,13 @@ function renderHomePage(v) {
       </div>
     </section>
     <section class="gx-card gx-search"><div class="search-box-wrap" style="margin:0;"><span class="search-icon">🔍</span><input type="search" class="search-input" id="inpGlobalSearch" aria-label="Search questions" placeholder="सवाल नंबर, परीक्षा (SSC, NTPC, JE), टॉपिक सर्च करें..." oninput="onGlobalSearch(this.value)"></div><div id="globalSearchResults"></div></section>
+    <section class="gx-card gx-quick" aria-labelledby="sjExploreHeading"><div class="gx-head"><h2 id="sjExploreHeading">${tx('Explore preparation','तैयारी के विकल्प')}</h2><span class="gx-explore-note">${tx('Choose what you want to do next','अगला कदम चुनें')}</span></div><div class="sj-quick">${quick.map(q => `<button type="button" class="sj-quick-btn" onclick="${q.call}"><span aria-hidden="true">${q.icon}</span><span>${escapeHtml(q.label)}</span></button>`).join('')}</div></section>
     ${primary ? `<section class="gx-card gx-next" aria-label="Next best action"><div class="gx-next-icon" aria-hidden="true">${primary.icon}</div><div class="gx-next-copy"><small>${tx('Next best action','अगला सबसे अच्छा काम')}</small><strong>${escapeHtml(primary.title)}</strong><span>${escapeHtml(primary.why)}</span></div><button type="button" class="gx-btn" onclick="${primary.call}">${escapeHtml(primary.cta)} →</button></section>` : ''}
     <section class="gx-card gx-continue" aria-labelledby="sjContinueH"><div class="gx-head"><h2 id="sjContinueH">${tx('Continue','जारी रखें')}</h2></div>
       ${d.resume ? `<div class="sj-resume"><div><strong>${escapeHtml(d.resume.module.topicTitle)}</strong><span>${escapeHtml(subjectDisplayName(d.resume.module.subject))} · Practice · ${tx('Question','सवाल')} ${d.resume.qIndex + 1} / ${sjModuleQuestionCount(d.resume.module)}</span></div><button type="button" class="gx-btn" onclick="${practiceCall}">${tx('Resume →','जारी रखें →')}</button></div>`
         : `<div class="gx-empty"><strong>${tx('No unfinished activity','कोई अधूरा काम नहीं')}</strong><span>${tx('Practice you leave mid-way appears here.','बीच में छोड़ी practice यहाँ दिखेगी।')}</span>${actions.length > 1 ? '' : (firstModule ? `<button type="button" class="gx-btn ghost" onclick="${practiceCall}">${tx('Practise','Practice:')} ${escapeHtml(firstModule.topicTitle)}</button>` : `<button type="button" class="gx-btn ghost" onclick="openImportModal()">${tx('Import questions','सवाल import करें')}</button>`)}</div>`}
       ${actions.length > 1 ? `<div class="sj-actions-list">${actions.slice(1).map(a => `<button type="button" class="sj-action" onclick="${a.call}"><span aria-hidden="true">${a.icon}</span><span class="sj-action-copy"><strong>${escapeHtml(a.title)}</strong><small>${escapeHtml(a.why)}</small></span><span class="sj-action-go" aria-hidden="true">›</span></button>`).join('')}</div>` : ''}
     </section>
-    <section class="gx-card gx-quick"><div class="gx-head"><h2>${tx('Quick actions','जल्दी के काम')}</h2></div><div class="sj-quick">${quick.map(q => `<button type="button" class="sj-quick-btn" ${q.call ? `onclick="${q.call}"` : 'disabled aria-disabled="true" title="No questions available"'}><span aria-hidden="true">${q.icon}</span>${escapeHtml(q.label)}</button>`).join('')}</div></section>
     ${gxSubjectWidget()}
     ${gxGoalWidget(d)}
     ${gxTodayWidget(d)}

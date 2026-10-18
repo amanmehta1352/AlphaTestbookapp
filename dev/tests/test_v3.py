@@ -16,6 +16,27 @@ with sync_playwright() as p:
     b = p.chromium.launch(); errors = []
     pg = b.new_page(viewport={'width': 360, 'height': 780}); pg.on('pageerror', lambda e: errors.append(str(e))); pg.on('dialog', lambda d: d.accept())
     pg.goto('file://' + APP); pg.wait_for_selector('.sj-dash', timeout=20000); pg.wait_for_timeout(300)
+    # Exam-first home launcher must only expose real, wired routes.
+    expected_tiles = [
+        ('Exams', 'exam_hub'), ('Mock tests', 'test_hub'), ('PYQ papers', 'pyq_hub'),
+        ('Topic practice', 'subjects'), ('Test builder', 'native_builder'),
+        ('Study library', 'digital_library'), ('Question bank', 'taxonomy_explorer'),
+        ('Revision', 'revision_hub')
+    ]
+    labels = pg.locator('.gx-quick .sj-quick-btn').all_inner_texts()
+    rec('home exposes eight exam-first preparation tiles',
+        len(labels) == 8 and all(label in ' '.join(labels) for label, _ in expected_tiles), labels)
+    for i, (label, route) in enumerate(expected_tiles):
+        pg.evaluate("navigate('home')")
+        pg.locator('.gx-quick .sj-quick-btn').nth(i).click()
+        actual = pg.evaluate("Route.page")
+        rec(f'home tile {label} → {route}', actual == route, actual)
+    pg.evaluate("navigate('home'); document.getElementById('btnMenu').click()")
+    drawer_sections = pg.locator('#sideDrawer .drawer-section-title').all_inner_texts()
+    rec('drawer groups exam prep, learning, revision and app tools',
+        all(x in ' '.join(drawer_sections) for x in ['PREPARE','LEARN & PRACTICE','REVISE & TRACK','APP TOOLS & DATA']),
+        drawer_sections)
+    pg.evaluate("closeDrawer(); navigate('home')")
     for w in (360, 412):
         pg.set_viewport_size({'width': w, 'height': 800})
         bad = []
