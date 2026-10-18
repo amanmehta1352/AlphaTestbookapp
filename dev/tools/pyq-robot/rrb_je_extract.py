@@ -459,6 +459,8 @@ def merge_parsed_sources(embedded_data: dict, ocr_data: dict, prefer_ocr_hindi: 
             reasons.append("official_answer_not_found")
         if answer_conflict:
             reasons.append("answer_key_ocr_disagreement")
+        elif not embedded_answer and ocr_answer and not dropped:
+            reasons.append("ocr_answer_only_review")
         if not q.get("question", "").strip():
             reasons.append("missing_question_text")
         if not q.get("question_en", "").strip() or not q.get("question_hi", "").strip():
