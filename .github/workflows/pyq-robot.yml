@@ -49,7 +49,7 @@ jobs:
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
         run: |
           if [ "$DRY" = "true" ]; then set -- --dry-run; else set --; fi
-          python3 dev/tools/pyq-robot/robot.py "$@" $LINKS
+          python3 dev/tools/pyq-robot/robot.py "$@" "$LINKS"
       - name: 📒 Record run in Control Room
         if: always() && steps.gate.outputs.run == 'true'
         env:
