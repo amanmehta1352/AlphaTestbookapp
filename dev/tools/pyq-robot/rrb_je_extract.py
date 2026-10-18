@@ -17,7 +17,8 @@ from pathlib import Path
 
 QUESTION_START = re.compile(r"^\s*(?:Q(?:uestion)?\s*)?\(?\s*(\d{1,3})\s*[).:]\s*(.*)$", re.I)
 OPTION_START = re.compile(r"^\s*(?:\(([A-D])\)|([A-D])[).:]|Option\s*([1-4])[).:]?)\s*(.*)$", re.I)
-ANSWER_LINE = re.compile(r"^\s*(?:correct\s+answer|answer\s*(?:key)?|ans)\s*[:.-]?\s*([A-D1-4])\b", re.I)
+ANSWER_LINE = re.compile(r"^\s*(?:correct\s+answer|answer\s*(?:key)?|ans)\s*:\s*([A-D1-4])\b", re.I)
+AMBIGUOUS_ANS_OPTIONS = re.compile(r"^\s*ans\s*1[).]\s+", re.I)
 ANSWER_PAIR = re.compile(r"(?<!\w)(\d{1,3})\s*[-:.)]?\s*([A-D])\b", re.I)
 HEADER_YEAR = re.compile(r"\b(20\d{2})\b")
 BRANCHES = {
@@ -62,6 +63,8 @@ def parse_text(text: str, source_name: str) -> dict:
             current["review_reasons"].append("options_not_exactly_A_to_D")
         if len(current["options"]) != 4:
             current["review_reasons"].append("incomplete_options")
+        if current.get("_ambiguous_answer_format"):
+            current["review_reasons"].append("ambiguous_answer_format")
         questions.append(current)
         current = None
 
@@ -115,7 +118,13 @@ def parse_text(text: str, source_name: str) -> dict:
                 current["_last_option"] = label
             continue
 
-        # A question's answer line is accepted only if it is explicitly labelled.
+        # Some coaching PDFs use "Ans 1. ... 2. ..." to list option texts, not the correct key.
+        # Never interpret that ambiguous format as answer A.
+        if AMBIGUOUS_ANS_OPTIONS.match(s):
+            current["_ambiguous_answer_format"] = True
+            continue
+
+        # Accept an answer only when the label explicitly separates the key (e.g. "Ans: B").
         am = ANSWER_LINE.match(s)
         if am:
             token = am.group(1).upper()
