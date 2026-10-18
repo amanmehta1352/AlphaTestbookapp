@@ -57,8 +57,8 @@ with sync_playwright() as p:
     rec('closed drawer casts no shadow on the page', pg.evaluate("getComputedStyle(document.getElementById('sideDrawer')).visibility") == 'hidden')
     for dark in (False, True):
         pg.evaluate(f"document.body.classList.toggle('dark',{str(dark).lower()})"); pg.evaluate("navigate('home')"); pg.wait_for_timeout(200)
-        c1 = pg.evaluate(f"({CONTRAST})('.gx-hero h1')"); c2 = pg.evaluate(f"({CONTRAST})('.gx-hero p')"); c3 = pg.evaluate(f"({CONTRAST})('#bottomNav .nav-tab.active')")
-        rec(f'{"dark" if dark else "light"}: text contrast ≥ 4.5 (title, body, active tab)', min(c1, c2, c3) >= 4.5, (round(c1, 1), round(c2, 1), round(c3, 1)))
+        c1 = pg.evaluate(f"({CONTRAST})('.gx-hero h1')"); c2 = pg.evaluate(f"({CONTRAST})('.gx-hero p')"); c3 = pg.evaluate(f"({CONTRAST})('#bottomNav .nav-tab.active')"); c4 = pg.evaluate(f"({CONTRAST})('.sj-next-copy small')")
+        rec(f'{"dark" if dark else "light"}: text contrast ≥ 4.5 (title, body, active tab, next-action label)', min(c1, c2, c3, c4) >= 4.5, (round(c1, 1), round(c2, 1), round(c3, 1), round(c4, 1)))
     pg.evaluate("document.body.classList.remove('dark')")
     # CBT confidence
     pg.evaluate("(()=>{const m=getWorkspaceModule('maths-percentage-class-test');initTestSession(m.moduleId,m.groups[0].groupId,0)})()"); pg.wait_for_timeout(400)
