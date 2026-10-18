@@ -39,6 +39,33 @@ Official Answer Key
         self.assertEqual(out["questions"][1]["answer"], "A")
         self.assertEqual(out["ready_for_import_count"], 2, out["questions"][0])
 
+    def test_explicit_question_no_ignores_numbered_steps_inside_question(self):
+        sample = """RRB JE 2019
+Question No. 1
+कौन सा क्रम सही है?
+1. पहला चरण
+2. दूसरा चरण
+Which sequence is correct?
+1. First step
+2. Second step
+A) एक B) दो
+C) तीन D) चार
+A) One B) Two
+C) Three D) Four
+Answer Key : B
+Question No. 2
+बल का SI मात्रक क्या है?
+What is the SI unit of force?
+A) न्यूटन B) जूल
+C) वाट D) पास्कल
+A) Newton B) Joule
+C) Watt D) Pascal
+Answer Key : A
+"""
+        out = parse_text(sample, "RRB-JE-2019.pdf")
+        self.assertEqual(out["question_count"], 2)
+        self.assertEqual([q["source_question_no"] for q in out["questions"]], [1, 2])
+
     def test_missing_answer_is_review_required(self):
         sample = """RRB JE Civil Engineering 2024
 1. Example question?
