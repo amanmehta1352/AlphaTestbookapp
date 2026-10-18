@@ -262,3 +262,39 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
 @media(min-width:720px){.gx-quick .sj-quick{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(min-width:1100px){.gx-quick .sj-quick{grid-template-columns:repeat(8,minmax(0,1fr))}}
 @media(prefers-reduced-motion:reduce){.gx-quick .sj-quick-btn{transition:none}}
+
+
+/* Subject navigation only — horizontal subject rail + expandable chapter/topic list. */
+.sn-subject-tabs{display:flex;gap:9px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin;padding:3px 2px 12px;margin:0 0 10px;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity}
+.sn-subject-tabs::-webkit-scrollbar{height:4px}
+.sn-tab{flex:0 0 auto;min-width:116px;max-width:180px;min-height:76px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:3px;padding:10px 13px;border:1px solid var(--border);border-radius:14px;background:var(--surface);color:var(--text-main);box-shadow:var(--shadow-sm);font:inherit;text-align:left;scroll-snap-align:start;transition:border-color .15s,background .15s,transform .15s}
+.sn-tab>span:nth-child(2){font-size:13px;font-weight:850;line-height:1.3;white-space:normal}
+.sn-tab small{font-size:10px;font-weight:750;color:var(--text-muted)}
+.sn-tab-icon{font-size:17px;line-height:1.1}
+.sn-tab.on{background:var(--primary-light);border-color:var(--primary);box-shadow:0 0 0 1px var(--primary-border) inset}
+.sn-tab.on>span:nth-child(2),.sn-tab.on .sn-tab-icon{color:var(--primary)}
+.sn-topic-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:14px;box-shadow:var(--shadow-sm);min-width:0}
+.sn-panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 12px}
+.sn-panel-head h2{font-size:17px;line-height:1.35;font-weight:900;margin:0;color:var(--text-main)}
+.sn-panel-head p{font-size:12px;color:var(--text-muted);margin:3px 0 0}
+.sn-total{flex:0 0 auto;font-size:11px;font-weight:850;padding:6px 9px;border-radius:999px;background:var(--surface-alt);color:var(--text-muted);white-space:nowrap}
+.sn-chapter-list{display:flex;flex-direction:column;gap:8px}
+.sn-chapter{border:1px solid var(--border);border-radius:13px;background:var(--surface);overflow:hidden;min-width:0}
+.sn-chapter.open{border-color:var(--primary-border);background:var(--surface)}
+.sn-chapter-toggle{width:100%;min-height:62px;display:flex;align-items:center;gap:11px;padding:11px 12px;border:0;background:transparent;color:var(--text-main);font:inherit;text-align:left}
+.sn-chapter-mark{display:grid;place-items:center;flex:0 0 30px;width:30px;height:30px;border-radius:9px;background:var(--surface-alt);color:var(--primary);font-size:19px;font-weight:700}
+.sn-chapter-main{display:flex;flex:1;min-width:0;flex-direction:column;gap:3px}
+.sn-chapter-main strong{font-size:13px;line-height:1.4;font-weight:850;overflow-wrap:anywhere}
+.sn-chapter-main small{font-size:11px;color:var(--text-muted);font-weight:650}
+.sn-chevron{font-size:21px;color:var(--text-muted);padding:0 3px}
+.sn-topic-list{border-top:1px solid var(--border);padding:4px 10px;background:var(--bg-main)}
+.sn-topic{width:100%;min-height:44px;display:flex;align-items:center;gap:8px;padding:8px 5px;border:0;border-bottom:1px solid var(--border);background:transparent;color:var(--text-main);font:inherit;text-align:left}
+.sn-topic:last-child{border-bottom:0}
+.sn-topic-dot{color:var(--primary);font-size:19px;line-height:1}
+.sn-topic-label{flex:1;min-width:0;font-size:12px;font-weight:700;line-height:1.4;overflow-wrap:anywhere}
+.sn-topic-count{font-size:10px;color:var(--text-muted);white-space:nowrap;font-weight:750}
+.sn-topic>span:last-child{font-size:18px;color:var(--text-muted)}
+.sn-chapter-action{display:flex;justify-content:flex-end;padding:8px 10px;border-top:1px solid var(--border)}
+.sn-empty-topic{margin:0;padding:12px 4px;color:var(--text-muted);font-size:12px}
+@media(min-width:700px){.sn-topic-panel{padding:18px}.sn-subject-tabs{gap:11px}.sn-tab{min-width:136px}.sn-chapter-list{gap:9px}}
+@media(prefers-reduced-motion:reduce){.sn-tab{transition:none}}
