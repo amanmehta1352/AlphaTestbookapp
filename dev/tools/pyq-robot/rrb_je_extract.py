@@ -214,7 +214,7 @@ def parse_text(text: str, source_name: str) -> dict:
                 "_stem": [qm.group("text").strip()] if qm.group("text").strip() else [],
                 "_options": {},
                 "_last_option": None,
-                "_raw_lines": [],
+                "_raw_lines": [qm.group("text").strip()] if qm.group("text").strip() else [],
             }
             continue
 
