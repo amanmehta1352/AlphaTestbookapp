@@ -13,3 +13,11 @@
 .cl-prompt{display:flex;align-items:center;gap:12px;width:100%;margin:0 0 12px;padding:12px 14px;border-radius:16px;border:1.5px solid rgba(37,99,235,.35);background:var(--surface);color:var(--text-main);text-align:left;box-shadow:var(--shadow-sm)}
 .cl-prompt>span:nth-child(2){flex:1;display:flex;flex-direction:column}.cl-prompt b{font-size:15px}.cl-prompt small{font-size:12px;color:var(--text-muted)}
 .cl-prompt>span:last-child{font-size:22px;color:var(--text-muted)}
+
+.cl-sync-prompt{display:flex;flex-direction:column;gap:8px;width:100%;margin:0 0 12px;padding:13px 14px;border:1.5px solid rgba(217,119,6,.45);border-radius:16px;background:var(--surface);color:var(--text-main);box-shadow:var(--shadow-sm);line-height:1.45}
+.cl-sync-prompt>b{font-size:15px}
+.cl-sync-prompt p{margin:0;color:var(--text-muted);font-size:13px;overflow-wrap:anywhere}
+.cl-sync-actions{display:flex;flex-wrap:wrap;gap:8px}
+.cl-sync-actions button{min-height:44px;padding:9px 12px;border:1px solid var(--border);border-radius:11px;background:var(--surface);color:var(--text-main);font:inherit;font-size:13px;font-weight:700}
+.cl-sync-actions .cl-sync-retry{background:var(--primary);border-color:var(--primary);color:#fff}
+.cl-sync-actions button:disabled{opacity:.65}
