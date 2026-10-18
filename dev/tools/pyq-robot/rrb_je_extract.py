@@ -67,6 +67,8 @@ def parse_text(text: str, source_name: str) -> dict:
             current["review_reasons"].append("incomplete_options")
         if current.get("_ambiguous_answer_format"):
             current["review_reasons"].append("ambiguous_answer_format")
+        if current.get("_answer_key_note"):
+            current["review_reasons"].append("answer_key_unavailable_or_dropped")
         questions.append(current)
         current = None
 
