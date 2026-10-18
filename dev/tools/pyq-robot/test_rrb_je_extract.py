@@ -43,6 +43,20 @@ D. Four
         self.assertIn("official_answer_not_found", out["questions"][0]["review_reasons"])
         self.assertEqual(out["review_required_count"], 1)
 
+    def test_does_not_treat_ans_one_option_list_as_correct_answer(self):
+        sample = """RRB JE Mechanical Engineering 2024
+1. Example question?
+A. One
+B. Two
+C. Three
+D. Four
+Ans 1. One 2. Two 3. Three 4. Four
+"""
+        out = parse_text(sample, "sample.pdf")
+        self.assertIsNone(out["questions"][0]["answer"])
+        self.assertIn("ambiguous_answer_format", out["questions"][0]["review_reasons"])
+        self.assertEqual(out["ready_for_import_count"], 0)
+
     def test_does_not_invent_missing_option(self):
         sample = """RRB JE Electrical Engineering 2024
 1. Example question?
