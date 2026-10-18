@@ -3,7 +3,7 @@ import tempfile
 import urllib.parse
 
 from robot import download_pdf_or_page
-from rrb_je_extract import parse_text, pdf_text
+from rrb_je_extract import parse_pdf
 
 PAPERS = [
     "https://docs.aglasem.com/view/d8be4568-aab6-11e9-aac7-02f21f5619c4",  # 22 May 2019 Shift 1
@@ -32,8 +32,7 @@ def main():
             pdf = root / f"paper-{index:02d}.pdf"
             try:
                 title = download_pdf_or_page(url, str(pdf), HEADERS)
-                text = pdf_text(pdf)
-                data = parse_text(text, urllib.parse.urlsplit(url).path.rsplit("/", 1)[-1])
+                data = parse_pdf(pdf, urllib.parse.urlsplit(url).path.rsplit("/", 1)[-1])
                 qcount = int(data.get("question_count", 0))
                 answers = sum(1 for q in data.get("questions", []) if q.get("answer") in {"A", "B", "C", "D"})
                 if qcount < 80 or answers < 70:
