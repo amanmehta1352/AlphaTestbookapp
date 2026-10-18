@@ -167,6 +167,7 @@ def bilingual_body(raw_lines: list[str]) -> dict:
 
 def parse_text(text: str, source_name: str) -> dict:
     lines = text.replace("\f", "\n").splitlines()
+    has_explicit_question_numbers = bool(re.search(r"(?m)^\s*Question\s+No\.?\s*\d{1,3}", text, re.I))
     header = "\n".join(lines[:100])
     lower = header.lower()
     branch = next((v for k, v in BRANCHES.items() if k in lower), None)
@@ -242,6 +243,8 @@ def parse_text(text: str, source_name: str) -> dict:
             continue
 
         qm = QUESTION_START.match(line)
+        if has_explicit_question_numbers and not re.match(r"^\s*Question\s+No\.?\s*\d{1,3}", line, re.I):
+            qm = None
         if qm:
             qno = int(qm.group("qno1") or qm.group("qno2"))
             # Avoid mistaking answer/section numbering for question starts.
