@@ -20,6 +20,10 @@ class PYQRobotCLITests(unittest.TestCase):
             "https://example.net/c.pdf",
         ])
 
+    def test_partial_batch_failure_returns_failure(self):
+        self.assertEqual(robot.exit_code_for_results(8, 1), 1)
+        self.assertEqual(robot.exit_code_for_results(0, 0), 0)
+
     def test_accepts_valid_https_url(self):
         parts = robot.validate_pdf_url("https://example.com/paper.pdf?download=1")
         self.assertEqual(parts.hostname, "example.com")
