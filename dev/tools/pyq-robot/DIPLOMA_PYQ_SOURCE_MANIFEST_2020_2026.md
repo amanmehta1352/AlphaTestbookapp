@@ -50,3 +50,28 @@ The current workflow accepts one or more HTTPS PDF links or public document page
 - NOT-FOUND: no official public source found after a documented search.
 
 No source should be marked IMPORTED-DRAFT without a successful workflow run summary.
+
+
+## Direct paper links discovered (2026-10-18)
+
+These are concrete source URLs found during the next discovery pass. They are source candidates, **not yet imported**. Each must be run through the supported parser and bilingual/answer-key checks before any Draft insert.
+
+| Exam / year | Paper / source | Direct URL | Current disposition |
+|---|---|---|---|
+| SSC JE 2020 | Official SSC legacy answer-key archive entry for JE 2020 Paper-I question papers and final keys | https://ssc.nic.in/Portal/AnswerKey | Archive entry confirmed; extract the paper-specific download URL and test access/format |
+| ISRO HSFC 2022 | Technical Assistant Mechanical, Booklet A (official bilingual question booklet) | https://www.isro.gov.in/media_isro/pdf/recruitmentNotice/2022_Sep/ta-01_a-mechanical.pdf | Direct official PDF found; parser compatibility and matching final answer key must be validated |
+| ISRO PRL 2025 | Technical Assistant Mechanical archive entry | https://www.isro.gov.in/ISRO_HINDI/Prl_old_questionPapers.html | Official archive lists the paper; extract exact PDF URL and validate key |
+| RRB JE 2024 | Official CEN 03/2024 JE notices and CBT question/response/key window | https://www.rrbcdg.gov.in/2024-03-je.php | Official notice confirmed; candidate response-sheet window may be closed, so public reusable PDF availability is not assumed |
+| RRB JE / DMS / CMA 2024 | Official RRB Secunderabad notice index | https://rrbsecunderabad.gov.in/ | Official notice index confirmed; locate any still-public question-paper links; login-only response sheets are ACCESS-LIMITED |
+| ISRO SHAR | Official previous-question-paper archive | https://apps.shar.gov.in/sdscshar/prevQuesPapers.jsp | Archive identified; collect paper-specific URLs and verify answer keys |
+
+### Evidence from current discovery pass
+
+- SSC's official legacy archive explicitly lists SSC JE 2020 Paper-I question papers with final answer keys.
+- ISRO's official HSFC page publishes the 22 May 2022 Technical Assistant (Mechanical) booklet sets and final answer keys.
+- ISRO's official PRL archive lists a 2025 Technical Assistant (Mechanical) paper.
+- RRB official 2024 notices confirm CBT question-paper/response/key windows, but those candidate-specific windows are not equivalent to permanently public PDF files.
+
+### Import status (do not overstate)
+
+No new question has been inserted into Supabase by this discovery pass. The workflow is `workflow_dispatch` only and needs an actual GitHub Actions dispatch with the PDF URLs; a manifest edit or successful dry-run is not a Draft import. Keep candidate links at FOUND until the Robot validates them, and mark IMPORTED-DRAFT only after the workflow confirms inserted draft rows.
