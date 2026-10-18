@@ -223,9 +223,9 @@ def pdf_metadata_title(pdf):
 
 def bilingual_paper_to_txt(pdf, work, source_name, source_title, source_url, original_error=None):
     """Convert a bilingual RRB JE CBT paper to ImportEngine TXT; uncertain questions stay out."""
-    from rrb_je_extract import parse_text, pdf_text as rrb_pdf_text
+    from rrb_je_extract import parse_pdf_sources
 
-    text = rrb_pdf_text(Path(pdf))
+    data, text = parse_pdf_sources(Path(pdf), source_name or os.path.basename(pdf))
     title_hint = " ".join(x for x in [source_name or "", source_title or "", source_url or "", pdf_metadata_title(pdf)] if x)
     first_question = re.search(r"(?mi)^\s*(?:Question\s+No\.?\s*\d{1,3}|(?:Q(?:uestion)?\s*)?\(?\s*\d{1,3}\s*[).:])", text)
     header_text = text[:first_question.start()] if first_question else "\n".join(text.splitlines()[:20])
@@ -238,7 +238,6 @@ def bilingual_paper_to_txt(pdf, work, source_name, source_title, source_url, ori
         if original_error:
             raise RuntimeError(original_error)
         raise RuntimeError("Exam name नहीं मिला; ऐसा PDF/document-page link दें जिसके title या filename में exam का नाम हो")
-    data = parse_text(text, source_name or os.path.basename(pdf))
     if not data.get("question_count"):
         raise RuntimeError(f"{exam_name} PDF से कोई numbered question नहीं निकला")
 
