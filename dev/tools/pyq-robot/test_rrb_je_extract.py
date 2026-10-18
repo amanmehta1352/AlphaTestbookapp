@@ -39,6 +39,34 @@ Official Answer Key
         self.assertEqual(out["questions"][1]["answer"], "A")
         self.assertEqual(out["ready_for_import_count"], 2, out["questions"][0])
 
+    def test_merges_embedded_answer_key_with_clean_ocr_hindi(self):
+        embedded = """RRB JE 2019
+Question No. 1
+ेणी को पण ू कर।
+A)748 B)635
+C)712 D)682
+Complete the series.
+A)748 B)635
+C)712 D)682
+Answer Key : B
+"""
+        ocr = """RRB JE 2019
+Question No. 1
+श्रेणी को पूर्ण करें।
+A)748 B)635
+C)712 D)682
+Complete the series.
+A)748 B)635
+C)712 D)682
+"""
+        embedded_data = parse_text(embedded, "embedded.pdf")
+        ocr_data = parse_text(ocr, "ocr.pdf")
+        merged = merge_parsed_sources(embedded_data, ocr_data, prefer_ocr_hindi=True)
+        q = merged["questions"][0]
+        self.assertEqual(q["answer"], "B")
+        self.assertIn("श्रेणी को पूर्ण करें", q["question_hi"])
+        self.assertEqual(q["status"], "EXTRACTED")
+
     def test_explicit_question_no_ignores_numbered_steps_inside_question(self):
         sample = """RRB JE 2019
 Question No. 1
