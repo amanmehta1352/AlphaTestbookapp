@@ -61,11 +61,11 @@ try:
         st.locator('.pf-chip').click(); st.wait_for_selector('#pfSheet .pf-opt'); st.locator('#pfSheet .gx-btn.ghost').click(); idle(); st.wait_for_timeout(300)
         rec('"show everything" brings all subjects back', len(subjects()) == 5 and st.evaluate("UserState.studentProfile") is None, subjects())
         # A valid login with a stale/wrong exam selection must not silently look like a broken app.
-        await st.evaluate("profileApply({examId:'missing-exam',branch:''})")
+        st.evaluate("profileApply({examId:'missing-exam',branch:''})")
         idle(); st.wait_for_timeout(250)
         rec('zero questions after profile filter shows a visible recovery card', st.locator('.cl-sync-prompt').count() == 1 and 'exam/branch' in st.locator('.cl-sync-prompt').inner_text(), st.locator('.cl-sync-prompt').inner_text() if st.locator('.cl-sync-prompt').count() else 'card missing')
         rec('recovery card offers retry and exam change', st.locator('.cl-sync-retry').count() == 1 and st.locator('.cl-sync-change').count() == 1)
-        await st.evaluate("profileApply(null)")
+        st.evaluate("profileApply(null)")
         idle(); st.wait_for_timeout(200)
         rec('recovery card clears after questions return', st.locator('.cl-sync-prompt').count() == 0 and len(subjects()) == 5, subjects())
         rec('no page errors', not errors, errors)
