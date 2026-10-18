@@ -178,15 +178,25 @@ with sync_playwright() as p:
     data = json.loads(open(dl.value.path(), encoding='utf-8').read())
     rec('backup snapshot includes attempt + result history', len(data.get('attemptHistory', [])) == 5 and len(data.get('resultHistory', [])) == 2 and 'modules' in data and 'userState' in data)
 
-    # ---------- Regression: quick actions / journey / layout ----------
-    expected = ['practice', 'native_builder', 'taxonomy_explorer', 'revision_hub', 'test_hub', 'mistakes', None, 'mastery']
-    for i, e in enumerate(expected):
+    # ---------- Regression: Testbook-inspired quick actions / journey / layout ----------
+    # Keep the expected route contract aligned with the current exam-first launcher.
+    # These checks deliberately validate every tile's actual route, not just labels.
+    expected = [
+        ('Exams', 'exam_hub'),
+        ('Mock tests', 'test_hub'),
+        ('PYQ papers', 'pyq_hub'),
+        ('Topic practice', 'subjects'),
+        ('Test builder', 'native_builder'),
+        ('Study library', 'digital_library'),
+        ('Question bank', 'taxonomy_explorer'),
+        ('Revision', 'revision_hub'),
+    ]
+    for i, (label, route) in enumerate(expected):
         page.evaluate("closeModal();navigate('home')")
-        page.locator('.sj-quick-btn').nth(i).click()
-        if e is None:
-            rec('quick action Test History opens modal', page.evaluate("document.getElementById('modalSheet').classList.contains('open') && document.getElementById('modalSheetTitle').textContent.includes('Test History')"))
-        else:
-            rec(f'quick action {i+1} → {e}', page.evaluate("Route.page") == e)
+        button = page.locator('.sj-quick-btn').nth(i)
+        rec(f'quick action {i+1} label = {label}', label.lower() in button.inner_text().lower())
+        button.click()
+        rec(f'quick action {label} → {route}', page.evaluate("Route.page") == route)
     page.evaluate("closeModal();navigate('home')")
     for w in [360, 390, 768, 1280]:
         page.set_viewport_size({'width': w, 'height': 900}); page.evaluate("navigate('home')")
