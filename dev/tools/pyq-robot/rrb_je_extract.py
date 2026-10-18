@@ -502,7 +502,7 @@ def parse_pdf(path: Path, source_name: str) -> dict:
     return merge_parsed_sources(
         embedded_data,
         ocr_data,
-        prefer_ocr_hindi=sources.get("embedded_hindi_broken", False) and _prefer_ocr(sources),
+        prefer_ocr_hindi=sources.get("embedded_hindi_broken", False),
         ocr_only=not embedded.strip(),
     )
 
