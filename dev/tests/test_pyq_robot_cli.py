@@ -43,6 +43,21 @@ ANSWER: A
         block = "=== QUESTION START ===\n" + "\n".join(fields) + "\n=== QUESTION END ==="
         robot.assert_bilingual_txt(block, "bilingual.txt")
 
+    def test_detects_common_exam_names_from_titles(self):
+        cases = {
+            "RRB JE Question Paper 2019": "RRB JE",
+            "RRB NTPC CBT 1": "RRB NTPC",
+            "SSC CGL Tier 1 2024": "SSC CGL",
+            "SSC-JE Mechanical Paper": "SSC JE",
+            "BHEL Supervisor Previous Year Paper": "BHEL",
+        }
+        for title, expected in cases.items():
+            with self.subTest(title=title):
+                self.assertEqual(robot.detect_exam_name(title), expected)
+
+    def test_does_not_guess_unknown_exam(self):
+        self.assertIsNone(robot.detect_exam_name("random coaching PDF"))
+
     def test_accepts_valid_https_url(self):
         parts = robot.validate_pdf_url("https://example.com/paper.pdf?download=1")
         self.assertEqual(parts.hostname, "example.com")
