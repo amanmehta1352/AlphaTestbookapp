@@ -1,4 +1,4 @@
-"""PYQ Robot — SSC JE response-sheet PDF links -> server questions as DRAFT.
+"""PYQ Robot — SSC JE response sheets + bilingual RRB JE CBT PDFs -> ImportEngine draft questions.
 
 Runs on GitHub Actions (.github/workflows/pyq-robot.yml), so it costs no Claude usage.
   python3 dev/tools/pyq-robot/robot.py [--dry-run] URL [URL ...]
@@ -6,7 +6,7 @@ Runs on GitHub Actions (.github/workflows/pyq-robot.yml), so it costs no Claude 
 Steps per PDF: download -> v2/extract.py + v2/gaps.py -> app TXT -> the app's own ImportEngine
 (built index.html, same IDs/hash as Admin Studio) -> insert into Supabase as status='draft'.
 Safety:
-- Only official data: text/options + answer from the SSC green tick (exactly 4 marks, 1 tick).
+- Only explicit answer keys / SSC green ticks are used. Bilingual question and all A-D options are required before ImportEngine.
 - Questions with a figure / big blank gap / no clear answer are skipped (app can't show images).
 - Existing rows are never changed (insert with ignore-duplicates). A paper whose source_ref is
   already on the server is skipped, so running the same link twice is harmless.
@@ -352,6 +352,21 @@ def paper_to_txt(pdf, work, source_name=None, source_title=None, source_url=None
 
     return dict(src=src, title=f'SSC JE {year} {branch} · {shift}', files=files, skip=skip)
 
+def assert_bilingual_txt(text, filename="input.txt"):
+    """Do not let ImportEngine silently duplicate English into missing Hindi fields."""
+    blocks = re.findall(r"=== QUESTION START ===(.*?)=== QUESTION END ===", text, re.S)
+    if not blocks:
+        raise RuntimeError(f"{filename}: कोई question block नहीं मिला")
+    required = ["QUESTION_EN", "QUESTION_HI"] + [f"{letter}_{lang}" for letter in "ABCD" for lang in ("EN", "HI")]
+    bad = []
+    for index, block in enumerate(blocks, 1):
+        missing = [field for field in required if not re.search(rf"(?m)^{re.escape(field)}:\s*\S", block)]
+        if missing:
+            bad.append(f"Q{index}: {','.join(missing)}")
+    if bad:
+        raise RuntimeError(f"{filename}: bilingual gate ने {len(bad)}/{len(blocks)} सवाल रोके; English को Hindi की जगह duplicate नहीं किया जाएगा. " + "; ".join(bad[:4]))
+
+
 def analyze(files):
     """Run the app's own ImportEngine (built index.html) -> server rows, exactly like Admin Studio."""
     from playwright.sync_api import sync_playwright
@@ -366,6 +381,7 @@ def analyze(files):
         for f in files:
             with open(f, encoding='utf-8') as fh:
                 t = fh.read()
+            assert_bilingual_txt(t, os.path.basename(f))
             r = pg.evaluate(
                 """async ([t,name])=>{
                     AppModules=[];
