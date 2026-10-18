@@ -1,0 +1,28 @@
+name: RRB JE 1000-question Corpus Stress Test
+
+on:
+  pull_request:
+    paths:
+      - "dev/tools/pyq-robot/stress_test_rrb_corpus.py"
+      - ".github/workflows/rrb-je-corpus-stress.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  corpus-stress:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install PDF/OCR dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils tesseract-ocr tesseract-ocr-hin
+          python -m pip install requests pdfplumber
+      - name: Download and test 12 real RRB JE papers (about 1,000+ questions)
+        run: python dev/tools/pyq-robot/stress_test_rrb_corpus.py
