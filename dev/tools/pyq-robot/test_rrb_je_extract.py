@@ -57,6 +57,25 @@ Ans 1. One 2. Two 3. Three 4. Four
         self.assertIn("ambiguous_answer_format", out["questions"][0]["review_reasons"])
         self.assertEqual(out["ready_for_import_count"], 0)
 
+    def test_parses_aglasem_style_question_no_and_answer_key(self):
+        sample = """Exam Code : DEMO Exam Date : 01-06-2019
+Question No. 1
+What is the SI unit of force?
+A)Joule B)Newton
+C)Watt D)Pascal
+Answer Key : B Your Response : B (Correct)
+Question No. 2
+Which law relates pressure and volume?
+A)Boyle law B)Ohm law
+C)Hooke law D)Newton law
+Answer Key : A Your Response : C (Wrong)
+"""
+        out = parse_text(sample, "sample.pdf")
+        self.assertEqual(out["question_count"], 2)
+        self.assertEqual(out["questions"][0]["answer"], "B")
+        self.assertEqual(out["questions"][1]["answer"], "A")
+        self.assertEqual(out["ready_for_import_count"], 2)
+
     def test_does_not_invent_missing_option(self):
         sample = """RRB JE Electrical Engineering 2024
 1. Example question?
