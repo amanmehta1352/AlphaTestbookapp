@@ -1,4 +1,4 @@
-"""PYQ Robot — SSC JE response-sheet PDF links -> server questions as DRAFT.
+"""PYQ Robot — SSC JE response sheets + bilingual RRB JE CBT PDFs -> ImportEngine draft questions.
 
 Runs on GitHub Actions (.github/workflows/pyq-robot.yml), so it costs no Claude usage.
   python3 dev/tools/pyq-robot/robot.py [--dry-run] URL [URL ...]
@@ -6,7 +6,7 @@ Runs on GitHub Actions (.github/workflows/pyq-robot.yml), so it costs no Claude 
 Steps per PDF: download -> v2/extract.py + v2/gaps.py -> app TXT -> the app's own ImportEngine
 (built index.html, same IDs/hash as Admin Studio) -> insert into Supabase as status='draft'.
 Safety:
-- Only official data: text/options + answer from the SSC green tick (exactly 4 marks, 1 tick).
+- Only explicit answer keys / SSC green ticks are used. Bilingual question and all A-D options are required before ImportEngine.
 - Questions with a figure / big blank gap / no clear answer are skipped (app can't show images).
 - Existing rows are never changed (insert with ignore-duplicates). A paper whose source_ref is
   already on the server is skipped, so running the same link twice is harmless.
@@ -15,6 +15,10 @@ Safety:
 """
 import json, os, re, subprocess, sys, tempfile, time, urllib.parse, urllib.request
 from collections import Counter
+import unicodedata
+from html import unescape
+from html.parser import HTMLParser
+from pathlib import Path
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.abspath(os.path.join(HERE, '..', '..', '..'))
@@ -109,7 +113,178 @@ def shift_of(time_txt):
     h = int(m.group(1)) % 12 + (12 if m.group(3) == 'PM' else 0)
     return 1 if h < 12 else 2 if h < 16 else 3
 
-def paper_to_txt(pdf, work):
+class _PageLinkParser(HTMLParser):
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.title_parts = []
+        self.links = []
+        self.in_title = False
+
+    def handle_starttag(self, tag, attrs):
+        if tag.lower() == "title":
+            self.in_title = True
+        if tag.lower() == "a":
+            href = dict(attrs).get("href")
+            if href:
+                self.links.append(href)
+
+    def handle_endtag(self, tag):
+        if tag.lower() == "title":
+            self.in_title = False
+
+    def handle_data(self, data):
+        if self.in_title:
+            self.title_parts.append(data)
+
+
+def download_pdf_or_page(url, pdf, headers):
+    """Accept a direct PDF URL or a public document page that links to a PDF."""
+    safe_download_file(
+        url, pdf, headers=headers, timeout=120, retries=3, backoff_factor=0.5,
+        debug=(os.environ.get("DEBUG_PYQ") == "1"),
+    )
+    with open(pdf, "rb") as fh:
+        if fh.read(5) == b"%PDF-":
+            return None
+
+    with open(pdf, "rb") as fh:
+        page = fh.read(3 * 1024 * 1024).decode("utf-8", "ignore")
+    if "<html" not in page.lower() and "<!doctype html" not in page.lower():
+        raise RuntimeError("यह link PDF नहीं देता और HTML document page भी नहीं है")
+
+    parser = _PageLinkParser()
+    parser.feed(page)
+    title = unescape(" ".join(" ".join(parser.title_parts).split())).strip()
+    candidates = []
+    for href in parser.links:
+        lower = href.lower()
+        if "single-doc-download" in lower or ".pdf" in lower or "download" in lower:
+            full = urllib.parse.urljoin(url, href)
+            if full not in candidates:
+                candidates.append(full)
+    candidates.sort(key=lambda x: (0 if "single-doc-download" in x.lower() else 1 if ".pdf" in x.lower() else 2))
+    last_error = None
+    for candidate in candidates[:8]:
+        try:
+            safe_download_file(
+                candidate, pdf, headers=headers, timeout=120, retries=3, backoff_factor=0.5,
+                debug=(os.environ.get("DEBUG_PYQ") == "1"),
+            )
+            with open(pdf, "rb") as fh:
+                if fh.read(5) == b"%PDF-":
+                    return title or None
+        except Exception as exc:
+            last_error = exc
+    detail = f" ({title})" if title else ""
+    if last_error:
+        detail += f" · download error: {str(last_error)[:160]}"
+    raise RuntimeError("Webpage मिली, लेकिन उसमें downloadable PDF नहीं मिला" + detail)
+
+
+def rrb_je_paper_to_txt(pdf, work, source_name, source_title, source_url, original_error=None):
+    """Convert a bilingual RRB JE CBT paper to ImportEngine TXT; uncertain questions stay out."""
+    from rrb_je_extract import parse_text, pdf_text as rrb_pdf_text
+
+    text = rrb_pdf_text(Path(pdf))
+    title_hint = " ".join(x for x in [source_name or "", source_title or "", source_url or ""] if x)
+    if not re.search(r"\bRRB\b|Railway Recruitment Board", title_hint, re.I):
+        if original_error:
+            raise RuntimeError(original_error)
+        raise RuntimeError("PDF RRB JE जैसा है, लेकिन exam title नहीं मिला; document page/title वाला link दें")
+    data = parse_text(text, source_name or os.path.basename(pdf))
+    if not data.get("question_count"):
+        raise RuntimeError("RRB JE PDF से कोई numbered question नहीं निकला")
+
+    year = data.get("year") or (re.search(r"\b(20\d{2})\b", title_hint) or [None, None])[1]
+    if not year:
+        raise RuntimeError("RRB JE PDF में year नहीं मिला; import रोक दिया")
+    date_match = re.search(r"Exam Date\s*:\s*(\d{2})-(\d{2})-(\d{4})", text[:10000], re.I)
+    title_date = re.search(r"\b(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+(20\d{2})\b", title_hint, re.I)
+    shift_match = re.search(r"\bshift\s*(\d+)\b", title_hint, re.I)
+    shift_no = int(shift_match.group(1)) if shift_match else None
+    if not shift_no:
+        tm = re.search(r"Exam Time\s*:\s*(\d{1,2}):(\d{2})", text[:10000], re.I)
+        if tm:
+            hour = int(tm.group(1))
+            shift_no = 1 if hour < 12 else 2 if hour < 16 else 3
+    shift_no = shift_no or 1
+    if date_match:
+        dd, mm, yy = date_match.groups()
+        shift = f"{dd} {MON[int(mm) - 1]} {yy} Shift {shift_no}"
+    elif title_date:
+        dd, mon, yy = title_date.groups()
+        shift = f"{int(dd):02d} {mon.title()} {yy} Shift {shift_no}"
+    else:
+        shift = f"{year} Shift {shift_no}"
+
+    src = f"RRB JE {year} {shift} · {source_title or source_name or 'CBT paper'} · bilingual answer-key PDF"[:220]
+    title = f"RRB JE {year} · {shift}"
+    blocks, skip = {}, Counter()
+    seen_question_numbers, seen_fingerprints = set(), set()
+    def fingerprint_text(value):
+        value = unicodedata.normalize("NFKC", str(value or "")).lower()
+        return " ".join(re.sub(r"[^\w]+", " ", value, flags=re.UNICODE).replace("_", " ").split())
+    for q in data["questions"]:
+        reasons = q.get("review_reasons") or []
+        if q.get("status") != "EXTRACTED":
+            skip["review required: " + ",".join(reasons or ["unknown"])] += 1
+            continue
+        if not q.get("question_en", "").strip() or not q.get("question_hi", "").strip():
+            skip["bilingual question missing"] += 1
+            continue
+        if any(not q.get("options_en", {}).get(k, "").strip() or not q.get("options_hi", {}).get(k, "").strip() for k in "ABCD"):
+            skip["bilingual options missing"] += 1
+            continue
+        if q.get("answer") not in set("ABCD"):
+            skip["answer key missing"] += 1
+            continue
+        qno = q.get("source_question_no")
+        if qno in seen_question_numbers:
+            skip["duplicate question number"] += 1
+            continue
+        fp = "|".join([fingerprint_text(q.get("question_en"))] + [fingerprint_text(q.get("options_en", {}).get(k)) for k in "ABCD"])
+        if fp in seen_fingerprints:
+            skip["duplicate question fingerprint"] += 1
+            continue
+        seen_question_numbers.add(qno)
+        seen_fingerprints.add(fp)
+
+        fields = {
+            "SOURCE_QUESTION_NO": q["source_question_no"],
+            "EXAM_NAME": "RRB JE",
+            "YEAR": year,
+            "SHIFT": shift,
+            "SUBJECT": UNTAGGED,
+            "CHAPTER": UNTAGGED,
+            "TOPIC": UNTAGGED,
+            "SOURCE_TYPE": "PYQ",
+            "QUESTION_EN": fix(q["question_en"]),
+            "QUESTION_HI": fix(q["question_hi"]),
+        }
+        for letter in "ABCD":
+            fields[letter + "_EN"] = fix(q["options_en"][letter])
+            fields[letter + "_HI"] = fix(q["options_hi"][letter])
+        fields["ANSWER"] = q["answer"]
+        blocks.setdefault((UNTAGGED, UNTAGGED), []).append(
+            "=== QUESTION START ===\n" + "\n".join(f"{k}: {v}" for k, v in fields.items()) + "\n=== QUESTION END ===\n"
+        )
+
+    files = []
+    for (subject, topic), entries in blocks.items():
+        path = os.path.join(work, "RRB_JE_Mixed_Untagged.txt")
+        with open(path, "w", encoding="utf-8") as fh:
+            fh.write("\n".join(entries))
+        files.append(path)
+    if not files:
+        top_reasons = ", ".join(f"{k} {v}" for k, v in skip.most_common(5))
+        raise RuntimeError(f"RRB JE PDF से bilingual + answer-key QA पास करने वाला सवाल नहीं मिला. Extracted={data['question_count']}; skipped: {top_reasons}")
+    return dict(src=src, title=title, files=files, skip=dict(skip))
+
+
+def paper_to_txt(pdf, work, source_name=None, source_title=None, source_url=None):
+    hint = " ".join(x for x in [source_name or "", source_title or "", source_url or ""] if x)
+    if re.search(r"\bRRB\b|Railway Recruitment Board", hint, re.I):
+        return rrb_je_paper_to_txt(pdf, work, source_name, source_title, source_url)
     js = os.path.join(work, 'paper.json')
     r = subprocess.run(
         [sys.executable, '-I', os.path.join(V2, 'extract.py'), pdf, js],
@@ -117,16 +292,20 @@ def paper_to_txt(pdf, work):
         text=True
     )
     if r.returncode:
-        raise RuntimeError('PDF का format नहीं पहचाना (शायद SSC response sheet नहीं है): ' + (r.stderr.strip().splitlines() or ['?'])[-1][:200])
+        reason = 'PDF का format नहीं पहचाना (शायद SSC response sheet नहीं है): ' + (r.stderr.strip().splitlines() or ['?'])[-1][:200]
+        return rrb_je_paper_to_txt(pdf, work, source_name, source_title, source_url, original_error=reason)
 
-    subprocess.run([sys.executable, '-I', os.path.join(V2, 'gaps.py'), pdf, js], check=True, capture_output=True)
+    try:
+        subprocess.run([sys.executable, '-I', os.path.join(V2, 'gaps.py'), pdf, js], check=True, capture_output=True)
+    except subprocess.CalledProcessError:
+        return rrb_je_paper_to_txt(pdf, work, source_name, source_title, source_url, original_error='SSC PDF gap detection failed; generic fallback unavailable')
     d = json.load(open(js, encoding='utf-8'))
     h = d['header']
     m = re.search(r'(?:(\d{4})\s+)?(Civil|Electrical|Mechanical)', h.get('subject') or '')
     year = (m and m.group(1)) or h.get('exam_year')
     sh = shift_of(h.get('time'))
     if not (m and year and h.get('date') and sh):
-        raise RuntimeError(f'Paper header अधूरा: {h}')
+        return rrb_je_paper_to_txt(pdf, work, source_name, source_title, source_url, original_error=f'Paper header अधूरा: {h}')
     branch = m.group(2)
     alltext = ' '.join(q['text'] for q in d['questions'])
     if len(re.findall(r'\b(?:t he|t o|o f|io n|at io|ent ly)\b', alltext)) > 30:
@@ -188,6 +367,21 @@ def paper_to_txt(pdf, work):
 
     return dict(src=src, title=f'SSC JE {year} {branch} · {shift}', files=files, skip=skip)
 
+def assert_bilingual_txt(text, filename="input.txt"):
+    """Do not let ImportEngine silently duplicate English into missing Hindi fields."""
+    blocks = re.findall(r"=== QUESTION START ===(.*?)=== QUESTION END ===", text, re.S)
+    if not blocks:
+        raise RuntimeError(f"{filename}: कोई question block नहीं मिला")
+    required = ["QUESTION_EN", "QUESTION_HI"] + [f"{letter}_{lang}" for letter in "ABCD" for lang in ("EN", "HI")]
+    bad = []
+    for index, block in enumerate(blocks, 1):
+        missing = [field for field in required if not re.search(rf"(?m)^{re.escape(field)}:\s*\S", block)]
+        if missing:
+            bad.append(f"Q{index}: {','.join(missing)}")
+    if bad:
+        raise RuntimeError(f"{filename}: bilingual gate ने {len(bad)}/{len(blocks)} सवाल रोके; English को Hindi की जगह duplicate नहीं किया जाएगा. " + "; ".join(bad[:4]))
+
+
 def analyze(files):
     """Run the app's own ImportEngine (built index.html) -> server rows, exactly like Admin Studio."""
     from playwright.sync_api import sync_playwright
@@ -202,11 +396,12 @@ def analyze(files):
         for f in files:
             with open(f, encoding='utf-8') as fh:
                 t = fh.read()
+            assert_bilingual_txt(t, os.path.basename(f))
             r = pg.evaluate(
                 """async ([t,name])=>{
                     AppModules=[];
                     const a=await ImportEngine.analyzeTxt(new File([t],name),'',{});
-                    if(!a.commitReady) return {ok:false, errors:a.validationErrors};
+                    if(!a.commitReady) return {ok:false, errors:a.validationErrors, duplicates:a.duplicateBatch, external:a.duplicateExternal, total:a.totalQuestions};
                     const mod=studioModFromAnalysis(a); const rows=[], probs=[];
                     a.questions.forEach(q=>{const r=srvQuestionRow(q,mod); if(r.problems.length) probs.push([q.originalQNo,r.problems]); else rows.push(r.row);});
                     const exams={}; [srvTopicRow(mod).exam_id,...rows.map(r=>r.exam_id)].filter(Boolean).forEach(e=>{exams[e]=srvExamRow(e,a.questions[0].metadata.exam)});
@@ -215,7 +410,8 @@ def analyze(files):
                 [t, os.path.basename(f)]
             )
             if not r['ok']:
-                raise RuntimeError(f'ऐप ने file नहीं माना {os.path.basename(f)}: {str(r["errors"])[:300]}')
+                detail = {'errors': r.get('errors'), 'duplicates': r.get('duplicates'), 'external': r.get('external'), 'total': r.get('total')}
+                raise RuntimeError(f'ऐप ने file नहीं माना {os.path.basename(f)}: {str(detail)[:500]}')
             if r['probs']:
                 raise RuntimeError(f'सवालों में कमी: {str(r["probs"])[:300]}')
             out['topics'][r['topic']['id']] = r['topic']
@@ -316,21 +512,9 @@ def main(argv):
                     'Accept': 'application/pdf,*/*;q=0.8',
                     'Accept-Language': 'en-IN,en;q=0.9,hi;q=0.8'
                 }
-                safe_download_file(
-                    url,
-                    pdf,
-                    headers=headers,
-                    timeout=120,
-                    retries=3,
-                    backoff_factor=0.5,
-                    debug=(os.environ.get('DEBUG_PYQ') == '1')
-                )
-
-                with open(pdf, 'rb') as fh:
-                    if fh.read(5) != b'%PDF-':
-                        raise RuntimeError('यह link PDF नहीं देता')
-
-                paper = paper_to_txt(pdf, work)
+                source_name = urllib.parse.urlsplit(url).path.rsplit('/', 1)[-1] or 'paper.pdf'
+                page_title = download_pdf_or_page(url, pdf, headers)
+                paper = paper_to_txt(pdf, work, source_name=source_name, source_title=page_title, source_url=url)
                 paper['url'] = ('upload:' + url.split('?')[0].rsplit('/', 1)[-1]) if '/object/sign/' in url else url
                 say(f"- Paper: **{paper['title']}**")
 
