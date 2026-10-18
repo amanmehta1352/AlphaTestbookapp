@@ -226,12 +226,12 @@ function cloudHomePrompt() {
   const v = document.getElementById('mainView'); if (!v) return;
   const syncCard = v.querySelector('.cl-sync-prompt');
   if (ServerState.session) {
-    const needsHelp = CloudState.isAdmin !== true && (CloudState.msgKind === 'bad' ||
+    const needsHelp = CloudState.isAdmin !== true && (['bad', 'warn'].includes(CloudState.msgKind) ||
       (CloudState.isAdmin === false && !!CloudState.lastSyncAt && Number(CloudState.serverQuestions || 0) === 0));
     if (!needsHelp) { syncCard?.remove(); return; }
     const hasFilteredOutQuestions = Number(CloudState.serverQuestionsAll || 0) > 0 && Number(CloudState.serverQuestions || 0) === 0;
     const title = CloudState.busy ? 'सवाल sync हो रहे हैं…' : 'सवाल लोड नहीं हुए';
-    const detail = CloudState.msgKind === 'bad'
+    const detail = ['bad', 'warn'].includes(CloudState.msgKind)
       ? (CloudState.msg || 'Server से सवाल लाने में समस्या हुई।')
       : hasFilteredOutQuestions
         ? 'आपके चुने exam/branch में सवाल नहीं मिले। अपना exam और branch जाँचें।'
