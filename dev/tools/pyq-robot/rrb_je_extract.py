@@ -520,7 +520,7 @@ def main(argv: list[str]) -> int:
         return 2
     src, out = Path(argv[1]), Path(argv[2])
     try:
-        result = parse_text(pdf_text(src), src.name)
+        result = parse_pdf(src, src.name)
     except (OSError, subprocess.CalledProcessError) as exc:
         print(f"PDF extraction failed: {exc}", file=sys.stderr)
         return 1
