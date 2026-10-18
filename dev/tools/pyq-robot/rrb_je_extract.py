@@ -36,7 +36,7 @@ def ocr_pdf_text(path: Path) -> str:
     with tempfile.TemporaryDirectory(prefix="rrb-je-ocr-") as td:
         prefix = Path(td) / "page"
         subprocess.run(
-            ["pdftoppm", "-png", "-r", "160", str(path), str(prefix)],
+            ["pdftoppm", "-png", "-r", "250", str(path), str(prefix)],
             capture_output=True, text=True, check=True, timeout=300,
         )
         pages = sorted(Path(td).glob("page-*.png"), key=lambda p: int(re.search(r"-(\d+)\.png$", p.name).group(1)))
