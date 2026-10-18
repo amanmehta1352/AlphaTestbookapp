@@ -386,7 +386,7 @@ def analyze(files):
                 """async ([t,name])=>{
                     AppModules=[];
                     const a=await ImportEngine.analyzeTxt(new File([t],name),'',{});
-                    if(!a.commitReady) return {ok:false, errors:a.validationErrors};
+                    if(!a.commitReady) return {ok:false, errors:a.validationErrors, duplicates:a.duplicateBatch, external:a.duplicateExternal, total:a.totalQuestions};
                     const mod=studioModFromAnalysis(a); const rows=[], probs=[];
                     a.questions.forEach(q=>{const r=srvQuestionRow(q,mod); if(r.problems.length) probs.push([q.originalQNo,r.problems]); else rows.push(r.row);});
                     const exams={}; [srvTopicRow(mod).exam_id,...rows.map(r=>r.exam_id)].filter(Boolean).forEach(e=>{exams[e]=srvExamRow(e,a.questions[0].metadata.exam)});
@@ -395,7 +395,8 @@ def analyze(files):
                 [t, os.path.basename(f)]
             )
             if not r['ok']:
-                raise RuntimeError(f'ऐप ने file नहीं माना {os.path.basename(f)}: {str(r["errors"])[:300]}')
+                detail = {'errors': r.get('errors'), 'duplicates': r.get('duplicates'), 'external': r.get('external'), 'total': r.get('total')}
+                raise RuntimeError(f'ऐप ने file नहीं माना {os.path.basename(f)}: {str(detail)[:500]}')
             if r['probs']:
                 raise RuntimeError(f'सवालों में कमी: {str(r["probs"])[:300]}')
             out['topics'][r['topic']['id']] = r['topic']
