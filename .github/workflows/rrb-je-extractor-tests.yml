@@ -22,7 +22,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install PDF text extraction dependency
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils tesseract-ocr tesseract-ocr-hin
       - name: Run parser unit tests
         working-directory: dev/tools/pyq-robot
         run: python -m unittest -v test_rrb_je_extract.py
