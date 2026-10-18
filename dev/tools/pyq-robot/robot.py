@@ -221,6 +221,23 @@ def pdf_metadata_title(pdf):
         return ""
 
 
+def rrb_subject_from_branch(branch):
+    """Route branch-specific RRB JE CBT-2 papers to existing subject IDs.
+
+    CBT-1/common papers often have no engineering branch in the PDF header;
+    keep those in Mixed instead of guessing from a URL or question text.
+    """
+    value = re.sub(r"\s+", " ", str(branch or "").strip()).lower()
+    mapping = {
+        "civil": "Civil-Engineering",
+        "civil engineering": "Civil-Engineering",
+        "electrical": "Electrical-Engineering",
+        "electrical engineering": "Electrical-Engineering",
+        "mechanical": "Mechanical-Engineering",
+        "mechanical engineering": "Mechanical-Engineering",
+    }
+    return mapping.get(value, "Mixed")
+
 def bilingual_paper_to_txt(pdf, work, source_name, source_title, source_url, original_error=None):
     """Convert a bilingual RRB JE CBT paper to ImportEngine TXT; uncertain questions stay out."""
     from rrb_je_extract import parse_pdf_sources
@@ -266,6 +283,7 @@ def bilingual_paper_to_txt(pdf, work, source_name, source_title, source_url, ori
     src = f"{exam_name} {year} {shift} · {source_title or source_name or 'CBT paper'} · bilingual answer-key PDF"[:220]
     title = f"{exam_name} {year} · {shift}"
     blocks, skip = {}, Counter()
+    subject = rrb_subject_from_branch(data.get("branch"))
     seen_question_numbers, seen_fingerprints = set(), set()
     def fingerprint_text(value):
         # Match ImportEngine.importNormText exactly: NFKC, lowercase, collapse whitespace.
@@ -301,7 +319,7 @@ def bilingual_paper_to_txt(pdf, work, source_name, source_title, source_url, ori
             "EXAM_NAME": exam_name,
             "YEAR": year,
             "SHIFT": shift,
-            "SUBJECT": "Mixed",
+            "SUBJECT": subject,
             "CHAPTER": UNTAGGED,
             "TOPIC": UNTAGGED,
             "SOURCE_TYPE": "PYQ",
@@ -312,13 +330,13 @@ def bilingual_paper_to_txt(pdf, work, source_name, source_title, source_url, ori
             fields[letter + "_EN"] = fix(q["options_en"][letter])
             fields[letter + "_HI"] = fix(q["options_hi"][letter])
         fields["ANSWER"] = q["answer"]
-        blocks.setdefault(("Mixed", UNTAGGED), []).append(
+        blocks.setdefault((subject, UNTAGGED), []).append(
             "=== QUESTION START ===\n" + "\n".join(f"{k}: {v}" for k, v in fields.items()) + "\n=== QUESTION END ===\n"
         )
 
     files = []
     for (subject, topic), entries in blocks.items():
-        path = os.path.join(work, "RRB_JE_Mixed_Untagged.txt")
+        path = os.path.join(work, f"RRB_JE_{subject}_Untagged.txt")
         with open(path, "w", encoding="utf-8") as fh:
             fh.write("\n".join(entries))
         files.append(path)
