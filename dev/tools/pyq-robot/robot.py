@@ -227,7 +227,12 @@ def bilingual_paper_to_txt(pdf, work, source_name, source_title, source_url, ori
 
     text = rrb_pdf_text(Path(pdf))
     title_hint = " ".join(x for x in [source_name or "", source_title or "", source_url or "", pdf_metadata_title(pdf)] if x)
-    exam_name = detect_exam_name(title_hint)
+    header_text = text.split("Question No.", 1)[0][:3000]
+    exam_name = detect_exam_name(title_hint + " " + header_text)
+    if not exam_name:
+        explicit_exam = re.search(r"(?mi)^\s*(?:exam name|exam title|paper name|test name)\s*[:\-]\s*(.{2,80})$", text[:6000])
+        if explicit_exam:
+            exam_name = detect_exam_name(explicit_exam.group(1))
     if not exam_name:
         if original_error:
             raise RuntimeError(original_error)
