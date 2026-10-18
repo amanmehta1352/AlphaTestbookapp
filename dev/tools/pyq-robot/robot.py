@@ -407,7 +407,14 @@ def paper_to_txt(pdf, work, source_name=None, source_title=None, source_url=None
             f.write('\n'.join(b))
         files.append(p)
 
-    return dict(src=src, title=f'SSC JE {year} {branch} · {shift}', files=files, skip=skip)
+    result = dict(src=src, title=f'SSC JE {year} {branch} · {shift}', files=files, skip=skip)
+    try:
+        for path in files:
+            with open(path, encoding="utf-8") as fh:
+                assert_bilingual_txt(fh.read(), os.path.basename(path))
+    except RuntimeError as exc:
+        return bilingual_paper_to_txt(pdf, work, source_name, source_title, source_url, original_error=str(exc))
+    return result
 
 def assert_bilingual_txt(text, filename="input.txt"):
     """Do not let ImportEngine silently duplicate English into missing Hindi fields."""
