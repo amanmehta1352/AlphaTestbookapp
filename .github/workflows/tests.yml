@@ -1,8 +1,10 @@
-# ✅ Auto-tests — every push to main runs all test suites (dev/tests/run_all.sh). Red = something broke.
+# ✅ Auto-tests — every push to main and pull request runs all test suites (dev/tests/run_all.sh). Red = something broke.
 name: Tests
 on:
   push:
     branches: [main]
+    paths-ignore: ['**.md']
+  pull_request:
     paths-ignore: ['**.md']
   workflow_dispatch:
 permissions:
