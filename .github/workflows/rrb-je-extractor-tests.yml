@@ -1,0 +1,28 @@
+name: RRB JE Extractor Tests
+
+on:
+  pull_request:
+    paths:
+      - "dev/tools/pyq-robot/rrb_je_extract.py"
+      - "dev/tools/pyq-robot/test_rrb_je_extract.py"
+      - ".github/workflows/rrb-je-extractor-tests.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install PDF text extraction dependency
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+      - name: Run parser unit tests
+        working-directory: dev/tools/pyq-robot
+        run: python -m unittest -v test_rrb_je_extract.py
