@@ -1,5 +1,5 @@
 # 🔑 Key-check Robot — checks answers of questions on the server. READ-ONLY: never changes a question.
-# Runs automatically after every "PYQ Robot" run (draft questions), or by hand: Actions → Key-check Robot → Run workflow.
+# Runs automatically after a successful real PYQ import (draft questions; never after Dry Run), or by hand.
 # Needs repo secret SUPABASE_SECRET_KEY. Optional free "second opinion": repo secret GEMINI_API_KEY (Google AI Studio, free tier).
 name: Key-check Robot
 on:
