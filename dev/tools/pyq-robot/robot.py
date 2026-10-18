@@ -19,6 +19,7 @@ from collections import Counter
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.abspath(os.path.join(HERE, '..', '..', '..'))
 V2 = os.path.join(REPO, 'dev', 'tools', 'pyq-from-response-sheet', 'v2')
+sys.path.insert(0, REPO)
 sys.path.insert(0, V2)
 sys.path.insert(0, HERE)
 
