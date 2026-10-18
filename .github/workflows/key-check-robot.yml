@@ -51,7 +51,7 @@ jobs:
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           SCOPE: ${{ inputs.scope || 'draft' }}
-          USE_GEMINI: ${{ github.event_name == 'workflow_dispatch' && inputs.gemini || 'true' }}
+          USE_GEMINI: ${{ github.event_name == 'workflow_run' || inputs.gemini }}
           LIMIT: ${{ inputs.limit || '150' }}
           OFFSET: ${{ inputs.offset || '0' }}
           KEYCHECK_REPORT: ${{ runner.temp }}/keycheck-report.json
