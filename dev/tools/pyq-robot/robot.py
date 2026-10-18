@@ -222,8 +222,9 @@ def rrb_je_paper_to_txt(pdf, work, source_name, source_title, source_url, origin
     blocks, skip = {}, Counter()
     seen_question_numbers, seen_fingerprints = set(), set()
     def fingerprint_text(value):
+        # Match ImportEngine.importNormText exactly: NFKC, lowercase, collapse whitespace.
         value = unicodedata.normalize("NFKC", str(value or "")).lower()
-        return " ".join(re.sub(r"[^\w]+", " ", value, flags=re.UNICODE).replace("_", " ").split())
+        return " ".join(value.split())
     for q in data["questions"]:
         reasons = q.get("review_reasons") or []
         if q.get("status") != "EXTRACTED":
