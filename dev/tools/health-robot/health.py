@@ -552,7 +552,7 @@ def evaluate(s):
         add('db-up', 'Server', 'ok', f"Server चालू · {q['live']} सवाल live · {sb.get('ms')} ms")
         if q['broken_live']: add('q-broken', 'सवाल', 'bad', f"{q['broken_live']} live सवाल अधूरे/टूटे (answer, option या text)", 'Control Room → सवाल → "टूटे" → Hide करो या Claude से ठीक कराओ')
         if q.get('dup_options_live'): add('q-dupopt', 'सवाल', 'warn', f"{q['dup_options_live']} live सवालों में दो options एक जैसे", 'Control Room → सवाल → "Options एक जैसे" देखो')
-        if q['draft'] + q['reviewed']: add('q-pending', 'सवाल', 'warn', f"{q['draft'] + q['reviewed']} सवाल publish का इंतज़ार कर रहे", 'Control Room → Publish queue', SITE + 'control/#publish')
+        if q['draft'] + q['reviewed']: add('q-pending', 'सवाल', 'warn', f"{q['draft'] + q['reviewed']} सवाल Draft/Review में हैं — अभी publish नहीं हुए; manual review बाकी", 'Control Room → Publish queue में review करें; publish केवल आपके निर्णय पर', SITE + 'control/#publish')
         if q['untagged_live']: add('q-untagged', 'सवाल', 'warn', f"{q['untagged_live']} live सवाल अभी 'Mixed' में (chapter नहीं)", 'Tag Robot चलाओ या Claude को बोलो')
         if q['no_hindi_live'] > 50: add('q-hindi', 'सवाल', 'warn', f"{q['no_hindi_live']} live सवालों में Hindi नहीं", 'Hindi Robot चलाओ')
         if st.get('robots.paused') is True: add('paused', 'Control', 'warn', 'सारे robots रुके हुए हैं (Global pause)', 'Control Room → Emergency → Resume')
