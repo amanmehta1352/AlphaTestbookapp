@@ -491,20 +491,27 @@ def merge_parsed_sources(embedded_data: dict, ocr_data: dict, prefer_ocr_hindi: 
     return result
 
 
-def parse_pdf(path: Path, source_name: str) -> dict:
+def parse_pdf_sources(path: Path, source_name: str) -> tuple[dict, str]:
     sources = pdf_text_sources(path)
     embedded = sources.get("embedded", "")
     ocr = sources.get("ocr", "")
+    selected_text = ocr if _prefer_ocr(sources) else embedded
     embedded_data = parse_text(embedded, source_name) if embedded.strip() else parse_text("", source_name)
     if not ocr.strip():
-        return merge_parsed_sources(embedded_data, {}, sources.get("embedded_hindi_broken", False))
+        data = merge_parsed_sources(embedded_data, {}, sources.get("embedded_hindi_broken", False))
+        return data, selected_text
     ocr_data = parse_text(ocr, source_name)
-    return merge_parsed_sources(
+    data = merge_parsed_sources(
         embedded_data,
         ocr_data,
         prefer_ocr_hindi=sources.get("embedded_hindi_broken", False),
         ocr_only=not embedded.strip(),
     )
+    return data, selected_text
+
+
+def parse_pdf(path: Path, source_name: str) -> dict:
+    return parse_pdf_sources(path, source_name)[0]
 
 
 def main(argv: list[str]) -> int:
