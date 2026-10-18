@@ -362,6 +362,151 @@ def parse_text(text: str, source_name: str) -> dict:
     }
 
 
+def _has_hindi(value: str) -> bool:
+    return bool(re.search(r"[\u0900-\u097F]", str(value or "")))
+
+
+def _has_english(value: str) -> bool:
+    return bool(re.search(r"[A-Za-z]{2,}", str(value or "")))
+
+
+def _starts_with_broken_hindi_mark(value: str) -> bool:
+    return bool(re.search(r"(?m)^\s*[\u093E-\u094D]", str(value or "")))
+
+
+def _best_english(primary: str, secondary: str) -> str:
+    if _has_english(primary):
+        return primary
+    if _has_english(secondary):
+        return secondary
+    return primary or secondary or ""
+
+
+def _best_hindi(primary: str, secondary: str, prefer_secondary: bool) -> str:
+    p_good = bool(primary.strip()) and not _starts_with_broken_hindi_mark(primary)
+    s_good = bool(secondary.strip()) and not _starts_with_broken_hindi_mark(secondary)
+    if prefer_secondary and s_good and (_has_hindi(secondary) or not _has_english(secondary)):
+        return secondary
+    if p_good and (_has_hindi(primary) or not _has_english(primary)):
+        return primary
+    if s_good and (_has_hindi(secondary) or not _has_english(secondary)):
+        return secondary
+    return secondary or primary or ""
+
+
+def merge_parsed_sources(embedded_data: dict, ocr_data: dict, prefer_ocr_hindi: bool, ocr_only: bool = False) -> dict:
+    embedded_questions = embedded_data.get("questions", [])
+    ocr_questions = ocr_data.get("questions", [])
+    if not embedded_questions:
+        result = dict(ocr_data)
+        if ocr_only:
+            for q in result.get("questions", []):
+                q["review_reasons"] = list(dict.fromkeys((q.get("review_reasons") or []) + ["ocr_only_source_review"]))
+                q["status"] = "REVIEW_REQUIRED"
+            result["ready_for_import_count"] = 0
+            result["review_required_count"] = len(result.get("questions", []))
+        return result
+    if not ocr_questions:
+        result = dict(embedded_data)
+        if prefer_ocr_hindi:
+            for q in result.get("questions", []):
+                q["review_reasons"] = list(dict.fromkeys((q.get("review_reasons") or []) + ["hindi_text_quality_review"]))
+                q["status"] = "REVIEW_REQUIRED"
+            result["ready_for_import_count"] = 0
+            result["review_required_count"] = len(result.get("questions", []))
+        return result
+
+    ocr_by_no = {q.get("source_question_no"): q for q in ocr_questions}
+    overlap = sum(1 for q in embedded_questions if q.get("source_question_no") in ocr_by_no)
+    minimum_overlap = max(1, int(len(embedded_questions) * 0.8))
+    if overlap < minimum_overlap:
+        result = dict(embedded_data)
+        if prefer_ocr_hindi:
+            for q in result.get("questions", []):
+                q["review_reasons"] = list(dict.fromkeys((q.get("review_reasons") or []) + ["hindi_text_quality_review"]))
+                q["status"] = "REVIEW_REQUIRED"
+            result["ready_for_import_count"] = 0
+            result["review_required_count"] = len(result.get("questions", []))
+        return result
+
+    merged_questions = []
+    for original in embedded_questions:
+        scanned = ocr_by_no.get(original.get("source_question_no"), {})
+        q = dict(original)
+        q["question_en"] = _best_english(original.get("question_en", ""), scanned.get("question_en", ""))
+        q["question_hi"] = _best_hindi(original.get("question_hi", ""), scanned.get("question_hi", ""), prefer_ocr_hindi)
+
+        opts_en, opts_hi = {}, {}
+        original_en = original.get("options_en", {})
+        original_hi = original.get("options_hi", {})
+        scanned_en = scanned.get("options_en", {})
+        scanned_hi = scanned.get("options_hi", {})
+        for label in "ABCD":
+            opts_en[label] = _best_english(original_en.get(label, ""), scanned_en.get(label, ""))
+            opts_hi[label] = _best_hindi(original_hi.get(label, ""), scanned_hi.get(label, ""), prefer_ocr_hindi)
+        q["options_en"], q["options_hi"] = opts_en, opts_hi
+
+        dropped = bool(original.get("_answer_key_note")) or "answer_key_unavailable_or_dropped" in (original.get("review_reasons") or [])
+        embedded_answer = original.get("answer") if original.get("answer") in set("ABCD") else None
+        ocr_answer = scanned.get("answer") if scanned.get("answer") in set("ABCD") else None
+        answer_conflict = bool(embedded_answer and ocr_answer and embedded_answer != ocr_answer)
+        q["answer"] = None if dropped else (embedded_answer or ocr_answer)
+
+        reasons = []
+        if dropped:
+            reasons.append("answer_key_unavailable_or_dropped")
+        elif not q["answer"]:
+            reasons.append("official_answer_not_found")
+        if answer_conflict:
+            reasons.append("answer_key_ocr_disagreement")
+        if not q.get("question", "").strip():
+            reasons.append("missing_question_text")
+        if not q.get("question_en", "").strip() or not q.get("question_hi", "").strip():
+            reasons.append("bilingual_question_missing_language")
+        if any(not opts_en.get(k, "").strip() or not opts_hi.get(k, "").strip() for k in "ABCD"):
+            reasons.append("bilingual_options_missing_language")
+        if _starts_with_broken_hindi_mark(q.get("question_hi", "")):
+            reasons.append("hindi_text_encoding_suspect")
+        if prefer_ocr_hindi and not _has_hindi(q.get("question_hi", "")) and _has_english(q.get("question_hi", "")):
+            reasons.append("hindi_text_quality_review")
+        if not embedded_data.get("branch") and any("branch_not_detected_from_header" in (src.get("review_reasons") or []) for src in (original, scanned)):
+            reasons.append("branch_not_detected_from_header")
+        if not embedded_data.get("year"):
+            reasons.append("year_not_detected_from_header")
+
+        q["review_reasons"] = list(dict.fromkeys(reasons))
+        q["status"] = "REVIEW_REQUIRED" if q["review_reasons"] else "EXTRACTED"
+        merged_questions.append(q)
+
+    result = dict(embedded_data)
+    result["branch"] = embedded_data.get("branch") or ocr_data.get("branch")
+    result["year"] = embedded_data.get("year") or ocr_data.get("year")
+    result["source_text_has_hindi"] = embedded_data.get("source_text_has_hindi", False) or ocr_data.get("source_text_has_hindi", False)
+    result["source_text_has_english"] = embedded_data.get("source_text_has_english", False) or ocr_data.get("source_text_has_english", False)
+    result["questions"] = merged_questions
+    result["question_count"] = len(merged_questions)
+    result["ready_for_import_count"] = sum(q["status"] == "EXTRACTED" for q in merged_questions)
+    result["review_required_count"] = sum(q["status"] != "EXTRACTED" for q in merged_questions)
+    result["notes"] = list(result.get("notes", [])) + ["Embedded text answer keys were merged with OCR-derived Hindi/English fields when question-number overlap was sufficient."]
+    return result
+
+
+def parse_pdf(path: Path, source_name: str) -> dict:
+    sources = pdf_text_sources(path)
+    embedded = sources.get("embedded", "")
+    ocr = sources.get("ocr", "")
+    embedded_data = parse_text(embedded, source_name) if embedded.strip() else parse_text("", source_name)
+    if not ocr.strip():
+        return merge_parsed_sources(embedded_data, {}, sources.get("embedded_hindi_broken", False))
+    ocr_data = parse_text(ocr, source_name)
+    return merge_parsed_sources(
+        embedded_data,
+        ocr_data,
+        prefer_ocr_hindi=sources.get("embedded_hindi_broken", False) and _prefer_ocr(sources),
+        ocr_only=not embedded.strip(),
+    )
+
+
 def main(argv: list[str]) -> int:
     if len(argv) != 3:
         print(__doc__.strip(), file=sys.stderr)
