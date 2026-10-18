@@ -22,7 +22,7 @@ jobs:
       - name: Install
         run: |
           ls /usr/lib/postgresql/16/bin/initdb || (sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-16)
-          pip install -q playwright pdfplumber scikit-learn pyyaml
+          pip install -q playwright pdfplumber requests scikit-learn pyyaml
           python -m playwright install --with-deps chromium
       - name: Run all suites
         env:
