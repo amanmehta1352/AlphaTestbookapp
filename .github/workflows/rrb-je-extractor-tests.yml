@@ -5,6 +5,8 @@ on:
     paths:
       - "dev/tools/pyq-robot/rrb_je_extract.py"
       - "dev/tools/pyq-robot/test_rrb_je_extract.py"
+      - "dev/tools/pyq-robot/robot.py"
+      - "dev/tests/test_pyq_robot_cli.py"
       - ".github/workflows/rrb-je-extractor-tests.yml"
   workflow_dispatch:
 
@@ -23,6 +25,10 @@ jobs:
           python-version: "3.12"
       - name: Install PDF text extraction dependency
         run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+      - name: Install robot dependency
+        run: python -m pip install requests
       - name: Run parser unit tests
         working-directory: dev/tools/pyq-robot
         run: python -m unittest -v test_rrb_je_extract.py
+      - name: Run PYQ robot CLI regression tests
+        run: python -m unittest -v dev.tests.test_pyq_robot_cli
