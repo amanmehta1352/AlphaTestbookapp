@@ -181,23 +181,64 @@ def download_pdf_or_page(url, pdf, headers):
     raise RuntimeError("Webpage मिली, लेकिन उसमें downloadable PDF नहीं मिला" + detail)
 
 
-def rrb_je_paper_to_txt(pdf, work, source_name, source_title, source_url, original_error=None):
+def detect_exam_name(hint):
+    """Recognize common competitive-exam labels from the document URL/title, not question text."""
+    value = str(hint or "").lower()
+    patterns = [
+        (r"\brrb[\s_-]*je\b|railway recruitment board.{0,40}junior engineer", "RRB JE"),
+        (r"\brrb[\s_-]*ntpc\b", "RRB NTPC"),
+        (r"\brrb[\s_-]*group[\s_-]*d\b", "RRB Group D"),
+        (r"\brrb[\s_-]*alp\b", "RRB ALP"),
+        (r"\bssc[\s_-]*je\b|staff selection commission.{0,40}junior engineer", "SSC JE"),
+        (r"\bssc[\s_-]*cgl\b", "SSC CGL"),
+        (r"\bssc[\s_-]*chsl\b", "SSC CHSL"),
+        (r"\bssc[\s_-]*gd\b", "SSC GD"),
+        (r"\bugc[\s_-]*net\b", "UGC NET"),
+        (r"\bupsc\b", "UPSC"),
+        (r"\bnda\b", "NDA"),
+        (r"\bcds\b", "CDS"),
+        (r"\bctet\b", "CTET"),
+        (r"\bdsssb\b", "DSSSB"),
+        (r"\bhssc\b", "HSSC"),
+        (r"\bup[\s_-]*police\b", "UP Police"),
+        (r"\bisro\b", "ISRO"),
+        (r"\bbhel\b", "BHEL"),
+        (r"\bdrdo\b", "DRDO"),
+        (r"\bgate\b", "GATE"),
+    ]
+    for pattern, name in patterns:
+        if re.search(pattern, value, re.I):
+            return name
+    return None
+
+
+def pdf_metadata_title(pdf):
+    try:
+        result = subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True, timeout=20)
+        match = re.search(r"(?m)^Title:\s*(.+?)\s*$", result.stdout)
+        return match.group(1).strip() if match else ""
+    except (OSError, subprocess.SubprocessError):
+        return ""
+
+
+def bilingual_paper_to_txt(pdf, work, source_name, source_title, source_url, original_error=None):
     """Convert a bilingual RRB JE CBT paper to ImportEngine TXT; uncertain questions stay out."""
     from rrb_je_extract import parse_text, pdf_text as rrb_pdf_text
 
     text = rrb_pdf_text(Path(pdf))
-    title_hint = " ".join(x for x in [source_name or "", source_title or "", source_url or ""] if x)
-    if not re.search(r"\bRRB\b|Railway Recruitment Board", title_hint, re.I):
+    title_hint = " ".join(x for x in [source_name or "", source_title or "", source_url or "", pdf_metadata_title(pdf)] if x)
+    exam_name = detect_exam_name(title_hint)
+    if not exam_name:
         if original_error:
             raise RuntimeError(original_error)
-        raise RuntimeError("PDF RRB JE जैसा है, लेकिन exam title नहीं मिला; document page/title वाला link दें")
+        raise RuntimeError("Exam name नहीं मिला; ऐसा PDF/document-page link दें जिसके title या filename में exam का नाम हो")
     data = parse_text(text, source_name or os.path.basename(pdf))
     if not data.get("question_count"):
-        raise RuntimeError("RRB JE PDF से कोई numbered question नहीं निकला")
+        raise RuntimeError(f"{exam_name} PDF से कोई numbered question नहीं निकला")
 
     year = data.get("year") or (re.search(r"\b(20\d{2})\b", title_hint) or [None, None])[1]
     if not year:
-        raise RuntimeError("RRB JE PDF में year नहीं मिला; import रोक दिया")
+        raise RuntimeError(f"{exam_name} PDF में year नहीं मिला; import रोक दिया")
     date_match = re.search(r"Exam Date\s*:\s*(\d{2})-(\d{2})-(\d{4})", text[:10000], re.I)
     title_date = re.search(r"\b(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+(20\d{2})\b", title_hint, re.I)
     shift_match = re.search(r"\bshift\s*(\d+)\b", title_hint, re.I)
@@ -217,8 +258,8 @@ def rrb_je_paper_to_txt(pdf, work, source_name, source_title, source_url, origin
     else:
         shift = f"{year} Shift {shift_no}"
 
-    src = f"RRB JE {year} {shift} · {source_title or source_name or 'CBT paper'} · bilingual answer-key PDF"[:220]
-    title = f"RRB JE {year} · {shift}"
+    src = f"{exam_name} {year} {shift} · {source_title or source_name or 'CBT paper'} · bilingual answer-key PDF"[:220]
+    title = f"{exam_name} {year} · {shift}"
     blocks, skip = {}, Counter()
     seen_question_numbers, seen_fingerprints = set(), set()
     def fingerprint_text(value):
@@ -252,7 +293,7 @@ def rrb_je_paper_to_txt(pdf, work, source_name, source_title, source_url, origin
 
         fields = {
             "SOURCE_QUESTION_NO": q["source_question_no"],
-            "EXAM_NAME": "RRB JE",
+            "EXAM_NAME": exam_name,
             "YEAR": year,
             "SHIFT": shift,
             "SUBJECT": "Mixed",
@@ -278,14 +319,14 @@ def rrb_je_paper_to_txt(pdf, work, source_name, source_title, source_url, origin
         files.append(path)
     if not files:
         top_reasons = ", ".join(f"{k} {v}" for k, v in skip.most_common(5))
-        raise RuntimeError(f"RRB JE PDF से bilingual + answer-key QA पास करने वाला सवाल नहीं मिला. Extracted={data['question_count']}; skipped: {top_reasons}")
+        raise RuntimeError(f"bilingual gate: {exam_name} PDF से bilingual + answer-key QA पास करने वाला सवाल नहीं मिला. Extracted={data['question_count']}; skipped: {top_reasons}")
     return dict(src=src, title=title, files=files, skip=dict(skip))
 
 
 def paper_to_txt(pdf, work, source_name=None, source_title=None, source_url=None):
     hint = " ".join(x for x in [source_name or "", source_title or "", source_url or ""] if x)
     if re.search(r"\bRRB\b|Railway Recruitment Board", hint, re.I):
-        return rrb_je_paper_to_txt(pdf, work, source_name, source_title, source_url)
+        return bilingual_paper_to_txt(pdf, work, source_name, source_title, source_url)
     js = os.path.join(work, 'paper.json')
     r = subprocess.run(
         [sys.executable, '-I', os.path.join(V2, 'extract.py'), pdf, js],
@@ -294,19 +335,19 @@ def paper_to_txt(pdf, work, source_name=None, source_title=None, source_url=None
     )
     if r.returncode:
         reason = 'PDF का format नहीं पहचाना (शायद SSC response sheet नहीं है): ' + (r.stderr.strip().splitlines() or ['?'])[-1][:200]
-        return rrb_je_paper_to_txt(pdf, work, source_name, source_title, source_url, original_error=reason)
+        return bilingual_paper_to_txt(pdf, work, source_name, source_title, source_url, original_error=reason)
 
     try:
         subprocess.run([sys.executable, '-I', os.path.join(V2, 'gaps.py'), pdf, js], check=True, capture_output=True)
     except subprocess.CalledProcessError:
-        return rrb_je_paper_to_txt(pdf, work, source_name, source_title, source_url, original_error='SSC PDF gap detection failed; generic fallback unavailable')
+        return bilingual_paper_to_txt(pdf, work, source_name, source_title, source_url, original_error='SSC PDF gap detection failed; generic fallback unavailable')
     d = json.load(open(js, encoding='utf-8'))
     h = d['header']
     m = re.search(r'(?:(\d{4})\s+)?(Civil|Electrical|Mechanical)', h.get('subject') or '')
     year = (m and m.group(1)) or h.get('exam_year')
     sh = shift_of(h.get('time'))
     if not (m and year and h.get('date') and sh):
-        return rrb_je_paper_to_txt(pdf, work, source_name, source_title, source_url, original_error=f'Paper header अधूरा: {h}')
+        return bilingual_paper_to_txt(pdf, work, source_name, source_title, source_url, original_error=f'Paper header अधूरा: {h}')
     branch = m.group(2)
     alltext = ' '.join(q['text'] for q in d['questions'])
     if len(re.findall(r'\b(?:t he|t o|o f|io n|at io|ent ly)\b', alltext)) > 30:
