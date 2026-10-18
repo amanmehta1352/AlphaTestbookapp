@@ -1,5 +1,5 @@
 # 🏷️ Tag Robot — moves "Mixed (Untagged)" questions into chapters, learning from hand-tagged questions.
-# Runs after every "PYQ Robot" run, or by hand: Actions → Tag Robot → Run workflow. Needs secret SUPABASE_SECRET_KEY.
+# Runs after every successful real PYQ import (never after Dry Run), or by hand. Needs secret SUPABASE_SECRET_KEY.
 name: Tag Robot
 on:
   workflow_dispatch:
