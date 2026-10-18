@@ -15,7 +15,8 @@ import subprocess
 import sys
 from pathlib import Path
 
-QUESTION_START = re.compile(r"^\s*(?:Q(?:uestion)?\s*)?\(?\s*(\d{1,3})\s*[).:]\s*(.*)$", re.I)
+QUESTION_START = re.compile(r"^\s*(?:Question\s+No\.?\s*(?P<qno1>\d{1,3})|(?:Q(?:uestion)?\s*)?\(?\s*(?P<qno2>\d{1,3})\s*[).:])\s*(?P<text>.*)$", re.I)
+INLINE_ANSWER_KEY = re.compile(r"^\s*answer\s+key\s*:\s*([A-D])\b", re.I)
 OPTION_START = re.compile(r"^\s*(?:\(([A-D])\)|([A-D])[).:]|Option\s*([1-4])[).:]?)\s*(.*)$", re.I)
 ANSWER_LINE = re.compile(r"^\s*(?:correct\s+answer|answer\s*(?:key)?|ans)\s*:\s*([A-D1-4])\b", re.I)
 AMBIGUOUS_ANS_OPTIONS = re.compile(r"^\s*ans\s*1[).]\s+", re.I)
@@ -80,6 +81,11 @@ def parse_text(text: str, source_name: str) -> dict:
                     current["_stem"].append("")
             continue
 
+        inline_answer = INLINE_ANSWER_KEY.match(s)
+        if inline_answer and current is not None:
+            current["_explicit_answer"] = inline_answer.group(1).upper()
+            continue
+
         if re.search(r"\b(answer\s*key|correct\s*answers|official\s*answers)\b", s, re.I):
             finish()
             in_answer_key = True
@@ -93,13 +99,13 @@ def parse_text(text: str, source_name: str) -> dict:
 
         qm = QUESTION_START.match(line)
         if qm:
-            qno = int(qm.group(1))
+            qno = int(qm.group("qno1") or qm.group("qno2"))
             # Avoid mistaking answer/section numbering for question starts.
             if current is not None:
                 finish()
             current = {
                 "source_question_no": qno,
-                "_stem": [qm.group(2).strip()] if qm.group(2).strip() else [],
+                "_stem": [qm.group("text").strip()] if qm.group("text").strip() else [],
                 "_options": {},
                 "_last_option": None,
             }
