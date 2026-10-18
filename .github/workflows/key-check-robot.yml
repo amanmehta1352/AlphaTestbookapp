@@ -1,48 +1,81 @@
-# 🔑 Key-check Robot — checks answers of questions on the server. READ-ONLY: never changes a question.
-# Runs automatically after a successful real PYQ import (draft questions; never after Dry Run), or by hand.
-# Needs repo secret SUPABASE_SECRET_KEY. Optional free "second opinion": repo secret GEMINI_API_KEY (Google AI Studio, free tier).
+# 🔑 Key-check Robot — checks answers of questions on the server.
+# READ-ONLY: never changes a question.
+# Runs automatically after a successful real PYQ import (draft questions;
+# never after Dry Run), or manually.
+# Requires repository secret SUPABASE_SECRET_KEY.
+# Optional second opinion: GEMINI_API_KEY.
+
 name: Key-check Robot
+
 on:
   workflow_dispatch:
     inputs:
       scope:
         description: 'कौन से सवाल: draft (नए) / published (live) / all'
-        default: 'draft'
+        type: choice
+        options:
+          - draft
+          - published
+          - all
+        default: draft
+        required: true
+
       gemini:
         description: 'Gemini से दूसरी राय भी लें (मुफ़्त key चाहिए)'
         type: boolean
         default: true
+        required: false
+
       limit:
         description: 'Gemini कितने सवाल जाँचे (free सीमा के लिए)'
+        type: string
         default: '150'
+        required: true
+
       offset:
         description: 'कितने सवाल छोड़कर शुरू करें (अगली बार के लिए)'
+        type: string
         default: '0'
+        required: true
+
   repository_dispatch:
-    types: [pyq-imported]
+    types:
+      - pyq-imported
+
 permissions:
   contents: read
+
 concurrency:
   group: key-check-robot
   cancel-in-progress: false
+
 jobs:
   check:
-    if: github.event_name == 'workflow_dispatch' || github.event_name == 'repository_dispatch'
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'repository_dispatch'
+
     runs-on: ubuntu-latest
     timeout-minutes: 120
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: 🚦 Control Room check (pause / enable)
         id: gate
         env:
           SUPABASE_URL: https://fzkvwkrbtykucjfdqiin.supabase.co
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
         run: python3 dev/tools/ops/opslib.py gate keycheck
-      - uses: actions/setup-python@v5
+
+      - name: Set up Python
         if: steps.gate.outputs.run == 'true'
+        uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Check answers
+
+      - name: Check answers (STRICT MODE)
         if: steps.gate.outputs.run == 'true'
         env:
           OPS_COUNTS: ${{ runner.temp }}/ops_counts.json
@@ -54,19 +87,36 @@ jobs:
           LIMIT: ${{ inputs.limit || '150' }}
           OFFSET: ${{ inputs.offset || '0' }}
           KEYCHECK_REPORT: ${{ runner.temp }}/keycheck-report.json
+
+        shell: bash
         run: |
-          args="--scope $SCOPE --limit $LIMIT --offset $OFFSET"
-          if [ "$USE_GEMINI" = "true" ]; then args="$args --gemini"; fi
-          python3 dev/tools/key-check-robot/keycheck.py $args
-      - uses: actions/upload-artifact@v4
+          set -euo pipefail
+
+          args=(
+            --scope "$SCOPE"
+            --limit "$LIMIT"
+            --offset "$OFFSET"
+            --strict
+          )
+
+          if [[ "$USE_GEMINI" == "true" ]]; then
+            args+=(--gemini)
+          fi
+
+          python3 dev/tools/key-check-robot/keycheck.py "${args[@]}"
+
+      - name: Upload Key-check report
         if: always() && steps.gate.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
         with:
           name: keycheck-report
           path: ${{ runner.temp }}/keycheck-report.json
           if-no-files-found: ignore
+
       - name: 📒 Record run in Control Room
         if: always() && steps.gate.outputs.run == 'true'
         env:
           SUPABASE_URL: https://fzkvwkrbtykucjfdqiin.supabase.co
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
-        run: python3 dev/tools/ops/opslib.py record keycheck "${{ job.status }}" "$RUNNER_TEMP/ops_counts.json"
+        run: |
+          python3 dev/tools/ops/opslib.py record keycheck "${{ job.status }}"
