@@ -13,6 +13,7 @@ import json
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 QUESTION_START = re.compile(r"^\s*(?:Question\s+No\.?\s*(?P<qno1>\d{1,3})|(?:Q(?:uestion)?\s*)?\(?\s*(?P<qno2>\d{1,3})\s*[).:])\s*(?P<text>.*)$", re.I)
@@ -30,12 +31,47 @@ BRANCHES = {
 }
 
 
+def ocr_pdf_text(path: Path) -> str:
+    """OCR image-only or badly encoded Hindi PDFs using Tesseract English+Hindi."""
+    with tempfile.TemporaryDirectory(prefix="rrb-je-ocr-") as td:
+        prefix = Path(td) / "page"
+        subprocess.run(
+            ["pdftoppm", "-png", "-r", "160", str(path), str(prefix)],
+            capture_output=True, text=True, check=True, timeout=300,
+        )
+        pages = sorted(Path(td).glob("page-*.png"), key=lambda p: int(re.search(r"-(\d+)\.png$", p.name).group(1)))
+        if not pages:
+            raise RuntimeError("PDF pages could not be rendered for OCR")
+        text_pages = []
+        for page in pages:
+            result = subprocess.run(
+                ["tesseract", str(page), "stdout", "-l", "eng+hin", "--psm", "6"],
+                capture_output=True, text=True, check=True, timeout=60,
+            )
+            text_pages.append(result.stdout)
+        return "\n".join(text_pages).replace("\x00", "")
+
+
 def pdf_text(path: Path) -> str:
     p = subprocess.run(
         ["pdftotext", "-layout", str(path), "-"],
         capture_output=True, text=True, check=True,
     )
-    return p.stdout.replace("\x00", "")
+    text = p.stdout.replace("\x00", "")
+    # A dependent Hindi vowel mark at the start of a word/line signals broken
+    # embedded-font mapping; empty text signals a scanned PDF. Prefer OCR in either case.
+    needs_ocr = not text.strip() or not QUESTION_START.search(text) or bool(
+        re.search(r"(?m)^\s*[\u093E-\u094D]", text)
+    )
+    if not needs_ocr:
+        return text
+    try:
+        ocr = ocr_pdf_text(path)
+        if QUESTION_START.search(ocr) and len(ocr.strip()) > len(text.strip()):
+            return ocr
+    except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired, RuntimeError):
+        pass
+    return text
 
 
 def bilingual_body(raw_lines: list[str]) -> dict:
@@ -163,6 +199,8 @@ def parse_text(text: str, source_name: str) -> dict:
             current["review_reasons"].append("ambiguous_answer_format")
         if current.get("_answer_key_note"):
             current["review_reasons"].append("answer_key_unavailable_or_dropped")
+        if re.search(r"(?m)^\s*[\u093E-\u094D]", current.get("question_hi", "")):
+            current["review_reasons"].append("hindi_text_encoding_suspect")
         if not current.get("question_hi") or not current.get("question_en"):
             current["review_reasons"].append("bilingual_question_missing_language")
         if not all(current.get("options_hi", {}).get(k, "").strip() for k in "ABCD") or not all(current.get("options_en", {}).get(k, "").strip() for k in "ABCD"):
