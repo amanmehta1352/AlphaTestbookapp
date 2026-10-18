@@ -38,7 +38,7 @@ jobs:
               raise SystemExit("shards must be an integer from 1 to 8")
           count = int(raw)
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as out:
-              out.write("shards=" + json.dumps(list(range(count))) + "\\n")
+              out.write("shards=" + json.dumps(list(range(count))) + "\n")
           PY
   translate:
     needs: prepare
