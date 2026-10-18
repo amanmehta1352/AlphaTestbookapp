@@ -82,11 +82,18 @@ def parse_text(text: str, source_name: str) -> dict:
                     current["_stem"].append("")
             continue
 
-        inline_answer = INLINE_ANSWER_KEY.match(s)
-        if inline_answer and current is not None:
-            current["_explicit_answer"] = inline_answer.group(1).upper()
+        inline_key_text = re.match(r"^\s*answer\s+key\s*:\s*(.*)$", s, re.I)
+        if inline_key_text and current is not None:
+            inline_answer = INLINE_ANSWER_KEY.match(s)
+            if inline_answer:
+                current["_explicit_answer"] = inline_answer.group(1).upper()
+            else:
+                current["_answer_key_note"] = inline_key_text.group(1).strip()
+            # A dropped/invalid inline key belongs to this question; it is not a
+            # document-level answer-key table and must not stop later questions.
             continue
 
+        if re.fullmatch(r"\s*(?:official\s+)?(?:answer\s*key|correct\s*answers|official\s*answers)\s*", s, re.I):
         if re.search(r"\b(answer\s*key|correct\s*answers|official\s*answers)\b", s, re.I):
             finish()
             in_answer_key = True
