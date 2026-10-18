@@ -12,6 +12,7 @@ permissions:
 
 jobs:
   corpus-stress:
+    if: github.event_name == 'workflow_dispatch' || github.event.action == 'opened'
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
