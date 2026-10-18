@@ -18,6 +18,7 @@ from pathlib import Path
 QUESTION_START = re.compile(r"^\s*(?:Question\s+No\.?\s*(?P<qno1>\d{1,3})|(?:Q(?:uestion)?\s*)?\(?\s*(?P<qno2>\d{1,3})\s*[).:])\s*(?P<text>.*)$", re.I)
 INLINE_ANSWER_KEY = re.compile(r"^\s*answer\s+key\s*:\s*([A-D])\b", re.I)
 OPTION_START = re.compile(r"^\s*(?:\(([A-D])\)|([A-D])[).:]|Option\s*([1-4])[).:]?)\s*(.*)$", re.I)
+INLINE_OPTION_MARKER = re.compile(r"(?<!\S)(?:\(([A-D])\)|([A-D])[).:])\s*", re.I)
 ANSWER_LINE = re.compile(r"^\s*(?:correct\s+answer|answer\s*(?:key)?|ans)\s*:\s*([A-D1-4])\b", re.I)
 AMBIGUOUS_ANS_OPTIONS = re.compile(r"^\s*ans\s*1[).]\s+", re.I)
 ANSWER_PAIR = re.compile(r"(?<!\w)(\d{1,3})\s*[-:.)]?\s*([A-D])\b", re.I)
@@ -112,6 +113,18 @@ def parse_text(text: str, source_name: str) -> dict:
             continue
 
         if current is None:
+            continue
+        # Some PDFs place multiple options on one text line (e.g. "A)Joule B)Newton").
+        # Split only when at least two explicit A-D markers are present.
+        inline_options = list(INLINE_OPTION_MARKER.finditer(line))
+        if len(inline_options) >= 2:
+            for idx, marker in enumerate(inline_options):
+                label = (marker.group(1) or marker.group(2)).upper()
+                end = inline_options[idx + 1].start() if idx + 1 < len(inline_options) else len(line)
+                value = line[marker.end():end].strip()
+                current["_options"].setdefault(label, [])
+                current["_options"][label].append(value)
+                current["_last_option"] = label
             continue
         om = OPTION_START.match(line)
         if om:
