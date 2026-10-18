@@ -18,9 +18,8 @@ on:
       offset:
         description: 'कितने सवाल छोड़कर शुरू करें (अगली बार के लिए)'
         default: '0'
-  workflow_run:
-    workflows: ['PYQ Robot']
-    types: [completed]
+  repository_dispatch:
+    types: [pyq-imported]
 permissions:
   contents: read
 concurrency:
@@ -28,7 +27,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   check:
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'repository_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
@@ -51,7 +50,7 @@ jobs:
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           SCOPE: ${{ inputs.scope || 'draft' }}
-          USE_GEMINI: ${{ github.event_name == 'workflow_run' || inputs.gemini }}
+          USE_GEMINI: ${{ github.event_name == 'repository_dispatch' || inputs.gemini }}
           LIMIT: ${{ inputs.limit || '150' }}
           OFFSET: ${{ inputs.offset || '0' }}
           KEYCHECK_REPORT: ${{ runner.temp }}/keycheck-report.json
