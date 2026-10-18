@@ -17,7 +17,7 @@
 .rv-r small{font-size:10px;font-weight:700;color:var(--text-muted)}
 .rv-r.hard{border-color:var(--danger)}.rv-r.okay{border-color:var(--warning)}.rv-r.easy{border-color:var(--success)}
 .rv-done{text-align:center}.rv-done h2{margin:6px 0;font-size:20px}.rv-emoji{font-size:40px}
-.bm-btn{width:36px;height:36px;min-width:36px;border:1px solid var(--border);border-radius:9px;background:var(--surface);color:var(--text-muted);font-size:18px;line-height:1;display:inline-flex;align-items:center;justify-content:center}
+.bm-btn{width:44px;height:44px;min-width:44px;min-height:44px;border:1px solid var(--border);border-radius:9px;background:var(--surface);color:var(--text-muted);font-size:18px;line-height:1;display:inline-flex;align-items:center;justify-content:center}
 .bm-btn.on{color:#f59e0b;border-color:#f59e0b;background:var(--warning-bg)}
 .test-fixed-viewport .q-badge .cbt-bm{width:32px;height:32px;min-width:32px;font-size:16px;margin-left:4px}
 .bm-row{display:flex;gap:6px;align-items:center}.bm-row .sj-action{flex:1}
