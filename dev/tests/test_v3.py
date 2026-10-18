@@ -48,6 +48,11 @@ with sync_playwright() as p:
     rec('tablet: quick-action labels never break inside a word', pg.evaluate("[...document.querySelectorAll('.sj-quick-btn')].every(b=>b.scrollWidth<=b.clientWidth+1)"))
     pg.set_viewport_size({'width': 412, 'height': 800}); pg.evaluate("navigate('home')"); pg.wait_for_timeout(200)
     rec('dock tabs are at least 48px tall', pg.evaluate("[...document.querySelectorAll('#bottomNav .nav-tab')].every(t=>t.getBoundingClientRect().height>=48)"))
+    pg.evaluate("navigate('taxonomy_explorer')"); pg.wait_for_timeout(250)
+    rec('bookmark controls have 44px touch targets', pg.evaluate("[...document.querySelectorAll('.bm-btn')].length>0 && [...document.querySelectorAll('.bm-btn')].every(b=>b.getBoundingClientRect().width>=44 && b.getBoundingClientRect().height>=44)"))
+    pg.evaluate("openModal('Touch target check','<p>Check close-button target.</p>')"); pg.wait_for_timeout(100)
+    rec('modal close control has a 44px touch target', pg.evaluate("(()=>{const b=document.querySelector('#modalSheet .modal-close');return !!b && b.getBoundingClientRect().width>=44 && b.getBoundingClientRect().height>=44})()"))
+    pg.evaluate("closeModal(); navigate('home')")
     rec('V3 fonts and tokens are active', 'Inter' in pg.evaluate("getComputedStyle(document.body).fontFamily") and pg.evaluate("getComputedStyle(document.documentElement).getPropertyValue('--primary').trim()") != '')
     rec('closed drawer casts no shadow on the page', pg.evaluate("getComputedStyle(document.getElementById('sideDrawer')).visibility") == 'hidden')
     for dark in (False, True):
