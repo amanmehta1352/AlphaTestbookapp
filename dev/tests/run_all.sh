@@ -1,8 +1,23 @@
 #!/usr/bin/env bash
 # Run every test suite against the built index.html. Usage: dev/tests/run_all.sh
 cd "$(dirname "$0")"
-APP="$(cd ../.. && pwd)/index.html"
+ROOT="$(cd ../.. && pwd)"
 OUT="$(mktemp -d)"
+SITE="$OUT/AlphaTestbookapp"
+mkdir -p "$SITE"
+# Test the current source, not the checked-in root HTML candidate. This copy is
+# disposable: building it must never rewrite a developer's working tree.
+tar --exclude=.git --exclude=__pycache__ -cf - -C "$ROOT" . | tar -xf - -C "$SITE"
+APP="$SITE/index.html"
+if ! (cd "$SITE/dev/app" && python3 build.py "$APP"); then
+  echo "✕ Source build failed; tests not run."
+  exit 1
+fi
+if ! (cd "$SITE/dev/app" && python3 build.py "$SITE/admin/index.html" --studio); then
+  echo "✕ Admin Studio source build failed; tests not run."
+  exit 1
+fi
+export MTB_SITE="$SITE"
 SUITES="test_u1_reg test_u2_v4 test_u3 test_u4a test_u4b test_u4c test_u5 test_a test_c1 test_c2 test_f1 test_clean test_pwa test_defaults test_sql_v2 test_studio test_robot test_hindi test_tagger test_profile test_v3 test_keycheck test_health test_ops"
 fail=0
 for t in $SUITES; do
