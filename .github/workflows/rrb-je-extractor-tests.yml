@@ -26,3 +26,8 @@ jobs:
       - name: Run parser unit tests
         working-directory: dev/tools/pyq-robot
         run: python -m unittest -v test_rrb_je_extract.py
+      - name: Extract a real public RRB JE 2019 PDF (no import)
+        run: |
+          curl -fsSL --retry 3 "https://cdn.aglasem.com/aglasem-doc/dcb05986-aab6-11e9-9a6b-02f21f5619c4/dcb05986-aab6-11e9-9a6b-02f21f5619c4.pdf" -o "$RUNNER_TEMP/rrb-je-2019.pdf"
+          python dev/tools/pyq-robot/rrb_je_extract.py "$RUNNER_TEMP/rrb-je-2019.pdf" "$RUNNER_TEMP/rrb-je-2019.json"
+          python -c "import json,sys; d=json.load(open(sys.argv[1],encoding='utf-8')); assert d['question_count'] >= 80, d['question_count']; assert any(q.get('answer') for q in d['questions']), 'no explicit answer keys found'; print('Real RRB JE PDF parsed:', d['question_count'], 'questions;', sum(bool(q.get('answer')) for q in d['questions']), 'explicit answers;', d['review_required_count'], 'need review')" "$RUNNER_TEMP/rrb-je-2019.json"
