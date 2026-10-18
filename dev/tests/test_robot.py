@@ -37,7 +37,7 @@ def main():
         work = tempfile.mkdtemp()
         blk = lambda n, subj, topic, q, a: ('=== QUESTION START ===\n' + '\n'.join(f'{k}: {v}' for k, v in {
             'SOURCE_QUESTION_NO': n, 'EXAM_NAME': 'SSC JE', 'YEAR': '2023', 'SHIFT': '09 Oct 2023 Shift 1', 'SUBJECT': subj,
-            'CHAPTER': topic, 'TOPIC': topic, 'SOURCE_TYPE': 'PYQ', 'QUESTION_EN': q, 'A_EN': 'one', 'B_EN': 'two', 'C_EN': 'three', 'D_EN': 'four', 'ANSWER': a}.items()) + '\n=== QUESTION END ===\n')
+            'CHAPTER': topic, 'TOPIC': topic, 'SOURCE_TYPE': 'PYQ', 'QUESTION_EN': q, 'QUESTION_HI': f'हिन्दी अनुवाद: {q}', 'A_EN': 'one', 'A_HI': 'एक', 'B_EN': 'two', 'B_HI': 'दो', 'C_EN': 'three', 'C_HI': 'तीन', 'D_EN': 'four', 'D_HI': 'चार', 'ANSWER': a}.items()) + '\n=== QUESTION END ===\n')
         f1 = os.path.join(work, 'a.txt'); open(f1, 'w').write('\n'.join(blk(i, 'General-Awareness', robot.UNTAGGED, f'Robot test question number {i}?', 'ABCD'[i % 4]) for i in range(1, 6)))
         f2 = os.path.join(work, 'b.txt'); open(f2, 'w').write('\n'.join(blk(i, 'Reasoning', 'Series', f'Find the next term in series test {i}?', 'B') for i in range(51, 54)))
         data = robot.analyze([f1, f2])
