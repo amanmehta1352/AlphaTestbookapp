@@ -2354,6 +2354,21 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
 .ops-maint{display:flex;gap:10px;align-items:flex-start;margin:0 0 10px;padding:12px 14px;border-radius:var(--radius-md);background:var(--warning-bg);border:1.5px solid var(--warning);color:var(--text-main)}
 .ops-maint b{display:block;font-size:14px}.ops-maint small{display:block;font-size:12.5px;color:var(--text-main);margin-top:2px}
 
+
+/* Testbook-inspired exam-first home navigation — additive, existing routes only. */
+.gx-quick{grid-column:1/-1;min-width:0}
+.gx-quick .gx-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.gx-explore-note{font-size:11px;color:var(--text-muted);font-weight:600}
+.gx-quick .sj-quick{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.gx-quick .sj-quick-btn{min-width:0;min-height:76px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:10px 5px;border:1px solid var(--border);background:var(--surface);box-shadow:var(--shadow-sm);font-size:11.5px;font-weight:800;line-height:1.25;text-align:center;overflow-wrap:anywhere;transition:transform .15s ease,border-color .15s ease,background .15s ease}
+.gx-quick .sj-quick-btn span:first-child{font-size:22px;line-height:1}
+.gx-quick .sj-quick-btn span:last-child{max-width:100%}
+.gx-quick .sj-quick-btn:active{transform:scale(.97);border-color:var(--primary-border);background:var(--primary-light)}
+@media(min-width:480px){.gx-quick .sj-quick{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(min-width:720px){.gx-quick .sj-quick{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(min-width:1100px){.gx-quick .sj-quick{grid-template-columns:repeat(8,minmax(0,1fr))}}
+@media(prefers-reduced-motion:reduce){.gx-quick .sj-quick-btn{transition:none}}
+
 </style>
 </head>
 <body>
@@ -2388,28 +2403,32 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
     <button id="btnCloseDrawer" style="font-size:20px; font-weight:900;" aria-label="Close">✕</button>
   </div>
   <nav class="drawer-nav" aria-label="Main menu">
-    <div class="drawer-section-title" data-en="STUDY" data-hi="पढ़ाई">STUDY</div>
-    <button class="drawer-item" id="drwMe" onclick="navigate('me')" data-en="👤 Me (progress, settings)" data-hi="👤 मैं (progress, सेटिंग)">👤 Me (progress, settings)</button>
+    <div class="drawer-section-title" data-en="PREPARE" data-hi="तैयारी शुरू करें">PREPARE</div>
     <button class="drawer-item" id="drwHome" onclick="navigate('home')" data-en="🏠 Home" data-hi="🏠 होम">🏠 Home</button>
-    <button class="drawer-item" id="drwSubjects" onclick="navigate('subjects')" data-en="📚 Subjects" data-hi="📚 विषय">📚 Subjects</button>
+    <button class="drawer-item" id="drwExams" onclick="navigate('exam_hub')" data-en="🏛️ Exam hub" data-hi="🏛️ परीक्षा केंद्र">🏛️ Exam hub</button>
+    <button class="drawer-item" id="drwTest" onclick="navigate('test_hub')" data-en="⏱️ Mock tests" data-hi="⏱️ मॉक टेस्ट">⏱️ Mock tests</button>
+    <button class="drawer-item" id="drwPYQ" onclick="navigate('pyq_hub')" data-en="🎯 Previous year papers (PYQ)" data-hi="🎯 पिछले वर्ष के पेपर (PYQ)">🎯 Previous year papers (PYQ)</button>
+    <button class="drawer-item" id="drwSubjects" onclick="navigate('subjects')" data-en="📚 Subjects & topic practice" data-hi="📚 विषय और टॉपिक अभ्यास">📚 Subjects &amp; topic practice</button>
+
+    <div class="drawer-section-title" data-en="LEARN & PRACTICE" data-hi="सीखें और अभ्यास करें">LEARN &amp; PRACTICE</div>
     <button class="drawer-item" id="drwNativeBuilder" onclick="navigate('native_builder')" data-en="🧩 Create a test" data-hi="🧩 टेस्ट बनाएँ">🧩 Create a test</button>
-    <button class="drawer-item" id="drwTest" onclick="navigate('test_hub')" data-en="⏱️ Tests" data-hi="⏱️ टेस्ट">⏱️ Tests</button>
-    <button class="drawer-item" id="drwExams" onclick="navigate('exam_hub')" data-en="🏛️ Exams" data-hi="🏛️ परीक्षाएँ">🏛️ Exams</button>
-    <button class="drawer-item" id="drwPYQ" onclick="navigate('pyq_hub')" data-en="🎯 PYQ archive" data-hi="🎯 PYQ संग्रह">🎯 PYQ archive</button>
-    <button class="drawer-item" id="drwLibrary" onclick="navigate('digital_library')" data-en="📖 Digital library" data-hi="📖 डिजिटल लाइब्रेरी">📖 Digital library</button>
-    <div class="drawer-section-title" data-en="REVIEW" data-hi="दोहराना">REVIEW</div>
-    <button class="drawer-item" id="drwRevision" onclick="navigate('revision_hub')" data-en="🔄 Revision" data-hi="🔄 रिवीज़न">🔄 Revision</button>
-    <button class="drawer-item" onclick="navigate('mistakes')" data-en="📕 Mistake book" data-hi="📕 गलतियों की किताब">📕 Mistake book</button>
+    <button class="drawer-item" id="drwLibrary" onclick="navigate('digital_library')" data-en="📖 Study library" data-hi="📖 स्टडी लाइब्रेरी">📖 Study library</button>
     <button class="drawer-item" id="drwTaxonomy" onclick="navigate('taxonomy_explorer')" data-en="🔎 Question bank" data-hi="🔎 प्रश्न बैंक">🔎 Question bank</button>
-    <button class="drawer-item" onclick="navigate('mastery')" data-en="🎯 Mastery" data-hi="🎯 महारत">🎯 Mastery</button>
-    <div class="drawer-section-title" data-en="SETTINGS & DATA" data-hi="सेटिंग और डेटा">SETTINGS & DATA</div>
+
+    <div class="drawer-section-title" data-en="REVISE & TRACK" data-hi="दोहराएँ और प्रगति देखें">REVISE &amp; TRACK</div>
+    <button class="drawer-item" id="drwRevision" onclick="navigate('revision_hub')" data-en="🔄 Revision centre" data-hi="🔄 रिवीज़न सेंटर">🔄 Revision centre</button>
+    <button class="drawer-item" onclick="navigate('mistakes')" data-en="📕 Mistake book" data-hi="📕 गलतियों की किताब">📕 Mistake book</button>
+    <button class="drawer-item" onclick="navigate('mastery')" data-en="🎯 Topic mastery" data-hi="🎯 टॉपिक महारत">🎯 Topic mastery</button>
+    <button class="drawer-item" id="drwMe" onclick="navigate('me')" data-en="👤 My progress & settings" data-hi="👤 मेरी प्रगति और सेटिंग">👤 My progress &amp; settings</button>
+
+    <div class="drawer-section-title" data-en="APP TOOLS & DATA" data-hi="ऐप टूल्स और डेटा">APP TOOLS &amp; DATA</div>
     <button class="drawer-item" onclick="openDisplaySettings()" data-en="Aa Display (language, text size)" data-hi="Aa डिस्प्ले (भाषा, अक्षर आकार)">Aa Display (language, text size)</button>
     <a class="drawer-item admin-only" id="drwControl" href="control/" data-en="🩺 Control Room (app health)" data-hi="🩺 Control Room (ऐप की सेहत)">🩺 Control Room (app health)</a>
     <a class="drawer-item admin-only" id="drwStudio" href="admin/" data-en="🛠️ Admin Studio" data-hi="🛠️ Admin Studio">🛠️ Admin Studio</a>
     <button class="drawer-item admin-only" onclick="openImportModal()" data-en="📥 Import questions" data-hi="📥 सवाल import करें">📥 Import questions</button>
     <button class="drawer-item admin-only" onclick="openCleanup()" data-en="🧹 Data cleanup" data-hi="🧹 Data सफ़ाई">🧹 Data cleanup</button>
-    <button class="drawer-item" onclick="openHealthCheck()" data-en="🩺 Health Check" data-hi="🩺 Health Check">🩺 Health Check</button>
-    <button class="drawer-item" onclick="openBackupCenter()" data-en="💾 Backup & Restore" data-hi="💾 Backup और Restore">💾 Backup &amp; Restore</button>
+    <button class="drawer-item" onclick="openHealthCheck()" data-en="🩺 Health check" data-hi="🩺 हेल्थ चेक">🩺 Health check</button>
+    <button class="drawer-item" onclick="openBackupCenter()" data-en="💾 Backup & restore" data-hi="💾 बैकअप और रीस्टोर">💾 Backup &amp; restore</button>
     <button class="drawer-item admin-only" onclick="openServerSync()" data-en="☁️ Server (Admin)" data-hi="☁️ Server (Admin)">☁️ Server (Admin)</button>
     <button class="drawer-item" id="drwInstall" hidden onclick="pwaInstall()" data-en="📲 Install app" data-hi="📲 ऐप install करें">📲 Install app</button>
     <button class="drawer-item" onclick="openDataControlModal()" data-en="🛡️ Data control" data-hi="🛡️ डेटा नियंत्रण">🛡️ Data control</button>
@@ -5313,15 +5332,17 @@ function renderHomePage(v) {
   const recent = [];
   d.results.slice(0, 3).forEach(r => recent.push({ icon: '⏱️', title: `Test · ${r.topicTitle || 'Custom Test'}`, meta: `Score ${Number(r.score) || 0}/${Number(r.total) || 0} · ${Number(r.accuracy) || 0}% · ${sjFormatWhen(r.ts)}`, call: `openStoredResult(${nbJsAttr(r.id)})` }));
   d.imports.slice(0, 2).forEach(h => { const w = h.committedAt ? new Date(h.committedAt) : null; recent.push({ icon: '📥', title: `Imported · ${h.topicTitle || h.sourceFile || 'Questions'}`, meta: `${Number(h.committedQuestions) || 0} questions · ${w && !isNaN(w) ? w.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : 'date unknown'}`, call: `openDataControlModal()` }); });
+  // Testbook-inspired exam-first navigation; every tile targets an existing, working route.
+  // Features without a real data source (live classes/current affairs/AI doubt chat) are intentionally not faked.
   const quick = [
-    { icon: '✍️', label: 'Practice', call: practiceCall },
-    { icon: '🧩', label: tx('Test Builder','Test बनाएँ'), call: `navigate('native_builder')` },
-    { icon: '🗂️', label: tx('Question Bank','प्रश्न बैंक'), call: `navigate('taxonomy_explorer')` },
-    { icon: '🔄', label: tx('Revision','दोहराई'), call: `navigate('revision_hub')` },
-    { icon: '⏱️', label: tx('CBT Tests','CBT Test'), call: `navigate('test_hub')` },
-    { icon: '📕', label: tx('Mistakes','गलतियाँ'), call: `navigate('mistakes')` },
-    { icon: '📜', label: 'Test History', call: `openTestHistoryModal()` },
-    { icon: '🏆', label: tx('Mastery','महारत'), call: `navigate('mastery')` }
+    { icon: '🏛️', label: tx('Exams','परीक्षाएँ'), call: `navigate('exam_hub')` },
+    { icon: '⏱️', label: tx('Mock tests','मॉक टेस्ट'), call: `navigate('test_hub')` },
+    { icon: '🎯', label: tx('PYQ papers','PYQ पेपर'), call: `navigate('pyq_hub')` },
+    { icon: '✍️', label: tx('Topic practice','टॉपिक अभ्यास'), call: `navigate('subjects')` },
+    { icon: '🧩', label: tx('Test builder','टेस्ट बनाएँ'), call: `navigate('native_builder')` },
+    { icon: '📖', label: tx('Study library','स्टडी लाइब्रेरी'), call: `navigate('digital_library')` },
+    { icon: '🔎', label: tx('Question bank','प्रश्न बैंक'), call: `navigate('taxonomy_explorer')` },
+    { icon: '🔄', label: tx('Revision','दोहराई'), call: `navigate('revision_hub')` }
   ];
 
   v.innerHTML = `<div class="sj-dash gx">
@@ -5335,13 +5356,13 @@ function renderHomePage(v) {
       </div>
     </section>
     <section class="gx-card gx-search"><div class="search-box-wrap" style="margin:0;"><span class="search-icon">🔍</span><input type="search" class="search-input" id="inpGlobalSearch" aria-label="Search questions" placeholder="सवाल नंबर, परीक्षा (SSC, NTPC, JE), टॉपिक सर्च करें..." oninput="onGlobalSearch(this.value)"></div><div id="globalSearchResults"></div></section>
+    <section class="gx-card gx-quick" aria-labelledby="sjExploreHeading"><div class="gx-head"><h2 id="sjExploreHeading">${tx('Explore preparation','तैयारी के विकल्प')}</h2><span class="gx-explore-note">${tx('Choose what you want to do next','अगला कदम चुनें')}</span></div><div class="sj-quick">${quick.map(q => `<button type="button" class="sj-quick-btn" onclick="${q.call}"><span aria-hidden="true">${q.icon}</span><span>${escapeHtml(q.label)}</span></button>`).join('')}</div></section>
     ${primary ? `<section class="gx-card gx-next" aria-label="Next best action"><div class="gx-next-icon" aria-hidden="true">${primary.icon}</div><div class="gx-next-copy"><small>${tx('Next best action','अगला सबसे अच्छा काम')}</small><strong>${escapeHtml(primary.title)}</strong><span>${escapeHtml(primary.why)}</span></div><button type="button" class="gx-btn" onclick="${primary.call}">${escapeHtml(primary.cta)} →</button></section>` : ''}
     <section class="gx-card gx-continue" aria-labelledby="sjContinueH"><div class="gx-head"><h2 id="sjContinueH">${tx('Continue','जारी रखें')}</h2></div>
       ${d.resume ? `<div class="sj-resume"><div><strong>${escapeHtml(d.resume.module.topicTitle)}</strong><span>${escapeHtml(subjectDisplayName(d.resume.module.subject))} · Practice · ${tx('Question','सवाल')} ${d.resume.qIndex + 1} / ${sjModuleQuestionCount(d.resume.module)}</span></div><button type="button" class="gx-btn" onclick="${practiceCall}">${tx('Resume →','जारी रखें →')}</button></div>`
         : `<div class="gx-empty"><strong>${tx('No unfinished activity','कोई अधूरा काम नहीं')}</strong><span>${tx('Practice you leave mid-way appears here.','बीच में छोड़ी practice यहाँ दिखेगी।')}</span>${actions.length > 1 ? '' : (firstModule ? `<button type="button" class="gx-btn ghost" onclick="${practiceCall}">${tx('Practise','Practice:')} ${escapeHtml(firstModule.topicTitle)}</button>` : `<button type="button" class="gx-btn ghost" onclick="openImportModal()">${tx('Import questions','सवाल import करें')}</button>`)}</div>`}
       ${actions.length > 1 ? `<div class="sj-actions-list">${actions.slice(1).map(a => `<button type="button" class="sj-action" onclick="${a.call}"><span aria-hidden="true">${a.icon}</span><span class="sj-action-copy"><strong>${escapeHtml(a.title)}</strong><small>${escapeHtml(a.why)}</small></span><span class="sj-action-go" aria-hidden="true">›</span></button>`).join('')}</div>` : ''}
     </section>
-    <section class="gx-card gx-quick"><div class="gx-head"><h2>${tx('Quick actions','जल्दी के काम')}</h2></div><div class="sj-quick">${quick.map(q => `<button type="button" class="sj-quick-btn" ${q.call ? `onclick="${q.call}"` : 'disabled aria-disabled="true" title="No questions available"'}><span aria-hidden="true">${q.icon}</span>${escapeHtml(q.label)}</button>`).join('')}</div></section>
     ${gxSubjectWidget()}
     ${gxGoalWidget(d)}
     ${gxTodayWidget(d)}
