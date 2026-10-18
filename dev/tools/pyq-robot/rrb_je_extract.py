@@ -67,7 +67,11 @@ def pdf_text(path: Path) -> str:
         return text
     try:
         ocr = ocr_pdf_text(path)
-        if QUESTION_START.search(ocr) and len(ocr.strip()) > len(text.strip()):
+        original_count = len(re.findall(r"(?m)^\s*Question\s+No\.?\s*\d{1,3}", text, re.I))
+        ocr_count = len(re.findall(r"(?m)^\s*Question\s+No\.?\s*\d{1,3}", ocr, re.I))
+        minimum_count = max(1, int(original_count * 0.8))
+        # OCR may be shorter but more legible than a broken embedded Hindi font map.
+        if QUESTION_START.search(ocr) and ocr_count >= minimum_count and len(ocr.strip()) >= max(1000, len(text.strip()) * 0.5):
             return ocr
     except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired, RuntimeError):
         pass
