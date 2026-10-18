@@ -156,44 +156,62 @@ function nbSubjectGroups() {
   });
   return Array.from(map.values()).filter(g => g.qs > 0).sort((a, b) => b.qs - a.qs);
 }
+/* Subject navigation redesign — scoped only to the Subjects catalog. */
+let SubjectNavState = { selected: '', expanded: '' };
+function shSelectCatalogSubject(key) {
+  SubjectNavState.selected = String(key || '');
+  SubjectNavState.expanded = '';
+  renderView();
+}
+function shToggleCatalogChapter(key) {
+  SubjectNavState.expanded = SubjectNavState.expanded === key ? '' : key;
+  renderView();
+}
 function renderSubjectsCatalog(v) {
   const groups = nbSubjectGroups();
   const total = groups.reduce((n, g) => n + g.qs, 0);
+  if (!groups.some(g => g.key === SubjectNavState.selected)) SubjectNavState.selected = groups[0]?.key || '';
+  const selected = groups.find(g => g.key === SubjectNavState.selected) || null;
+  const chapters = selected ? Array.from(selected.chapters.entries()).map(([id, name]) => {
+    const mods = selected.mods.filter(m => String(m.chapter || '').trim().toLowerCase() === String(name).trim().toLowerCase());
+    return { id: String(id), name, mods, qs: mods.reduce((n, m) => n + nbModuleQCount(m), 0) };
+  }) : [];
+  const subjectTabs = groups.map(g => {
+    const active = selected && g.key === selected.key;
+    const k = g.key.toLowerCase();
+    return `<button type="button" class="sn-tab ${active ? 'on' : ''}" aria-pressed="${!!active}" onclick="shSelectCatalogSubject(${nbJsAttr(g.key)})">
+      <span class="sn-tab-icon" aria-hidden="true">${SUBJECT_ICONS[k] || '📘'}</span>
+      <span>${escapeHtml(subjectLabel(g.key))}</span><small>${g.qs} ${tx('Qs', 'सवाल')}</small>
+    </button>`;
+  }).join('');
+  const chapterRows = chapters.map(c => {
+    const open = SubjectNavState.expanded === c.id;
+    const topicRows = c.mods.map(m => {
+      const topic = String(m.topicTitle || m.topic || '').trim();
+      const subtopic = String(m.subtopic || '').trim();
+      const label = [topic, subtopic].filter((x, i, a) => x && a.indexOf(x) === i).join(' › ') || tx('Open topic', 'टॉपिक खोलें');
+      return `<button type="button" class="sn-topic" onclick="navigate('chapter', {subject:${nbJsAttr(selected.key)}, chapter:${nbJsAttr(c.name)}})">
+        <span class="sn-topic-dot" aria-hidden="true">•</span><span class="sn-topic-label">${escapeHtml(label)}</span><span class="sn-topic-count">${nbModuleQCount(m)} ${tx('Qs', 'सवाल')}</span><span aria-hidden="true">›</span>
+      </button>`;
+    }).join('');
+    return `<section class="sn-chapter ${open ? 'open' : ''}">
+      <button type="button" class="sn-chapter-toggle" aria-expanded="${!!open}" onclick="shToggleCatalogChapter(${nbJsAttr(c.id)})">
+        <span class="sn-chapter-mark" aria-hidden="true">${open ? '−' : '+'}</span>
+        <span class="sn-chapter-main"><strong>${escapeHtml(c.name)}</strong><small>${c.mods.length} ${tx('topics', 'टॉपिक')} · ${c.qs} ${tx('questions', 'सवाल')}</small></span>
+        <span class="sn-chevron" aria-hidden="true">${open ? '⌄' : '›'}</span>
+      </button>
+      ${open ? `<div class="sn-topic-list">${topicRows || `<p class="sn-empty-topic">${tx('No topics available yet.', 'अभी कोई टॉपिक उपलब्ध नहीं है।')}</p>`}</div><div class="sn-chapter-action"><button type="button" class="btn-action-sm" onclick="navigate('chapter', {subject:${nbJsAttr(selected.key)}, chapter:${nbJsAttr(c.name)}})">${tx('Open chapter', 'अध्याय खोलें')} →</button></div>` : ''}
+    </section>`;
+  }).join('');
   v.innerHTML = `
-    <div class="nav-breadcrumb"><button onclick="navigate('home')">${tx('Home', 'होम')}</button><span class="sep">/</span><span>${tx('Subjects', 'विषय')}</span></div>
-    <div class="sc-head">
-      <div><h1>${tx('Subjects', 'विषय')}</h1><p>${groups.length ? tx(`${groups.length} subject${groups.length === 1 ? '' : 's'} · ${total} questions in this workspace`, `${groups.length} विषय · इस workspace में ${total} सवाल`) : tx('No questions imported yet', 'अभी कोई सवाल import नहीं हुआ')}</p></div>
+    <div class="nav-breadcrumb"><button type="button" onclick="navigate('home')">${tx('Home', 'होम')}</button><span class="sep">/</span><span>${tx('Subjects', 'विषय')}</span></div>
+    <div class="sc-head"><div><h1>${tx('Subjects', 'विषय')}</h1><p>${groups.length ? tx(`${groups.length} subjects · ${total} questions in this workspace`, `${groups.length} विषय · इस workspace में ${total} सवाल`) : tx('No questions imported yet', 'अभी कोई सवाल import नहीं हुआ')}</p></div>
       <button type="button" class="btn-action-sm" onclick="navigate('taxonomy_explorer')">🔎 ${tx('Question Bank', 'प्रश्न बैंक')}</button>
     </div>
-    ${groups.length ? `<div class="sc-grid">${groups.map(g => {
-      const k = g.key.toLowerCase(); const chs = Array.from(g.chapters.values());
-      return `<button type="button" class="sc-card" onclick="navigate('subject', {subject:${nbJsAttr(g.key)}})">
-        <span class="sc-icon" aria-hidden="true">${SUBJECT_ICONS[k] || '📘'}</span>
-        <span class="sc-body"><strong>${escapeHtml(subjectLabel(g.key))}</strong>
-          <span class="sc-counts">${tx(`${g.qs} questions · ${chs.length} chapter${chs.length === 1 ? '' : 's'} · ${g.mods.length} topic${g.mods.length === 1 ? '' : 's'}`, `${g.qs} सवाल · ${chs.length} अध्याय · ${g.mods.length} टॉपिक`)}</span>
-          <span class="sc-chips">${chs.slice(0, 4).map(c => `<span>${escapeHtml(c)}</span>`).join('')}${chs.length > 4 ? `<span>+${chs.length - 4}</span>` : ''}</span>
-          ${nbAccuracyLine(nbSubjectAccuracy(g.key))}</span>
-        <span class="sc-go" aria-hidden="true">›</span></button>`;
-    }).join('')}</div>` : `<div class="sc-empty"><strong>${tx('Nothing to show yet', 'अभी दिखाने को कुछ नहीं')}</strong><span>${tx('Import a topic file to see its subjects here.', 'Topic file import करें, उसके विषय यहाँ दिखेंगे।')}</span><button type="button" class="btn-nav primary" onclick="openImportModal()">${tx('Import questions', 'सवाल import करें')}</button></div>`}`;
-}
-function renderSubjectPage(v, subject) {
-  const key = String(subject || '').trim().toLowerCase();
-  const mods = (typeof profileVisible==='function'?profileVisible:(x=>x))(CurriculumContext.filterModules(AppModules)).filter(m => String(m.subject || '').trim().toLowerCase() === key && nbModuleQCount(m) > 0);
-  const chapters = new Map();
-  mods.forEach(m => { const ch = String(m.chapter || '').trim(); if (!ch) return; const c = chapters.get(ch.toLowerCase()) || { name: ch, mods: [], qs: 0 }; c.mods.push(m); c.qs += nbModuleQCount(m); chapters.set(ch.toLowerCase(), c); });
-  const list = Array.from(chapters.values());
-  const name = subjectLabel(subject);
-  v.innerHTML = `
-    <div class="nav-breadcrumb"><button onclick="navigate('home')">${tx('Home', 'होम')}</button><span class="sep">/</span><button onclick="navigate('subjects')">${tx('Subjects', 'विषय')}</button><span class="sep">/</span><span>${escapeHtml(name)}</span></div>
-    <div class="sc-head"><div><h1>${escapeHtml(name)}</h1><p>${tx(`${list.length} chapter${list.length === 1 ? '' : 's'} with questions`, `सवालों वाले ${list.length} अध्याय`)}</p></div>
-      <button type="button" class="btn-action-sm" onclick="navigate('subjects')">← ${tx('Subjects', 'विषय')}</button></div>
-    ${list.length ? `<div class="sc-grid">${list.map(c => `<button type="button" class="sc-card" onclick="navigate('chapter', {subject:${nbJsAttr(subject)}, chapter:${nbJsAttr(c.name)}})">
-        <span class="sc-body"><strong>${escapeHtml(c.name)}</strong>
-          <span class="sc-counts">${tx(`${c.qs} questions · ${c.mods.length} topic${c.mods.length === 1 ? '' : 's'}`, `${c.qs} सवाल · ${c.mods.length} टॉपिक`)}</span>
-          <span class="sc-chips">${c.mods.slice(0, 4).map(m => `<span>${escapeHtml(m.topicTitle || m.topic || '')}</span>`).join('')}${c.mods.length > 4 ? `<span>+${c.mods.length - 4}</span>` : ''}</span>
-          ${nbAccuracyLine(nbChapterAccuracy(c.mods))}</span>
-        <span class="sc-go" aria-hidden="true">›</span></button>`).join('')}</div>`
-    : `<div class="sc-empty"><strong>${tx('No chapters with questions', 'सवालों वाला कोई अध्याय नहीं')}</strong><span>${tx('Import a topic for this subject to start.', 'शुरू करने के लिए इस विषय का topic import करें।')}</span><button type="button" class="btn-nav primary" onclick="openImportModal()">${tx('Import questions', 'सवाल import करें')}</button></div>`}`;
+    ${groups.length ? `<nav class="sn-subject-tabs" aria-label="${tx('Main subjects', 'मुख्य विषय')}" role="tablist">${subjectTabs}</nav>
+      <section class="sn-topic-panel"><div class="sn-panel-head"><div><h2>${selected ? escapeHtml(subjectLabel(selected.key)) : tx('Choose a subject', 'विषय चुनें')}</h2><p>${selected ? tx('Choose a chapter to expand its topics.', 'टॉपिक्स देखने के लिए अध्याय खोलें।') : ''}</p></div>${selected ? `<span class="sn-total">${selected.qs} ${tx('questions', 'सवाल')}</span>` : ''}</div>
+        ${chapters.length ? `<div class="sn-chapter-list">${chapterRows}</div>` : `<div class="sc-empty"><strong>${tx('No chapters with questions', 'सवालों वाला कोई अध्याय नहीं')}</strong><span>${tx('Import a topic for this subject to start.', 'शुरू करने के लिए इस विषय का topic import करें।')}</span><button type="button" class="btn-nav primary" onclick="openImportModal()">${tx('Import questions', 'सवाल import करें')}</button></div>`}
+      </section>` : `<div class="sc-empty"><strong>${tx('Nothing to show yet', 'अभी दिखाने को कुछ नहीं')}</strong><span>${tx('Import a topic file to see its subjects here.', 'Topic file import करें, उसके विषय यहाँ दिखेंगे।')}</span><button type="button" class="btn-nav primary" onclick="openImportModal()">${tx('Import questions', 'सवाल import करें')}</button></div>`}`;
 }
 
 /* ---------- Question Bank ---------- */
