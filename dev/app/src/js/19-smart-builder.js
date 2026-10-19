@@ -756,16 +756,14 @@ function sbLaunch(ids, minutes, lang, title) {
   sbReset();
   return true;
 }
+function sbTestTitle() {
+  if (SB.mode === "pyq") return SB.title;
+  if (SB.hist === "wrong") return tx("Mistakes Test", "गलतियों का टेस्ट");
+  if (SB.hist === "bookmarked") return tx("Bookmarks Test", "बुकमार्क टेस्ट");
+  return tx("Custom Test", "अपना टेस्ट");
+}
 function sbStartFromInstructions() {
-  const title =
-    SB.mode === "pyq"
-      ? SB.title
-      : SB.hist === "wrong"
-        ? tx("Mistakes Test", "गलतियों का टेस्ट")
-        : SB.hist === "bookmarked"
-          ? tx("Bookmarks Test", "बुकमार्क टेस्ट")
-          : tx("Custom Test", "अपना टेस्ट");
-  sbLaunch(SB.previewIds.slice(), SB.minutes, SB.lang, title);
+  sbLaunch(SB.previewIds.slice(), SB.minutes, SB.lang, sbTestTitle());
 }
 
 // Change the builder selection without changing the student's downloaded profile.
@@ -1176,7 +1174,7 @@ function sbRenderInstructions() {
     `<button type="button" class="${SB.lang === id ? "on" : ""}" aria-pressed="${SB.lang === id}" onclick="sbSet('lang','${id}')">${label}</button>`;
   const body = rows.length
     ? `
-    <div class="sb-paper"><strong>${escapeHtml(SB.mode === "pyq" ? SB.title : SB.hist === "wrong" ? tx("Mistakes Test", "गलतियों का टेस्ट") : tx("Custom Test", "अपना टेस्ट"))}</strong><small>${escapeHtml(sbExamName(rows[0].examId))} · ${escapeHtml(rows[0].year)}</small></div>
+    <div class="sb-paper"><strong>${escapeHtml(sbTestTitle())}</strong><small>${escapeHtml(sbExamName(rows[0].examId))} · ${escapeHtml(rows[0].year)}</small></div>
     <div class="sb-summary"><div><b>${rows.length}</b><span>${tx("Questions", "सवाल")}</span></div><div><b>${SB.minutes}</b><span>${tx("Minutes", "मिनट")}</span></div><div><b>${subjects.length}</b><span>${tx(`Subject${subjects.length === 1 ? "" : "s"}`, "विषय")}</span></div></div>
     <ul class="sb-rules">
       <li><b>${tx("Marking:", "अंक:")}</b> ${tx("+1 for each correct answer. Wrong or skipped answers get 0 (no negative marking).", "हर सही जवाब पर +1 अंक। गलत या छोड़े हुए सवाल पर 0 अंक (कोई ऋणात्मक अंक नहीं)।")}</li>

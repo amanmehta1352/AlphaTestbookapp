@@ -1258,7 +1258,7 @@ body.native-builder-active .nb-wizard-nav .nb-row-meta{flex:1 1 auto;min-width:0
 </style>
 <meta name="phase3" content="Profile-Driven Workspace + Data Airlock"><meta name="phase3-status" content="IMPLEMENTED"><meta name="phase3-frozen" content="Phase1A Storage; Phase2 QuestionUI; CBT scoring/timer"><meta name="master-testbook-candidate" content="V2.1.8 Smart Builder repair; child of V2.1.7; parent and data contracts preserved"><meta name="release-status" content="PARTIAL-HOLD-RUNTIME-VERIFICATION-PENDING">
 <meta name="master-testbook-candidate-version" content="V2.11.0_ADMIN_STUDIO">
-<meta name="app-version" content="V3.4.3">
+<meta name="app-version" content="V3.4.4">
 
 <style id="v2-3-2-deep-functional-repair">
 /* Root cause: display:contents exposed Previous, Clear, Mark and Next as four grid items for a three-column footer. */
@@ -4279,7 +4279,11 @@ function renderView() {
   const key = routeUiKey();
   const changed = key !== RenderedRouteKey;
   const saved = RouteUiMemory.get(key);
-  const scroll = changed ? saved?.scroll || 0 : container.scrollTop;
+  const scroll = changed
+    ? AppRouteRestoring
+      ? saved?.scroll || 0
+      : 0
+    : container.scrollTop;
   if (changed) RouteViewStates.get(Route.page)?.restore(saved?.state, AppRouteRestoring);
   RenderedRouteKey = key;
   AppRouteRestoring = false;
@@ -5885,7 +5889,7 @@ function nbRouteTitle(page) {
 }
 
 /* ---------- accessibility ---------- */
-let A11yQueued = false, ModalReturnFocus = null;
+let A11yQueued = false, ModalReturnFocus = null, ModalFocusTimer = null;
 function nbA11yEnhance() {
   A11yQueued = false;
   document.querySelectorAll('[onclick]:not(button):not(a):not(input):not(select):not(textarea):not(label):not(summary):not([role])').forEach(el => {
@@ -5897,24 +5901,50 @@ function nbA11yEnhance() {
 function nbQueueA11y() { if (A11yQueued) return; A11yQueued = true; setTimeout(nbA11yEnhance, 0); }
 function nbModalIsOpen() { return document.getElementById('modalSheet')?.classList.contains('open'); }
 function nbFocusModal() {
-  const sheet = document.getElementById('modalSheet'); if (!sheet) return;
+  ModalFocusTimer = null;
+  const sheet = document.getElementById("modalSheet");
+  if (!sheet?.classList.contains("open")) return;
   // A form field gets focus directly; otherwise the dialog itself (no stray focus ring on a button).
   // Sheets marked data-no-autofocus (long lists with inputs) should not pop the phone keyboard open.
-  const first = sheet.querySelector('[data-no-autofocus]') ? null : sheet.querySelector('#modalSheetBody input:not([type=hidden]):not([disabled]), #modalSheetBody select, #modalSheetBody textarea');
-  try { (first || sheet).focus({ preventScroll: true }); } catch (_) {}
+  const first = sheet.querySelector("[data-no-autofocus]")
+    ? null
+    : sheet.querySelector(
+        "#modalSheetBody input:not([type=hidden]):not([disabled]), #modalSheetBody select, #modalSheetBody textarea",
+      );
+  try {
+    (first || sheet).focus({ preventScroll: true });
+  } catch (_) {}
 }
-const _u5OpenModal = openModal, _u5CloseModal = closeModal;
+const _u5OpenModal = openModal,
+  _u5CloseModal = closeModal;
 openModal = function (title, contentHtml) {
   const wasOpen = nbModalIsOpen();
   if (!wasOpen) ModalReturnFocus = document.activeElement;
   _u5OpenModal(title, contentHtml);
   nbQueueA11y();
-  if (!wasOpen || !document.getElementById('modalSheet').contains(document.activeElement)) setTimeout(nbFocusModal, 0);
+  if (
+    !wasOpen ||
+    !document.getElementById("modalSheet").contains(document.activeElement)
+  ) {
+    clearTimeout(ModalFocusTimer);
+    ModalFocusTimer = setTimeout(nbFocusModal, 0);
+  }
 };
 closeModal = function () {
+  clearTimeout(ModalFocusTimer);
+  ModalFocusTimer = null;
   const wasOpen = nbModalIsOpen();
   _u5CloseModal();
-  if (wasOpen && ModalReturnFocus && document.contains(ModalReturnFocus) && ModalReturnFocus !== document.body) { try { ModalReturnFocus.focus({ preventScroll: true }); } catch (_) {} }
+  if (
+    wasOpen &&
+    ModalReturnFocus &&
+    document.contains(ModalReturnFocus) &&
+    ModalReturnFocus !== document.body
+  ) {
+    try {
+      ModalReturnFocus.focus({ preventScroll: true });
+    } catch (_) {}
+  }
   if (wasOpen) ModalReturnFocus = null;
 };
 document.addEventListener('keydown', e => {
@@ -8634,16 +8664,14 @@ function sbLaunch(ids, minutes, lang, title) {
   sbReset();
   return true;
 }
+function sbTestTitle() {
+  if (SB.mode === "pyq") return SB.title;
+  if (SB.hist === "wrong") return tx("Mistakes Test", "गलतियों का टेस्ट");
+  if (SB.hist === "bookmarked") return tx("Bookmarks Test", "बुकमार्क टेस्ट");
+  return tx("Custom Test", "अपना टेस्ट");
+}
 function sbStartFromInstructions() {
-  const title =
-    SB.mode === "pyq"
-      ? SB.title
-      : SB.hist === "wrong"
-        ? tx("Mistakes Test", "गलतियों का टेस्ट")
-        : SB.hist === "bookmarked"
-          ? tx("Bookmarks Test", "बुकमार्क टेस्ट")
-          : tx("Custom Test", "अपना टेस्ट");
-  sbLaunch(SB.previewIds.slice(), SB.minutes, SB.lang, title);
+  sbLaunch(SB.previewIds.slice(), SB.minutes, SB.lang, sbTestTitle());
 }
 
 // Change the builder selection without changing the student's downloaded profile.
@@ -9054,7 +9082,7 @@ function sbRenderInstructions() {
     `<button type="button" class="${SB.lang === id ? "on" : ""}" aria-pressed="${SB.lang === id}" onclick="sbSet('lang','${id}')">${label}</button>`;
   const body = rows.length
     ? `
-    <div class="sb-paper"><strong>${escapeHtml(SB.mode === "pyq" ? SB.title : SB.hist === "wrong" ? tx("Mistakes Test", "गलतियों का टेस्ट") : tx("Custom Test", "अपना टेस्ट"))}</strong><small>${escapeHtml(sbExamName(rows[0].examId))} · ${escapeHtml(rows[0].year)}</small></div>
+    <div class="sb-paper"><strong>${escapeHtml(sbTestTitle())}</strong><small>${escapeHtml(sbExamName(rows[0].examId))} · ${escapeHtml(rows[0].year)}</small></div>
     <div class="sb-summary"><div><b>${rows.length}</b><span>${tx("Questions", "सवाल")}</span></div><div><b>${SB.minutes}</b><span>${tx("Minutes", "मिनट")}</span></div><div><b>${subjects.length}</b><span>${tx(`Subject${subjects.length === 1 ? "" : "s"}`, "विषय")}</span></div></div>
     <ul class="sb-rules">
       <li><b>${tx("Marking:", "अंक:")}</b> ${tx("+1 for each correct answer. Wrong or skipped answers get 0 (no negative marking).", "हर सही जवाब पर +1 अंक। गलत या छोड़े हुए सवाल पर 0 अंक (कोई ऋणात्मक अंक नहीं)।")}</li>

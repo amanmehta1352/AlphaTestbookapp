@@ -34,6 +34,15 @@ with sync_playwright() as p:
     rec('Display remains keyboard accessible through Me', page.locator('#modalSheet.open').count() == 1)
     page.keyboard.press('Escape')
     rec('Display restores focus to its visible settings control', page.evaluate("document.activeElement.id === 'btnTextSize'"))
+    # Closing within the same event turn must cancel the pending autofocus.
+    page.evaluate('''() => {
+      document.getElementById('btnTextSize').focus();
+      openDisplaySettings();
+      closeModal();
+    }''')
+    page.wait_for_timeout(50)
+    rec('Rapidly closed Display never steals focus back into the closed dialog',
+        page.evaluate("!nbModalIsOpen() && document.activeElement.id === 'btnTextSize'"))
     page.locator('.me-row', has_text='Dark mode').click()
     rec('Me theme control changes and persists theme', page.evaluate("UserState.theme === 'dark' && document.body.classList.contains('dark')"))
     page.reload()

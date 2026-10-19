@@ -56,6 +56,16 @@ with sync_playwright() as p:
         page.locator('#qbSearch').input_value() == 'percentage')
     rec('browser Back restores scroll position', scroll > 100 and
         abs(page.evaluate("document.getElementById('mainView').scrollTop") - scroll) <= 2, scroll)
+    page.evaluate("renderView()")
+    page.wait_for_timeout(50)
+    rec('same-route refresh preserves scroll position',
+        abs(page.evaluate("document.getElementById('mainView').scrollTop") - scroll) <= 2)
+    page.evaluate("navigate('me');navigate('taxonomy_explorer')")
+    page.wait_for_timeout(50)
+    rec('forward entry starts at the top while preserving bank filters',
+        page.evaluate("document.getElementById('mainView').scrollTop") == 0 and
+        page.evaluate('JSON.stringify(QBState)') == bank and
+        page.locator('#qbSearch').input_value() == 'percentage')
     page.evaluate("navigate('me');navigate('home');appNavigateBack();navigate('subjects');appNavigateBack()")
     rec('forward navigation after Back keeps the immediate previous page', page.evaluate('Route.page') == 'me')
     page.evaluate("navigate('topic',{moduleId:'maths-percentage-class-test'})")
@@ -109,6 +119,29 @@ with sync_playwright() as p:
         page.evaluate('(dark)=>document.body.classList.toggle("dark",dark)', dark)
         page.evaluate("navigate('subjects')")
         rec(f'context actions have 44px tap targets (dark={dark})', page.locator('.study-context button').evaluate('(el)=>el.getBoundingClientRect().height>=44'))
+    # Exercise the actual instructions -> launched session title in both UI languages.
+    for lang in ['en', 'hi']:
+        for mode, history, expected in [
+            ('custom', 'all', 'Custom Test' if lang == 'en' else 'अपना टेस्ट'),
+            ('custom', 'wrong', 'Mistakes Test' if lang == 'en' else 'गलतियों का टेस्ट'),
+            ('custom', 'bookmarked', 'Bookmarks Test' if lang == 'en' else 'बुकमार्क टेस्ट'),
+            ('pyq', 'all', 'SSC practice paper'),
+        ]:
+            page.evaluate('''([lang, mode, history]) => {
+                StudySettings.ui={lang,size:'m'}; applyDisplaySettings();
+                SB=sbFresh(); SB.mode=mode; SB.hist=history;
+                const row=sbAll()[0];
+                SB.examId=row.examId; SB.year=row.year;
+                SB.previewIds=[row.id]; SB.title='SSC practice paper'; SB.step='instructions';
+                navigate('native_builder');
+            }''', [lang, mode, history])
+            shown_title = page.locator('.sb-paper strong').inner_text()
+            page.locator('[onclick="sbStartFromInstructions()"]').click()
+            rec(f'{mode}/{history} instructions and launched title agree ({lang})',
+                shown_title == expected and page.evaluate('ActiveTestSession?.topicTitle') == expected and
+                page.evaluate('Route.page') == 'test', shown_title)
+            page.evaluate("if(ActiveTestSession) ActiveTestSession.sessionStatus='DONE';"
+                          "clearCbtRecoveryState();ActiveTestSession=null;navigate('home')")
     rec('no JavaScript errors', not errors, errors)
     browser.close()
 

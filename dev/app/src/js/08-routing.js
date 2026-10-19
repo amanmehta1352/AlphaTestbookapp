@@ -222,7 +222,11 @@ function renderView() {
   const key = routeUiKey();
   const changed = key !== RenderedRouteKey;
   const saved = RouteUiMemory.get(key);
-  const scroll = changed ? saved?.scroll || 0 : container.scrollTop;
+  const scroll = changed
+    ? AppRouteRestoring
+      ? saved?.scroll || 0
+      : 0
+    : container.scrollTop;
   if (changed) RouteViewStates.get(Route.page)?.restore(saved?.state, AppRouteRestoring);
   RenderedRouteKey = key;
   AppRouteRestoring = false;

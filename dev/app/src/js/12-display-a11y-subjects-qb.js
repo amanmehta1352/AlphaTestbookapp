@@ -59,7 +59,7 @@ function nbRouteTitle(page) {
 }
 
 /* ---------- accessibility ---------- */
-let A11yQueued = false, ModalReturnFocus = null;
+let A11yQueued = false, ModalReturnFocus = null, ModalFocusTimer = null;
 function nbA11yEnhance() {
   A11yQueued = false;
   document.querySelectorAll('[onclick]:not(button):not(a):not(input):not(select):not(textarea):not(label):not(summary):not([role])').forEach(el => {
@@ -71,24 +71,50 @@ function nbA11yEnhance() {
 function nbQueueA11y() { if (A11yQueued) return; A11yQueued = true; setTimeout(nbA11yEnhance, 0); }
 function nbModalIsOpen() { return document.getElementById('modalSheet')?.classList.contains('open'); }
 function nbFocusModal() {
-  const sheet = document.getElementById('modalSheet'); if (!sheet) return;
+  ModalFocusTimer = null;
+  const sheet = document.getElementById("modalSheet");
+  if (!sheet?.classList.contains("open")) return;
   // A form field gets focus directly; otherwise the dialog itself (no stray focus ring on a button).
   // Sheets marked data-no-autofocus (long lists with inputs) should not pop the phone keyboard open.
-  const first = sheet.querySelector('[data-no-autofocus]') ? null : sheet.querySelector('#modalSheetBody input:not([type=hidden]):not([disabled]), #modalSheetBody select, #modalSheetBody textarea');
-  try { (first || sheet).focus({ preventScroll: true }); } catch (_) {}
+  const first = sheet.querySelector("[data-no-autofocus]")
+    ? null
+    : sheet.querySelector(
+        "#modalSheetBody input:not([type=hidden]):not([disabled]), #modalSheetBody select, #modalSheetBody textarea",
+      );
+  try {
+    (first || sheet).focus({ preventScroll: true });
+  } catch (_) {}
 }
-const _u5OpenModal = openModal, _u5CloseModal = closeModal;
+const _u5OpenModal = openModal,
+  _u5CloseModal = closeModal;
 openModal = function (title, contentHtml) {
   const wasOpen = nbModalIsOpen();
   if (!wasOpen) ModalReturnFocus = document.activeElement;
   _u5OpenModal(title, contentHtml);
   nbQueueA11y();
-  if (!wasOpen || !document.getElementById('modalSheet').contains(document.activeElement)) setTimeout(nbFocusModal, 0);
+  if (
+    !wasOpen ||
+    !document.getElementById("modalSheet").contains(document.activeElement)
+  ) {
+    clearTimeout(ModalFocusTimer);
+    ModalFocusTimer = setTimeout(nbFocusModal, 0);
+  }
 };
 closeModal = function () {
+  clearTimeout(ModalFocusTimer);
+  ModalFocusTimer = null;
   const wasOpen = nbModalIsOpen();
   _u5CloseModal();
-  if (wasOpen && ModalReturnFocus && document.contains(ModalReturnFocus) && ModalReturnFocus !== document.body) { try { ModalReturnFocus.focus({ preventScroll: true }); } catch (_) {} }
+  if (
+    wasOpen &&
+    ModalReturnFocus &&
+    document.contains(ModalReturnFocus) &&
+    ModalReturnFocus !== document.body
+  ) {
+    try {
+      ModalReturnFocus.focus({ preventScroll: true });
+    } catch (_) {}
+  }
   if (wasOpen) ModalReturnFocus = null;
 };
 document.addEventListener('keydown', e => {
