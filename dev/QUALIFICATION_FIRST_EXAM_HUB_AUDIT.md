@@ -9,7 +9,7 @@ Repository scope: primary AlphaTestbookapp only. Control Room was excluded.
 - The existing cloud question sync builds a data-driven exam/branch index from rows available to the signed-in student, applies profile filtering, then uses DataCore to commit the filtered content. The change reuses that path and adds no second question store.
 - The Universal Exam Hub listed all registered exam cards. The student view now filters technical-branch cards to exams whose indexed published question rows contain the selected branch.
 - Existing app UI classes are reused for the qualification page: pf-grid, pf-opt, student-hero-card, section-title, pf-actions and gx-note. No new CSS design system or full-screen redesign was added.
-- The root index.html is generated release output; this PR changes source, manifest and tests only. It does not edit the live index, Control Room, question rows, database schema, import robots or release workflows.
+- The root index.html and admin/index.html are generated release outputs; both are regenerated on this feature branch to match the updated source manifest. Neither file was hand-authored, and main/live deployment was not changed. The PR does not alter Control Room source, question rows, database schema, import robots or release workflows.
 
 ## Intended flow
 
