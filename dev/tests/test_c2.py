@@ -40,6 +40,8 @@ try:
         if st.locator('.qualification-setup').count():
             st.locator('[data-qf-level="10th"]').click(); st.locator('#qualificationSave').click()
             st.wait_for_selector('.exam-hub-page', timeout=15000); idle(st)
+            rec('qualification selection does not download full question bodies before exam choice', st.evaluate("CloudState.serverQuestions===0 && AppModules.filter(m=>m.source==='server').length===0"))
+            st.locator('[data-exam-id]').first.click(); st.wait_for_function("Route.page==='exam_profile' && !!UserState.studentProfile?.examId", timeout=15000); idle(st)
             st.evaluate("navigate('home')"); st.wait_for_selector('.sj-dash', timeout=15000)
         rec('Google login returns to the app, address cleaned', 'access_token' not in st.url and st.evaluate("ServerState.session.email") == F.STUDENT[1])
         rec('student is not admin; questions came from the server', st.evaluate("CloudState.isAdmin===false && CloudState.serverQuestions===362 && AppModules.filter(m=>m.source==='server').length===3"))
@@ -85,6 +87,7 @@ try:
         if st2.locator('.qualification-setup').count():
             st2.locator('[data-qf-level="10th"]').click(); st2.locator('#qualificationSave').click()
             st2.wait_for_selector('.exam-hub-page', timeout=15000); idle(st2)
+            st2.locator('[data-exam-id]').first.click(); st2.wait_for_function("Route.page==='exam_profile' && !!UserState.studentProfile?.examId", timeout=15000); idle(st2)
             st2.evaluate("navigate('home')"); st2.wait_for_selector('.sj-dash', timeout=15000)
         rec('new phone: history comes back (4 answers, 1 test)', st2.evaluate("AttemptHistory.length") == 4 and st2.evaluate("ResultHistory.length") == 1, (st2.evaluate("AttemptHistory.length"), st2.evaluate("ResultHistory.length")))
         rec('new phone: bookmark and daily goal come back', st2.evaluate("ReviewState.bookmarks.length") == 1 and st2.evaluate("StudySettings.dailyGoal") == 25)
