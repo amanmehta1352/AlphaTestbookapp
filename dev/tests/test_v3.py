@@ -26,6 +26,12 @@ with sync_playwright() as p:
     labels = pg.locator('.gx-quick .sj-quick-btn').all_inner_texts()
     rec('home exposes eight exam-first preparation tiles',
         len(labels) == 8 and all(label in ' '.join(labels) for label, _ in expected_tiles), labels)
+    rec('live Home layout arranges existing components into main and study-focus columns',
+        pg.locator('.ao-home-601010 .ao-home-main .gx-hero').count() == 1 and
+        pg.locator('.ao-home-601010 .ao-home-main .gx-quick').count() == 1 and
+        pg.locator('.ao-home-601010 .ao-home-side .ao-today').count() == 1 and
+        pg.locator('.ao-home-601010 > .ao-details').count() == 1)
+    rec('live Home keeps the existing bottom dock', pg.locator('#bottomNav .nav-tab').count() == 5)
     for i, (label, route) in enumerate(expected_tiles):
         pg.evaluate("navigate('home')")
         pg.locator('.gx-quick .sj-quick-btn').nth(i).click()
@@ -44,6 +50,10 @@ with sync_playwright() as p:
             pg.evaluate(f"navigate('{route}')"); pg.wait_for_timeout(250)
             if not pg.evaluate(OVER): bad.append(route)
         rec(f'no sideways scroll at {w}px (home, subjects, tests, revision, exams)', not bad, bad)
+    pg.set_viewport_size({'width': 1280, 'height': 800}); pg.evaluate("navigate('home')"); pg.wait_for_timeout(200)
+    rec('desktop Home uses two balanced responsive columns', pg.evaluate("(()=>{const root=document.querySelector('.ao-home-601010'),main=document.querySelector('.ao-home-main'),side=document.querySelector('.ao-home-side');return !!root&&getComputedStyle(root).display==='grid'&&getComputedStyle(root).gridTemplateColumns.trim().split(/\\s+/).length===2&&side.getBoundingClientRect().left>main.getBoundingClientRect().left})()"))
+    pg.set_viewport_size({'width': 360, 'height': 800}); pg.evaluate("navigate('home')"); pg.wait_for_timeout(150)
+    rec('mobile Home collapses to a single column without sideways overflow', pg.evaluate("(()=>{const r=document.querySelector('.ao-home-601010');return getComputedStyle(r).gridTemplateColumns.trim().split(/\\s+/).length===1&&document.documentElement.scrollWidth<=window.innerWidth+1})()"))
     pg.set_viewport_size({'width': 1024, 'height': 768}); pg.evaluate("navigate('home')"); pg.wait_for_timeout(250)
     rec('tablet: quick-action labels never break inside a word', pg.evaluate("[...document.querySelectorAll('.sj-quick-btn')].every(b=>b.scrollWidth<=b.clientWidth+1)"))
     pg.set_viewport_size({'width': 412, 'height': 800}); pg.evaluate("navigate('home')"); pg.wait_for_timeout(200)
