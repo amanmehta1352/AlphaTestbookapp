@@ -58,8 +58,9 @@ try:
         # ---- student does not see drafts ----
         fake.google_user = F.STUDENT
         sc = ctx_new(); sp = page(sc, APP, '.sj-dash')
-        sp.locator('.cl-prompt').click(); sp.locator('.cl-google').click(); sp.wait_for_selector('.sj-dash', timeout=15000)
+        sp.locator('.cl-prompt').click(); sp.locator('.cl-google').click()
         sp.wait_for_function("ServerState.session && CloudState.isAdmin===false && !CloudState.busy", timeout=20000); sp.wait_for_timeout(300)
+        sp.wait_for_selector('.qualification-setup', timeout=15000)
         rec('student gets 0 server questions while all are draft', sp.evaluate("CloudState.serverQuestions") == 0, sp.evaluate("CloudState.serverQuestions"))
         sp.evaluate("closeModal()"); sp.click('#btnMenu'); sp.wait_for_timeout(200)
         rec('student menu hides Import / Cleanup / Server / Studio', sp.locator('#sideDrawer .admin-only:visible').count() == 0)
