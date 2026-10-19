@@ -6,6 +6,8 @@
   gap: 12px;
   min-width: 0;
 }
+.ao-home-601010 .ao-home-main { grid-column: 1; grid-row: 1; }
+.ao-home-601010 .ao-home-side { grid-column: 2; grid-row: 1; }
 .ao-home-601010 .ao-home-main,
 .ao-home-601010 .ao-home-side {
   display: flex;
@@ -38,5 +40,5 @@
   }
   .ao-home-601010 > .ao-details { grid-column: 1; }
   .ao-home-601010 .ao-home-main,
-  .ao-home-601010 .ao-home-side { gap: 10px; }
+  .ao-home-601010 .ao-home-side { grid-column: 1; grid-row: auto; gap: 10px; }
 }

@@ -15,22 +15,22 @@ renderHomePage = function(v) {
 
   root.classList.add('ao-home-601010');
   root.dataset.layout601010 = 'true';
-  root.insertBefore(main, root.firstChild);
-  root.insertBefore(side, main.nextSibling);
+  // Put the focus column first in DOM reading order; CSS places it on the right on desktop.
+  root.insertBefore(side, root.firstChild);
+  root.insertBefore(main, side.nextSibling);
 
   const move = (selector, target) => {
     const element = Array.from(root.children).find(child => child.matches(selector));
     if (element) target.appendChild(element);
   };
 
-  // Keep the primary Continue action before the hero's daily-goal content in DOM reading order.
-  move('.ao-next', main);
+  // Keep Continue → daily goal → preparation shortcuts in DOM reading order.
+  move('.ao-next', side);
+  move('.ao-today', side);
   move('.gx-hero', main);
-  move('.ao-today', main);
   move('.gx-quick', main);
   move('.gx-search', main);
   move('.ao-followups', side);
-  move('.ao-today', side);
 
   const details = Array.from(root.children).find(child => child.matches('.ao-details'));
   if (details) details.setAttribute('aria-label', tx('Progress and study tools', 'प्रगति और अध्ययन टूल'));
