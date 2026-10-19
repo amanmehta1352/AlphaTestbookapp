@@ -167,6 +167,13 @@
    ]
   },
   {
+   "file": "src/css/20-home-dashboard-601010.css",
+   "wrap": [
+    "<style id=\"home-dashboard-601010\">",
+    "</style>"
+   ]
+  },
+  {
    "file": "src/html/head-14.html"
   },
   {
@@ -318,6 +325,10 @@
   },
   {
    "file": "src/js/24d-admin-studio.js",
+   "script": true
+  },
+  {
+   "file": "src/js/24e-home-dashboard-601010.js",
    "script": true
   },
   {
