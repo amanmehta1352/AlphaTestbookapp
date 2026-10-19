@@ -42,6 +42,7 @@ try:
         rec('login opens required qualification step first', st.locator('.qualification-setup').count() == 1)
         rec('qualification page keeps the existing app shell', st.locator('#appHeader').count() == 1 and st.locator('#bottomNav').count() == 1)
         rec('profile index knows SSC JE branch content', st.evaluate("Object.keys(CloudState.profileIndex['ssc-je'].branches).sort().join()") == 'civil,electrical,mechanical')
+        rec('full question bodies are not downloaded before qualification', st.evaluate("CloudState.serverQuestions===0 && AppModules.filter(m=>m.source==='server').length===0"))
         st.locator('[data-qf-level="diploma"]').click()
         st.wait_for_function("QualificationDraft.level==='diploma'")
         rec('Diploma offers Mechanical and other available branch choices', st.locator('[data-qf-branch="mechanical"]').count() == 1 and st.locator('[data-qf-branch="civil"]').count() == 1)
