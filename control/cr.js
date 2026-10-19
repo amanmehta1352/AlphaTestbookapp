@@ -195,16 +195,16 @@ function vOverview() {
       <div class="chips"><span class="hchip">${ICON[st.overall]} ${todo.length} काम</span><span class="hchip">📚 ${n(q.live)} live</span><span class="hchip">👥 ${n(stu.total)} students</span>${flags.map(f => `<span class="hchip">${f}</span>`).join('')}</div>
       <div class="hbtns"><button class="hbtn solid" data-act="health-now">🩺 अभी जाँच करवाओ</button><button class="hbtn" data-go="emergency">🛑 Emergency</button><a class="hbtn" href="../" >📱 ऐप</a></div></div>
   </div></section>
-  <div class="kpis s12">
-    ${kpi('📚', q.live, 'Live सवाल', 'k1')}${kpi('🚀', (q.draft || 0) + (q.reviewed || 0), 'Publish बाकी', 'k3', (q.draft + q.reviewed) ? 'warn' : '')}
-    ${kpi('🧩', q.broken_live, 'टूटे सवाल', 'k4', q.broken_live ? 'bad' : '')}${kpi('🏷️', q.untagged_live, 'बिना chapter', 'k6', q.untagged_live ? 'warn' : '')}
-    ${kpi('👥', stu.active_7d, '7 दिन active', 'k2')}${kpi('💾', db.backups?.count ?? (st.supabase?.backups || []).length, 'Backups', 'k5')}
-  </div>
   <section class="card s8"><h2>👉 क्या करना है <small>${todo.length ? todo.length + ' काम' : 'कुछ नहीं'}</small></h2>
     <ul class="list">${todo.length ? todo.map(itemHtml).join('') : '<li class="item ok"><span class="ic">🎉</span><span class="msg">अभी कोई काम बाकी नहीं</span><span></span></li>'}</ul>
     <details style="margin-top:10px"><summary class="muted">ठीक चल रही चीज़ें (${good.length})</summary><ul class="list" style="margin-top:8px">${good.map(itemHtml).join('')}</ul></details></section>
   <section class="card s4"><h2>🗓️ आगे क्या चलेगा</h2><ul class="list">${nexts.slice(0, 5).map(w => `<li class="item ok"><span class="ic">${esc(w.label.split(' ')[0])}</span><span><div class="msg">${esc(w.label.replace(/^\S+\s/, ''))}</div><span class="faint">${when(w.next_run)} · ${ago(w.next_run)}</span></span><span></span></li>`).join('') || '<div class="empty">कोई schedule नहीं</div>'}
     <li class="item ok"><span class="ic">🔗</span><span><div class="msg">PYQ आते ही</div><span class="faint">Hindi → Tag → Key-check अपने-आप</span></span><span></span></li></ul></section>
+  <div class="kpis s12">
+    ${kpi('📚', q.live, 'Live सवाल', 'k1')}${kpi('🚀', (q.draft || 0) + (q.reviewed || 0), 'Publish बाकी', 'k3', (q.draft + q.reviewed) ? 'warn' : '')}
+    ${kpi('🧩', q.broken_live, 'टूटे सवाल', 'k4', q.broken_live ? 'bad' : '')}${kpi('🏷️', q.untagged_live, 'बिना chapter', 'k6', q.untagged_live ? 'warn' : '')}
+    ${kpi('👥', stu.active_7d, '7 दिन active', 'k2')}${kpi('💾', db.backups?.count ?? (st.supabase?.backups || []).length, 'Backups', 'k5')}
+  </div>
   <section class="card s6"><h2>📈 सवाल (समय के साथ)</h2>${lineChart([{ name: 'Live', color: 'var(--c1)', values: H.map(h => h.live) }, { name: 'Publish बाकी', color: 'var(--c3)', values: H.map(h => h.pending) }], H.map(h => when(h.at).split(',')[0]))}</section>
   <section class="card s6"><h2>⚡ Students (14 दिन)</h2>${stu.trend ? lineChart([{ name: 'Active students', color: 'var(--c2)', values: stu.trend.map(d => d.active) }, { name: 'टेस्ट', color: 'var(--c4)', values: stu.trend.map(d => d.tests) }], stu.trend.map(d => d.day.slice(5))) : '<div class="empty">Health Robot की अगली जाँच के बाद</div>'}</section>
   <section class="card s12"><h2>🤖 Robots एक नज़र में <button class="btn sm soft" data-go="robots">सब देखो ›</button></h2>

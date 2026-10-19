@@ -22,7 +22,7 @@ if ! (cd "$SITE/dev/app" && python3 build.py "$SITE/admin/index.html" --studio);
   exit 1
 fi
 export MTB_SITE="$SITE"
-SUITES="test_build test_u1_reg test_u2_v4 test_u3 test_u4a test_u4b test_u4c test_u5 test_a test_c1 test_c2 test_f1 test_clean test_pwa test_defaults test_sql_v2 test_studio test_robot test_hindi test_tagger test_profile test_v3 test_mobile_design test_navigation test_keycheck test_health test_ops"
+SUITES="test_build test_u1_reg test_u2_v4 test_u3 test_u4a test_u4b test_u4c test_u5 test_a test_c1 test_c2 test_f1 test_clean test_pwa test_defaults test_sql_v2 test_studio test_robot test_hindi test_tagger test_profile test_v3 test_design test_mobile_design test_navigation test_keycheck test_health test_ops"
 fail=0
 for t in $SUITES; do
   case $t in

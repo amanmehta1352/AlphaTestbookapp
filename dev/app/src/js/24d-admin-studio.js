@@ -78,8 +78,9 @@ function studioPaint() {
   if (ServerState.isAdmin !== true) { root.innerHTML = `${head}<main class="st-main">${msg}${prog || '<div class="st-msg">⏳ जाँच रहे हैं…</div>'}${Studio.msgKind === 'bad' ? '<button class="st-btn" onclick="location.reload()">फिर कोशिश करें</button>' : ''}</main>`; return; }
   const tabs = [['home', '📊', 'सारांश'], ['import', '📥', 'Import'], ['review', '👀', 'Review']];
   const nav = `<nav class="st-tabs" role="tablist">${tabs.map(([id, ic, l]) => `<button role="tab" aria-selected="${Studio.tab === id}" class="${Studio.tab === id ? 'on' : ''}" onclick="studioTab('${id}')">${ic} ${l}</button>`).join('')}</nav>`;
+  const intro = Studio.tab === 'import' ? '<div class="st-intro"><span class="st-eyebrow">सवाल जोड़ें</span><h1>Import → जाँच → Draft</h1><p>पहले file जाँचें, फिर तैयार सवाल server पर भेजें।</p></div>' : Studio.tab === 'review' ? '<div class="st-intro"><span class="st-eyebrow">सवालों की गुणवत्ता</span><h1>Review और publish</h1><p>Topic चुनें, सवाल जाँचें, फिर students के लिए publish करें।</p></div>' : '';
   const body = Studio.tab === 'import' ? studioImportHtml() : Studio.tab === 'review' ? studioReviewHtml() : studioHomeHtml();
-  root.innerHTML = `${head}${nav}<main class="st-main">${msg}${prog}${body}</main>`;
+  root.innerHTML = `${head}${nav}<main class="st-main">${msg}${prog}${intro}${body}</main>`;
 }
 function studioTab(t) { Studio.tab = t; Studio.msg = ''; if (t === 'review' && Studio.review.topicId && !Studio.review.rows.length) studioLoadTopic(Studio.review.topicId); studioPaint(); window.scrollTo(0, 0); }
 
@@ -87,15 +88,26 @@ function studioTab(t) { Studio.tab = t; Studio.msg = ''; if (t === 'review' && S
 function studioHomeHtml() {
   const c = studioCounts(Studio.qIndex);
   const list = studioTopicStats();
-  return `<section class="st-stats">
+  const next = list.find(x => x.c.draft || x.c.reviewed);
+  const action = next
+    ? `<button class="st-btn primary" onclick="studioOpenTopic(${nbJsAttr(next.t.id)})">👀 सवाल जाँचना शुरू करें ›</button>`
+    : '<button class="st-btn primary" onclick="studioTab(\'import\')">📥 नई file import करें ›</button>';
+  return `<section class="st-card st-next">
+      <span class="st-eyebrow">अगला कदम</span>
+      <h1>${next ? 'सवाल तैयार करें, फिर publish करें' : 'अगला question set जोड़ें'}</h1>
+      <p>${next ? `${c.draft + c.reviewed} सवाल review / publish के लिए बाकी हैं। शुरुआत ${escapeHtml(next.t.title)} से करें।` : 'एक file चुनें, सवाल जाँचें और सुरक्षित तरीके से Draft में जोड़ें।'}</p>
+      ${action}
+      <span class="st-note">Students को सिर्फ़ Published सवाल दिखते हैं।</span>
+    </section>
+    <section class="st-stats" aria-label="सवालों की स्थिति">
       <div class="st-stat draft"><b>${c.draft}</b><span>📝 Draft</span></div>
       <div class="st-stat reviewed"><b>${c.reviewed}</b><span>👀 Reviewed</span></div>
       <div class="st-stat published"><b>${c.published}</b><span>✅ Published</span></div>
     </section>
     <p class="st-note">Students को सिर्फ़ ✅ Published सवाल दिखते हैं।${c.hidden ? ` ${c.hidden} सवाल छिपाए गए हैं।` : ''} कुल ${c.total} सवाल, ${list.length} topics।</p>
-    <div class="st-row"><button class="st-btn primary" onclick="studioTab('import')">📥 नई file import करें</button><button class="st-btn" onclick="studioLoad()" ${Studio.busy ? 'disabled' : ''}>↻ ताज़ा करें</button></div>
+    <div class="st-row"><button class="st-btn" onclick="studioTab('import')">📥 नई file import करें</button><button class="st-btn" onclick="studioLoad()" ${Studio.busy ? 'disabled' : ''}>↻ ताज़ा करें</button></div>
     <h3 class="st-h">Topics</h3>
-    <div class="st-list">${list.map(({ t, c }) => `<button class="st-topic" onclick="studioOpenTopic('${escapeHtml(t.id)}')">
+    <div class="st-list">${list.map(({ t, c }) => `<button class="st-topic" onclick="studioOpenTopic(${nbJsAttr(t.id)})">
       <span><b>${escapeHtml(t.title)}</b><small>${escapeHtml(subjectDisplayName(t.subject))} · ${escapeHtml(t.chapter || '')}${t.exam_id ? ' · ' + escapeHtml(Studio.exams.get(t.exam_id) || t.exam_id) : ''}${t.year ? ' ' + t.year : ''}</small></span>
       <span class="st-pills">${c.draft ? `<i class="draft">📝 ${c.draft}</i>` : ''}${c.reviewed ? `<i class="reviewed">👀 ${c.reviewed}</i>` : ''}<i class="published">✅ ${c.published}</i></span></button>`).join('') || '<p class="st-note">Server पर अभी कोई सवाल नहीं।</p>'}</div>`;
 }

@@ -1,0 +1,869 @@
+/* Shared presentation contract for student routes, study flows and Admin Studio.
+   Loaded after historical releases; !important only resolves legacy compact rules. */
+:root {
+  --on-primary: #ffffff;
+  --app-header-height: 64px;
+  --app-content-width: 1120px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --action-height: 48px;
+  --success: #087f5b;
+  --danger: #b93835;
+}
+body.dark {
+  --on-primary: #0f172a;
+  --success: #39d9a2;
+  --danger: #ff8c89;
+}
+html,
+body {
+  line-height: 1.6;
+}
+body {
+  user-select: text;
+}
+h1,
+h2,
+h3 {
+  line-height: 1.3;
+}
+button {
+  font-weight: 650;
+}
+button,
+input,
+select,
+textarea,
+a {
+  touch-action: manipulation;
+}
+button:disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+}
+[hidden] {
+  display: none !important;
+}
+
+/* A quiet shell: settings and question bank remain in the menu. */
+#appHeader {
+  height: calc(var(--app-header-height) + var(--safe-top));
+  padding-inline: max(16px, calc((100vw - var(--app-content-width)) / 2));
+  gap: 12px;
+  background: var(--surface);
+  backdrop-filter: none;
+}
+#appHeader .header-left,
+#appHeader .header-right {
+  gap: 8px;
+}
+#appHeader .header-title {
+  max-width: none;
+  min-width: 0;
+  font-size: 16px;
+  flex: 1;
+}
+#appHeader .header-btn {
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  min-width: 44px;
+  flex: 0 0 auto;
+  font-size: 17px;
+  border-radius: 12px;
+}
+#appHeader #btnAppBack {
+  width: auto;
+  padding-inline: 10px;
+  font-size: 13px;
+}
+#appHeader #btnTheme,
+#appHeader #btnQuestionBank,
+#workspaceSwitcherBtn {
+  display: none;
+}
+#bottomNav {
+  height: 68px;
+  max-width: 560px;
+  background: var(--surface);
+  backdrop-filter: none;
+  box-shadow: var(--shadow-lg);
+}
+#bottomNav .nav-tab {
+  font-size: 12px;
+  font-weight: 650;
+  gap: 4px;
+}
+#bottomNav .nav-tab.active {
+  font-weight: 750;
+}
+#bottomNav .nav-tab-icon {
+  font-size: 18px;
+}
+#sideDrawer {
+  padding: 20px 16px;
+}
+.drawer-item {
+  min-height: 48px;
+  font-weight: 600;
+}
+.drawer-section-title {
+  margin-top: 24px;
+  font-size: 12px;
+}
+.nav-breadcrumb {
+  gap: 8px;
+  flex-wrap: wrap;
+  white-space: normal;
+  overflow: visible;
+  font-size: 13px;
+}
+.nav-breadcrumb button {
+  min-height: 44px;
+  padding: 8px 2px;
+}
+
+/* Shared controls: one treatment for primary, secondary and destructive actions. */
+.btn-nav,
+.btn-action-sm,
+.gx-btn,
+.gx-link,
+.sj-inline-link,
+.sb-back,
+.sb-restart,
+.sb-crumbs > button,
+.sh-t-name,
+.qb-practice,
+.header-btn,
+.modal-close,
+.pf-chip {
+  min-height: 44px;
+  line-height: 1.4;
+}
+.btn-nav,
+.gx-btn {
+  min-height: var(--action-height);
+  padding: 12px 18px;
+  font-size: 14px;
+  font-weight: 700;
+}
+.btn-action-sm {
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 650;
+}
+.btn-nav.primary,
+.btn-primary,
+.gx-btn:not(.ghost),
+.sh-act.primary,
+.sb-mode.selected,
+.sb-next,
+.nb-tab.active,
+.sh-chip.on,
+.sn-tab.on,
+.st-btn.primary {
+  color: var(--on-primary);
+}
+.sn-tab.on {
+  color: var(--primary);
+}
+.btn-nav.primary,
+.btn-primary,
+.gx-btn:not(.ghost),
+.sh-act.primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  box-shadow: none;
+}
+.btn-nav.danger {
+  background: var(--danger);
+  color: #fff;
+  border-color: var(--danger);
+}
+body.dark .btn-nav.danger {
+  color: #0f172a;
+}
+.gx-btn.ghost {
+  background: var(--surface);
+  color: var(--text-main);
+  border: 1px solid var(--border-strong);
+}
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not(
+    [type="hidden"]
+  ),
+select,
+textarea {
+  min-height: 48px;
+  max-width: 100%;
+  font-size: max(16px, 1em);
+  line-height: 1.5;
+  border-radius: var(--radius-md);
+  color: var(--text-main);
+  background: var(--surface);
+}
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--primary);
+}
+textarea {
+  resize: vertical;
+}
+
+/* Cards and page intros: consistent hierarchy across all content routes. */
+.grid-cards {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 16px;
+}
+.card-btn,
+.subject-card,
+.student-hero-card,
+.nb-card,
+.gx-card,
+.rv-card,
+.rs-card,
+.qb-item,
+.me-head,
+.sn-topic-panel {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  color: var(--text-main);
+  box-shadow: var(--shadow-sm);
+}
+.card-btn {
+  padding: 20px;
+  min-width: 0;
+}
+.card-btn strong {
+  font-size: 16px;
+  font-weight: 750;
+  line-height: 1.4;
+}
+.card-btn small {
+  font-size: 13px;
+  line-height: 1.6;
+}
+.student-hero-card,
+.ao-page-head {
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.student-hero-card h1 {
+  font-size: clamp(23px, 3vw, 30px);
+  font-weight: 750;
+  color: var(--text-main);
+}
+.student-hero-card p {
+  font-size: 14px;
+  color: var(--text-muted);
+  opacity: 1;
+}
+.student-hero-card .journey-pill {
+  color: var(--primary);
+  background: var(--primary-light);
+  font-size: 12px;
+  letter-spacing: 0;
+}
+.section-title {
+  margin: 24px 0 12px;
+  font-size: 18px;
+  font-weight: 750;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.ao-primary-card {
+  border-color: var(--primary-border);
+  background: var(--primary-light);
+}
+.ao-actions,
+.rs-actions,
+.ao-page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+.ao-page-actions {
+  margin-top: 20px;
+}
+.ao-primary-card .ao-actions,
+.rs-next-step .rs-actions {
+  margin-top: 16px;
+}
+.gx-empty,
+.qb-empty,
+.nb-empty {
+  padding: 20px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.tax-badge,
+.sh-tag,
+.sn-topic-count,
+.sn-tab small,
+.sn-chapter-main small,
+.node-meta,
+.nb-row-meta,
+.qb-meta,
+.me-tile,
+.gx-explore-note {
+  font-size: 12px;
+  line-height: 1.5;
+}
+.sn-tab {
+  min-width: 138px;
+}
+.sn-tab > span:nth-child(2),
+.sn-chapter-main strong {
+  font-size: 14px;
+  font-weight: 700;
+}
+.sn-topic-label {
+  font-size: 14px;
+  font-weight: 600;
+}
+.sn-topic {
+  min-height: 52px;
+}
+.sh-act {
+  min-height: 48px;
+}
+.sh-t-meta,
+.me-row-main small,
+.me-id p {
+  font-size: 13px;
+}
+.me-row {
+  min-height: 64px;
+}
+
+/* Home: match DOM order to visual order, at every breakpoint. */
+.ao-home {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+}
+.ao-home > *,
+.ao-today > *,
+.ao-detail-grid > * {
+  grid-column: auto;
+  grid-row: auto;
+  min-width: 0;
+}
+.ao-home .gx-card {
+  padding: 20px;
+}
+.ao-home .gx-hero {
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.ao-home .gx-hero h1 {
+  font-size: clamp(24px, 3vw, 30px);
+  font-weight: 750;
+}
+.ao-home .gx-hero p,
+.ao-home .gx-hero-facts {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.ao-home .gx-head {
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.ao-home .gx-head h2 {
+  font-size: 17px;
+  font-weight: 750;
+}
+.ao-home .ao-next {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  padding: 24px;
+}
+.ao-next .gx-next-icon {
+  width: 44px;
+  height: 44px;
+  font-size: 24px;
+  background: var(--surface);
+  box-shadow: none;
+}
+.ao-next .gx-next-copy h2 {
+  margin: 4px 0 8px;
+  font-size: clamp(22px, 3vw, 28px);
+  line-height: 1.3;
+  font-weight: 750;
+  color: var(--text-main);
+}
+.ao-next .gx-next-copy small {
+  font-size: 12px;
+  color: var(--primary);
+}
+.ao-next .gx-next-copy span {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+.ao-next > .gx-btn {
+  grid-column: 1 / -1;
+  width: 100%;
+  margin-top: 8px;
+  min-height: 52px;
+}
+.ao-today,
+.ao-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+.ao-home .sj-action {
+  min-height: 64px;
+}
+.ao-home .sj-action-copy small {
+  font-size: 13px;
+  line-height: 1.5;
+}
+.ao-home .gx-quick .sj-quick {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.ao-home .gx-quick .sj-quick-btn {
+  min-height: 84px;
+  padding: 12px 8px;
+  font-size: 13px;
+  font-weight: 650;
+  overflow-wrap: normal;
+}
+.ao-home .gx-search {
+  padding: 0;
+}
+.ao-details > .gx-head {
+  margin: 8px 0 16px;
+}
+.ao-home .gx-journey,
+.ao-home .gx-recent,
+.ao-home .gx-backup {
+  grid-column: 1 / -1;
+}
+
+/* Builder, revision and reading flows share the same control sizing. */
+.sb-shell {
+  max-width: 960px;
+}
+.sb-top {
+  min-height: 64px;
+  gap: 12px;
+}
+.sb-mode {
+  min-height: 100px;
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
+.sb-mode strong {
+  font-size: 17px;
+}
+.sb-mode small,
+.sb-bar-info,
+.sb-note,
+.sb-meta {
+  font-size: 13px;
+  line-height: 1.6;
+}
+.sb-bar {
+  padding-block: 16px 8px;
+  gap: 12px;
+}
+.sb-body {
+  padding-block: 20px;
+}
+.sb-crumbs {
+  padding-block: 12px;
+}
+.sb-crumbs > button,
+.sb-crumbs > span:not(.sb-crumb-sep) {
+  display: inline-flex;
+  align-items: center;
+}
+.sb-card,
+.sb-row {
+  border-radius: var(--radius-md);
+}
+.rv-card {
+  padding: 20px;
+}
+.rv-card h2 {
+  font-size: 22px;
+}
+.rv-card p,
+.rv-meta {
+  font-size: 14px;
+}
+.rs-next-step {
+  padding: 20px;
+  margin-block: 16px;
+}
+.rs-next-step h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+.rs-next-step p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+.rs-tr {
+  min-height: 44px;
+  font-size: 13px;
+}
+.rs-th {
+  font-size: 12px;
+}
+
+/* Dialogs stay scrollable, with a stable title/close affordance. */
+#modalSheet {
+  border-radius: 24px 24px 0 0;
+  background: var(--surface);
+}
+.modal-header {
+  min-height: 72px;
+  padding: 16px 20px;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.modal-header h3 {
+  font-size: 20px;
+  font-weight: 750;
+}
+.modal-close,
+#btnCloseDrawer {
+  min-width: 44px;
+  min-height: 44px;
+}
+#modalSheetBody {
+  padding: 20px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Override old !important compressed exam chrome, without changing CBT layout lifecycle. */
+.test-fixed-viewport .test-fixed-header {
+  padding: 8px 12px !important;
+  background: var(--surface) !important;
+}
+.test-fixed-viewport .test-header-row {
+  flex-wrap: wrap;
+  gap: 8px !important;
+}
+.test-fixed-viewport .cbt-one-step-back,
+.test-fixed-viewport .cbt-header-submit,
+.test-fixed-viewport .test-fixed-header .icon-btn,
+.test-fixed-viewport .question-palette-toggle,
+.test-fixed-viewport .timer-badge {
+  min-height: 44px !important;
+  min-width: 44px !important;
+  font-size: 13px !important;
+  padding: 8px !important;
+}
+.test-fixed-viewport .test-fixed-header .icon-btn {
+  width: 44px !important;
+  height: 44px !important;
+}
+.test-fixed-viewport .header-logo-box {
+  display: none;
+}
+.test-fixed-viewport .section-switcher-wrap {
+  font-size: 12px !important;
+  line-height: 1.4 !important;
+}
+.test-fixed-viewport .section-switcher {
+  font-size: 13px !important;
+  max-width: 160px !important;
+}
+.test-fixed-viewport .proctor-status {
+  display: none;
+}
+.test-fixed-viewport .cbt-compact-tools-row {
+  gap: 8px;
+  padding-top: 8px;
+}
+.test-fixed-viewport .cbt-compact-tools-row .header-actions {
+  gap: 8px;
+  padding-left: 0;
+  flex-wrap: wrap;
+}
+.test-fixed-viewport .test-scrollable-body {
+  padding: 16px !important;
+}
+.test-fixed-viewport .cbt-question-card {
+  padding: 20px !important;
+  max-width: 840px;
+  margin-inline: auto;
+}
+.test-fixed-viewport .question-stem {
+  font-size: calc(18px * var(--ui-zoom, 1)) !important;
+  line-height: 1.7 !important;
+}
+.test-fixed-viewport .question-stem .hi-stem {
+  font-size: calc(17px * var(--ui-zoom, 1)) !important;
+  line-height: 1.8 !important;
+}
+.test-fixed-viewport .opt-card {
+  min-height: 56px;
+  padding: 14px;
+}
+.test-fixed-viewport .question-palette-grid {
+  grid-template-columns: repeat(auto-fit, minmax(44px, 1fr));
+}
+.test-fixed-viewport .question-palette-grid .strip-chip {
+  min-height: 44px;
+  aspect-ratio: auto;
+  font-size: 13px;
+}
+.test-fixed-viewport .question-palette-close {
+  min-width: 44px;
+  min-height: 44px;
+}
+.test-fixed-viewport .question-palette-legend {
+  font-size: 12px;
+}
+.test-fixed-viewport .ao-cbt-footer {
+  padding: 12px 16px max(12px, var(--safe-bottom)) !important;
+  background: var(--surface);
+}
+.test-fixed-viewport .ao-cbt-footer .test-footer-inner {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 10px !important;
+}
+.test-fixed-viewport .ao-cbt-footer .ao-secondary-actions {
+  display: flex !important;
+  grid-column: 1 / -1;
+  grid-row: 2;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  overflow: visible !important;
+}
+.test-fixed-viewport .ao-cbt-footer .footer-btn {
+  min-height: 48px !important;
+  font-size: 14px !important;
+  padding: 10px 12px !important;
+  line-height: 1.4 !important;
+  word-break: normal;
+  overflow-wrap: normal !important;
+}
+.test-fixed-viewport .ao-cbt-footer .btn-nav-next {
+  color: var(--on-primary);
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.test-fixed-viewport .ao-cbt-footer .btn-nav-clear,
+.test-fixed-viewport .ao-cbt-footer .btn-nav-mark {
+  flex: 1 !important;
+  width: auto !important;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.test-fixed-viewport .ao-cbt-footer .btn-nav-mark.marked {
+  color: var(--primary);
+  background: var(--primary-light);
+  border-color: var(--primary-border);
+}
+.question-palette-grid .strip-chip.answered {
+  background: var(--success) !important;
+  color: #fff !important;
+}
+body.dark .question-palette-grid .strip-chip.answered {
+  color: #0f172a !important;
+}
+.ao-practice-actions {
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+@media (hover: hover) {
+  .card-btn:hover,
+  .sj-action:hover,
+  .sn-topic:hover,
+  .me-row:hover {
+    border-color: var(--primary-border);
+    background: var(--primary-light);
+  }
+  .btn-nav.primary:hover,
+  .gx-btn:not(.ghost):hover {
+    filter: brightness(0.94);
+  }
+}
+@media (min-width: 720px) {
+  .ao-today {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  }
+  .ao-detail-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .ao-home .gx-quick .sj-quick {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .ao-home .ao-next {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+  }
+  .ao-next > .gx-btn {
+    grid-column: auto;
+    min-width: 180px;
+    width: auto;
+  }
+  #bottomNav {
+    left: 50%;
+    right: auto;
+    width: min(560px, calc(100% - 24px));
+    transform: translateX(-50%);
+  }
+  #modalSheet {
+    border-radius: 24px;
+    bottom: 24px;
+    max-height: calc(100dvh - 48px);
+  }
+}
+@media (max-width: 480px) {
+  #appHeader {
+    padding-inline: 12px;
+    gap: 8px;
+  }
+  #appHeader .header-left,
+  #appHeader .header-right {
+    gap: 6px;
+  }
+  #appHeader .header-title {
+    font-size: 14px;
+    min-width: 0;
+    flex-basis: auto;
+  }
+  #bottomNav {
+    left: 8px;
+    right: 8px;
+    padding-inline: 2px;
+  }
+  #bottomNav .nav-tab {
+    font-size: 11px;
+  }
+  .student-hero-card,
+  .ao-page-head {
+    padding: 20px;
+  }
+  .ao-home .gx-card {
+    padding: 16px;
+  }
+  .ao-home .gx-hero {
+    padding: 4px 0;
+  }
+  .ao-home .ao-next {
+    padding: 20px;
+  }
+  .ao-home .gx-search {
+    padding: 0;
+  }
+  .ao-actions > .btn-nav,
+  .rs-next-step .btn-nav {
+    width: 100%;
+  }
+  .test-fixed-viewport .test-header-row > div:first-child {
+    flex: 1 1 100%;
+  }
+  .test-fixed-viewport .test-header-row > div:last-child {
+    flex: 1 1 100%;
+    justify-content: space-between;
+  }
+  .test-fixed-viewport .section-switcher-wrap {
+    max-width: none !important;
+  }
+  .test-fixed-viewport .section-switcher {
+    max-width: 240px !important;
+  }
+}
+@media (max-height: 580px) and (orientation: landscape) {
+  .test-fixed-viewport .test-header-row > div:first-child,
+  .test-fixed-viewport .test-header-row > div:last-child {
+    flex: 0 1 auto;
+  }
+  .test-fixed-viewport .ao-cbt-footer .test-footer-inner {
+    grid-template-columns: 1fr 2fr 1fr !important;
+  }
+  .test-fixed-viewport .ao-cbt-footer .ao-secondary-actions {
+    grid-column: auto;
+    grid-row: auto;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+    animation: none !important;
+  }
+}
+/* Explicit fixes for controls with older inline or high-specificity sizes. */
+.ao-home .ao-next {
+  background: var(--primary-light);
+  border-color: var(--primary-border);
+}
+#mainView .btn-nav {
+  min-height: 48px !important;
+}
+#mainView .gx-mini,
+#mainView .gx-seg button,
+#mainView .mr-chip,
+#mainView .filter-pill,
+#mainView .bm-btn {
+  min-height: 44px;
+}
+#mainView .bm-btn {
+  min-width: 44px;
+}
+.test-fixed-viewport .test-header-row .cbt-one-step-back,
+.test-fixed-viewport .test-header-row .timer-badge {
+  min-height: 44px !important;
+  font-size: 13px !important;
+  padding: 8px 10px !important;
+  max-width: none !important;
+}
+.test-fixed-viewport .question-stem .en-stem {
+  font-family: var(--font-ui);
+  font-weight: 600;
+}
+.test-fixed-viewport .question-stem .hi-stem {
+  font-family: var(--font-ui);
+  font-weight: 500;
+}
+.rv-hero.ao-page-head {
+  color: var(--text-main);
+}
+.rv-hero.ao-page-head p {
+  color: var(--text-muted);
+  opacity: 1;
+}
+.rv-hero.ao-page-head .journey-pill {
+  color: var(--primary);
+  background: var(--surface);
+}
+.filter-pill.active {
+  color: var(--on-primary);
+}
+.rs-next-step h2 {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+/* Section labels use the same type scale without the padding of a page intro. */
+.section-title.ao-page-head {
+  padding: 0;
+}

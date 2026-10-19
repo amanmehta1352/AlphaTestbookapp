@@ -25,15 +25,17 @@ with sync_playwright() as p:
     rec(
         "Continue and daily goal precede study shortcuts in reading order",
         page.evaluate("""() => {
-      const cards = [...document.querySelector('.gx').children];
-      return cards.indexOf(document.querySelector('.gx-continue')) < cards.indexOf(document.querySelector('.gx-goal')) &&
-        cards.indexOf(document.querySelector('.gx-goal')) < cards.indexOf(document.querySelector('.gx-quick'));
+      const next = document.querySelector('.ao-next');
+      const goal = document.querySelector('.gx-goal');
+      const explore = document.querySelector('.gx-quick');
+      return !!(next.compareDocumentPosition(goal) & Node.DOCUMENT_POSITION_FOLLOWING) &&
+        !!(goal.compareDocumentPosition(explore) & Node.DOCUMENT_POSITION_FOLLOWING);
     }"""),
     )
     rec(
         "Fresh session has one main study action instead of an empty Continue message",
-        page.locator(".gx-continue .gx-btn").count() == 1
-        and "No unfinished activity" not in page.locator(".gx-continue").inner_text(),
+        page.locator(".ao-next .gx-btn").count() == 1
+        and "No unfinished activity" not in page.locator(".ao-next").inner_text(),
     )
     page.evaluate("navigate('subjects')")
     page.locator(".sn-tab").first.focus()

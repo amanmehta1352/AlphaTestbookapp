@@ -63,16 +63,16 @@ function renderSubjectPage(v, subject) {
           ? `<button type="button" class="sh-t-name sm" onclick="navigate('topic', {moduleId:${nbJsAttr(m.moduleId)}})">${tx('Open topic', 'टॉपिक खोलें')} ›</button>`
           : `<button type="button" class="sh-t-name" onclick="navigate('topic', {moduleId:${nbJsAttr(m.moduleId)}})">${escapeHtml(m.topicTitle || m.topic || '')}</button>`}
           <span class="sh-t-meta">${st.pyq ? '<span class="sh-tag pyq">PYQ</span>' : ''}${st.weak ? `<span class="sh-tag weak">${tx('Weak', 'कमज़ोर')}</span>` : ''}${tx(`${st.done}/${st.total} done`, `${st.done}/${st.total} हुए`)}${st.acc != null ? ` · ${Math.round(st.acc * 100)}%` : ''}</span></div>
-        <div class="sh-acts">
+        <div class="sh-acts ao-actions">
+          <button type="button" class="sh-act primary" onclick="navigate('practice', {moduleId:${nbJsAttr(m.moduleId)}, qIndex:0})">✍️ ${tx('Practice', 'अभ्यास')}</button>
           <button type="button" class="sh-act" onclick="navigate('learn', {moduleId:${nbJsAttr(m.moduleId)}})">📖 ${tx('Learn', 'सीखें')}</button>
-          <button type="button" class="sh-act" onclick="navigate('practice', {moduleId:${nbJsAttr(m.moduleId)}, qIndex:0})">✍️ ${tx('Practice', 'अभ्यास')}</button>
-          <button type="button" class="sh-act primary" onclick="sjTopicTest(${nbJsAttr(m.moduleId)})">⏱️ ${tx('Test', 'टेस्ट')}</button>
+          <button type="button" class="sh-act" onclick="sjTopicTest(${nbJsAttr(m.moduleId)})">⏱️ ${tx('Test', 'टेस्ट')}</button>
         </div></div>`).join('')}</div>
     </details>`;
   };
   v.innerHTML = `
     <div class="nav-breadcrumb"><button onclick="navigate('home')">${tx('Home', 'होम')}</button><span class="sep">/</span><button onclick="navigate('subjects')">${tx('Subjects', 'विषय')}</button><span class="sep">/</span><span>${escapeHtml(name)}</span></div>
-    <div class="sc-head"><div><h1>${escapeHtml(name)}</h1><p>${tx(`${all.length} chapter${all.length === 1 ? '' : 's'} · ${mods.length} topics`, `${all.length} अध्याय · ${mods.length} टॉपिक`)}</p></div>
+    <div class="sc-head ao-page-head"><div><h1>${escapeHtml(name)}</h1><p>${tx(`${all.length} chapter${all.length === 1 ? '' : 's'} · ${mods.length} topics`, `${all.length} अध्याय · ${mods.length} टॉपिक`)}</p></div>
       <button type="button" class="btn-action-sm" onclick="navigate('subjects')">← ${tx('Subjects', 'विषय')}</button></div>
     <div class="sh-chips" role="group" aria-label="${tx('Filter topics', 'टॉपिक छाँटें')}">${chips}</div>
     ${shown.length ? `<div class="sh-list">${shown.map(chapterHtml).join('')}</div>` : studyEmptyState(all.length ? 'subject' : '')}`;
@@ -116,7 +116,7 @@ function renderMePage(v) {
   const row = (ico, label, sub, on, id = "") =>
     `<button type="button" ${id ? `id="${id}"` : ""} class="me-row" onclick="${on}"><span class="me-ico" aria-hidden="true">${ico}</span><span class="me-row-main"><b>${label}</b>${sub ? `<small>${sub}</small>` : ""}</span><span aria-hidden="true">›</span></button>`;
   v.innerHTML = `
-    <section class="me-head">
+    <section class="me-head ao-page-head">
       <span class="me-avatar" aria-hidden="true">${escapeHtml(String(nameTxt).trim().charAt(0).toUpperCase() || "?")}</span>
       <div class="me-id"><h1>${escapeHtml(nameTxt)}</h1><p>${s ? escapeHtml(s.email || "") : tx("Not logged in — progress stays on this phone only", "Login नहीं — progress सिर्फ़ इस phone में")}</p></div>
       <button type="button" class="btn-action-sm" onclick="openAccount()">${s ? tx("Account", "Account") : tx("Login", "Login")}</button>

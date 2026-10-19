@@ -16,7 +16,7 @@ function renderLearnEngine(v, moduleId) {
       <span>Learn</span>
     </div>
 
-    <div class="section-title">
+    <div class="section-title ao-page-head">
       <span>📖 LEARN — ${mod.topicTitle.toUpperCase()}</span>
       <button class="btn-action-sm" onclick="navigate('topic', {moduleId:'${mod.moduleId}'})">← Topic Hub</button>
     </div>
@@ -29,7 +29,7 @@ ${escapeHtml(mod.theoryNotes || "No notes have been added for this topic yet. Us
       </div>
     </div>
 
-    <div class="section-title">
+    <div class="section-title ao-page-head">
       <span>💡 Concept Check</span>
     </div>
     ${learnConceptCheckHtml(mod)}
@@ -205,7 +205,7 @@ function renderPracticeEngine(v, moduleId, qIndex, customQuestions = null) {
       <span>Practice</span>
     </div>
 
-    <div class="section-title">
+    <div class="section-title ao-page-head">
       <div>
         <span>✏️ PRACTICE (Q.${q.originalQNo} • ${qIndex + 1}/${allQs.length})</span>
         <div style="display:flex; gap:4px; margin-top:4px; flex-wrap:wrap;">
@@ -251,9 +251,9 @@ function renderPracticeEngine(v, moduleId, qIndex, customQuestions = null) {
       ` : ''}
     </div>
 
-    <div style="display:flex; gap:10px;">
+    <div class="ao-actions ao-practice-actions" style="display:flex; gap:10px;">
       <button class="btn-nav" ${qIndex === 0 ? 'disabled' : ''} onclick="ActiveHintStep=0; navigate('practice', {moduleId:'${moduleId}', qIndex:${qIndex - 1}})">← Previous</button>
-      <button class="btn-nav primary" style="flex:1.4;" ${qIndex === allQs.length - 1 ? 'disabled' : ''} onclick="ActiveHintStep=0; navigate('practice', {moduleId:'${moduleId}', qIndex:${qIndex + 1}})">Next Problem →</button>
+      ${qIndex === allQs.length - 1 ? `<button class="btn-nav primary" style="flex:1.4;" onclick="ActiveHintStep=0; navigate('topic', {moduleId:'${moduleId}'})">${tx('Back to topic', 'टॉपिक पर वापस जाएँ')} →</button>` : `<button class="btn-nav primary" style="flex:1.4;" onclick="ActiveHintStep=0; navigate('practice', {moduleId:'${moduleId}', qIndex:${qIndex + 1}})">${tx('Next question', 'अगला सवाल')} →</button>`}
     </div>
   `;
 }
@@ -551,10 +551,10 @@ function renderTestPage(v, moduleId, groupId, qIndex) {
             ${typeof cbtConfidenceRow==='function'?cbtConfidenceRow(q, qIndex):''}
         </div>
       </div>
-      <div class="test-fixed-footer">
+      <div class="test-fixed-footer ao-cbt-footer">
         <div class="test-footer-inner">
           <button class="footer-btn btn-nav-prev" ${qIndex === 0 ? 'disabled style="opacity:0.3; pointer-events:none;"' : ''} onclick="switchQuestion(${qIndex - 1})" aria-label="Previous Question">← Previous</button>
-          <div style="display:flex; gap:12px; align-items:center;">
+          <div class="ao-secondary-actions" style="display:flex; gap:12px; align-items:center;">
              <button class="footer-btn btn-nav-clear" onclick="clearOption(${qIndex})">Clear</button>
              <button class="footer-btn btn-nav-mark ${isMarked ? 'marked' : ''}" onclick="toggleMarkReview(${qIndex})"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256" style="margin-right:3px;"><path d="M192,24H96A16,16,0,0,0,80,40V56H64A16,16,0,0,0,48,72V224a8,8,0,0,0,12.65,6.51L112,193.83l51.36,36.68A8,8,0,0,0,176,224V184h16a16,16,0,0,0,16-16V40A16,16,0,0,0,192,24ZM160,206.17l-43.35-31a8,8,0,0,0-9.3,0L64,206.17V72H160Zm32-38.17V72a16,16,0,0,0-16-16H96V40h96Z"></path></svg> Mark for Review</button>
           </div>
@@ -721,7 +721,7 @@ function renderResultPage(v,res){
     });
   }
   const topicPerformanceHtml=[...topicStats].map(([label,x])=>`<div class="nb-row"><span class="nb-row-main"><span class="nb-row-title">${escapeHtml(label)}</span><span class="nb-row-meta">${x.correct} correct · ${x.wrong} incorrect · ${x.unanswered} unanswered</span></span><span class="nb-count">${x.total} Q</span></div>`).join('');
-  v.innerHTML=`<div class="nav-breadcrumb"><button onclick="navigate('home')">Home</button><span class="sep">/</span><button onclick="navigate('test_hub')">CBT Assessment</button><span class="sep">/</span><span>Result</span></div><div class="section-title"><span>📊 ${tx('RESULT','परिणाम')}</span><button class="btn-action-sm" onclick="navigate('home')">🏠 ${tx('Home','होम')}</button></div>${typeof resultSoftLanding==='function'?resultSoftLanding(res):''}<div class="student-hero-card rs-score" style="text-align:center;"><h1 style="font-size:32px;">${res.score} / ${res.total}</h1><p style="font-size:14px;font-weight:700;color:var(--text-main);">Score in ${escapeHtml(res.topicTitle||'Custom Test')} • ${escapeHtml(res.groupTitle||'')}</p></div>${typeof resultWhatIf==='function'?resultWhatIf(res, keyFor):''}${typeof resultTimeCard==='function'?resultTimeCard(res, keyFor):''}<div class="goals-grid" style="margin-bottom:16px;"><div class="goal-box"><small>ACCURACY</small><strong style="color:var(--primary);">${res.accuracy}%</strong></div><div class="goal-box"><small>CORRECT</small><strong style="color:var(--success);">${res.correct}</strong></div><div class="goal-box"><small>WRONG</small><strong style="color:var(--danger);">${res.wrong}</strong></div><div class="goal-box"><small>SKIPPED</small><strong>${res.unattempted}</strong></div></div>${isCustom?`<section class="nb-panel"><h3>Performance by subject / topic</h3>${topicPerformanceHtml||'<p class="nb-row-meta">No topic performance data is available.</p>'}</section><p class="nb-row-meta">Topic-level figures come from this submitted question sequence. Mixed-topic mastery-map updates are not assigned to an arbitrary anchor topic.</p>`:''}<div class="nba-banner"><div><span style="font-size:10px;font-weight:900;color:var(--accent-cyan);text-transform:uppercase;">Next Step</span><div style="font-size:13px;font-weight:800;color:var(--text-main);">${res.wrong>0?`Revise your ${res.wrong} mistakes in the Mistake Book.`:'Review your results or create another test.'}</div></div><button class="btn-nav primary" style="min-height:38px;font-size:12px;padding:6px 12px;" onclick="${res.wrong>0?"navigate('mistakes')":"navigate('native_builder')"}">${res.wrong>0?'Review Mistakes ➔':'Create Another Test ➔'}</button></div><div class="section-title"><span>Detailed Question Solutions</span></div>${solutionsHtml}`;
+  v.innerHTML=`<div class="nav-breadcrumb"><button onclick="navigate('home')">Home</button><span class="sep">/</span><button onclick="navigate('test_hub')">CBT Assessment</button><span class="sep">/</span><span>Result</span></div><div class="section-title ao-page-head"><span>📊 ${tx('RESULT','परिणाम')}</span><button class="btn-action-sm" onclick="navigate('home')">🏠 ${tx('Home','होम')}</button></div>${typeof resultSoftLanding==='function'?resultSoftLanding(res):''}<div class="student-hero-card rs-score" style="text-align:center;"><h1 style="font-size:32px;">${res.score} / ${res.total}</h1><p style="font-size:14px;font-weight:700;color:var(--text-main);">Score in ${escapeHtml(res.topicTitle||'Custom Test')} • ${escapeHtml(res.groupTitle||'')}</p></div>${typeof resultWhatIf==='function'?resultWhatIf(res, keyFor):''}${typeof resultTimeCard==='function'?resultTimeCard(res, keyFor):''}<div class="goals-grid" style="margin-bottom:16px;"><div class="goal-box"><small>ACCURACY</small><strong style="color:var(--primary);">${res.accuracy}%</strong></div><div class="goal-box"><small>CORRECT</small><strong style="color:var(--success);">${res.correct}</strong></div><div class="goal-box"><small>WRONG</small><strong style="color:var(--danger);">${res.wrong}</strong></div><div class="goal-box"><small>SKIPPED</small><strong>${res.unattempted}</strong></div></div>${isCustom?`<section class="nb-panel"><h3>Performance by subject / topic</h3>${topicPerformanceHtml||'<p class="nb-row-meta">No topic performance data is available.</p>'}</section><p class="nb-row-meta">Topic-level figures come from this submitted question sequence. Mixed-topic mastery-map updates are not assigned to an arbitrary anchor topic.</p>`:''}<div class="section-title ao-page-head"><span>Detailed Question Solutions</span></div>${solutionsHtml}`;
   try { resultEnhance(v, res); } catch (e) { console.warn('[Result] enhance failed', e); }
 }
 
@@ -772,7 +772,7 @@ function renderMistakeBookPage(v) {
 
   v.innerHTML = `
     <div class="nav-breadcrumb"><button onclick="navigate('home')">Home</button><span class="sep">/</span><button onclick="navigate('revision_hub')">Revision</button><span class="sep">/</span><span>Mistake Book</span></div>
-    <div class="section-title"><span>❌ MISTAKE BOOK (${list.length})</span><button class="btn-action-sm" onclick="navigate('home')">← Home</button></div>
+    <div class="section-title ao-page-head"><span>❌ MISTAKE BOOK (${list.length})</span><button class="btn-action-sm" onclick="navigate('home')">← Home</button></div>
     ${competitiveEnabledGuard() ? `<div class="mb-scope" role="group" aria-label="Which mistakes to show">
       <button type="button" class="filter-pill ${!MistakeViewState.allExams ? 'active' : ''}" aria-pressed="${!MistakeViewState.allExams}" onclick="setMistakeView('allExams', false)">${escapeHtml(examLabel)} (${scopedCount})</button>
       <button type="button" class="filter-pill ${MistakeViewState.allExams ? 'active' : ''}" aria-pressed="${MistakeViewState.allExams}" onclick="setMistakeView('allExams', true)">All exams (${workspaceCount})</button>
