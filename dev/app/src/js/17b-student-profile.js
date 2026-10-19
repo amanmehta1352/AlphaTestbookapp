@@ -97,8 +97,7 @@ function profileHomePrompt() {
   el.innerHTML = `<span class="pf-ico" aria-hidden="true">🎯</span><span style="flex:1"><b>${tx('Choose your exam and branch','अपना exam और branch चुनें')}</b><small>${tx('Then only your questions appear — no other branch mixed in.','फिर सिर्फ़ आपके सवाल दिखेंगे — दूसरी branch के नहीं।')}</small></span><span aria-hidden="true">›</span>`;
   v.prepend(el);
 }
-const _pfRenderView = renderView;
-renderView = function () { _pfRenderView(); try { profileHomePrompt(); } catch (_) {} };
+registerViewHook('after', 'profile-prompt', profileHomePrompt);
 /* After a sync the login state is known: repaint Home once if the chip is not there yet */
 const _pfCloudSync = cloudSync;
 cloudSync = async function (...args) {

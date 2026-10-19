@@ -31,7 +31,7 @@ with sync_playwright() as p:
     t = page.inner_text('#mainView')
     rec('dashboard in Hindi', 'दैनिक लक्ष्य' in t and 'Daily goal' not in t)
     rec('bottom nav in Hindi', page.inner_text('#tabHome') .strip().endswith('होम') and 'रिवीज़न' in page.inner_text('#tabRevision'))
-    rec('header title in Hindi', 'स्टूडेंट हब' in page.inner_text('#txtHeaderTitle'))
+    rec('header title in Hindi', 'होम' in page.inner_text('#txtHeaderTitle'))
     rec('html lang = hi', page.evaluate("document.documentElement.lang") == 'hi')
     page.wait_for_timeout(300); page.reload(); page.wait_for_selector('.sj-dash', timeout=15000); page.wait_for_timeout(300)
     rec('Hindi survives reload', 'दैनिक लक्ष्य' in page.inner_text('#mainView') and 'होम' in page.inner_text('#tabHome'))
@@ -85,7 +85,7 @@ with sync_playwright() as p:
     rec('syllabus has no fake "Mapped" claim', 'Mapped' not in page.inner_text('#mainView'))
     page.click('#btnMenu'); page.keyboard.press('Escape')
     rec('Escape closes the menu', not page.evaluate("document.getElementById('sideDrawer').classList.contains('open')"))
-    rec('menu labels are clear', 'Question bank' in page.evaluate("document.getElementById('sideDrawer').textContent") and 'ALL DATA CONTROL' not in page.evaluate("document.getElementById('sideDrawer').textContent"))
+    rec('menu labels are clear', 'Question Bank' in page.evaluate("document.getElementById('sideDrawer').textContent") and 'ALL DATA CONTROL' not in page.evaluate("document.getElementById('sideDrawer').textContent"))
 
     # --- Subjects navigation redesign: validate data and the new tab/accordion UI
     page.evaluate("navigate('subjects')")

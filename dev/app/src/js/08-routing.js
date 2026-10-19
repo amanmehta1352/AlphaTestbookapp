@@ -7,6 +7,33 @@ let TimerInterval = null;
 const APP_ROUTE_HISTORY_KEY = 'masterTestBookRouteHistoryV1';
 let AppRouteStack = [];
 let AppRouteRestoring = false;
+// One renderer owns the shell. Features register named hooks instead of wrapping it.
+const ViewHooks = { before: new Map(), after: new Map() };
+const RouteViewStates = new Map();
+const RouteUiMemory = new Map();
+let RenderedRouteKey = '';
+function registerViewHook(phase, name, hook) {
+  ViewHooks[phase].set(name, hook);
+}
+function runViewHooks(phase) {
+  ViewHooks[phase].forEach((hook, name) => {
+    try { hook(); } catch (error) { console.warn('[View hook]', name, error); }
+  });
+}
+function registerRouteViewState(page, adapter) { RouteViewStates.set(page, adapter); }
+function routeUiKey(route = Route) {
+  return JSON.stringify([WorkspaceManager.current().id, route.page, route.params]);
+}
+function captureRouteView() {
+  if (RenderedRouteKey !== routeUiKey()) return;
+  const adapter = RouteViewStates.get(Route.page);
+  RouteUiMemory.delete(RenderedRouteKey);
+  RouteUiMemory.set(RenderedRouteKey, {
+    scroll: document.getElementById('mainView')?.scrollTop || 0,
+    state: adapter ? adapter.capture() : null
+  });
+  while (RouteUiMemory.size > 40) RouteUiMemory.delete(RouteUiMemory.keys().next().value);
+}
 function routeSnapshot(route=Route){ return {page:String(route?.page||'home'),params:route?.params&&typeof route.params==='object'?route.params:{}}; }
 function sameRoute(a,b){ return !!a&&!!b&&a.page===b.page&&JSON.stringify(a.params||{})===JSON.stringify(b.params||{}); }
 function persistAppRoute(){ try { sessionStorage.setItem(APP_ROUTE_HISTORY_KEY, JSON.stringify({version:1,workspaceId:WorkspaceManager.current().id,stack:AppRouteStack.slice(-40),current:routeSnapshot()})); } catch(_) {} }
@@ -25,7 +52,7 @@ function updateAppBackButton(){
   const b=document.getElementById('btnAppBack'); if(!b)return;
   const canBack=Route.page!=='home' || AppRouteStack.length>0;
   b.hidden=!canBack; b.disabled=!canBack;
-  b.setAttribute('aria-label','ONE STEP BACK'); b.title='ONE STEP BACK';
+  b.setAttribute('aria-label', tx('Back', 'वापस')); b.title=tx('Back', 'वापस'); b.textContent='← '+tx('Back', 'वापस');
 }
 const APP_ACTIVE_MODE_PAGES = new Set(['practice','test','learn','revision','pyq','mockSession','mock_session']);
 let AppBackConfirmationOpen = false;
@@ -41,6 +68,7 @@ function appNavigateBack(confirmed=false){
   if(!confirmed && (appBackWouldExitMode(previous) || (!previous && Route.page==='home'))){ requestAppBackConfirmation(); return; }
   if(ActiveTestSession?.sessionStatus==='ACTIVE'){ CbtExitGuard.requestExit(); return; }
   AppBackConfirmationOpen=false;
+  captureRouteView();
   if(previous){
     AppRouteStack.pop(); AppBackConfirmationOpen=false;
     AppRouteRestoring=true; Route=routeSnapshot(previous); persistAppRoute(); renderView(); updateAppBackButton();
@@ -71,11 +99,11 @@ function practiceSessionSummary(){
 function requestPracticeBackOptions(){
   if(AppBackConfirmationOpen)return;AppBackConfirmationOpen=true;
   const x=practiceSessionSummary();
-  openModal('Practice is in progress',`<div style="font-size:14px;line-height:1.6;color:var(--text-main);">You have an active practice session. Submit shows a summary; Exit returns to the previous screen; Cancel keeps this question open. Existing answers and mistake-book entries are not deleted.</div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:12px;font-size:12px;"><div class="nb-stat"><small>ANSWERED</small><strong>${x.answered} / ${x.total}</strong></div><div class="nb-stat"><small>UNANSWERED</small><strong>${x.unanswered}</strong></div></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap;"><button onclick="submitPracticeSessionSummary()" class="btn-nav primary">SUBMIT</button><button onclick="exitPracticeSession()" class="btn-nav">EXIT</button><button onclick="cancelAppBack()" class="btn-nav">CANCEL</button></div>`);
+  openModal(tx('Practice is in progress', 'अभ्यास चल रहा है'),`<div style="font-size:14px;line-height:1.6;color:var(--text-main);">${tx('You have an active practice session. Submit shows a summary; Exit returns to the previous screen; Cancel keeps this question open. Existing answers and mistake-book entries are not deleted.', 'आपका अभ्यास चल रहा है। जमा करें से सारांश दिखेगा; बाहर निकलें से पिछला पेज खुलेगा; रद्द करें से यही सवाल खुला रहेगा। सहेजे जवाब और गलतियों की किताब सुरक्षित रहेंगे।')}</div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:12px;font-size:12px;"><div class="nb-stat"><small>${tx('ANSWERED', 'हल किए')}</small><strong>${x.answered} / ${x.total}</strong></div><div class="nb-stat"><small>${tx('UNANSWERED', 'बिना हल किए')}</small><strong>${x.unanswered}</strong></div></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap;"><button onclick="submitPracticeSessionSummary()" class="btn-nav primary">${tx('SUBMIT', 'जमा करें')}</button><button onclick="exitPracticeSession()" class="btn-nav">${tx('EXIT', 'बाहर निकलें')}</button><button onclick="cancelAppBack()" class="btn-nav">${tx('CANCEL', 'रद्द करें')}</button></div>`);
 }
 function submitPracticeSessionSummary(){
   const x=practiceSessionSummary();AppBackConfirmationOpen=true;
-  openModal('Practice summary',`<div style="font-size:14px;line-height:1.6;color:var(--text-main);">Practice review summary from the questions available in this session. This does not write a separate scored exam result.</div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:12px;font-size:12px;"><div class="nb-stat"><small>ANSWERED</small><strong>${x.answered} / ${x.total}</strong></div><div class="nb-stat"><small>CORRECT</small><strong>${x.correct}</strong></div><div class="nb-stat"><small>WRONG</small><strong>${x.wrong}</strong></div><div class="nb-stat"><small>UNANSWERED</small><strong>${x.unanswered}</strong></div></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap;"><button onclick="cancelAppBack()" class="btn-nav">KEEP REVIEWING</button><button onclick="exitPracticeSession()" class="btn-nav primary">FINISH PRACTICE</button></div>`);
+  openModal(tx('Practice summary', 'अभ्यास का सारांश'),`<div style="font-size:14px;line-height:1.6;color:var(--text-main);">${tx('Practice review summary from the questions available in this session. This does not write a separate scored exam result.', 'इस अभ्यास के सवालों का सारांश। इसे अलग परीक्षा परिणाम के रूप में नहीं सहेजा जाएगा।')}</div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:12px;font-size:12px;"><div class="nb-stat"><small>${tx('ANSWERED', 'हल किए')}</small><strong>${x.answered} / ${x.total}</strong></div><div class="nb-stat"><small>${tx('CORRECT', 'सही')}</small><strong>${x.correct}</strong></div><div class="nb-stat"><small>${tx('WRONG', 'गलत')}</small><strong>${x.wrong}</strong></div><div class="nb-stat"><small>${tx('UNANSWERED', 'बिना हल किए')}</small><strong>${x.unanswered}</strong></div></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap;"><button onclick="cancelAppBack()" class="btn-nav">${tx('KEEP REVIEWING', 'देखते रहें')}</button><button onclick="exitPracticeSession()" class="btn-nav primary">${tx('FINISH PRACTICE', 'अभ्यास पूरा करें')}</button></div>`);
 }
 function exitPracticeSession(){AppBackConfirmationOpen=false;closeModal();appNavigateBack(true);}
 
@@ -86,9 +114,9 @@ function requestAppBackConfirmation(){
   AppBackConfirmationOpen=true;
   const atRoot=Route.page==='home' && !AppRouteStack.length;
   const message=atRoot
-    ? 'You are at the application root. Confirm only if you want to leave this page; the browser or Android may still control whether it can close.'
-    : 'Leaving this mode will return to the previous screen. Cancel to keep your current screen and progress.';
-  openModal(atRoot?'Leave Master TestBook?':'Exit current mode?', `<div style="font-size:14px;line-height:1.6;color:var(--text-main);">${message}</div><div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;flex-wrap:wrap;"><button onclick="cancelAppBack()" class="btn-nav">CANCEL / STAY</button><button onclick="confirmAppBack()" class="btn-nav primary">CONFIRM EXIT</button></div>`);
+    ? tx('You are at the application root. Confirm only if you want to leave this page; the browser or Android may still control whether it can close.', 'आप होम पेज पर हैं। ऐप छोड़ने के लिए पुष्टि करें। पेज बंद करना ब्राउज़र या Android के नियंत्रण में है।')
+    : tx('Leaving this mode will return to the previous screen. Cancel to keep your current screen and progress.', 'बाहर निकलने पर पिछला पेज खुलेगा। इसी पेज पर रहने के लिए रद्द करें।');
+  openModal(atRoot?tx('Leave Master TestBook?', 'Master TestBook छोड़ें?'):tx('Exit current mode?', 'इस मोड से बाहर निकलें?'), `<div style="font-size:14px;line-height:1.6;color:var(--text-main);">${message}</div><div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;flex-wrap:wrap;"><button onclick="cancelAppBack()" class="btn-nav">${tx('CANCEL / STAY', 'रद्द करें / रहें')}</button><button onclick="confirmAppBack()" class="btn-nav primary">${tx('CONFIRM EXIT', 'बाहर निकलें')}</button></div>`);
 }
 function cancelAppBack(){ AppBackConfirmationOpen=false; closeModal(); }
 function confirmAppBack(){
@@ -115,6 +143,7 @@ function navigate(page, params = {}) {
     AppRouteStack.push(routeSnapshot(Route));
     if(AppRouteStack.length>40) AppRouteStack=AppRouteStack.slice(-40);
   }
+  captureRouteView();
   AppRouteRestoring=false;
   Route = nextRoute;
   persistAppRoute();
@@ -122,150 +151,97 @@ function navigate(page, params = {}) {
   closeDrawer();
   closeModal();
   
-  const bottomNav = document.getElementById('bottomNav');
-  const appHeader = document.getElementById('appHeader');
-
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.drawer-item').forEach(d => d.classList.remove('active'));
-
-  if (page === 'home') {
-    document.getElementById('tabHome')?.classList.add('active');
-    document.getElementById('drwHome')?.classList.add('active');
-  } else if (page === 'subjects' || page === 'subject') {
-    document.getElementById('tabSubjects')?.classList.add('active');
-    document.getElementById('drwSubjects')?.classList.add('active');
-  } else if (page === 'digital_library') {
-    document.getElementById('drwLibrary')?.classList.add('active');
-  } else if (page === 'competitive_hub' || page === 'competitive_subjects' || page === 'competitive_chapters' || page === 'competitive_topics' || page === 'competitive_topic' || page === 'exam_hub' || page === 'exam_profile' || page === 'syllabus') {
-    document.getElementById('tabPYQ')?.classList.add('active');
-    document.getElementById('drwExams')?.classList.add('active');
-  } else if (page === 'pyq_hub' || page === 'pyq') {
-    document.getElementById('drwPYQ')?.classList.add('active');
-  } else if (page === 'test_hub') {
-    document.getElementById('tabTest')?.classList.add('active');
-    document.getElementById('drwTest')?.classList.add('active');
-  } else if (page === 'revision_hub' || page === 'revision' || page === 'mistakes' || page === 'mastery') {
-    document.getElementById('tabRevision')?.classList.add('active');
-    document.getElementById('drwRevision')?.classList.add('active');
-  } else if (page === 'taxonomy_explorer') {
-    document.getElementById('drwTaxonomy')?.classList.add('active');
-  }
-
-  // CBT Viewport Lock
-  if (page === 'test') {
-    bottomNav.style.display = 'none';
-    appHeader.style.display = 'none';
-    document.body.style.overflow = 'hidden';
-  } else {
-    bottomNav.style.display = 'flex';
-    appHeader.style.display = 'flex';
-    document.body.style.overflow = 'auto';
+  if (page !== 'test') {
     if (TimerInterval) { clearInterval(TimerInterval); TimerInterval = null; }
-    // Ensure we exit fullscreen if we leave the test
-    if (document.fullscreenElement) {
-        document.exitFullscreen().catch(()=>{});
-    }
-  }
-
-  const mainView = document.getElementById('mainView');
-  if (page !== 'test' && mainView) {
-    mainView.scrollTo({ top: 0, behavior: 'instant' });
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
   }
   renderView();
 }
 
+const AppRoutes = {
+  home: { nav: 'home', title: ['🏠 Home', '🏠 होम'], render: v => {
+    if (WorkspaceManager.current().type === 'BOARD') {
+      document.getElementById('txtHeaderTitle').textContent = '🎓 CBSE CAMPUS';
+      renderBoardDashboard(v);
+    } else renderHomePage(v);
+  } },
+  competitive_hub: { nav: 'exams', title: ['🏆 Competitive exams', '🏆 प्रतियोगी परीक्षाएँ'], render: v => renderCompetitiveDashboard(v) },
+  competitive_subjects: { nav: 'exams', title: ['📚 Subjects', '📚 विषय'], render: v => renderCompetitiveSubjects(v) },
+  competitive_chapters: { nav: 'exams', title: ['📚 Chapters', '📚 अध्याय'], render: (v, p) => renderCompetitiveChapters(v, p.subject) },
+  competitive_topics: { nav: 'exams', title: ['📚 Topics', '📚 टॉपिक'], render: (v, p) => renderCompetitiveTopics(v, p.subject, p.chapter) },
+  competitive_topic: { nav: 'exams', title: ['📚 Topic', '📚 टॉपिक'], render: (v, p) => renderCompetitiveTopic(v, p.moduleId) },
+  exam_hub: { nav: 'exams', title: ['🏛️ Exams', '🏛️ परीक्षाएँ'], render: v => renderUniversalExamHub(v) },
+  exam_profile: { nav: 'exams', title: ['🎓 Exam', '🎓 परीक्षा'], render: (v, p) => renderExamProfile(v, p.examId) },
+  syllabus: { nav: 'exams', title: ['📚 Syllabus', '📚 पाठ्यक्रम'], render: (v, p) => renderSyllabusMatrix(v, p.examId) },
+  board_subjects: { nav: 'subjects', title: ['📚 Subjects', '📚 विषय'], render: v => renderBoardSubjects(v) },
+  board_chapters: { nav: 'subjects', title: ['📚 Chapters', '📚 अध्याय'], render: (v, p) => renderBoardChapters(v, p.subjectId) },
+  board_topics: { nav: 'subjects', title: ['📚 Topics', '📚 टॉपिक'], render: (v, p) => renderBoardTopics(v, p.chapterId, p.subjectId) },
+  board_topic: { nav: 'subjects', title: ['📚 Topic', '📚 टॉपिक'], render: (v, p) => renderBoardTopic(v, p.topicId, p.chapterId, p.subjectId) },
+  digital_library: { nav: 'library', title: ['📖 Study library', '📖 स्टडी लाइब्रेरी'], render: v => renderDigitalLibrary(v) },
+  native_builder: { nav: 'builder', title: ['🧩 Create Test', '🧩 टेस्ट बनाएँ'], render: v => renderNativeBuilder(v) },
+  subjects: { nav: 'subjects', title: ['📚 Subjects', '📚 विषय'], render: v => renderSubjectsCatalog(v) },
+  subject: { nav: 'subjects', title: ['📚 Chapters', '📚 अध्याय'], render: (v, p) => renderSubjectPage(v, p.subject) },
+  chapter: { nav: 'subjects', title: ['📚 Topics', '📚 टॉपिक'], render: (v, p) => renderChapterPage(v, p.subject, p.chapter) },
+  topic: { nav: 'subjects', title: ['📚 Topic', '📚 टॉपिक'], render: (v, p) => renderTopicHubPage(v, p.moduleId) },
+  subtopic: { nav: 'subjects', title: ['📚 Subtopic', '📚 उपविषय'], render: (v, p) => renderSubtopicConceptPage(v, p.moduleId, p.subtopic) },
+  taxonomy_explorer: { nav: 'bank', title: ['🔎 Question Bank', '🔎 प्रश्न बैंक'], render: (v, p) => renderTaxonomyExplorer(v, p) },
+  learn: { nav: 'subjects', title: ['📖 Learn', '📖 सीखें'], render: (v, p) => renderLearnEngine(v, p.moduleId) },
+  revision: { nav: 'revision', title: ['🔄 Revision', '🔄 रिवीज़न'], render: (v, p) => renderRevisionEngine(v, p.moduleId) },
+  practice: { nav: 'subjects', title: ['✍️ Practice', '✍️ अभ्यास'], render: (v, p) => renderPracticeEngine(v, p.moduleId, p.qIndex || 0, p.customQuestions) },
+  class: { nav: 'subjects', title: ['📚 Class', '📚 कक्षा'], render: (v, p) => renderClassEngine(v, p.moduleId) },
+  pyq: { nav: 'pyq', title: ['🎯 PYQ papers', '🎯 पिछले वर्ष के पेपर'], render: (v, p) => renderPYQEngine(v, p.moduleId) },
+  pyq_hub: { nav: 'pyq', title: ['🎯 PYQ papers', '🎯 पिछले वर्ष के पेपर'], render: v => renderGlobalPYQHub(v) },
+  test_hub: { nav: 'tests', title: ['⏱️ Tests', '⏱️ टेस्ट'], render: v => renderGlobalTestHub(v) },
+  revision_hub: { nav: 'revision', title: ['🔄 Revision', '🔄 रिवीज़न'], render: v => renderGlobalRevisionHub(v) },
+  test: { nav: 'tests', title: ['⏱️ Test', '⏱️ टेस्ट'], render: (v, p) => renderTestPage(v, p.moduleId, p.groupId, p.qIndex || 0) },
+  mistakes: { nav: 'revision', title: ['📕 Mistake Book', '📕 गलतियों की किताब'], render: v => renderMistakeBookPage(v) },
+  mastery: { nav: 'revision', title: ['🎯 Mastery', '🎯 महारत'], render: v => renderMasteryPage(v) },
+  result: { nav: 'tests', title: ['📊 Result', '📊 परिणाम'], render: (v, p) => renderResultPage(v, p.result) },
+  me: { nav: 'me', title: ['👤 Me', '👤 मैं'], render: v => renderMePage(v) }
+};
+const RouteNavItems = {
+  home: ['tabHome', 'drwHome'], subjects: ['tabSubjects', 'drwSubjects'],
+  exams: ['tabPYQ', 'drwExams'], tests: ['tabTest', 'drwTest'],
+  builder: ['tabTest', 'drwNativeBuilder'], pyq: ['tabPYQ', 'drwPYQ'],
+  revision: ['tabRevision', 'drwRevision'], bank: ['drwTaxonomy'],
+  library: ['drwLibrary'], me: ['drwMe', 'btnMe']
+};
+function updateRouteNavigation() {
+  document.querySelectorAll('.nav-tab, .drawer-item, #btnMe').forEach(el => {
+    el.classList.remove('active'); el.removeAttribute('aria-current');
+  });
+  (RouteNavItems[AppRoutes[Route.page]?.nav] || []).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.classList.add('active'); el.setAttribute('aria-current', 'page'); }
+  });
+}
 function renderView() {
-  nbApplyShellForRoute(Route?.page);
-  updateAppBackButton();
   const container = document.getElementById('mainView');
-  const titleElem = document.getElementById('txtHeaderTitle');
+  if (!container) return;
+  if (Route.params?.moduleId && !enforceWorkspaceRoute(Route.page, Route.params)) return renderView();
+  const key = routeUiKey();
+  const changed = key !== RenderedRouteKey;
+  const saved = RouteUiMemory.get(key);
+  const scroll = changed ? saved?.scroll || 0 : container.scrollTop;
+  if (changed) RouteViewStates.get(Route.page)?.restore(saved?.state, AppRouteRestoring);
+  RenderedRouteKey = key;
+  AppRouteRestoring = false;
+  nbApplyShellForRoute(Route.page);
+  updateRouteNavigation();
+  updateAppBackButton();
   const header = document.getElementById('appHeader');
-  if (header && !document.getElementById('workspaceSwitcherBtn')) { const b=document.createElement('button'); b.id='workspaceSwitcherBtn'; b.className='btn-action-sm'; b.textContent='🧭 Workspace'; b.onclick=openWorkspaceSwitcher; (header.querySelector('.header-right') || header).appendChild(b); }
-
-  if (Route.params && Route.params.moduleId && !enforceWorkspaceRoute(Route.page, Route.params)) { return renderView(); }
-
-  if (Route.page === 'home') {
-    if (WorkspaceManager.current().type === 'BOARD') { titleElem.textContent = '🎓 CBSE CAMPUS'; renderBoardDashboard(container); }
-    else { titleElem.textContent = '📚 STUDENT HUB'; renderHomePage(container); }
-  } else if (Route.page === 'competitive_hub') {
-    titleElem.textContent = '🏆 COMPETITIVE EXAMS';
-    renderCompetitiveDashboard(container);
-  } else if (Route.page === 'competitive_subjects') {
-    titleElem.textContent = '🏆 SUBJECTS'; renderCompetitiveSubjects(container);
-  } else if (Route.page === 'competitive_chapters') {
-    titleElem.textContent = '🏆 CHAPTERS'; renderCompetitiveChapters(container, Route.params.subject);
-  } else if (Route.page === 'competitive_topics') {
-    titleElem.textContent = '🏆 TOPICS'; renderCompetitiveTopics(container, Route.params.subject, Route.params.chapter);
-  } else if (Route.page === 'competitive_topic') {
-    titleElem.textContent = '🏆 TOPIC'; renderCompetitiveTopic(container, Route.params.moduleId);
-  } else if (Route.page === 'exam_hub') {
-    titleElem.textContent = '🏛️ UNIVERSAL EXAMS';
-    renderUniversalExamHub(container);
-  } else if (Route.page === 'exam_profile') {
-    titleElem.textContent = '🎓 EXAM PROFILE';
-    renderExamProfile(container, Route.params.examId);
-  } else if (Route.page === 'syllabus') {
-    titleElem.textContent = '📚 SYLLABUS MATRIX';
-    renderSyllabusMatrix(container, Route.params.examId);
-  } else if (Route.page === 'board_subjects') {
-    titleElem.textContent='🎓 BOARD SUBJECTS'; renderBoardSubjects(container);
-  } else if (Route.page === 'board_chapters') {
-    titleElem.textContent='🎓 BOARD CHAPTERS'; renderBoardChapters(container,Route.params.subjectId);
-  } else if (Route.page === 'board_topics') {
-    titleElem.textContent='🎓 BOARD TOPICS'; renderBoardTopics(container,Route.params.chapterId,Route.params.subjectId);
-  } else if (Route.page === 'board_topic') {
-    titleElem.textContent='🎓 BOARD TOPIC'; renderBoardTopic(container,Route.params.topicId,Route.params.chapterId,Route.params.subjectId);
-  } else if (Route.page === 'digital_library') {
-    titleElem.textContent = '📖 DIGITAL LIBRARY';
-    renderDigitalLibrary(container);
-  } else if (Route.page === 'native_builder') {
-    titleElem.textContent = '🧩 CREATE CUSTOM TEST';
-    renderNativeBuilder(container);
-  } else if (Route.page === 'subjects') {
-    titleElem.textContent = '📚 CURRICULUM SUBJECTS';
-    renderSubjectsCatalog(container);
-  } else if (Route.page === 'subject') {
-    renderSubjectPage(container, Route.params.subject);
-  } else if (Route.page === 'chapter') {
-    renderChapterPage(container, Route.params.subject, Route.params.chapter);
-  } else if (Route.page === 'topic') {
-    renderTopicHubPage(container, Route.params.moduleId);
-  } else if (Route.page === 'subtopic') {
-    renderSubtopicConceptPage(container, Route.params.moduleId, Route.params.subtopic);
-  } else if (Route.page === 'taxonomy_explorer') {
-    titleElem.textContent = '🏷️ TAXONOMY EXPLORER';
-    renderTaxonomyExplorer(container, Route.params);
-  } else if (Route.page === 'learn') {
-    renderLearnEngine(container, Route.params.moduleId);
-  } else if (Route.page === 'revision') {
-    renderRevisionEngine(container, Route.params.moduleId);
-  } else if (Route.page === 'practice') {
-    renderPracticeEngine(container, Route.params.moduleId, Route.params.qIndex || 0, Route.params.customQuestions);
-  } else if (Route.page === 'class') {
-    renderClassEngine(container, Route.params.moduleId);
-  } else if (Route.page === 'pyq') {
-    renderPYQEngine(container, Route.params.moduleId);
-  } else if (Route.page === 'pyq_hub') {
-    titleElem.textContent = '🎯 UNIVERSAL PYQ HUB';
-    renderGlobalPYQHub(container);
-  } else if (Route.page === 'test_hub') {
-    titleElem.textContent = '⏱️ CBT ASSESSMENT CENTER';
-    renderGlobalTestHub(container);
-  } else if (Route.page === 'revision_hub') {
-    titleElem.textContent = '🔄 SMART REVISION & DECKS';
-    renderGlobalRevisionHub(container);
-  } else if (Route.page === 'test') {
-    renderTestPage(container, Route.params.moduleId, Route.params.groupId, Route.params.qIndex || 0);
-  } else if (Route.page === 'mistakes') {
-    titleElem.textContent = '❌ MISTAKE BOOK';
-    renderMistakeBookPage(container);
-  } else if (Route.page === 'mastery') {
-    titleElem.textContent = '🎯 4-TIER MASTERY';
-    renderMasteryPage(container);
-  } else if (Route.page === 'result') {
-    titleElem.textContent = '📊 TEST SCORECARD';
-    renderResultPage(container, Route.params.result);
+  if (header && !document.getElementById('workspaceSwitcherBtn')) {
+    const b = document.createElement('button'); b.id = 'workspaceSwitcherBtn'; b.className = 'btn-action-sm';
+    b.textContent = '🧭 ' + tx('Workspace', 'वर्कस्पेस'); b.onclick = openWorkspaceSwitcher;
+    (header.querySelector('.header-right') || header).appendChild(b);
   }
+  const title = document.getElementById('txtHeaderTitle');
+  if (title) title.textContent = '📚 Master TestBook';
+  runViewHooks('before');
+  AppRoutes[Route.page]?.render(container, Route.params || {});
+  runViewHooks('after');
+  container.scrollTop = scroll;
+  requestAnimationFrame(() => { if (RenderedRouteKey === key) container.scrollTop = scroll; });
 }
 
 /* V2.1.5 — Native Builder integration. Uses the existing IndexEngine registry and CBT host lifecycle. */
@@ -548,46 +524,4 @@ function nbHasVerifiedMockPattern(examId){
   const profile=UniversalExamRegistry?.registry?.get(String(examId||''));
   const contract=profile?.verifiedExamPatternContract;
   return !!(contract&&contract.version===1&&contract.verified===true&&Array.isArray(contract.sections)&&contract.sections.length>0&&contract.sections.every(x=>x&&String(x.name||'').trim()&&Number(x.questionCount)>0));
-}
-function nbModeCardsHtml(){
-  const sourceRows=nbSourceRows();
-  const pyqCount=sourceRows.filter(nbSafePYQ).length;
-  const claimedPyqCount=sourceRows.filter(nbVerifiedPYQ).length;
-  const mismatchCount=sourceRows.filter(r=>r.sourceContextMismatch).length;
-  const mockReady=nbHasVerifiedMockPattern(NativeBuilderState.examId||UserState?.selectedExam);
-  const cards=[
-    ['quick','Quick Test','Choose subject, count and time','⚡',false],
-    ['custom','Custom / Topic Test','Choose subject, topic, type and time','⚙',false],
-    ['pyq','PYQ Test',pyqCount?`${pyqCount} questions with verified PYQ provenance`:claimedPyqCount?`${claimedPyqCount} source-tagged questions blocked by module/source mismatch`:'No verified PYQ questions','◷',!pyqCount],
-    ['mock','Full Mock Test',mockReady?'Verified exam pattern available':'Exam pattern not available yet','▣',!mockReady]
-  ];
-  const dataQuality=mismatchCount?`<details class="nb-data-quality"><summary><span>Review exam/year mapping</span><span class="nb-count">${mismatchCount} questions</span></summary><div class="nb-data-quality-body"><p><strong>Source exam/year differs from the current module assignment.</strong> The count is calculated from the active workspace's currently indexed questions; it does not mean every listed record is corrupt.</p><p>Question metadata and module assignments have not been edited. Records without reconcilable source provenance are excluded from official PYQ selection. Their original SOURCE label remains visible in Preview for review.</p></div></details>`:'';
-  return `<div class="nb-mode-grid">${cards.map(([id,title,desc,icon,disabled])=>`<button type="button" class="nb-mode-card ${NativeBuilderState.mode===id?'active':''}" aria-pressed="${NativeBuilderState.mode===id?'true':'false'}" ${disabled?'disabled aria-disabled="true" title="'+nbEsc(desc)+'"':''} onclick="nbSelectBuilderMode('${id}')"><span class="nb-mode-icon" aria-hidden="true">${icon}</span><span class="nb-mode-copy"><strong>${nbEsc(title)}</strong><small>${nbEsc(desc)}</small></span><span class="nb-mode-check" aria-hidden="true">${NativeBuilderState.mode===id?'✓':''}</span></button>`).join('')}</div>${dataQuality}`;
-}
-function nbEnhanceWizardDOM(v){
-  const shell=v.querySelector('.nb-shell');if(!shell)return;
-  v.querySelector('.nav-breadcrumb')?.remove();v.querySelector('.section-title')?.remove();
-  shell.querySelector('.nb-toolbar')?.remove();
-  const modeStep=shell.querySelector('[data-nb-step="0"]');const modeActions=modeStep?.querySelector('.nb-panel .nb-actions');if(modeActions)modeActions.outerHTML=nbModeCardsHtml();
-  modeStep?.querySelector('.nb-panel h3')?.remove();
-  const modeNote=modeStep?.querySelector('.nb-panel > p.nb-row-meta');if(modeNote&&/Quick Test chooses available indexed questions/i.test(modeNote.textContent||''))modeNote.remove();
-  const typeStep=shell.querySelector('[data-nb-step="3"]');const typePanel=typeStep?.querySelector('.nb-panel');
-  if(typePanel){
-    const typePool=nbBuilderTypePool();const counts=nbTypeCounts(typePool);const opts=Object.entries(counts).sort((a,b)=>a[1].label.localeCompare(b[1].label));
-    typePanel.innerHTML=`<h3>Choose question types</h3><p class="nb-row-meta">Types are derived from question metadata and indexed topic/chapter labels. Select one or more Types; eligible questions from all selected Types are included within your subject/topic and exam filters. Individual question checkboxes are not used in this workflow.</p><div class="nb-adaptive-grid nb-type-grid">${opts.map(([id,info])=>{const n=info.count;const selected=NativeBuilderState.questionTypes.has(id);return `<button type="button" class="nb-adaptive-card ${selected?'active':''}" aria-pressed="${selected?'true':'false'}" ${n?'':'disabled'} onclick="nbToggleQuestionType(${nbJsAttr(id)},${selected?'false':'true'})"><span class="nb-row-main"><span class="nb-row-title">${nbEsc(info.label)}</span><span class="nb-row-meta">${n} eligible question${n===1?'':'s'}</span></span><span class="nb-count">${n}</span><span aria-hidden="true">${selected?'✓':''}</span></button>`;}).join('')||'<div class="nb-alert">No verified Type metadata is available for the current filters.</div>'}</div><div class="nb-alert">Select one or more Types. All eligible questions in the selected Types are included automatically; incompatible exam/year contexts are still blocked at preview.</div>`;
-  }
-  const labels=['Mode','Subject','Topic','Type','Setting','Preview'];
-  const progress=shell.querySelector('.nb-wizard-progress');if(progress){progress.innerHTML=labels.map((label,i)=>{const skipped=NativeBuilderState.mode==='quick'&&(i===2||i===3); const classes=[NativeBuilderState.wizardStep===i?'active':i<NativeBuilderState.wizardStep?'done':'',skipped?'skipped':''].filter(Boolean).join(' ');const action=skipped?'disabled aria-disabled="true" title="Quick Test automatically uses eligible questions from the chosen exam/year"':i<NativeBuilderState.wizardStep?`onclick="nbWizardGo(${i})"`:'';return `<button type="button" class="${classes}" ${action} aria-current="${NativeBuilderState.wizardStep===i?'step':'false'}">${label}</button>`;}).join('');}
-  const stepCount=shell.querySelector('.nb-toolbar .nb-count');if(stepCount)stepCount.textContent=`Step ${NativeBuilderState.wizardStep+1} / 6`;
-  shell.querySelector('.nb-toolbar strong')?.replaceChildren(document.createTextNode('Smart Test Builder'));
-  const helper=shell.querySelector('.nb-toolbar .nb-row-meta');if(helper)helper.textContent='Choose a metadata Type to auto-include its eligible questions';
-  shell.querySelectorAll('.nb-wizard-nav').forEach(nav=>{const label=nav.querySelector('.nb-row-meta');if(label)label.textContent=`Step ${NativeBuilderState.wizardStep+1} of 6 · ${labels[NativeBuilderState.wizardStep]}`;});
-  const countField=shell.querySelector('#nbCount');if(countField){countField.disabled=false;}
-  const exactWords=shell.querySelectorAll('.nb-wizard-step');exactWords.forEach(step=>{step.querySelectorAll('h3').forEach(h=>{if(/Optional exact question selection|Question selection/i.test(h.textContent))h.textContent='3. Choose question Type(s)';});});
-  if(NativeBuilderState.tab==='preview'){
-    const active=shell.querySelector('[data-nb-step="5"]');const inlineActions=active?.querySelector('.nb-summary .nb-actions');const launch=inlineActions?.querySelector('button[onclick="nbStartTest()"]');const nav=active?.querySelector('.nb-wizard-nav');
-    if(inlineActions&&launch){const copy=launch.cloneNode(true);inlineActions.remove();if(nav){nav.innerHTML='';const back=document.createElement('button');back.className='btn-nav';back.textContent='← Back';back.onclick=nbWizardBack;const label=document.createElement('span');label.className='nb-row-meta';label.textContent='Step 6 of 6 · Preview';nav.append(back,label,copy);}}
-  }
-  shell.querySelectorAll('.nb-wizard-step').forEach(el=>{const i=Number(el.dataset.nbStep);const active=NativeBuilderState.tab==='preview'?i===5:(i===NativeBuilderState.wizardStep&&i!==5);el.classList.toggle('active',active);el.setAttribute('aria-hidden',active?'false':'true');});
-  const activeStep=shell.querySelector('.nb-wizard-step.active');if(activeStep){const heading=activeStep.querySelector('h3');if(heading){const titles=['Choose your test type','1. Subjects','2. Chapters & Topics','3. Choose question Type(s)','4. Test settings','Preview & Confirm'];heading.textContent=titles[NativeBuilderState.wizardStep]||heading.textContent;}}
 }

@@ -183,12 +183,12 @@ with sync_playwright() as p:
     # These checks deliberately validate every tile's actual route, not just labels.
     expected = [
         ('Exams', 'exam_hub'),
-        ('Mock tests', 'test_hub'),
+        ('Tests', 'test_hub'),
         ('PYQ papers', 'pyq_hub'),
         ('Topic practice', 'subjects'),
-        ('Test builder', 'native_builder'),
+        ('Create Test', 'native_builder'),
         ('Study library', 'digital_library'),
-        ('Question bank', 'taxonomy_explorer'),
+        ('Question Bank', 'taxonomy_explorer'),
         ('Revision', 'revision_hub'),
     ]
     for i, (label, route) in enumerate(expected):

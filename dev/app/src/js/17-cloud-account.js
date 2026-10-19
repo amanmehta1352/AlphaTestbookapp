@@ -172,7 +172,7 @@ async function cloudSync(reason = 'manual') {
   if (!ServerState.session || DataHealth.readOnly) return null;
   if (CloudSyncRunning) return CloudSyncRunning;
   CloudSyncRunning = (async () => {
-    CloudState.busy = true; cloudPaint();
+    CloudState.busy = true; cloudPaint(); refreshStudyFeedback();
     try {
       await Server.ensureFresh();
       const uid = ServerState.session.user_id;
@@ -188,7 +188,7 @@ async function cloudSync(reason = 'manual') {
     } catch (e) {
       CloudState.msg = (reason === 'auto' ? 'Sync बाद में होगा: ' : '') + e.message; CloudState.msgKind = e.network ? 'warn' : 'bad';
       return null;
-    } finally { CloudState.busy = false; CloudSyncRunning = null; cloudPaint(); }
+    } finally { CloudState.busy = false; CloudSyncRunning = null; cloudPaint(); refreshStudyFeedback(); }
   })();
   return CloudSyncRunning;
 }
@@ -238,5 +238,4 @@ async function cloudBoot() {
   window.addEventListener('online', () => { if (ServerState.session) cloudSync('auto'); });
 }
 
-const _c2RenderView = renderView;
-renderView = function () { _c2RenderView(); try { cloudHomePrompt(); } catch (_) {} };
+registerViewHook('after', 'account-prompt', cloudHomePrompt);

@@ -298,3 +298,17 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
 .sn-empty-topic{margin:0;padding:12px 4px;color:var(--text-muted);font-size:12px}
 @media(min-width:700px){.sn-topic-panel{padding:18px}.sn-subject-tabs{gap:11px}.sn-tab{min-width:136px}.sn-chapter-list{gap:9px}}
 @media(prefers-reduced-motion:reduce){.sn-tab{transition:none}}
+
+/* Shared context and student feedback use the existing light/dark tokens. */
+.study-context,.study-feedback{padding:12px;border:1px solid var(--border-strong);border-radius:var(--radius-md);background:var(--surface);color:var(--text-main);margin-bottom:12px}
+.study-context{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.study-context-copy{flex:1;min-width:0;overflow-wrap:anywhere}
+.study-context-copy strong,.study-context-copy small{display:block}
+.study-context-copy strong,.study-feedback strong{font-size:14px}
+.study-context-copy small,.study-feedback p{font-size:12px;line-height:1.6;color:var(--text-muted);margin:4px 0 0}
+.study-action{min-height:44px;max-width:100%;padding:8px 12px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--surface-alt);color:var(--text-main);font-size:13px;font-weight:700;line-height:1.5}
+.study-action:focus-visible{outline:3px solid var(--primary);outline-offset:2px}
+.study-action:disabled{opacity:.6;cursor:not-allowed}
+.study-feedback .study-action{margin-top:12px}
+.sb-shell .study-context{margin:8px 0 0}
+@media(max-width:380px){.study-context{flex-wrap:wrap}.study-context-copy{flex-basis:100%}}

@@ -74,8 +74,7 @@ function renderSubjectPage(v, subject) {
     <div class="sc-head"><div><h1>${escapeHtml(name)}</h1><p>${tx(`${all.length} chapter${all.length === 1 ? '' : 's'} · ${mods.length} topics`, `${all.length} अध्याय · ${mods.length} टॉपिक`)}</p></div>
       <button type="button" class="btn-action-sm" onclick="navigate('subjects')">← ${tx('Subjects', 'विषय')}</button></div>
     <div class="sh-chips" role="group" aria-label="${tx('Filter topics', 'टॉपिक छाँटें')}">${chips}</div>
-    ${shown.length ? `<div class="sh-list">${shown.map(chapterHtml).join('')}</div>`
-      : `<div class="sc-empty"><strong>${all.length ? tx('Nothing here yet', 'यहाँ अभी कुछ नहीं') : tx('No chapters with questions', 'सवालों वाला कोई अध्याय नहीं')}</strong><span>${all.length ? tx('Try another filter.', 'दूसरा filter चुनें।') : tx('Import a topic for this subject to start.', 'शुरू करने के लिए इस विषय का topic import करें।')}</span>${all.length ? `<button type="button" class="btn-action-sm" onclick="shSetFilter('all')">${tx('Show all', 'सभी दिखाएँ')}</button>` : ''}</div>`}`;
+    ${shown.length ? `<div class="sh-list">${shown.map(chapterHtml).join('')}</div>` : studyEmptyState(all.length ? 'subject' : '')}`;
 }
 
 /* ---------- Result: time card ---------- */
@@ -137,13 +136,7 @@ function renderMePage(v) {
     </section>
     <p class="me-ver">Master TestBook ${escapeHtml(document.querySelector('meta[name="app-version"]')?.content || '')}</p>`;
 }
-const _meRenderView = renderView;
-renderView = function () {
-  if (Route && Route.page === 'me') {
-    try { nbApplyShellForRoute('me'); updateAppBackButton(); } catch (_) {}
-    const t = document.getElementById('txtHeaderTitle'); if (t) t.textContent = '👤 ' + tx('ME', 'मैं');
-    const c = document.getElementById('mainView'); if (c) renderMePage(c);
-    return;
-  }
-  _meRenderView();
-};
+registerRouteViewState('subject', {
+  capture: () => ({ filter: SubjectHubState.filter, open: { ...SubjectHubState.open } }),
+  restore: state => { SubjectHubState = state ? { filter: state.filter, open: { ...state.open } } : { filter: 'all', open: {} }; }
+});

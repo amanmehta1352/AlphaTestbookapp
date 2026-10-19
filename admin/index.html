@@ -1260,7 +1260,7 @@ body.native-builder-active .nb-wizard-nav .nb-row-meta{flex:1 1 auto;min-width:0
 </style>
 <meta name="phase3" content="Profile-Driven Workspace + Data Airlock"><meta name="phase3-status" content="IMPLEMENTED"><meta name="phase3-frozen" content="Phase1A Storage; Phase2 QuestionUI; CBT scoring/timer"><meta name="master-testbook-candidate" content="V2.1.8 Smart Builder repair; child of V2.1.7; parent and data contracts preserved"><meta name="release-status" content="PARTIAL-HOLD-RUNTIME-VERIFICATION-PENDING">
 <meta name="master-testbook-candidate-version" content="V2.11.0_ADMIN_STUDIO">
-<meta name="app-version" content="V3.4.1">
+<meta name="app-version" content="V3.4.2">
 
 <style id="v2-3-2-deep-functional-repair">
 /* Root cause: display:contents exposed Previous, Clear, Mark and Next as four grid items for a three-column footer. */
@@ -2356,6 +2356,71 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
 .ops-maint{display:flex;gap:10px;align-items:flex-start;margin:0 0 10px;padding:12px 14px;border-radius:var(--radius-md);background:var(--warning-bg);border:1.5px solid var(--warning);color:var(--text-main)}
 .ops-maint b{display:block;font-size:14px}.ops-maint small{display:block;font-size:12.5px;color:var(--text-main);margin-top:2px}
 
+
+/* Testbook-inspired exam-first home navigation — additive, existing routes only. */
+.gx-quick{grid-column:1/-1;min-width:0}
+.gx-quick .gx-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.gx-explore-note{font-size:11px;color:var(--text-muted);font-weight:600}
+.gx-quick .sj-quick{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.gx-quick .sj-quick-btn{min-width:0;min-height:76px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:10px 5px;border:1px solid var(--border);background:var(--surface);box-shadow:var(--shadow-sm);font-size:11.5px;font-weight:800;line-height:1.25;text-align:center;overflow-wrap:anywhere;transition:transform .15s ease,border-color .15s ease,background .15s ease}
+.gx-quick .sj-quick-btn span:first-child{font-size:22px;line-height:1}
+.gx-quick .sj-quick-btn span:last-child{max-width:100%}
+.gx-quick .sj-quick-btn:active{transform:scale(.97);border-color:var(--primary-border);background:var(--primary-light)}
+@media(min-width:480px){.gx-quick .sj-quick{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(min-width:720px){.gx-quick .sj-quick{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(min-width:1100px){.gx-quick .sj-quick{grid-template-columns:repeat(8,minmax(0,1fr))}}
+@media(prefers-reduced-motion:reduce){.gx-quick .sj-quick-btn{transition:none}}
+
+
+/* Subject navigation only — horizontal subject rail + expandable chapter/topic list. */
+.sn-subject-tabs{display:flex;gap:9px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin;padding:3px 2px 12px;margin:0 0 10px;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity}
+.sn-subject-tabs::-webkit-scrollbar{height:4px}
+.sn-tab{flex:0 0 auto;min-width:116px;max-width:180px;min-height:76px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:3px;padding:10px 13px;border:1px solid var(--border);border-radius:14px;background:var(--surface);color:var(--text-main);box-shadow:var(--shadow-sm);font:inherit;text-align:left;scroll-snap-align:start;transition:border-color .15s,background .15s,transform .15s}
+.sn-tab>span:nth-child(2){font-size:13px;font-weight:850;line-height:1.3;white-space:normal}
+.sn-tab small{font-size:10px;font-weight:750;color:var(--text-muted)}
+.sn-tab-icon{font-size:17px;line-height:1.1}
+.sn-tab.on{background:var(--primary-light);border-color:var(--primary);box-shadow:0 0 0 1px var(--primary-border) inset}
+.sn-tab.on>span:nth-child(2),.sn-tab.on .sn-tab-icon{color:var(--primary)}
+.sn-topic-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:14px;box-shadow:var(--shadow-sm);min-width:0}
+.sn-panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 12px}
+.sn-panel-head h2{font-size:17px;line-height:1.35;font-weight:900;margin:0;color:var(--text-main)}
+.sn-panel-head p{font-size:12px;color:var(--text-muted);margin:3px 0 0}
+.sn-total{flex:0 0 auto;font-size:11px;font-weight:850;padding:6px 9px;border-radius:999px;background:var(--surface-alt);color:var(--text-muted);white-space:nowrap}
+.sn-chapter-list{display:flex;flex-direction:column;gap:8px}
+.sn-chapter{border:1px solid var(--border);border-radius:13px;background:var(--surface);overflow:hidden;min-width:0}
+.sn-chapter.open{border-color:var(--primary-border);background:var(--surface)}
+.sn-chapter-toggle{width:100%;min-height:62px;display:flex;align-items:center;gap:11px;padding:11px 12px;border:0;background:transparent;color:var(--text-main);font:inherit;text-align:left}
+.sn-chapter-mark{display:grid;place-items:center;flex:0 0 30px;width:30px;height:30px;border-radius:9px;background:var(--surface-alt);color:var(--primary);font-size:19px;font-weight:700}
+.sn-chapter-main{display:flex;flex:1;min-width:0;flex-direction:column;gap:3px}
+.sn-chapter-main strong{font-size:13px;line-height:1.4;font-weight:850;overflow-wrap:anywhere}
+.sn-chapter-main small{font-size:11px;color:var(--text-muted);font-weight:650}
+.sn-chevron{font-size:21px;color:var(--text-muted);padding:0 3px}
+.sn-topic-list{border-top:1px solid var(--border);padding:4px 10px;background:var(--bg-main)}
+.sn-topic{width:100%;min-height:44px;display:flex;align-items:center;gap:8px;padding:8px 5px;border:0;border-bottom:1px solid var(--border);background:transparent;color:var(--text-main);font:inherit;text-align:left}
+.sn-topic:last-child{border-bottom:0}
+.sn-topic-dot{color:var(--primary);font-size:19px;line-height:1}
+.sn-topic-label{flex:1;min-width:0;font-size:12px;font-weight:700;line-height:1.4;overflow-wrap:anywhere}
+.sn-topic-count{font-size:10px;color:var(--text-muted);white-space:nowrap;font-weight:750}
+.sn-topic>span:last-child{font-size:18px;color:var(--text-muted)}
+.sn-chapter-action{display:flex;justify-content:flex-end;padding:8px 10px;border-top:1px solid var(--border)}
+.sn-empty-topic{margin:0;padding:12px 4px;color:var(--text-muted);font-size:12px}
+@media(min-width:700px){.sn-topic-panel{padding:18px}.sn-subject-tabs{gap:11px}.sn-tab{min-width:136px}.sn-chapter-list{gap:9px}}
+@media(prefers-reduced-motion:reduce){.sn-tab{transition:none}}
+
+/* Shared context and student feedback use the existing light/dark tokens. */
+.study-context,.study-feedback{padding:12px;border:1px solid var(--border-strong);border-radius:var(--radius-md);background:var(--surface);color:var(--text-main);margin-bottom:12px}
+.study-context{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.study-context-copy{flex:1;min-width:0;overflow-wrap:anywhere}
+.study-context-copy strong,.study-context-copy small{display:block}
+.study-context-copy strong,.study-feedback strong{font-size:14px}
+.study-context-copy small,.study-feedback p{font-size:12px;line-height:1.6;color:var(--text-muted);margin:4px 0 0}
+.study-action{min-height:44px;max-width:100%;padding:8px 12px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);background:var(--surface-alt);color:var(--text-main);font-size:13px;font-weight:700;line-height:1.5}
+.study-action:focus-visible{outline:3px solid var(--primary);outline-offset:2px}
+.study-action:disabled{opacity:.6;cursor:not-allowed}
+.study-feedback .study-action{margin-top:12px}
+.sb-shell .study-context{margin:8px 0 0}
+@media(max-width:380px){.study-context{flex-wrap:wrap}.study-context-copy{flex-basis:100%}}
+
 </style>
 </head>
 <body>
@@ -2390,28 +2455,32 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
     <button id="btnCloseDrawer" style="font-size:20px; font-weight:900;" aria-label="Close">✕</button>
   </div>
   <nav class="drawer-nav" aria-label="Main menu">
-    <div class="drawer-section-title" data-en="STUDY" data-hi="पढ़ाई">STUDY</div>
-    <button class="drawer-item" id="drwMe" onclick="navigate('me')" data-en="👤 Me (progress, settings)" data-hi="👤 मैं (progress, सेटिंग)">👤 Me (progress, settings)</button>
+    <div class="drawer-section-title" data-en="PREPARE" data-hi="तैयारी शुरू करें">PREPARE</div>
     <button class="drawer-item" id="drwHome" onclick="navigate('home')" data-en="🏠 Home" data-hi="🏠 होम">🏠 Home</button>
-    <button class="drawer-item" id="drwSubjects" onclick="navigate('subjects')" data-en="📚 Subjects" data-hi="📚 विषय">📚 Subjects</button>
-    <button class="drawer-item" id="drwNativeBuilder" onclick="navigate('native_builder')" data-en="🧩 Create a test" data-hi="🧩 टेस्ट बनाएँ">🧩 Create a test</button>
-    <button class="drawer-item" id="drwTest" onclick="navigate('test_hub')" data-en="⏱️ Tests" data-hi="⏱️ टेस्ट">⏱️ Tests</button>
     <button class="drawer-item" id="drwExams" onclick="navigate('exam_hub')" data-en="🏛️ Exams" data-hi="🏛️ परीक्षाएँ">🏛️ Exams</button>
-    <button class="drawer-item" id="drwPYQ" onclick="navigate('pyq_hub')" data-en="🎯 PYQ archive" data-hi="🎯 PYQ संग्रह">🎯 PYQ archive</button>
-    <button class="drawer-item" id="drwLibrary" onclick="navigate('digital_library')" data-en="📖 Digital library" data-hi="📖 डिजिटल लाइब्रेरी">📖 Digital library</button>
-    <div class="drawer-section-title" data-en="REVIEW" data-hi="दोहराना">REVIEW</div>
-    <button class="drawer-item" id="drwRevision" onclick="navigate('revision_hub')" data-en="🔄 Revision" data-hi="🔄 रिवीज़न">🔄 Revision</button>
+    <button class="drawer-item" id="drwTest" onclick="navigate('test_hub')" data-en="⏱️ Tests" data-hi="⏱️ टेस्ट">⏱️ Tests</button>
+    <button class="drawer-item" id="drwPYQ" onclick="navigate('pyq_hub')" data-en="🎯 Previous year papers (PYQ)" data-hi="🎯 पिछले वर्ष के पेपर (PYQ)">🎯 Previous year papers (PYQ)</button>
+    <button class="drawer-item" id="drwSubjects" onclick="navigate('subjects')" data-en="📚 Subjects & topic practice" data-hi="📚 विषय और टॉपिक अभ्यास">📚 Subjects &amp; topic practice</button>
+
+    <div class="drawer-section-title" data-en="LEARN & PRACTICE" data-hi="सीखें और अभ्यास करें">LEARN &amp; PRACTICE</div>
+    <button class="drawer-item" id="drwNativeBuilder" onclick="navigate('native_builder')" data-en="🧩 Create Test" data-hi="🧩 टेस्ट बनाएँ">🧩 Create Test</button>
+    <button class="drawer-item" id="drwLibrary" onclick="navigate('digital_library')" data-en="📖 Study library" data-hi="📖 स्टडी लाइब्रेरी">📖 Study library</button>
+    <button class="drawer-item" id="drwTaxonomy" onclick="navigate('taxonomy_explorer')" data-en="🔎 Question Bank" data-hi="🔎 प्रश्न बैंक">🔎 Question Bank</button>
+
+    <div class="drawer-section-title" data-en="REVISE & TRACK" data-hi="दोहराएँ और प्रगति देखें">REVISE &amp; TRACK</div>
+    <button class="drawer-item" id="drwRevision" onclick="navigate('revision_hub')" data-en="🔄 Revision centre" data-hi="🔄 रिवीज़न सेंटर">🔄 Revision centre</button>
     <button class="drawer-item" onclick="navigate('mistakes')" data-en="📕 Mistake book" data-hi="📕 गलतियों की किताब">📕 Mistake book</button>
-    <button class="drawer-item" id="drwTaxonomy" onclick="navigate('taxonomy_explorer')" data-en="🔎 Question bank" data-hi="🔎 प्रश्न बैंक">🔎 Question bank</button>
-    <button class="drawer-item" onclick="navigate('mastery')" data-en="🎯 Mastery" data-hi="🎯 महारत">🎯 Mastery</button>
-    <div class="drawer-section-title" data-en="SETTINGS & DATA" data-hi="सेटिंग और डेटा">SETTINGS & DATA</div>
+    <button class="drawer-item" onclick="navigate('mastery')" data-en="🎯 Topic mastery" data-hi="🎯 टॉपिक महारत">🎯 Topic mastery</button>
+    <button class="drawer-item" id="drwMe" onclick="navigate('me')" data-en="👤 Me" data-hi="👤 मैं">👤 My progress &amp; settings</button>
+
+    <div class="drawer-section-title" data-en="APP TOOLS & DATA" data-hi="ऐप टूल्स और डेटा">APP TOOLS &amp; DATA</div>
     <button class="drawer-item" onclick="openDisplaySettings()" data-en="Aa Display (language, text size)" data-hi="Aa डिस्प्ले (भाषा, अक्षर आकार)">Aa Display (language, text size)</button>
     <a class="drawer-item admin-only" id="drwControl" href="control/" data-en="🩺 Control Room (app health)" data-hi="🩺 Control Room (ऐप की सेहत)">🩺 Control Room (app health)</a>
     <a class="drawer-item admin-only" id="drwStudio" href="admin/" data-en="🛠️ Admin Studio" data-hi="🛠️ Admin Studio">🛠️ Admin Studio</a>
     <button class="drawer-item admin-only" onclick="openImportModal()" data-en="📥 Import questions" data-hi="📥 सवाल import करें">📥 Import questions</button>
     <button class="drawer-item admin-only" onclick="openCleanup()" data-en="🧹 Data cleanup" data-hi="🧹 Data सफ़ाई">🧹 Data cleanup</button>
-    <button class="drawer-item" onclick="openHealthCheck()" data-en="🩺 Health Check" data-hi="🩺 Health Check">🩺 Health Check</button>
-    <button class="drawer-item" onclick="openBackupCenter()" data-en="💾 Backup & Restore" data-hi="💾 Backup और Restore">💾 Backup &amp; Restore</button>
+    <button class="drawer-item" onclick="openHealthCheck()" data-en="🩺 Health check" data-hi="🩺 हेल्थ चेक">🩺 Health check</button>
+    <button class="drawer-item" onclick="openBackupCenter()" data-en="💾 Backup & restore" data-hi="💾 बैकअप और रीस्टोर">💾 Backup &amp; restore</button>
     <button class="drawer-item admin-only" onclick="openServerSync()" data-en="☁️ Server (Admin)" data-hi="☁️ Server (Admin)">☁️ Server (Admin)</button>
     <button class="drawer-item" id="drwInstall" hidden onclick="pwaInstall()" data-en="📲 Install app" data-hi="📲 ऐप install करें">📲 Install app</button>
     <button class="drawer-item" onclick="openDataControlModal()" data-en="🛡️ Data control" data-hi="🛡️ डेटा नियंत्रण">🛡️ Data control</button>
@@ -2439,7 +2508,7 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
   </button>
   <button class="nav-tab" id="tabTest" onclick="navigate('test_hub')" aria-label="Tests">
     <span class="nav-tab-icon">⏱️</span>
-    <span data-en="TEST" data-hi="टेस्ट">TEST</span>
+    <span data-en="TESTS" data-hi="टेस्ट">TESTS</span>
   </button>
   <button class="nav-tab" id="tabRevision" onclick="navigate('revision_hub')" aria-label="Revision">
     <span class="nav-tab-icon">🔄</span>
@@ -3837,6 +3906,33 @@ let TimerInterval = null;
 const APP_ROUTE_HISTORY_KEY = 'masterTestBookRouteHistoryV1';
 let AppRouteStack = [];
 let AppRouteRestoring = false;
+// One renderer owns the shell. Features register named hooks instead of wrapping it.
+const ViewHooks = { before: new Map(), after: new Map() };
+const RouteViewStates = new Map();
+const RouteUiMemory = new Map();
+let RenderedRouteKey = '';
+function registerViewHook(phase, name, hook) {
+  ViewHooks[phase].set(name, hook);
+}
+function runViewHooks(phase) {
+  ViewHooks[phase].forEach((hook, name) => {
+    try { hook(); } catch (error) { console.warn('[View hook]', name, error); }
+  });
+}
+function registerRouteViewState(page, adapter) { RouteViewStates.set(page, adapter); }
+function routeUiKey(route = Route) {
+  return JSON.stringify([WorkspaceManager.current().id, route.page, route.params]);
+}
+function captureRouteView() {
+  if (RenderedRouteKey !== routeUiKey()) return;
+  const adapter = RouteViewStates.get(Route.page);
+  RouteUiMemory.delete(RenderedRouteKey);
+  RouteUiMemory.set(RenderedRouteKey, {
+    scroll: document.getElementById('mainView')?.scrollTop || 0,
+    state: adapter ? adapter.capture() : null
+  });
+  while (RouteUiMemory.size > 40) RouteUiMemory.delete(RouteUiMemory.keys().next().value);
+}
 function routeSnapshot(route=Route){ return {page:String(route?.page||'home'),params:route?.params&&typeof route.params==='object'?route.params:{}}; }
 function sameRoute(a,b){ return !!a&&!!b&&a.page===b.page&&JSON.stringify(a.params||{})===JSON.stringify(b.params||{}); }
 function persistAppRoute(){ try { sessionStorage.setItem(APP_ROUTE_HISTORY_KEY, JSON.stringify({version:1,workspaceId:WorkspaceManager.current().id,stack:AppRouteStack.slice(-40),current:routeSnapshot()})); } catch(_) {} }
@@ -3855,7 +3951,7 @@ function updateAppBackButton(){
   const b=document.getElementById('btnAppBack'); if(!b)return;
   const canBack=Route.page!=='home' || AppRouteStack.length>0;
   b.hidden=!canBack; b.disabled=!canBack;
-  b.setAttribute('aria-label','ONE STEP BACK'); b.title='ONE STEP BACK';
+  b.setAttribute('aria-label', tx('Back', 'वापस')); b.title=tx('Back', 'वापस'); b.textContent='← '+tx('Back', 'वापस');
 }
 const APP_ACTIVE_MODE_PAGES = new Set(['practice','test','learn','revision','pyq','mockSession','mock_session']);
 let AppBackConfirmationOpen = false;
@@ -3871,6 +3967,7 @@ function appNavigateBack(confirmed=false){
   if(!confirmed && (appBackWouldExitMode(previous) || (!previous && Route.page==='home'))){ requestAppBackConfirmation(); return; }
   if(ActiveTestSession?.sessionStatus==='ACTIVE'){ CbtExitGuard.requestExit(); return; }
   AppBackConfirmationOpen=false;
+  captureRouteView();
   if(previous){
     AppRouteStack.pop(); AppBackConfirmationOpen=false;
     AppRouteRestoring=true; Route=routeSnapshot(previous); persistAppRoute(); renderView(); updateAppBackButton();
@@ -3901,11 +3998,11 @@ function practiceSessionSummary(){
 function requestPracticeBackOptions(){
   if(AppBackConfirmationOpen)return;AppBackConfirmationOpen=true;
   const x=practiceSessionSummary();
-  openModal('Practice is in progress',`<div style="font-size:14px;line-height:1.6;color:var(--text-main);">You have an active practice session. Submit shows a summary; Exit returns to the previous screen; Cancel keeps this question open. Existing answers and mistake-book entries are not deleted.</div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:12px;font-size:12px;"><div class="nb-stat"><small>ANSWERED</small><strong>${x.answered} / ${x.total}</strong></div><div class="nb-stat"><small>UNANSWERED</small><strong>${x.unanswered}</strong></div></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap;"><button onclick="submitPracticeSessionSummary()" class="btn-nav primary">SUBMIT</button><button onclick="exitPracticeSession()" class="btn-nav">EXIT</button><button onclick="cancelAppBack()" class="btn-nav">CANCEL</button></div>`);
+  openModal(tx('Practice is in progress', 'अभ्यास चल रहा है'),`<div style="font-size:14px;line-height:1.6;color:var(--text-main);">${tx('You have an active practice session. Submit shows a summary; Exit returns to the previous screen; Cancel keeps this question open. Existing answers and mistake-book entries are not deleted.', 'आपका अभ्यास चल रहा है। जमा करें से सारांश दिखेगा; बाहर निकलें से पिछला पेज खुलेगा; रद्द करें से यही सवाल खुला रहेगा। सहेजे जवाब और गलतियों की किताब सुरक्षित रहेंगे।')}</div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:12px;font-size:12px;"><div class="nb-stat"><small>${tx('ANSWERED', 'हल किए')}</small><strong>${x.answered} / ${x.total}</strong></div><div class="nb-stat"><small>${tx('UNANSWERED', 'बिना हल किए')}</small><strong>${x.unanswered}</strong></div></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap;"><button onclick="submitPracticeSessionSummary()" class="btn-nav primary">${tx('SUBMIT', 'जमा करें')}</button><button onclick="exitPracticeSession()" class="btn-nav">${tx('EXIT', 'बाहर निकलें')}</button><button onclick="cancelAppBack()" class="btn-nav">${tx('CANCEL', 'रद्द करें')}</button></div>`);
 }
 function submitPracticeSessionSummary(){
   const x=practiceSessionSummary();AppBackConfirmationOpen=true;
-  openModal('Practice summary',`<div style="font-size:14px;line-height:1.6;color:var(--text-main);">Practice review summary from the questions available in this session. This does not write a separate scored exam result.</div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:12px;font-size:12px;"><div class="nb-stat"><small>ANSWERED</small><strong>${x.answered} / ${x.total}</strong></div><div class="nb-stat"><small>CORRECT</small><strong>${x.correct}</strong></div><div class="nb-stat"><small>WRONG</small><strong>${x.wrong}</strong></div><div class="nb-stat"><small>UNANSWERED</small><strong>${x.unanswered}</strong></div></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap;"><button onclick="cancelAppBack()" class="btn-nav">KEEP REVIEWING</button><button onclick="exitPracticeSession()" class="btn-nav primary">FINISH PRACTICE</button></div>`);
+  openModal(tx('Practice summary', 'अभ्यास का सारांश'),`<div style="font-size:14px;line-height:1.6;color:var(--text-main);">${tx('Practice review summary from the questions available in this session. This does not write a separate scored exam result.', 'इस अभ्यास के सवालों का सारांश। इसे अलग परीक्षा परिणाम के रूप में नहीं सहेजा जाएगा।')}</div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:12px;font-size:12px;"><div class="nb-stat"><small>${tx('ANSWERED', 'हल किए')}</small><strong>${x.answered} / ${x.total}</strong></div><div class="nb-stat"><small>${tx('CORRECT', 'सही')}</small><strong>${x.correct}</strong></div><div class="nb-stat"><small>${tx('WRONG', 'गलत')}</small><strong>${x.wrong}</strong></div><div class="nb-stat"><small>${tx('UNANSWERED', 'बिना हल किए')}</small><strong>${x.unanswered}</strong></div></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap;"><button onclick="cancelAppBack()" class="btn-nav">${tx('KEEP REVIEWING', 'देखते रहें')}</button><button onclick="exitPracticeSession()" class="btn-nav primary">${tx('FINISH PRACTICE', 'अभ्यास पूरा करें')}</button></div>`);
 }
 function exitPracticeSession(){AppBackConfirmationOpen=false;closeModal();appNavigateBack(true);}
 
@@ -3916,9 +4013,9 @@ function requestAppBackConfirmation(){
   AppBackConfirmationOpen=true;
   const atRoot=Route.page==='home' && !AppRouteStack.length;
   const message=atRoot
-    ? 'You are at the application root. Confirm only if you want to leave this page; the browser or Android may still control whether it can close.'
-    : 'Leaving this mode will return to the previous screen. Cancel to keep your current screen and progress.';
-  openModal(atRoot?'Leave Master TestBook?':'Exit current mode?', `<div style="font-size:14px;line-height:1.6;color:var(--text-main);">${message}</div><div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;flex-wrap:wrap;"><button onclick="cancelAppBack()" class="btn-nav">CANCEL / STAY</button><button onclick="confirmAppBack()" class="btn-nav primary">CONFIRM EXIT</button></div>`);
+    ? tx('You are at the application root. Confirm only if you want to leave this page; the browser or Android may still control whether it can close.', 'आप होम पेज पर हैं। ऐप छोड़ने के लिए पुष्टि करें। पेज बंद करना ब्राउज़र या Android के नियंत्रण में है।')
+    : tx('Leaving this mode will return to the previous screen. Cancel to keep your current screen and progress.', 'बाहर निकलने पर पिछला पेज खुलेगा। इसी पेज पर रहने के लिए रद्द करें।');
+  openModal(atRoot?tx('Leave Master TestBook?', 'Master TestBook छोड़ें?'):tx('Exit current mode?', 'इस मोड से बाहर निकलें?'), `<div style="font-size:14px;line-height:1.6;color:var(--text-main);">${message}</div><div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;flex-wrap:wrap;"><button onclick="cancelAppBack()" class="btn-nav">${tx('CANCEL / STAY', 'रद्द करें / रहें')}</button><button onclick="confirmAppBack()" class="btn-nav primary">${tx('CONFIRM EXIT', 'बाहर निकलें')}</button></div>`);
 }
 function cancelAppBack(){ AppBackConfirmationOpen=false; closeModal(); }
 function confirmAppBack(){
@@ -3945,6 +4042,7 @@ function navigate(page, params = {}) {
     AppRouteStack.push(routeSnapshot(Route));
     if(AppRouteStack.length>40) AppRouteStack=AppRouteStack.slice(-40);
   }
+  captureRouteView();
   AppRouteRestoring=false;
   Route = nextRoute;
   persistAppRoute();
@@ -3952,150 +4050,97 @@ function navigate(page, params = {}) {
   closeDrawer();
   closeModal();
   
-  const bottomNav = document.getElementById('bottomNav');
-  const appHeader = document.getElementById('appHeader');
-
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.drawer-item').forEach(d => d.classList.remove('active'));
-
-  if (page === 'home') {
-    document.getElementById('tabHome')?.classList.add('active');
-    document.getElementById('drwHome')?.classList.add('active');
-  } else if (page === 'subjects' || page === 'subject') {
-    document.getElementById('tabSubjects')?.classList.add('active');
-    document.getElementById('drwSubjects')?.classList.add('active');
-  } else if (page === 'digital_library') {
-    document.getElementById('drwLibrary')?.classList.add('active');
-  } else if (page === 'competitive_hub' || page === 'competitive_subjects' || page === 'competitive_chapters' || page === 'competitive_topics' || page === 'competitive_topic' || page === 'exam_hub' || page === 'exam_profile' || page === 'syllabus') {
-    document.getElementById('tabPYQ')?.classList.add('active');
-    document.getElementById('drwExams')?.classList.add('active');
-  } else if (page === 'pyq_hub' || page === 'pyq') {
-    document.getElementById('drwPYQ')?.classList.add('active');
-  } else if (page === 'test_hub') {
-    document.getElementById('tabTest')?.classList.add('active');
-    document.getElementById('drwTest')?.classList.add('active');
-  } else if (page === 'revision_hub' || page === 'revision' || page === 'mistakes' || page === 'mastery') {
-    document.getElementById('tabRevision')?.classList.add('active');
-    document.getElementById('drwRevision')?.classList.add('active');
-  } else if (page === 'taxonomy_explorer') {
-    document.getElementById('drwTaxonomy')?.classList.add('active');
-  }
-
-  // CBT Viewport Lock
-  if (page === 'test') {
-    bottomNav.style.display = 'none';
-    appHeader.style.display = 'none';
-    document.body.style.overflow = 'hidden';
-  } else {
-    bottomNav.style.display = 'flex';
-    appHeader.style.display = 'flex';
-    document.body.style.overflow = 'auto';
+  if (page !== 'test') {
     if (TimerInterval) { clearInterval(TimerInterval); TimerInterval = null; }
-    // Ensure we exit fullscreen if we leave the test
-    if (document.fullscreenElement) {
-        document.exitFullscreen().catch(()=>{});
-    }
-  }
-
-  const mainView = document.getElementById('mainView');
-  if (page !== 'test' && mainView) {
-    mainView.scrollTo({ top: 0, behavior: 'instant' });
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
   }
   renderView();
 }
 
+const AppRoutes = {
+  home: { nav: 'home', title: ['🏠 Home', '🏠 होम'], render: v => {
+    if (WorkspaceManager.current().type === 'BOARD') {
+      document.getElementById('txtHeaderTitle').textContent = '🎓 CBSE CAMPUS';
+      renderBoardDashboard(v);
+    } else renderHomePage(v);
+  } },
+  competitive_hub: { nav: 'exams', title: ['🏆 Competitive exams', '🏆 प्रतियोगी परीक्षाएँ'], render: v => renderCompetitiveDashboard(v) },
+  competitive_subjects: { nav: 'exams', title: ['📚 Subjects', '📚 विषय'], render: v => renderCompetitiveSubjects(v) },
+  competitive_chapters: { nav: 'exams', title: ['📚 Chapters', '📚 अध्याय'], render: (v, p) => renderCompetitiveChapters(v, p.subject) },
+  competitive_topics: { nav: 'exams', title: ['📚 Topics', '📚 टॉपिक'], render: (v, p) => renderCompetitiveTopics(v, p.subject, p.chapter) },
+  competitive_topic: { nav: 'exams', title: ['📚 Topic', '📚 टॉपिक'], render: (v, p) => renderCompetitiveTopic(v, p.moduleId) },
+  exam_hub: { nav: 'exams', title: ['🏛️ Exams', '🏛️ परीक्षाएँ'], render: v => renderUniversalExamHub(v) },
+  exam_profile: { nav: 'exams', title: ['🎓 Exam', '🎓 परीक्षा'], render: (v, p) => renderExamProfile(v, p.examId) },
+  syllabus: { nav: 'exams', title: ['📚 Syllabus', '📚 पाठ्यक्रम'], render: (v, p) => renderSyllabusMatrix(v, p.examId) },
+  board_subjects: { nav: 'subjects', title: ['📚 Subjects', '📚 विषय'], render: v => renderBoardSubjects(v) },
+  board_chapters: { nav: 'subjects', title: ['📚 Chapters', '📚 अध्याय'], render: (v, p) => renderBoardChapters(v, p.subjectId) },
+  board_topics: { nav: 'subjects', title: ['📚 Topics', '📚 टॉपिक'], render: (v, p) => renderBoardTopics(v, p.chapterId, p.subjectId) },
+  board_topic: { nav: 'subjects', title: ['📚 Topic', '📚 टॉपिक'], render: (v, p) => renderBoardTopic(v, p.topicId, p.chapterId, p.subjectId) },
+  digital_library: { nav: 'library', title: ['📖 Study library', '📖 स्टडी लाइब्रेरी'], render: v => renderDigitalLibrary(v) },
+  native_builder: { nav: 'builder', title: ['🧩 Create Test', '🧩 टेस्ट बनाएँ'], render: v => renderNativeBuilder(v) },
+  subjects: { nav: 'subjects', title: ['📚 Subjects', '📚 विषय'], render: v => renderSubjectsCatalog(v) },
+  subject: { nav: 'subjects', title: ['📚 Chapters', '📚 अध्याय'], render: (v, p) => renderSubjectPage(v, p.subject) },
+  chapter: { nav: 'subjects', title: ['📚 Topics', '📚 टॉपिक'], render: (v, p) => renderChapterPage(v, p.subject, p.chapter) },
+  topic: { nav: 'subjects', title: ['📚 Topic', '📚 टॉपिक'], render: (v, p) => renderTopicHubPage(v, p.moduleId) },
+  subtopic: { nav: 'subjects', title: ['📚 Subtopic', '📚 उपविषय'], render: (v, p) => renderSubtopicConceptPage(v, p.moduleId, p.subtopic) },
+  taxonomy_explorer: { nav: 'bank', title: ['🔎 Question Bank', '🔎 प्रश्न बैंक'], render: (v, p) => renderTaxonomyExplorer(v, p) },
+  learn: { nav: 'subjects', title: ['📖 Learn', '📖 सीखें'], render: (v, p) => renderLearnEngine(v, p.moduleId) },
+  revision: { nav: 'revision', title: ['🔄 Revision', '🔄 रिवीज़न'], render: (v, p) => renderRevisionEngine(v, p.moduleId) },
+  practice: { nav: 'subjects', title: ['✍️ Practice', '✍️ अभ्यास'], render: (v, p) => renderPracticeEngine(v, p.moduleId, p.qIndex || 0, p.customQuestions) },
+  class: { nav: 'subjects', title: ['📚 Class', '📚 कक्षा'], render: (v, p) => renderClassEngine(v, p.moduleId) },
+  pyq: { nav: 'pyq', title: ['🎯 PYQ papers', '🎯 पिछले वर्ष के पेपर'], render: (v, p) => renderPYQEngine(v, p.moduleId) },
+  pyq_hub: { nav: 'pyq', title: ['🎯 PYQ papers', '🎯 पिछले वर्ष के पेपर'], render: v => renderGlobalPYQHub(v) },
+  test_hub: { nav: 'tests', title: ['⏱️ Tests', '⏱️ टेस्ट'], render: v => renderGlobalTestHub(v) },
+  revision_hub: { nav: 'revision', title: ['🔄 Revision', '🔄 रिवीज़न'], render: v => renderGlobalRevisionHub(v) },
+  test: { nav: 'tests', title: ['⏱️ Test', '⏱️ टेस्ट'], render: (v, p) => renderTestPage(v, p.moduleId, p.groupId, p.qIndex || 0) },
+  mistakes: { nav: 'revision', title: ['📕 Mistake Book', '📕 गलतियों की किताब'], render: v => renderMistakeBookPage(v) },
+  mastery: { nav: 'revision', title: ['🎯 Mastery', '🎯 महारत'], render: v => renderMasteryPage(v) },
+  result: { nav: 'tests', title: ['📊 Result', '📊 परिणाम'], render: (v, p) => renderResultPage(v, p.result) },
+  me: { nav: 'me', title: ['👤 Me', '👤 मैं'], render: v => renderMePage(v) }
+};
+const RouteNavItems = {
+  home: ['tabHome', 'drwHome'], subjects: ['tabSubjects', 'drwSubjects'],
+  exams: ['tabPYQ', 'drwExams'], tests: ['tabTest', 'drwTest'],
+  builder: ['tabTest', 'drwNativeBuilder'], pyq: ['tabPYQ', 'drwPYQ'],
+  revision: ['tabRevision', 'drwRevision'], bank: ['drwTaxonomy'],
+  library: ['drwLibrary'], me: ['drwMe', 'btnMe']
+};
+function updateRouteNavigation() {
+  document.querySelectorAll('.nav-tab, .drawer-item, #btnMe').forEach(el => {
+    el.classList.remove('active'); el.removeAttribute('aria-current');
+  });
+  (RouteNavItems[AppRoutes[Route.page]?.nav] || []).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.classList.add('active'); el.setAttribute('aria-current', 'page'); }
+  });
+}
 function renderView() {
-  nbApplyShellForRoute(Route?.page);
-  updateAppBackButton();
   const container = document.getElementById('mainView');
-  const titleElem = document.getElementById('txtHeaderTitle');
+  if (!container) return;
+  if (Route.params?.moduleId && !enforceWorkspaceRoute(Route.page, Route.params)) return renderView();
+  const key = routeUiKey();
+  const changed = key !== RenderedRouteKey;
+  const saved = RouteUiMemory.get(key);
+  const scroll = changed ? saved?.scroll || 0 : container.scrollTop;
+  if (changed) RouteViewStates.get(Route.page)?.restore(saved?.state, AppRouteRestoring);
+  RenderedRouteKey = key;
+  AppRouteRestoring = false;
+  nbApplyShellForRoute(Route.page);
+  updateRouteNavigation();
+  updateAppBackButton();
   const header = document.getElementById('appHeader');
-  if (header && !document.getElementById('workspaceSwitcherBtn')) { const b=document.createElement('button'); b.id='workspaceSwitcherBtn'; b.className='btn-action-sm'; b.textContent='🧭 Workspace'; b.onclick=openWorkspaceSwitcher; (header.querySelector('.header-right') || header).appendChild(b); }
-
-  if (Route.params && Route.params.moduleId && !enforceWorkspaceRoute(Route.page, Route.params)) { return renderView(); }
-
-  if (Route.page === 'home') {
-    if (WorkspaceManager.current().type === 'BOARD') { titleElem.textContent = '🎓 CBSE CAMPUS'; renderBoardDashboard(container); }
-    else { titleElem.textContent = '📚 STUDENT HUB'; renderHomePage(container); }
-  } else if (Route.page === 'competitive_hub') {
-    titleElem.textContent = '🏆 COMPETITIVE EXAMS';
-    renderCompetitiveDashboard(container);
-  } else if (Route.page === 'competitive_subjects') {
-    titleElem.textContent = '🏆 SUBJECTS'; renderCompetitiveSubjects(container);
-  } else if (Route.page === 'competitive_chapters') {
-    titleElem.textContent = '🏆 CHAPTERS'; renderCompetitiveChapters(container, Route.params.subject);
-  } else if (Route.page === 'competitive_topics') {
-    titleElem.textContent = '🏆 TOPICS'; renderCompetitiveTopics(container, Route.params.subject, Route.params.chapter);
-  } else if (Route.page === 'competitive_topic') {
-    titleElem.textContent = '🏆 TOPIC'; renderCompetitiveTopic(container, Route.params.moduleId);
-  } else if (Route.page === 'exam_hub') {
-    titleElem.textContent = '🏛️ UNIVERSAL EXAMS';
-    renderUniversalExamHub(container);
-  } else if (Route.page === 'exam_profile') {
-    titleElem.textContent = '🎓 EXAM PROFILE';
-    renderExamProfile(container, Route.params.examId);
-  } else if (Route.page === 'syllabus') {
-    titleElem.textContent = '📚 SYLLABUS MATRIX';
-    renderSyllabusMatrix(container, Route.params.examId);
-  } else if (Route.page === 'board_subjects') {
-    titleElem.textContent='🎓 BOARD SUBJECTS'; renderBoardSubjects(container);
-  } else if (Route.page === 'board_chapters') {
-    titleElem.textContent='🎓 BOARD CHAPTERS'; renderBoardChapters(container,Route.params.subjectId);
-  } else if (Route.page === 'board_topics') {
-    titleElem.textContent='🎓 BOARD TOPICS'; renderBoardTopics(container,Route.params.chapterId,Route.params.subjectId);
-  } else if (Route.page === 'board_topic') {
-    titleElem.textContent='🎓 BOARD TOPIC'; renderBoardTopic(container,Route.params.topicId,Route.params.chapterId,Route.params.subjectId);
-  } else if (Route.page === 'digital_library') {
-    titleElem.textContent = '📖 DIGITAL LIBRARY';
-    renderDigitalLibrary(container);
-  } else if (Route.page === 'native_builder') {
-    titleElem.textContent = '🧩 CREATE CUSTOM TEST';
-    renderNativeBuilder(container);
-  } else if (Route.page === 'subjects') {
-    titleElem.textContent = '📚 CURRICULUM SUBJECTS';
-    renderSubjectsCatalog(container);
-  } else if (Route.page === 'subject') {
-    renderSubjectPage(container, Route.params.subject);
-  } else if (Route.page === 'chapter') {
-    renderChapterPage(container, Route.params.subject, Route.params.chapter);
-  } else if (Route.page === 'topic') {
-    renderTopicHubPage(container, Route.params.moduleId);
-  } else if (Route.page === 'subtopic') {
-    renderSubtopicConceptPage(container, Route.params.moduleId, Route.params.subtopic);
-  } else if (Route.page === 'taxonomy_explorer') {
-    titleElem.textContent = '🏷️ TAXONOMY EXPLORER';
-    renderTaxonomyExplorer(container, Route.params);
-  } else if (Route.page === 'learn') {
-    renderLearnEngine(container, Route.params.moduleId);
-  } else if (Route.page === 'revision') {
-    renderRevisionEngine(container, Route.params.moduleId);
-  } else if (Route.page === 'practice') {
-    renderPracticeEngine(container, Route.params.moduleId, Route.params.qIndex || 0, Route.params.customQuestions);
-  } else if (Route.page === 'class') {
-    renderClassEngine(container, Route.params.moduleId);
-  } else if (Route.page === 'pyq') {
-    renderPYQEngine(container, Route.params.moduleId);
-  } else if (Route.page === 'pyq_hub') {
-    titleElem.textContent = '🎯 UNIVERSAL PYQ HUB';
-    renderGlobalPYQHub(container);
-  } else if (Route.page === 'test_hub') {
-    titleElem.textContent = '⏱️ CBT ASSESSMENT CENTER';
-    renderGlobalTestHub(container);
-  } else if (Route.page === 'revision_hub') {
-    titleElem.textContent = '🔄 SMART REVISION & DECKS';
-    renderGlobalRevisionHub(container);
-  } else if (Route.page === 'test') {
-    renderTestPage(container, Route.params.moduleId, Route.params.groupId, Route.params.qIndex || 0);
-  } else if (Route.page === 'mistakes') {
-    titleElem.textContent = '❌ MISTAKE BOOK';
-    renderMistakeBookPage(container);
-  } else if (Route.page === 'mastery') {
-    titleElem.textContent = '🎯 4-TIER MASTERY';
-    renderMasteryPage(container);
-  } else if (Route.page === 'result') {
-    titleElem.textContent = '📊 TEST SCORECARD';
-    renderResultPage(container, Route.params.result);
+  if (header && !document.getElementById('workspaceSwitcherBtn')) {
+    const b = document.createElement('button'); b.id = 'workspaceSwitcherBtn'; b.className = 'btn-action-sm';
+    b.textContent = '🧭 ' + tx('Workspace', 'वर्कस्पेस'); b.onclick = openWorkspaceSwitcher;
+    (header.querySelector('.header-right') || header).appendChild(b);
   }
+  const title = document.getElementById('txtHeaderTitle');
+  if (title) title.textContent = '📚 Master TestBook';
+  runViewHooks('before');
+  AppRoutes[Route.page]?.render(container, Route.params || {});
+  runViewHooks('after');
+  container.scrollTop = scroll;
+  requestAnimationFrame(() => { if (RenderedRouteKey === key) container.scrollTop = scroll; });
 }
 
 /* V2.1.5 — Native Builder integration. Uses the existing IndexEngine registry and CBT host lifecycle. */
@@ -4379,48 +4424,7 @@ function nbHasVerifiedMockPattern(examId){
   const contract=profile?.verifiedExamPatternContract;
   return !!(contract&&contract.version===1&&contract.verified===true&&Array.isArray(contract.sections)&&contract.sections.length>0&&contract.sections.every(x=>x&&String(x.name||'').trim()&&Number(x.questionCount)>0));
 }
-function nbModeCardsHtml(){
-  const sourceRows=nbSourceRows();
-  const pyqCount=sourceRows.filter(nbSafePYQ).length;
-  const claimedPyqCount=sourceRows.filter(nbVerifiedPYQ).length;
-  const mismatchCount=sourceRows.filter(r=>r.sourceContextMismatch).length;
-  const mockReady=nbHasVerifiedMockPattern(NativeBuilderState.examId||UserState?.selectedExam);
-  const cards=[
-    ['quick','Quick Test','Choose subject, count and time','⚡',false],
-    ['custom','Custom / Topic Test','Choose subject, topic, type and time','⚙',false],
-    ['pyq','PYQ Test',pyqCount?`${pyqCount} questions with verified PYQ provenance`:claimedPyqCount?`${claimedPyqCount} source-tagged questions blocked by module/source mismatch`:'No verified PYQ questions','◷',!pyqCount],
-    ['mock','Full Mock Test',mockReady?'Verified exam pattern available':'Exam pattern not available yet','▣',!mockReady]
-  ];
-  const dataQuality=mismatchCount?`<details class="nb-data-quality"><summary><span>Review exam/year mapping</span><span class="nb-count">${mismatchCount} questions</span></summary><div class="nb-data-quality-body"><p><strong>Source exam/year differs from the current module assignment.</strong> The count is calculated from the active workspace's currently indexed questions; it does not mean every listed record is corrupt.</p><p>Question metadata and module assignments have not been edited. Records without reconcilable source provenance are excluded from official PYQ selection. Their original SOURCE label remains visible in Preview for review.</p></div></details>`:'';
-  return `<div class="nb-mode-grid">${cards.map(([id,title,desc,icon,disabled])=>`<button type="button" class="nb-mode-card ${NativeBuilderState.mode===id?'active':''}" aria-pressed="${NativeBuilderState.mode===id?'true':'false'}" ${disabled?'disabled aria-disabled="true" title="'+nbEsc(desc)+'"':''} onclick="nbSelectBuilderMode('${id}')"><span class="nb-mode-icon" aria-hidden="true">${icon}</span><span class="nb-mode-copy"><strong>${nbEsc(title)}</strong><small>${nbEsc(desc)}</small></span><span class="nb-mode-check" aria-hidden="true">${NativeBuilderState.mode===id?'✓':''}</span></button>`).join('')}</div>${dataQuality}`;
-}
-function nbEnhanceWizardDOM(v){
-  const shell=v.querySelector('.nb-shell');if(!shell)return;
-  v.querySelector('.nav-breadcrumb')?.remove();v.querySelector('.section-title')?.remove();
-  shell.querySelector('.nb-toolbar')?.remove();
-  const modeStep=shell.querySelector('[data-nb-step="0"]');const modeActions=modeStep?.querySelector('.nb-panel .nb-actions');if(modeActions)modeActions.outerHTML=nbModeCardsHtml();
-  modeStep?.querySelector('.nb-panel h3')?.remove();
-  const modeNote=modeStep?.querySelector('.nb-panel > p.nb-row-meta');if(modeNote&&/Quick Test chooses available indexed questions/i.test(modeNote.textContent||''))modeNote.remove();
-  const typeStep=shell.querySelector('[data-nb-step="3"]');const typePanel=typeStep?.querySelector('.nb-panel');
-  if(typePanel){
-    const typePool=nbBuilderTypePool();const counts=nbTypeCounts(typePool);const opts=Object.entries(counts).sort((a,b)=>a[1].label.localeCompare(b[1].label));
-    typePanel.innerHTML=`<h3>Choose question types</h3><p class="nb-row-meta">Types are derived from question metadata and indexed topic/chapter labels. Select one or more Types; eligible questions from all selected Types are included within your subject/topic and exam filters. Individual question checkboxes are not used in this workflow.</p><div class="nb-adaptive-grid nb-type-grid">${opts.map(([id,info])=>{const n=info.count;const selected=NativeBuilderState.questionTypes.has(id);return `<button type="button" class="nb-adaptive-card ${selected?'active':''}" aria-pressed="${selected?'true':'false'}" ${n?'':'disabled'} onclick="nbToggleQuestionType(${nbJsAttr(id)},${selected?'false':'true'})"><span class="nb-row-main"><span class="nb-row-title">${nbEsc(info.label)}</span><span class="nb-row-meta">${n} eligible question${n===1?'':'s'}</span></span><span class="nb-count">${n}</span><span aria-hidden="true">${selected?'✓':''}</span></button>`;}).join('')||'<div class="nb-alert">No verified Type metadata is available for the current filters.</div>'}</div><div class="nb-alert">Select one or more Types. All eligible questions in the selected Types are included automatically; incompatible exam/year contexts are still blocked at preview.</div>`;
-  }
-  const labels=['Mode','Subject','Topic','Type','Setting','Preview'];
-  const progress=shell.querySelector('.nb-wizard-progress');if(progress){progress.innerHTML=labels.map((label,i)=>{const skipped=NativeBuilderState.mode==='quick'&&(i===2||i===3); const classes=[NativeBuilderState.wizardStep===i?'active':i<NativeBuilderState.wizardStep?'done':'',skipped?'skipped':''].filter(Boolean).join(' ');const action=skipped?'disabled aria-disabled="true" title="Quick Test automatically uses eligible questions from the chosen exam/year"':i<NativeBuilderState.wizardStep?`onclick="nbWizardGo(${i})"`:'';return `<button type="button" class="${classes}" ${action} aria-current="${NativeBuilderState.wizardStep===i?'step':'false'}">${label}</button>`;}).join('');}
-  const stepCount=shell.querySelector('.nb-toolbar .nb-count');if(stepCount)stepCount.textContent=`Step ${NativeBuilderState.wizardStep+1} / 6`;
-  shell.querySelector('.nb-toolbar strong')?.replaceChildren(document.createTextNode('Smart Test Builder'));
-  const helper=shell.querySelector('.nb-toolbar .nb-row-meta');if(helper)helper.textContent='Choose a metadata Type to auto-include its eligible questions';
-  shell.querySelectorAll('.nb-wizard-nav').forEach(nav=>{const label=nav.querySelector('.nb-row-meta');if(label)label.textContent=`Step ${NativeBuilderState.wizardStep+1} of 6 · ${labels[NativeBuilderState.wizardStep]}`;});
-  const countField=shell.querySelector('#nbCount');if(countField){countField.disabled=false;}
-  const exactWords=shell.querySelectorAll('.nb-wizard-step');exactWords.forEach(step=>{step.querySelectorAll('h3').forEach(h=>{if(/Optional exact question selection|Question selection/i.test(h.textContent))h.textContent='3. Choose question Type(s)';});});
-  if(NativeBuilderState.tab==='preview'){
-    const active=shell.querySelector('[data-nb-step="5"]');const inlineActions=active?.querySelector('.nb-summary .nb-actions');const launch=inlineActions?.querySelector('button[onclick="nbStartTest()"]');const nav=active?.querySelector('.nb-wizard-nav');
-    if(inlineActions&&launch){const copy=launch.cloneNode(true);inlineActions.remove();if(nav){nav.innerHTML='';const back=document.createElement('button');back.className='btn-nav';back.textContent='← Back';back.onclick=nbWizardBack;const label=document.createElement('span');label.className='nb-row-meta';label.textContent='Step 6 of 6 · Preview';nav.append(back,label,copy);}}
-  }
-  shell.querySelectorAll('.nb-wizard-step').forEach(el=>{const i=Number(el.dataset.nbStep);const active=NativeBuilderState.tab==='preview'?i===5:(i===NativeBuilderState.wizardStep&&i!==5);el.classList.toggle('active',active);el.setAttribute('aria-hidden',active?'false':'true');});
-  const activeStep=shell.querySelector('.nb-wizard-step.active');if(activeStep){const heading=activeStep.querySelector('h3');if(heading){const titles=['Choose your test type','1. Subjects','2. Chapters & Topics','3. Choose question Type(s)','4. Test settings','Preview & Confirm'];heading.textContent=titles[NativeBuilderState.wizardStep]||heading.textContent;}}
-}
+
 /* =========================================================================
    V2.4.0 — Update 4 · Stage A: one source of truth for learning data
    ========================================================================= */
@@ -5315,15 +5319,17 @@ function renderHomePage(v) {
   const recent = [];
   d.results.slice(0, 3).forEach(r => recent.push({ icon: '⏱️', title: `Test · ${r.topicTitle || 'Custom Test'}`, meta: `Score ${Number(r.score) || 0}/${Number(r.total) || 0} · ${Number(r.accuracy) || 0}% · ${sjFormatWhen(r.ts)}`, call: `openStoredResult(${nbJsAttr(r.id)})` }));
   d.imports.slice(0, 2).forEach(h => { const w = h.committedAt ? new Date(h.committedAt) : null; recent.push({ icon: '📥', title: `Imported · ${h.topicTitle || h.sourceFile || 'Questions'}`, meta: `${Number(h.committedQuestions) || 0} questions · ${w && !isNaN(w) ? w.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : 'date unknown'}`, call: `openDataControlModal()` }); });
+  // Testbook-inspired exam-first navigation; every tile targets an existing, working route.
+  // Features without a real data source (live classes/current affairs/AI doubt chat) are intentionally not faked.
   const quick = [
-    { icon: '✍️', label: 'Practice', call: practiceCall },
-    { icon: '🧩', label: tx('Test Builder','Test बनाएँ'), call: `navigate('native_builder')` },
-    { icon: '🗂️', label: tx('Question Bank','प्रश्न बैंक'), call: `navigate('taxonomy_explorer')` },
-    { icon: '🔄', label: tx('Revision','दोहराई'), call: `navigate('revision_hub')` },
-    { icon: '⏱️', label: tx('CBT Tests','CBT Test'), call: `navigate('test_hub')` },
-    { icon: '📕', label: tx('Mistakes','गलतियाँ'), call: `navigate('mistakes')` },
-    { icon: '📜', label: 'Test History', call: `openTestHistoryModal()` },
-    { icon: '🏆', label: tx('Mastery','महारत'), call: `navigate('mastery')` }
+    { icon: '🏛️', label: tx('Exams','परीक्षाएँ'), call: `navigate('exam_hub')` },
+    { icon: '⏱️', label: tx('Tests','टेस्ट'), call: `navigate('test_hub')` },
+    { icon: '🎯', label: tx('PYQ papers','PYQ पेपर'), call: `navigate('pyq_hub')` },
+    { icon: '✍️', label: tx('Topic practice','टॉपिक अभ्यास'), call: `navigate('subjects')` },
+    { icon: '🧩', label: tx('Create Test','टेस्ट बनाएँ'), call: `navigate('native_builder')` },
+    { icon: '📖', label: tx('Study library','स्टडी लाइब्रेरी'), call: `navigate('digital_library')` },
+    { icon: '🔎', label: tx('Question Bank','प्रश्न बैंक'), call: `navigate('taxonomy_explorer')` },
+    { icon: '🔄', label: tx('Revision','दोहराई'), call: `navigate('revision_hub')` }
   ];
 
   v.innerHTML = `<div class="sj-dash gx">
@@ -5337,13 +5343,13 @@ function renderHomePage(v) {
       </div>
     </section>
     <section class="gx-card gx-search"><div class="search-box-wrap" style="margin:0;"><span class="search-icon">🔍</span><input type="search" class="search-input" id="inpGlobalSearch" aria-label="Search questions" placeholder="सवाल नंबर, परीक्षा (SSC, NTPC, JE), टॉपिक सर्च करें..." oninput="onGlobalSearch(this.value)"></div><div id="globalSearchResults"></div></section>
+    <section class="gx-card gx-quick" aria-labelledby="sjExploreHeading"><div class="gx-head"><h2 id="sjExploreHeading">${tx('Explore preparation','तैयारी के विकल्प')}</h2><span class="gx-explore-note">${tx('Choose what you want to do next','अगला कदम चुनें')}</span></div><div class="sj-quick">${quick.map(q => `<button type="button" class="sj-quick-btn" onclick="${q.call}"><span aria-hidden="true">${q.icon}</span><span>${escapeHtml(q.label)}</span></button>`).join('')}</div></section>
     ${primary ? `<section class="gx-card gx-next" aria-label="Next best action"><div class="gx-next-icon" aria-hidden="true">${primary.icon}</div><div class="gx-next-copy"><small>${tx('Next best action','अगला सबसे अच्छा काम')}</small><strong>${escapeHtml(primary.title)}</strong><span>${escapeHtml(primary.why)}</span></div><button type="button" class="gx-btn" onclick="${primary.call}">${escapeHtml(primary.cta)} →</button></section>` : ''}
     <section class="gx-card gx-continue" aria-labelledby="sjContinueH"><div class="gx-head"><h2 id="sjContinueH">${tx('Continue','जारी रखें')}</h2></div>
       ${d.resume ? `<div class="sj-resume"><div><strong>${escapeHtml(d.resume.module.topicTitle)}</strong><span>${escapeHtml(subjectDisplayName(d.resume.module.subject))} · Practice · ${tx('Question','सवाल')} ${d.resume.qIndex + 1} / ${sjModuleQuestionCount(d.resume.module)}</span></div><button type="button" class="gx-btn" onclick="${practiceCall}">${tx('Resume →','जारी रखें →')}</button></div>`
         : `<div class="gx-empty"><strong>${tx('No unfinished activity','कोई अधूरा काम नहीं')}</strong><span>${tx('Practice you leave mid-way appears here.','बीच में छोड़ी practice यहाँ दिखेगी।')}</span>${actions.length > 1 ? '' : (firstModule ? `<button type="button" class="gx-btn ghost" onclick="${practiceCall}">${tx('Practise','Practice:')} ${escapeHtml(firstModule.topicTitle)}</button>` : `<button type="button" class="gx-btn ghost" onclick="openImportModal()">${tx('Import questions','सवाल import करें')}</button>`)}</div>`}
       ${actions.length > 1 ? `<div class="sj-actions-list">${actions.slice(1).map(a => `<button type="button" class="sj-action" onclick="${a.call}"><span aria-hidden="true">${a.icon}</span><span class="sj-action-copy"><strong>${escapeHtml(a.title)}</strong><small>${escapeHtml(a.why)}</small></span><span class="sj-action-go" aria-hidden="true">›</span></button>`).join('')}</div>` : ''}
     </section>
-    <section class="gx-card gx-quick"><div class="gx-head"><h2>${tx('Quick actions','जल्दी के काम')}</h2></div><div class="sj-quick">${quick.map(q => `<button type="button" class="sj-quick-btn" ${q.call ? `onclick="${q.call}"` : 'disabled aria-disabled="true" title="No questions available"'}><span aria-hidden="true">${q.icon}</span>${escapeHtml(q.label)}</button>`).join('')}</div></section>
     ${gxSubjectWidget()}
     ${gxGoalWidget(d)}
     ${gxTodayWidget(d)}
@@ -5421,16 +5427,10 @@ function openDisplaySettings() {
 }
 
 /* ---------- route titles ---------- */
-const ROUTE_TITLES = {
-  home: ['📚 Student Hub', '📚 स्टूडेंट हब'], subjects: ['📚 Subjects', '📚 विषय'], subject: ['📚 Chapters', '📚 अध्याय'], chapter: ['📚 Topics', '📚 टॉपिक'],
-  exam_hub: ['🏛️ Exams', '🏛️ परीक्षाएँ'], exam_profile: ['🎓 Exam', '🎓 परीक्षा'], syllabus: ['📚 Syllabus', '📚 सिलेबस'],
-  test_hub: ['⏱️ Tests', '⏱️ टेस्ट'], revision_hub: ['🔄 Revision', '🔄 रिवीज़न'], mistakes: ['📕 Mistake Book', '📕 गलतियों की किताब'],
-  mastery: ['🎯 Mastery', '🎯 महारत'], taxonomy_explorer: ['🔎 Question Bank', '🔎 प्रश्न बैंक'], pyq_hub: ['🎯 PYQ Archive', '🎯 PYQ संग्रह'],
-  digital_library: ['📖 Library', '📖 लाइब्रेरी'], result: ['📊 Result', '📊 परिणाम']
-};
 function nbRouteTitle(page) {
   if (page === 'home' && WorkspaceManager.current().type === 'BOARD') return null;
-  const t = ROUTE_TITLES[page]; return t ? tx(t[0], t[1]) : null;
+  const title = AppRoutes[page]?.title;
+  return title ? tx(...title) : null;
 }
 
 /* ---------- accessibility ---------- */
@@ -5481,17 +5481,13 @@ try {
   ['mainView', 'modalSheetBody', 'sideDrawer'].forEach(id => { const el = document.getElementById(id); if (el) a11yObs.observe(el, { childList: true, subtree: true }); });
 } catch (_) {}
 
-/* renderView wrapper: default title before, localized title + a11y after. */
-const _u5RenderView = renderView;
-renderView = function () {
-  const titleElem = document.getElementById('txtHeaderTitle');
-  if (titleElem) titleElem.textContent = '📚 MASTER TEST-BOOK';
-  _u5RenderView();
-  const t = nbRouteTitle(Route?.page);
-  if (titleElem && t) titleElem.textContent = t;
+registerViewHook('after', 'display', () => {
+  const title = document.getElementById('txtHeaderTitle');
+  const text = nbRouteTitle(Route.page);
+  if (title && text) title.textContent = text;
   nbLocalizeShell();
   nbQueueA11y();
-};
+});
 
 /* ---------- honest subject catalog ---------- */
 const SUBJECT_ICONS = { maths: '📐', mathematics: '📐', science: '🔬', 'general science': '🔬', reasoning: '🧠', english: '📝', gk: '🌍', 'general-awareness': '🌍', hindi: '🅷', computer: '💻' };
@@ -5525,44 +5521,62 @@ function nbSubjectGroups() {
   });
   return Array.from(map.values()).filter(g => g.qs > 0).sort((a, b) => b.qs - a.qs);
 }
+/* Subject navigation redesign — scoped only to the Subjects catalog. */
+let SubjectNavState = { selected: '', expanded: '' };
+function shSelectCatalogSubject(key) {
+  SubjectNavState.selected = String(key || '');
+  SubjectNavState.expanded = '';
+  renderView();
+}
+function shToggleCatalogChapter(key) {
+  SubjectNavState.expanded = SubjectNavState.expanded === key ? '' : key;
+  renderView();
+}
 function renderSubjectsCatalog(v) {
   const groups = nbSubjectGroups();
   const total = groups.reduce((n, g) => n + g.qs, 0);
+  if (!groups.some(g => g.key === SubjectNavState.selected)) SubjectNavState.selected = groups[0]?.key || '';
+  const selected = groups.find(g => g.key === SubjectNavState.selected) || null;
+  const chapters = selected ? Array.from(selected.chapters.entries()).map(([id, name]) => {
+    const mods = selected.mods.filter(m => String(m.chapter || '').trim().toLowerCase() === String(name).trim().toLowerCase());
+    return { id: String(id), name, mods, qs: mods.reduce((n, m) => n + nbModuleQCount(m), 0) };
+  }) : [];
+  const subjectTabs = groups.map(g => {
+    const active = selected && g.key === selected.key;
+    const k = g.key.toLowerCase();
+    return `<button type="button" class="sn-tab ${active ? 'on' : ''}" aria-pressed="${!!active}" onclick="shSelectCatalogSubject(${nbJsAttr(g.key)})">
+      <span class="sn-tab-icon" aria-hidden="true">${SUBJECT_ICONS[k] || '📘'}</span>
+      <span>${escapeHtml(subjectLabel(g.key))}</span><small>${g.qs} ${tx('Qs', 'सवाल')}</small>
+    </button>`;
+  }).join('');
+  const chapterRows = chapters.map(c => {
+    const open = SubjectNavState.expanded === c.id;
+    const topicRows = c.mods.map(m => {
+      const topic = String(m.topicTitle || m.topic || '').trim();
+      const subtopic = String(m.subtopic || '').trim();
+      const label = [topic, subtopic].filter((x, i, a) => x && a.indexOf(x) === i).join(' › ') || tx('Open topic', 'टॉपिक खोलें');
+      return `<button type="button" class="sn-topic" onclick="navigate('chapter', {subject:${nbJsAttr(selected.key)}, chapter:${nbJsAttr(c.name)}})">
+        <span class="sn-topic-dot" aria-hidden="true">•</span><span class="sn-topic-label">${escapeHtml(label)}</span><span class="sn-topic-count">${nbModuleQCount(m)} ${tx('Qs', 'सवाल')}</span><span aria-hidden="true">›</span>
+      </button>`;
+    }).join('');
+    return `<section class="sn-chapter ${open ? 'open' : ''}">
+      <button type="button" class="sn-chapter-toggle" aria-expanded="${!!open}" onclick="shToggleCatalogChapter(${nbJsAttr(c.id)})">
+        <span class="sn-chapter-mark" aria-hidden="true">${open ? '−' : '+'}</span>
+        <span class="sn-chapter-main"><strong>${escapeHtml(c.name)}</strong><small>${c.mods.length} ${tx('topics', 'टॉपिक')} · ${c.qs} ${tx('questions', 'सवाल')}</small></span>
+        <span class="sn-chevron" aria-hidden="true">${open ? '⌄' : '›'}</span>
+      </button>
+      ${open ? `<div class="sn-topic-list">${topicRows || `<p class="sn-empty-topic">${tx('No topics available yet.', 'अभी कोई टॉपिक उपलब्ध नहीं है।')}</p>`}</div><div class="sn-chapter-action"><button type="button" class="btn-action-sm" onclick="navigate('chapter', {subject:${nbJsAttr(selected.key)}, chapter:${nbJsAttr(c.name)}})">${tx('Open chapter', 'अध्याय खोलें')} →</button></div>` : ''}
+    </section>`;
+  }).join('');
   v.innerHTML = `
-    <div class="nav-breadcrumb"><button onclick="navigate('home')">${tx('Home', 'होम')}</button><span class="sep">/</span><span>${tx('Subjects', 'विषय')}</span></div>
-    <div class="sc-head">
-      <div><h1>${tx('Subjects', 'विषय')}</h1><p>${groups.length ? tx(`${groups.length} subject${groups.length === 1 ? '' : 's'} · ${total} questions in this workspace`, `${groups.length} विषय · इस workspace में ${total} सवाल`) : tx('No questions imported yet', 'अभी कोई सवाल import नहीं हुआ')}</p></div>
+    <div class="nav-breadcrumb"><button type="button" onclick="navigate('home')">${tx('Home', 'होम')}</button><span class="sep">/</span><span>${tx('Subjects', 'विषय')}</span></div>
+    <div class="sc-head"><div><h1>${tx('Subjects', 'विषय')}</h1><p>${groups.length ? tx(`${groups.length} subjects · ${total} questions in this workspace`, `${groups.length} विषय · इस workspace में ${total} सवाल`) : tx('No questions available yet', 'अभी सवाल उपलब्ध नहीं हैं')}</p></div>
       <button type="button" class="btn-action-sm" onclick="navigate('taxonomy_explorer')">🔎 ${tx('Question Bank', 'प्रश्न बैंक')}</button>
     </div>
-    ${groups.length ? `<div class="sc-grid">${groups.map(g => {
-      const k = g.key.toLowerCase(); const chs = Array.from(g.chapters.values());
-      return `<button type="button" class="sc-card" onclick="navigate('subject', {subject:${nbJsAttr(g.key)}})">
-        <span class="sc-icon" aria-hidden="true">${SUBJECT_ICONS[k] || '📘'}</span>
-        <span class="sc-body"><strong>${escapeHtml(subjectLabel(g.key))}</strong>
-          <span class="sc-counts">${tx(`${g.qs} questions · ${chs.length} chapter${chs.length === 1 ? '' : 's'} · ${g.mods.length} topic${g.mods.length === 1 ? '' : 's'}`, `${g.qs} सवाल · ${chs.length} अध्याय · ${g.mods.length} टॉपिक`)}</span>
-          <span class="sc-chips">${chs.slice(0, 4).map(c => `<span>${escapeHtml(c)}</span>`).join('')}${chs.length > 4 ? `<span>+${chs.length - 4}</span>` : ''}</span>
-          ${nbAccuracyLine(nbSubjectAccuracy(g.key))}</span>
-        <span class="sc-go" aria-hidden="true">›</span></button>`;
-    }).join('')}</div>` : `<div class="sc-empty"><strong>${tx('Nothing to show yet', 'अभी दिखाने को कुछ नहीं')}</strong><span>${tx('Import a topic file to see its subjects here.', 'Topic file import करें, उसके विषय यहाँ दिखेंगे।')}</span><button type="button" class="btn-nav primary" onclick="openImportModal()">${tx('Import questions', 'सवाल import करें')}</button></div>`}`;
-}
-function renderSubjectPage(v, subject) {
-  const key = String(subject || '').trim().toLowerCase();
-  const mods = (typeof profileVisible==='function'?profileVisible:(x=>x))(CurriculumContext.filterModules(AppModules)).filter(m => String(m.subject || '').trim().toLowerCase() === key && nbModuleQCount(m) > 0);
-  const chapters = new Map();
-  mods.forEach(m => { const ch = String(m.chapter || '').trim(); if (!ch) return; const c = chapters.get(ch.toLowerCase()) || { name: ch, mods: [], qs: 0 }; c.mods.push(m); c.qs += nbModuleQCount(m); chapters.set(ch.toLowerCase(), c); });
-  const list = Array.from(chapters.values());
-  const name = subjectLabel(subject);
-  v.innerHTML = `
-    <div class="nav-breadcrumb"><button onclick="navigate('home')">${tx('Home', 'होम')}</button><span class="sep">/</span><button onclick="navigate('subjects')">${tx('Subjects', 'विषय')}</button><span class="sep">/</span><span>${escapeHtml(name)}</span></div>
-    <div class="sc-head"><div><h1>${escapeHtml(name)}</h1><p>${tx(`${list.length} chapter${list.length === 1 ? '' : 's'} with questions`, `सवालों वाले ${list.length} अध्याय`)}</p></div>
-      <button type="button" class="btn-action-sm" onclick="navigate('subjects')">← ${tx('Subjects', 'विषय')}</button></div>
-    ${list.length ? `<div class="sc-grid">${list.map(c => `<button type="button" class="sc-card" onclick="navigate('chapter', {subject:${nbJsAttr(subject)}, chapter:${nbJsAttr(c.name)}})">
-        <span class="sc-body"><strong>${escapeHtml(c.name)}</strong>
-          <span class="sc-counts">${tx(`${c.qs} questions · ${c.mods.length} topic${c.mods.length === 1 ? '' : 's'}`, `${c.qs} सवाल · ${c.mods.length} टॉपिक`)}</span>
-          <span class="sc-chips">${c.mods.slice(0, 4).map(m => `<span>${escapeHtml(m.topicTitle || m.topic || '')}</span>`).join('')}${c.mods.length > 4 ? `<span>+${c.mods.length - 4}</span>` : ''}</span>
-          ${nbAccuracyLine(nbChapterAccuracy(c.mods))}</span>
-        <span class="sc-go" aria-hidden="true">›</span></button>`).join('')}</div>`
-    : `<div class="sc-empty"><strong>${tx('No chapters with questions', 'सवालों वाला कोई अध्याय नहीं')}</strong><span>${tx('Import a topic for this subject to start.', 'शुरू करने के लिए इस विषय का topic import करें।')}</span><button type="button" class="btn-nav primary" onclick="openImportModal()">${tx('Import questions', 'सवाल import करें')}</button></div>`}`;
+    ${groups.length ? `<nav class="sn-subject-tabs" aria-label="${tx('Main subjects', 'मुख्य विषय')}" role="tablist">${subjectTabs}</nav>
+      <section class="sn-topic-panel"><div class="sn-panel-head"><div><h2>${selected ? escapeHtml(subjectLabel(selected.key)) : tx('Choose a subject', 'विषय चुनें')}</h2><p>${selected ? tx('Choose a chapter to expand its topics.', 'टॉपिक्स देखने के लिए अध्याय खोलें।') : ''}</p></div>${selected ? `<span class="sn-total">${selected.qs} ${tx('questions', 'सवाल')}</span>` : ''}</div>
+        ${chapters.length ? `<div class="sn-chapter-list">${chapterRows}</div>` : studyEmptyState()}
+      </section>` : studyEmptyState()}`;
 }
 
 /* ---------- Question Bank ---------- */
@@ -5597,7 +5611,7 @@ function qbRenderList() {
   const c = document.getElementById('qbCount'); if (c) c.textContent = tx(`${rows.length} question${rows.length === 1 ? '' : 's'}`, `${rows.length} सवाल`);
   box.innerHTML = rows.length ? `${shown.map(qbCardHtml).join('')}
     ${rows.length > shown.length ? `<button type="button" class="qb-moreBtn" onclick="QBState.show+=20; qbRenderList()">${tx(`Show 20 more (${rows.length - shown.length} left)`, `20 और दिखाएँ (${rows.length - shown.length} बाकी)`)}</button>` : `<p class="qb-end">${tx('End of list', 'सूची समाप्त')}</p>`}`
-    : `<div class="sc-empty"><strong>${tx('No questions match', 'कोई सवाल मेल नहीं खाता')}</strong><span>${tx('Try another word or clear the filters.', 'दूसरा शब्द आज़माएँ या फ़िल्टर हटाएँ।')}</span></div>`;
+    : studyEmptyState(QBState.q || QBState.pyq || Object.values(ActiveTaxonomyFilters).some(Boolean) ? 'bank' : '');
   const s = document.getElementById('qbStart'); if (s) s.disabled = !rows.length;
 }
 let QBSearchTimer = null;
@@ -5631,6 +5645,28 @@ function renderTaxonomyExplorer(v, params = {}) {
     <div id="qbList" class="qb-list"></div>`;
   qbRenderList();
 }
+
+registerRouteViewState('subjects', {
+  capture: () => ({ ...SubjectNavState }),
+  restore: state => { SubjectNavState = state ? { ...state } : { selected: '', expanded: '' }; }
+});
+let QBWorkspaceId = '';
+registerRouteViewState('taxonomy_explorer', {
+  capture: () => ({ filters: { ...ActiveTaxonomyFilters }, bank: { ...QBState } }),
+  restore: (state, fromHistory) => {
+    const workspaceId = WorkspaceManager.current().id;
+    const switchedWorkspace = QBWorkspaceId && QBWorkspaceId !== workspaceId;
+    if (switchedWorkspace) {
+      ActiveTaxonomyFilters = { subject: '', type: '', difficulty: '', length: '', examId: '' };
+      QBState = { q: '', show: 20, pyq: false };
+    }
+    // Explicit exam/topic entry points take precedence over remembered filters.
+    if (state && (fromHistory || switchedWorkspace)) {
+      ActiveTaxonomyFilters = { ...state.filters }; QBState = { ...state.bank };
+    }
+    QBWorkspaceId = workspaceId;
+  }
+});
 
 /* =========================================================================
    V2.5.0 — Phase A1: strict import, stable IDs, exact exam/subject mapping
@@ -6736,7 +6772,7 @@ async function cloudSync(reason = 'manual') {
   if (!ServerState.session || DataHealth.readOnly) return null;
   if (CloudSyncRunning) return CloudSyncRunning;
   CloudSyncRunning = (async () => {
-    CloudState.busy = true; cloudPaint();
+    CloudState.busy = true; cloudPaint(); refreshStudyFeedback();
     try {
       await Server.ensureFresh();
       const uid = ServerState.session.user_id;
@@ -6752,7 +6788,7 @@ async function cloudSync(reason = 'manual') {
     } catch (e) {
       CloudState.msg = (reason === 'auto' ? 'Sync बाद में होगा: ' : '') + e.message; CloudState.msgKind = e.network ? 'warn' : 'bad';
       return null;
-    } finally { CloudState.busy = false; CloudSyncRunning = null; cloudPaint(); }
+    } finally { CloudState.busy = false; CloudSyncRunning = null; cloudPaint(); refreshStudyFeedback(); }
   })();
   return CloudSyncRunning;
 }
@@ -6802,8 +6838,7 @@ async function cloudBoot() {
   window.addEventListener('online', () => { if (ServerState.session) cloudSync('auto'); });
 }
 
-const _c2RenderView = renderView;
-renderView = function () { _c2RenderView(); try { cloudHomePrompt(); } catch (_) {} };
+registerViewHook('after', 'account-prompt', cloudHomePrompt);
 /* =========================================================================
    STUDENT PROFILE (V3) — exam + branch.
    Only that track's server questions are pulled to the phone, so a Civil
@@ -6903,8 +6938,7 @@ function profileHomePrompt() {
   el.innerHTML = `<span class="pf-ico" aria-hidden="true">🎯</span><span style="flex:1"><b>${tx('Choose your exam and branch','अपना exam और branch चुनें')}</b><small>${tx('Then only your questions appear — no other branch mixed in.','फिर सिर्फ़ आपके सवाल दिखेंगे — दूसरी branch के नहीं।')}</small></span><span aria-hidden="true">›</span>`;
   v.prepend(el);
 }
-const _pfRenderView = renderView;
-renderView = function () { _pfRenderView(); try { profileHomePrompt(); } catch (_) {} };
+registerViewHook('after', 'profile-prompt', profileHomePrompt);
 /* After a sync the login state is known: repaint Home once if the chip is not there yet */
 const _pfCloudSync = cloudSync;
 cloudSync = async function (...args) {
@@ -6960,12 +6994,220 @@ async function opsReportError(message, stack) {
 }
 window.addEventListener('error', e => { opsReportError(e.message || 'error', e.error && e.error.stack); });
 window.addEventListener('unhandledrejection', e => { const r = e.reason; opsReportError('Unhandled: ' + (r && r.message || String(r)), r && r.stack); });
-const _opsRenderView = renderView;
-renderView = function () { _opsRenderView(); try { opsMaintenanceBanner(); } catch (_) {} };
+registerViewHook('after', 'maintenance', opsMaintenanceBanner);
 const _opsCloudSync = cloudSync;
 cloudSync = async function (...args) { const r = await _opsCloudSync(...args); opsFetchMaintenance(); return r; };
 setTimeout(opsFetchMaintenance, 1500);
 
+
+/* Shared student guidance. It only reads sync/profile state; question writes stay in DataCore. */
+function studyFeedbackModel(reset = '') {
+  if (reset)
+    return {
+      kind: 'filtered',
+      title: tx('No questions match', 'कोई सवाल मेल नहीं खाता'),
+      detail: tx(
+        'Clear the filters or choose another exam.',
+        'फ़िल्टर हटाएँ या दूसरी परीक्षा चुनें।',
+      ),
+      action: reset,
+      label: tx('Clear filters', 'फ़िल्टर हटाएँ'),
+    };
+  if (CloudState.busy)
+    return {
+      kind: 'loading',
+      title: tx('Loading your questions…', 'आपके सवाल लाए जा रहे हैं…'),
+      detail: tx(
+        'Your saved questions and progress stay on this device.',
+        'सहेजे गए सवाल और प्रगति इस डिवाइस पर सुरक्षित हैं।',
+      ),
+    };
+  if (navigator.onLine === false)
+    return {
+      kind: 'offline',
+      title: tx('You are offline', 'आप ऑफ़लाइन हैं'),
+      detail: tx(
+        'Connect to sync questions. Previously downloaded questions remain available.',
+        'सवाल सिंक करने के लिए इंटरनेट चालू करें। पहले डाउनलोड किए सवाल उपलब्ध रहेंगे।',
+      ),
+    };
+  if (!ServerState.session)
+    return {
+      kind: 'guest',
+      title: tx(
+        'Sign in to get your questions',
+        'अपने सवाल पाने के लिए लॉगिन करें',
+      ),
+      detail: tx(
+        'Guest mode uses questions saved on this device. Sign in to download published questions and sync progress.',
+        'मेहमान मोड में इस डिवाइस के सवाल दिखते हैं। प्रकाशित सवाल और प्रगति सिंक करने के लिए लॉगिन करें।',
+      ),
+      action: 'login',
+      label: tx('Sign in', 'लॉगिन करें'),
+    };
+  if (['bad', 'warn'].includes(CloudState.msgKind))
+    return {
+      kind: 'error',
+      title: tx('Questions could not sync', 'सवाल सिंक नहीं हो सके'),
+      detail: tx(
+        'Your saved questions and progress are still available. Try syncing again.',
+        'सहेजे गए सवाल और प्रगति उपलब्ध हैं। फिर से सिंक करें।',
+      ),
+      action: 'sync',
+      label: tx('Retry sync', 'फिर सिंक करें'),
+    };
+  if (!CloudState.lastContentAt)
+    return {
+      kind: 'pending',
+      title: tx('Download your questions', 'अपने सवाल डाउनलोड करें'),
+      detail: tx(
+        'Sync to check for published questions for your exam.',
+        'अपनी परीक्षा के प्रकाशित सवाल देखने के लिए सिंक करें।',
+      ),
+      action: 'sync',
+      label: tx('Sync questions', 'सवाल सिंक करें'),
+    };
+  return {
+    kind: 'empty',
+    title: tx(
+      'No questions available here yet',
+      'यहाँ अभी सवाल उपलब्ध नहीं हैं',
+    ),
+    detail: tx(
+      'Try another exam or branch. Only published questions are available to students.',
+      'दूसरी परीक्षा या ब्रांच चुनें। विद्यार्थियों को सिर्फ़ प्रकाशित सवाल मिलते हैं।',
+    ),
+    action: 'context',
+    label: tx('Change exam', 'परीक्षा बदलें'),
+  };
+}
+function studyFeedbackBody(reset) {
+  const model = studyFeedbackModel(reset);
+  return `<div class="study-feedback" data-state="${model.kind}" role="status" aria-live="polite" aria-busy="${model.kind === 'loading'}">
+    <strong>${escapeHtml(model.title)}</strong><p>${escapeHtml(model.detail)}</p>
+    ${model.action ? `<button type="button" class="study-action" onclick="studyFeedbackAction('${model.action}')" ${DataHealth.readOnly && model.action === 'sync' ? 'disabled' : ''}>${escapeHtml(model.label)}</button>` : ''}
+  </div>`;
+}
+function studyEmptyState(reset = '') {
+  return `<div data-study-feedback="${escapeHtml(reset)}">${studyFeedbackBody(reset)}</div>`;
+}
+function studyFeedbackAction(action) {
+  if (action === 'login') openAccount();
+  else if (action === 'sync') cloudSync('manual');
+  else if (action === 'bank') qbClear();
+  else if (action === 'subject') shSetFilter('all');
+  else if (action === 'context') changeStudyContext();
+}
+function studySyncLabel() {
+  if (CloudState.busy) return tx('Syncing…', 'सिंक हो रहा है…');
+  if (navigator.onLine === false)
+    return tx(
+      'Offline · saved questions available',
+      'ऑफ़लाइन · सहेजे गए सवाल उपलब्ध हैं',
+    );
+  if (!ServerState.session)
+    return tx(
+      'Guest · progress on this device',
+      'मेहमान · प्रगति इस डिवाइस पर है',
+    );
+  if (['bad', 'warn'].includes(CloudState.msgKind))
+    return tx(
+      'Sync failed · retry from Me',
+      'सिंक नहीं हुआ · मैं पेज से फिर कोशिश करें',
+    );
+  return CloudState.lastSyncAt
+    ? tx(
+        'Synced · saved questions available offline',
+        'सिंक पूरा · सहेजे गए सवाल ऑफ़लाइन उपलब्ध हैं',
+      )
+    : tx('Questions not synced yet', 'सवाल अभी सिंक नहीं हुए हैं');
+}
+function refreshStudyFeedback() {
+  document.querySelectorAll('[data-study-feedback]').forEach((el) => {
+    el.innerHTML = studyFeedbackBody(el.dataset.studyFeedback);
+  });
+  document.querySelectorAll('[data-study-sync]').forEach((el) => {
+    el.textContent = studySyncLabel();
+  });
+}
+function changeStudyContext() {
+  if (Route.page === 'native_builder') {
+    sbOpenContextPicker();
+    return;
+  }
+  if (profileAvailable()) openProfileSheet();
+  else navigate('exam_hub');
+}
+function studyContextHtml() {
+  const profile = studentProfile();
+  let examId = profile?.examId || UserState.selectedExam || '';
+  let year =
+    examId === UserState.selectedExam ? UserState.selectedYear || '' : '';
+  if (Route.page === 'native_builder' && SB.inited && SB.mode) {
+    if (SB.mode === 'quick') [examId, year] = sbQuickContextKey().split(SB_SEP);
+    else if (SB.mode === 'pyq') {
+      examId = SB.pyqExam;
+      year = SB.pyqYear;
+    } else {
+      examId = SB.examId;
+      year = SB.year;
+    }
+  } else if (
+    Route.page === 'taxonomy_explorer' &&
+    ActiveTaxonomyFilters.examId
+  ) {
+    examId = ActiveTaxonomyFilters.examId;
+    if (examId !== UserState.selectedExam) year = '';
+  }
+  const exam =
+    CloudState.profileIndex?.[examId]?.name ||
+    UniversalExamRegistry.registry.get(examId)?.examName ||
+    UniversalExamRegistry.knownProfiles[examId]?.name ||
+    examId;
+  const branch =
+    profile?.examId === examId && profile.branch
+      ? tx(
+          ProfileRules.branchLabel(profile.branch),
+          ProfileRules.branchHi(profile.branch),
+        )
+      : '';
+  const label =
+    [exam, branch, year].filter(Boolean).join(' · ') ||
+    tx('All available exams', 'सभी उपलब्ध परीक्षाएँ');
+  const loaded =
+    profile && profile.examId !== examId
+      ? `<small>${escapeHtml(tx('Downloaded profile: ', 'डाउनलोड किया प्रोफ़ाइल: ') + profileLabel(profile))}</small>`
+      : '';
+  return `<aside class="study-context" aria-label="${tx('Study context', 'पढ़ाई का संदर्भ')}">
+    <div class="study-context-copy"><strong>${escapeHtml((Route.page === 'native_builder' ? tx('Selection: ', 'चयन: ') : tx('Profile: ', 'प्रोफ़ाइल: ')) + label)}</strong>${loaded}<small data-study-sync role="status" aria-live="polite">${escapeHtml(studySyncLabel())}</small></div>
+    <button type="button" class="study-action" onclick="changeStudyContext()">${tx('Change exam', 'परीक्षा बदलें')}</button>
+  </aside>`;
+}
+registerViewHook('after', 'study-context', () => {
+  if (WorkspaceManager.current().type !== 'COMPETITIVE') return;
+  if (
+    ![
+      'subjects',
+      'subject',
+      'chapter',
+      'topic',
+      'subtopic',
+      'taxonomy_explorer',
+      'native_builder',
+      'test_hub',
+      'pyq_hub',
+    ].includes(Route.page)
+  )
+    return;
+  const view = document.getElementById('mainView');
+  if (Route.page === 'native_builder')
+    view
+      .querySelector('.sb-top')
+      ?.insertAdjacentHTML('afterend', studyContextHtml());
+  else view.insertAdjacentHTML('afterbegin', studyContextHtml());
+});
+window.addEventListener('online', refreshStudyFeedback);
+window.addEventListener('offline', refreshStudyFeedback);
 
 /* =========================================================================
    V2.3.9 — Update 3: CBT subject strip + result improvements
@@ -7716,6 +7958,30 @@ function sbStartFromInstructions() {
   sbLaunch(SB.previewIds.slice(), SB.minutes, SB.lang, title);
 }
 
+// Change the builder selection without changing the student's downloaded profile.
+function sbContextChoices() { return sbContexts(SB.mode === 'pyq' ? sbPyqRows() : sbAll()); }
+function sbOpenContextPicker() {
+  const choices = sbContextChoices();
+  openModal(tx('Choose exam and year', 'परीक्षा और वर्ष चुनें'), `
+    <p class="sj-note">${tx('Choosing an exam starts a new test selection.', 'परीक्षा चुनने पर टेस्ट का चयन फिर से शुरू होगा।')}</p>
+    <div class="sb-list">${choices.map(c => sbItemChoice(`sbChooseContext(${nbJsAttr(c.key)})`, sbExamName(c.examId), c.year, c.count)).join('') || studyEmptyState()}</div>`);
+}
+function sbChooseContext(key) {
+  const choice = sbContextChoices().find(c => c.key === key);
+  if (!choice) return;
+  const mode = SB.mode || 'custom';
+  SB = sbFresh(); SB.mode = mode; SB.stack = ['mode'];
+  if (mode === 'quick') { SB.quickCtx = key; SB.step = 'quick'; }
+  else if (mode === 'pyq') {
+    SB.pyqExam = choice.examId; SB.pyqYear = choice.year; SB.step = 'pyq_shift';
+    SB.stack.push('pyq_exam', 'pyq_year'); sbPyqAutoAdvance();
+  } else {
+    SB.board = sbBoardOf(choice.examId); SB.examId = choice.examId; SB.year = choice.year;
+    SB.stack.push('board', 'exam', 'year'); SB.step = 'subject';
+  }
+  closeModal(); sbRerender(true);
+}
+
 /* ---------- rendering ---------- */
 function sbBar(left, buttonHtml) {
   return `<div class="sb-bar-info" id="sbBarInfo">${left}</div>${buttonHtml || ''}`;
@@ -7735,7 +8001,7 @@ function sbCrumbs() {
   return `<nav class="sb-crumbs" aria-label="Your selection">${parts.join('<span class="sb-crumb-sep" aria-hidden="true">›</span>')}</nav>`;
 }
 const SB_TITLES = {
-  mode: 'Create a test', quick: 'Quick Test', pyq_exam: 'PYQ · Choose exam', pyq_year: 'PYQ · Choose year', pyq_shift: 'PYQ · Choose paper', pyq_scope: 'PYQ · Paper',
+  mode: 'Create Test', quick: 'Quick Test', pyq_exam: 'PYQ · Choose exam', pyq_year: 'PYQ · Choose year', pyq_shift: 'PYQ · Choose paper', pyq_scope: 'PYQ · Paper',
   board: 'Choose board', exam: 'Choose exam', year: 'Choose year', subject: 'Choose subjects', topic: 'Choose topics', subtopic: 'Choose subtopics',
   type: 'Question type & difficulty', questions: 'Questions', settings: 'Test settings', preview: 'Preview', instructions: 'Instructions'
 };
@@ -7751,11 +8017,11 @@ function sbRenderMode() {
   const mockReady = nbHasVerifiedMockPattern(UserState?.selectedExam);
   const tpls = BuilderTemplates.filter(t => t.ws === WorkspaceManager.current().id);
   const body = `
-    ${all.length ? '' : `<div class="sj-empty"><strong>No questions yet</strong><span>Import questions first, then come back to build a test.</span><button type="button" class="btn-nav" onclick="openImportModal()">Import questions</button></div>`}
+    ${all.length ? '' : studyEmptyState()}
     <div class="sb-modes">
-      <button type="button" class="sb-mode" ${all.length ? '' : 'disabled'} onclick="sbStartMode('quick')"><span class="sb-mode-icon" aria-hidden="true">⚡</span><span class="sb-mode-copy"><strong>Quick Test</strong><small>Start in one tap. Pick subjects and a size.</small></span><span class="sb-go" aria-hidden="true">›</span></button>
-      <button type="button" class="sb-mode" ${pyqN ? '' : 'disabled'} onclick="sbStartMode('pyq')"><span class="sb-mode-icon" aria-hidden="true">🎯</span><span class="sb-mode-copy"><strong>PYQ Test</strong><small>${pyqN ? `Real past paper in original order · ${pyqN} questions marked PYQ` : 'No questions marked as PYQ yet — mark them in Data Control'}</small></span><span class="sb-go" aria-hidden="true">›</span></button>
-      <button type="button" class="sb-mode" ${all.length ? '' : 'disabled'} onclick="sbStartMode('custom')"><span class="sb-mode-icon" aria-hidden="true">⚙️</span><span class="sb-mode-copy"><strong>Custom Test</strong><small>Build it step by step: board, exam, year, subject, topic, subtopic, type.</small></span><span class="sb-go" aria-hidden="true">›</span></button>
+      <button type="button" class="sb-mode" ${all.length ? '' : 'disabled'} onclick="sbStartMode('quick')"><span class="sb-mode-icon" aria-hidden="true">⚡</span><span class="sb-mode-copy"><strong>${tx('Quick Test', 'झटपट टेस्ट')}</strong><small>Start in one tap. Pick subjects and a size.</small></span><span class="sb-go" aria-hidden="true">›</span></button>
+      <button type="button" class="sb-mode" ${pyqN ? '' : 'disabled'} onclick="sbStartMode('pyq')"><span class="sb-mode-icon" aria-hidden="true">🎯</span><span class="sb-mode-copy"><strong>${tx('PYQ Test', 'PYQ टेस्ट')}</strong><small>${pyqN ? `Real past paper in original order · ${pyqN} questions marked PYQ` : tx('No verified PYQ questions available for your selection', 'आपके चयन में सत्यापित PYQ सवाल उपलब्ध नहीं हैं')}</small></span><span class="sb-go" aria-hidden="true">›</span></button>
+      <button type="button" class="sb-mode" ${all.length ? '' : 'disabled'} onclick="sbStartMode('custom')"><span class="sb-mode-icon" aria-hidden="true">⚙️</span><span class="sb-mode-copy"><strong>${tx('Custom Test', 'अपना टेस्ट')}</strong><small>Build it step by step: board, exam, year, subject, topic, subtopic, type.</small></span><span class="sb-go" aria-hidden="true">›</span></button>
     </div>
     <p class="sb-mock-note">${mockReady ? 'Full Mock is available from the exam profile.' : 'Full Mock: available once a verified exam pattern is added.'}</p>
     ${tpls.length ? `<h3 class="sb-h3">⭐ My templates</h3><div class="sb-list">${tpls.map(t => `<div class="sb-tpl"><button type="button" class="sb-item sb-choice" onclick="sbApplyTemplate(${nbJsAttr(t.id)})"><span class="sb-item-main"><strong>${escapeHtml(t.name)}</strong><small>${escapeHtml(sbExamName(t.examId))} ${escapeHtml(t.year)} · ${Number(t.count) || 0} Q · ${Number(t.minutes) || 0} min</small></span><span class="sb-go" aria-hidden="true">›</span></button><button type="button" class="sb-tpl-del" aria-label="Delete template ${escapeHtml(t.name)}" onclick="sbDeleteTemplate(${nbJsAttr(t.id)})">✕</button></div>`).join('')}</div>` : ''}`;
@@ -7792,7 +8058,7 @@ function sbRenderMulti(level) {
   const pool = sbCustomRows(level).length;
   const body = `<div class="sb-tools"><span>${selected} of ${items.length} selected</span><span><button type="button" class="sb-link" onclick="sbSetAll('${level}', true)">All</button><button type="button" class="sb-link" onclick="sbSetAll('${level}', false)">None</button></span></div>
     <div class="sb-list">${items.map(it => sbItemMulti(level, it, !ex.has(it.key))).join('')}</div>`;
-  return { body, bar: sbBar(sbCount(pool), `<button type="button" class="btn-nav primary" ${pool ? '' : 'disabled'} onclick="sbForward()">Next →</button>`) };
+  return { body, bar: sbBar(sbCount(pool), `<button type="button" class="btn-nav primary" ${pool ? '' : 'disabled'} onclick="sbForward()">${tx('Next →', 'आगे →')}</button>`) };
 }
 function sbRenderType() {
   const rows = sbCustomRows('subtopic');
@@ -7805,7 +8071,7 @@ function sbRenderType() {
   const body = `<div class="sb-label">Question type</div><div class="sb-chips">${types.map(t => chip('type', t, SB.exType)).join('')}</div>
     <div class="sb-label">Difficulty</div><div class="sb-chips">${diffs.map(d => chip('diff', d, SB.exDiff)).join('')}</div>
     ${pool ? '' : '<p class="sj-note">No question matches this combination. Turn on at least one type and one difficulty.</p>'}`;
-  return { body, bar: sbBar(sbCount(pool), `<button type="button" class="btn-nav primary" ${pool ? '' : 'disabled'} onclick="sbForward()">Next →</button>`) };
+  return { body, bar: sbBar(sbCount(pool), `<button type="button" class="btn-nav primary" ${pool ? '' : 'disabled'} onclick="sbForward()">${tx('Next →', 'आगे →')}</button>`) };
 }
 function sbQuestionRow(r, on) {
   const text = r.q.QUESTION_EN || r.q.QUESTION_HI || 'Question text unavailable';
@@ -7832,7 +8098,7 @@ function sbRenderQuestions() {
     <div class="sb-label">How to choose</div>
     <div class="sb-seg" role="group" aria-label="How to choose questions"><button type="button" class="${SB.pick === 'all' ? 'on' : ''}" aria-pressed="${SB.pick === 'all'}" onclick="sbSetPick('all')">Pick automatically<small>${base.length} eligible</small></button><button type="button" class="${SB.pick === 'pick' ? 'on' : ''}" aria-pressed="${SB.pick === 'pick'}" onclick="sbSetPick('pick')">I'll choose myself<small>tick each question</small></button></div>
     ${list}`;
-  return { body, bar: sbBar(SB.pick === 'pick' ? `<b>${SB.picked.size}</b> chosen` : `${sbCount(base.length)} eligible`, `<button type="button" class="btn-nav primary" ${pool ? '' : 'disabled'} onclick="sbForward()">Next →</button>`) };
+  return { body, bar: sbBar(SB.pick === 'pick' ? `<b>${SB.picked.size}</b> chosen` : `${sbCount(base.length)} eligible`, `<button type="button" class="btn-nav primary" ${pool ? '' : 'disabled'} onclick="sbForward()">${tx('Next →', 'आगे →')}</button>`) };
 }
 function sbLangInfo(rows) {
   const hi = rows.filter(r => String(r.q.QUESTION_HI || '').trim()).length;
@@ -7879,7 +8145,7 @@ function sbRenderPreview() {
     <div class="sb-label">Questions in this test</div>
     <ol class="sb-preview">${rows.map((r, i) => `<li><div class="sb-pq-main"><strong>${i + 1}. ${escapeHtml(r.q.QUESTION_EN || r.q.QUESTION_HI || 'Question text unavailable')}</strong><small>${escapeHtml(sbSubjectLabel(r.subject))} › ${escapeHtml(r.topic)} · ${escapeHtml(SB_DIFF_LABEL[sbDiffOf(r)])}</small></div><div class="sb-pq-actions"><button type="button" aria-label="Replace question ${i + 1}" title="Replace" onclick="sbReplaceInPreview(${nbJsAttr(r.id)})">↻</button><button type="button" aria-label="Remove question ${i + 1}" title="Remove" onclick="sbRemoveFromPreview(${nbJsAttr(r.id)})">✕</button></div></li>`).join('')}</ol>`
     : `<div class="sj-empty"><strong>Preview is empty</strong><span>Go back and change your selection.</span></div>`;
-  return { body, bar: sbBar(`${sbCount(rows.length)} · ${SB.minutes} min`, `<button type="button" class="btn-nav primary" ${rows.length ? '' : 'disabled'} onclick="sbGo('instructions')">Continue →</button>`) };
+  return { body, bar: sbBar(`${sbCount(rows.length)} · ${SB.minutes} min`, `<button type="button" class="btn-nav primary" ${rows.length ? '' : 'disabled'} onclick="sbGo('instructions')">${tx('Continue →', 'आगे →')}</button>`) };
 }
 function sbRenderPyq() {
   if (SB.step === 'pyq_exam') {
@@ -7910,7 +8176,7 @@ function sbRenderPyq() {
     <div class="sb-inline" style="margin-top:12px;"><label for="sbPyqMin">Minutes</label><input id="sbPyqMin" type="number" inputmode="numeric" min="1" max="300" value="${SB.pyqMinutes}" oninput="sbPyqMinutesInput(this.value)"></div>
     <p class="sj-note sj-muted">${SB.pyqMinutesTouched ? 'Custom time.' : 'Suggested: 1 minute per question.'}${final.length > 500 ? ' Only the first 500 questions are used.' : ''}</p>
     ${blocked > 0 ? `<p class="sj-note">${blocked} question(s) of this exam/year are not included because their source exam/year differs from their topic's assignment. <button type="button" class="sj-inline-link" onclick="openDataControlModal()">Review in Data Control</button></p>` : ''}`;
-  return { body, bar: sbBar(`${sbCount(Math.min(final.length, 500))} · ${SB.pyqMinutes} min`, `<button type="button" class="btn-nav primary" ${final.length ? '' : 'disabled'} onclick="sbPyqToInstructions()">Continue →</button>`) };
+  return { body, bar: sbBar(`${sbCount(Math.min(final.length, 500))} · ${SB.pyqMinutes} min`, `<button type="button" class="btn-nav primary" ${final.length ? '' : 'disabled'} onclick="sbPyqToInstructions()">${tx('Continue →', 'आगे →')}</button>`) };
 }
 function sbRenderInstructions() {
   const byId = new Map(sbAll().map(r => [r.id, r]));
@@ -7931,8 +8197,24 @@ function sbRenderInstructions() {
     <div class="sb-seg" role="group" aria-label="Question language">${langBtn('both', 'English + हिंदी')}${langBtn('en', 'English')}${langBtn('hi', 'हिंदी')}</div>
     <p class="sj-note sj-muted">${L.hi} of ${L.total} questions have Hindi text. You can switch language inside the test with A/अ.</p>`
     : `<div class="sj-empty"><strong>Nothing to start</strong><span>Go back and choose questions.</span></div>`;
-  return { body, bar: sbBar(`${sbCount(rows.length)} · ${SB.minutes} min`, `<button type="button" class="btn-nav primary" ${rows.length ? '' : 'disabled'} onclick="sbStartFromInstructions()">I'm ready — Start</button>`) };
+  return { body, bar: sbBar(`${sbCount(rows.length)} · ${SB.minutes} min`, `<button type="button" class="btn-nav primary" ${rows.length ? '' : 'disabled'} onclick="sbStartFromInstructions()">${tx("I'm ready — Start", 'मैं तैयार हूँ — शुरू करें')}</button>`) };
 }
+// Each step renders its final body and footer directly from SB state.
+const SB_RENDERERS = {
+  mode: sbRenderMode, quick: sbRenderQuick,
+  pyq_exam: sbRenderPyq, pyq_year: sbRenderPyq, pyq_shift: sbRenderPyq, pyq_scope: sbRenderPyq,
+  board: () => sbRenderChoice('board'), exam: () => sbRenderChoice('exam'), year: () => sbRenderChoice('year'),
+  subject: () => sbRenderMulti('subject'), topic: () => sbRenderMulti('topic'), subtopic: () => sbRenderMulti('subtopic'),
+  type: sbRenderType, questions: sbRenderQuestions, settings: sbRenderSettings,
+  preview: () => { if (!SB.previewIds.length && SB.mode === 'custom') sbBuildPreview(); return sbRenderPreview(); },
+  instructions: sbRenderInstructions
+};
+const SB_TITLES_HI = {
+  mode: 'टेस्ट बनाएँ', quick: 'झटपट टेस्ट', pyq_exam: 'PYQ · परीक्षा चुनें', pyq_year: 'PYQ · वर्ष चुनें',
+  pyq_shift: 'PYQ · पेपर चुनें', pyq_scope: 'PYQ · पेपर', board: 'बोर्ड चुनें', exam: 'परीक्षा चुनें',
+  year: 'वर्ष चुनें', subject: 'विषय चुनें', topic: 'टॉपिक चुनें', subtopic: 'उपविषय चुनें',
+  type: 'सवाल का प्रकार और कठिनाई', questions: 'सवाल', settings: 'टेस्ट सेटिंग', preview: 'पूर्वावलोकन', instructions: 'निर्देश'
+};
 function sbRender(v) {
   SBCache = null;
   if (!SB.inited) SB = sbLoadDraft() || sbFresh();
@@ -7940,21 +8222,11 @@ function sbRender(v) {
     v.innerHTML = `<div class="sb-shell"><header class="sb-top"><button type="button" class="sb-back" onclick="navigate('home')">← Back</button><div class="sb-title">Create a test</div></header><div class="sb-body"><div class="sj-empty"><strong>Test Builder is for competitive exam workspaces</strong><span>Switch to a competitive workspace to build a test.</span><button type="button" class="btn-nav" onclick="openWorkspaceSwitcher()">Switch workspace</button></div></div></div>`;
     return;
   }
-  let out;
-  const s = SB.step;
-  if (s === 'mode') out = sbRenderMode();
-  else if (s === 'quick') out = sbRenderQuick();
-  else if (s.startsWith('pyq_')) out = sbRenderPyq();
-  else if (s === 'board' || s === 'exam' || s === 'year') out = sbRenderChoice(s);
-  else if (s === 'subject' || s === 'topic' || s === 'subtopic') out = sbRenderMulti(s);
-  else if (s === 'type') out = sbRenderType();
-  else if (s === 'questions') out = sbRenderQuestions();
-  else if (s === 'settings') out = sbRenderSettings();
-  else if (s === 'preview') { if (!SB.previewIds.length && SB.mode === 'custom') sbBuildPreview(); out = sbRenderPreview(); }
-  else if (s === 'instructions') out = sbRenderInstructions();
-  else { SB = sbFresh(); out = sbRenderMode(); }
+  const renderer = SB_RENDERERS[SB.step];
+  if (!renderer) SB = sbFresh();
+  const out = (renderer || sbRenderMode)();
   v.innerHTML = `<div class="sb-shell" data-step="${escapeHtml(SB.step)}">
-    <header class="sb-top"><button type="button" class="sb-back" onclick="sbBack()" aria-label="Back">← Back</button><div class="sb-title">${escapeHtml(SB_TITLES[SB.step] || 'Create a test')}</div>${SB.step !== 'mode' ? `<button type="button" class="sb-restart" onclick="sbStartOver()">Start over</button>` : ''}</header>
+    <header class="sb-top"><button type="button" class="sb-back" onclick="sbBack()" aria-label="${tx('Back', 'वापस')}">← ${tx('Back', 'वापस')}</button><div class="sb-title">${escapeHtml(tx(SB_TITLES[SB.step] || 'Create Test', SB_TITLES_HI[SB.step]))}</div>${SB.step !== 'mode' ? `<button type="button" class="sb-restart" onclick="sbStartOver()">${tx('Start over', 'फिर से शुरू करें')}</button>` : ''}</header>
     ${sbCrumbs()}
     <div class="sb-body" id="sbBody">${out.body}</div>
     <footer class="sb-bar">${out.bar}</footer>
@@ -9796,8 +10068,7 @@ function renderSubjectPage(v, subject) {
     <div class="sc-head"><div><h1>${escapeHtml(name)}</h1><p>${tx(`${all.length} chapter${all.length === 1 ? '' : 's'} · ${mods.length} topics`, `${all.length} अध्याय · ${mods.length} टॉपिक`)}</p></div>
       <button type="button" class="btn-action-sm" onclick="navigate('subjects')">← ${tx('Subjects', 'विषय')}</button></div>
     <div class="sh-chips" role="group" aria-label="${tx('Filter topics', 'टॉपिक छाँटें')}">${chips}</div>
-    ${shown.length ? `<div class="sh-list">${shown.map(chapterHtml).join('')}</div>`
-      : `<div class="sc-empty"><strong>${all.length ? tx('Nothing here yet', 'यहाँ अभी कुछ नहीं') : tx('No chapters with questions', 'सवालों वाला कोई अध्याय नहीं')}</strong><span>${all.length ? tx('Try another filter.', 'दूसरा filter चुनें।') : tx('Import a topic for this subject to start.', 'शुरू करने के लिए इस विषय का topic import करें।')}</span>${all.length ? `<button type="button" class="btn-action-sm" onclick="shSetFilter('all')">${tx('Show all', 'सभी दिखाएँ')}</button>` : ''}</div>`}`;
+    ${shown.length ? `<div class="sh-list">${shown.map(chapterHtml).join('')}</div>` : studyEmptyState(all.length ? 'subject' : '')}`;
 }
 
 /* ---------- Result: time card ---------- */
@@ -9859,16 +10130,10 @@ function renderMePage(v) {
     </section>
     <p class="me-ver">Master TestBook ${escapeHtml(document.querySelector('meta[name="app-version"]')?.content || '')}</p>`;
 }
-const _meRenderView = renderView;
-renderView = function () {
-  if (Route && Route.page === 'me') {
-    try { nbApplyShellForRoute('me'); updateAppBackButton(); } catch (_) {}
-    const t = document.getElementById('txtHeaderTitle'); if (t) t.textContent = '👤 ' + tx('ME', 'मैं');
-    const c = document.getElementById('mainView'); if (c) renderMePage(c);
-    return;
-  }
-  _meRenderView();
-};
+registerRouteViewState('subject', {
+  capture: () => ({ filter: SubjectHubState.filter, open: { ...SubjectHubState.open } }),
+  restore: state => { SubjectHubState = state ? { filter: state.filter, open: { ...state.open } } : { filter: 'all', open: {} }; }
+});
 
 /* V3.4 Control Room analytics — loaded after the engines it wraps (navigate, initTestSession, submitTestSession). */
 /* ---------- feature-usage events (privacy-safe: event name, screen, time on screen — no content, no answers) ---------- */

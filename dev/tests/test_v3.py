@@ -18,9 +18,9 @@ with sync_playwright() as p:
     pg.goto('file://' + APP); pg.wait_for_selector('.sj-dash', timeout=20000); pg.wait_for_timeout(300)
     # Exam-first home launcher must only expose real, wired routes.
     expected_tiles = [
-        ('Exams', 'exam_hub'), ('Mock tests', 'test_hub'), ('PYQ papers', 'pyq_hub'),
-        ('Topic practice', 'subjects'), ('Test builder', 'native_builder'),
-        ('Study library', 'digital_library'), ('Question bank', 'taxonomy_explorer'),
+        ('Exams', 'exam_hub'), ('Tests', 'test_hub'), ('PYQ papers', 'pyq_hub'),
+        ('Topic practice', 'subjects'), ('Create Test', 'native_builder'),
+        ('Study library', 'digital_library'), ('Question Bank', 'taxonomy_explorer'),
         ('Revision', 'revision_hub')
     ]
     labels = pg.locator('.gx-quick .sj-quick-btn').all_inner_texts()

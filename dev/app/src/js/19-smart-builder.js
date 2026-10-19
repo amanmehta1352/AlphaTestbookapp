@@ -530,6 +530,30 @@ function sbStartFromInstructions() {
   sbLaunch(SB.previewIds.slice(), SB.minutes, SB.lang, title);
 }
 
+// Change the builder selection without changing the student's downloaded profile.
+function sbContextChoices() { return sbContexts(SB.mode === 'pyq' ? sbPyqRows() : sbAll()); }
+function sbOpenContextPicker() {
+  const choices = sbContextChoices();
+  openModal(tx('Choose exam and year', 'परीक्षा और वर्ष चुनें'), `
+    <p class="sj-note">${tx('Choosing an exam starts a new test selection.', 'परीक्षा चुनने पर टेस्ट का चयन फिर से शुरू होगा।')}</p>
+    <div class="sb-list">${choices.map(c => sbItemChoice(`sbChooseContext(${nbJsAttr(c.key)})`, sbExamName(c.examId), c.year, c.count)).join('') || studyEmptyState()}</div>`);
+}
+function sbChooseContext(key) {
+  const choice = sbContextChoices().find(c => c.key === key);
+  if (!choice) return;
+  const mode = SB.mode || 'custom';
+  SB = sbFresh(); SB.mode = mode; SB.stack = ['mode'];
+  if (mode === 'quick') { SB.quickCtx = key; SB.step = 'quick'; }
+  else if (mode === 'pyq') {
+    SB.pyqExam = choice.examId; SB.pyqYear = choice.year; SB.step = 'pyq_shift';
+    SB.stack.push('pyq_exam', 'pyq_year'); sbPyqAutoAdvance();
+  } else {
+    SB.board = sbBoardOf(choice.examId); SB.examId = choice.examId; SB.year = choice.year;
+    SB.stack.push('board', 'exam', 'year'); SB.step = 'subject';
+  }
+  closeModal(); sbRerender(true);
+}
+
 /* ---------- rendering ---------- */
 function sbBar(left, buttonHtml) {
   return `<div class="sb-bar-info" id="sbBarInfo">${left}</div>${buttonHtml || ''}`;
@@ -549,7 +573,7 @@ function sbCrumbs() {
   return `<nav class="sb-crumbs" aria-label="Your selection">${parts.join('<span class="sb-crumb-sep" aria-hidden="true">›</span>')}</nav>`;
 }
 const SB_TITLES = {
-  mode: 'Create a test', quick: 'Quick Test', pyq_exam: 'PYQ · Choose exam', pyq_year: 'PYQ · Choose year', pyq_shift: 'PYQ · Choose paper', pyq_scope: 'PYQ · Paper',
+  mode: 'Create Test', quick: 'Quick Test', pyq_exam: 'PYQ · Choose exam', pyq_year: 'PYQ · Choose year', pyq_shift: 'PYQ · Choose paper', pyq_scope: 'PYQ · Paper',
   board: 'Choose board', exam: 'Choose exam', year: 'Choose year', subject: 'Choose subjects', topic: 'Choose topics', subtopic: 'Choose subtopics',
   type: 'Question type & difficulty', questions: 'Questions', settings: 'Test settings', preview: 'Preview', instructions: 'Instructions'
 };
@@ -565,11 +589,11 @@ function sbRenderMode() {
   const mockReady = nbHasVerifiedMockPattern(UserState?.selectedExam);
   const tpls = BuilderTemplates.filter(t => t.ws === WorkspaceManager.current().id);
   const body = `
-    ${all.length ? '' : `<div class="sj-empty"><strong>No questions yet</strong><span>Import questions first, then come back to build a test.</span><button type="button" class="btn-nav" onclick="openImportModal()">Import questions</button></div>`}
+    ${all.length ? '' : studyEmptyState()}
     <div class="sb-modes">
-      <button type="button" class="sb-mode" ${all.length ? '' : 'disabled'} onclick="sbStartMode('quick')"><span class="sb-mode-icon" aria-hidden="true">⚡</span><span class="sb-mode-copy"><strong>Quick Test</strong><small>Start in one tap. Pick subjects and a size.</small></span><span class="sb-go" aria-hidden="true">›</span></button>
-      <button type="button" class="sb-mode" ${pyqN ? '' : 'disabled'} onclick="sbStartMode('pyq')"><span class="sb-mode-icon" aria-hidden="true">🎯</span><span class="sb-mode-copy"><strong>PYQ Test</strong><small>${pyqN ? `Real past paper in original order · ${pyqN} questions marked PYQ` : 'No questions marked as PYQ yet — mark them in Data Control'}</small></span><span class="sb-go" aria-hidden="true">›</span></button>
-      <button type="button" class="sb-mode" ${all.length ? '' : 'disabled'} onclick="sbStartMode('custom')"><span class="sb-mode-icon" aria-hidden="true">⚙️</span><span class="sb-mode-copy"><strong>Custom Test</strong><small>Build it step by step: board, exam, year, subject, topic, subtopic, type.</small></span><span class="sb-go" aria-hidden="true">›</span></button>
+      <button type="button" class="sb-mode" ${all.length ? '' : 'disabled'} onclick="sbStartMode('quick')"><span class="sb-mode-icon" aria-hidden="true">⚡</span><span class="sb-mode-copy"><strong>${tx('Quick Test', 'झटपट टेस्ट')}</strong><small>Start in one tap. Pick subjects and a size.</small></span><span class="sb-go" aria-hidden="true">›</span></button>
+      <button type="button" class="sb-mode" ${pyqN ? '' : 'disabled'} onclick="sbStartMode('pyq')"><span class="sb-mode-icon" aria-hidden="true">🎯</span><span class="sb-mode-copy"><strong>${tx('PYQ Test', 'PYQ टेस्ट')}</strong><small>${pyqN ? `Real past paper in original order · ${pyqN} questions marked PYQ` : tx('No verified PYQ questions available for your selection', 'आपके चयन में सत्यापित PYQ सवाल उपलब्ध नहीं हैं')}</small></span><span class="sb-go" aria-hidden="true">›</span></button>
+      <button type="button" class="sb-mode" ${all.length ? '' : 'disabled'} onclick="sbStartMode('custom')"><span class="sb-mode-icon" aria-hidden="true">⚙️</span><span class="sb-mode-copy"><strong>${tx('Custom Test', 'अपना टेस्ट')}</strong><small>Build it step by step: board, exam, year, subject, topic, subtopic, type.</small></span><span class="sb-go" aria-hidden="true">›</span></button>
     </div>
     <p class="sb-mock-note">${mockReady ? 'Full Mock is available from the exam profile.' : 'Full Mock: available once a verified exam pattern is added.'}</p>
     ${tpls.length ? `<h3 class="sb-h3">⭐ My templates</h3><div class="sb-list">${tpls.map(t => `<div class="sb-tpl"><button type="button" class="sb-item sb-choice" onclick="sbApplyTemplate(${nbJsAttr(t.id)})"><span class="sb-item-main"><strong>${escapeHtml(t.name)}</strong><small>${escapeHtml(sbExamName(t.examId))} ${escapeHtml(t.year)} · ${Number(t.count) || 0} Q · ${Number(t.minutes) || 0} min</small></span><span class="sb-go" aria-hidden="true">›</span></button><button type="button" class="sb-tpl-del" aria-label="Delete template ${escapeHtml(t.name)}" onclick="sbDeleteTemplate(${nbJsAttr(t.id)})">✕</button></div>`).join('')}</div>` : ''}`;
@@ -606,7 +630,7 @@ function sbRenderMulti(level) {
   const pool = sbCustomRows(level).length;
   const body = `<div class="sb-tools"><span>${selected} of ${items.length} selected</span><span><button type="button" class="sb-link" onclick="sbSetAll('${level}', true)">All</button><button type="button" class="sb-link" onclick="sbSetAll('${level}', false)">None</button></span></div>
     <div class="sb-list">${items.map(it => sbItemMulti(level, it, !ex.has(it.key))).join('')}</div>`;
-  return { body, bar: sbBar(sbCount(pool), `<button type="button" class="btn-nav primary" ${pool ? '' : 'disabled'} onclick="sbForward()">Next →</button>`) };
+  return { body, bar: sbBar(sbCount(pool), `<button type="button" class="btn-nav primary" ${pool ? '' : 'disabled'} onclick="sbForward()">${tx('Next →', 'आगे →')}</button>`) };
 }
 function sbRenderType() {
   const rows = sbCustomRows('subtopic');
@@ -619,7 +643,7 @@ function sbRenderType() {
   const body = `<div class="sb-label">Question type</div><div class="sb-chips">${types.map(t => chip('type', t, SB.exType)).join('')}</div>
     <div class="sb-label">Difficulty</div><div class="sb-chips">${diffs.map(d => chip('diff', d, SB.exDiff)).join('')}</div>
     ${pool ? '' : '<p class="sj-note">No question matches this combination. Turn on at least one type and one difficulty.</p>'}`;
-  return { body, bar: sbBar(sbCount(pool), `<button type="button" class="btn-nav primary" ${pool ? '' : 'disabled'} onclick="sbForward()">Next →</button>`) };
+  return { body, bar: sbBar(sbCount(pool), `<button type="button" class="btn-nav primary" ${pool ? '' : 'disabled'} onclick="sbForward()">${tx('Next →', 'आगे →')}</button>`) };
 }
 function sbQuestionRow(r, on) {
   const text = r.q.QUESTION_EN || r.q.QUESTION_HI || 'Question text unavailable';
@@ -646,7 +670,7 @@ function sbRenderQuestions() {
     <div class="sb-label">How to choose</div>
     <div class="sb-seg" role="group" aria-label="How to choose questions"><button type="button" class="${SB.pick === 'all' ? 'on' : ''}" aria-pressed="${SB.pick === 'all'}" onclick="sbSetPick('all')">Pick automatically<small>${base.length} eligible</small></button><button type="button" class="${SB.pick === 'pick' ? 'on' : ''}" aria-pressed="${SB.pick === 'pick'}" onclick="sbSetPick('pick')">I'll choose myself<small>tick each question</small></button></div>
     ${list}`;
-  return { body, bar: sbBar(SB.pick === 'pick' ? `<b>${SB.picked.size}</b> chosen` : `${sbCount(base.length)} eligible`, `<button type="button" class="btn-nav primary" ${pool ? '' : 'disabled'} onclick="sbForward()">Next →</button>`) };
+  return { body, bar: sbBar(SB.pick === 'pick' ? `<b>${SB.picked.size}</b> chosen` : `${sbCount(base.length)} eligible`, `<button type="button" class="btn-nav primary" ${pool ? '' : 'disabled'} onclick="sbForward()">${tx('Next →', 'आगे →')}</button>`) };
 }
 function sbLangInfo(rows) {
   const hi = rows.filter(r => String(r.q.QUESTION_HI || '').trim()).length;
@@ -693,7 +717,7 @@ function sbRenderPreview() {
     <div class="sb-label">Questions in this test</div>
     <ol class="sb-preview">${rows.map((r, i) => `<li><div class="sb-pq-main"><strong>${i + 1}. ${escapeHtml(r.q.QUESTION_EN || r.q.QUESTION_HI || 'Question text unavailable')}</strong><small>${escapeHtml(sbSubjectLabel(r.subject))} › ${escapeHtml(r.topic)} · ${escapeHtml(SB_DIFF_LABEL[sbDiffOf(r)])}</small></div><div class="sb-pq-actions"><button type="button" aria-label="Replace question ${i + 1}" title="Replace" onclick="sbReplaceInPreview(${nbJsAttr(r.id)})">↻</button><button type="button" aria-label="Remove question ${i + 1}" title="Remove" onclick="sbRemoveFromPreview(${nbJsAttr(r.id)})">✕</button></div></li>`).join('')}</ol>`
     : `<div class="sj-empty"><strong>Preview is empty</strong><span>Go back and change your selection.</span></div>`;
-  return { body, bar: sbBar(`${sbCount(rows.length)} · ${SB.minutes} min`, `<button type="button" class="btn-nav primary" ${rows.length ? '' : 'disabled'} onclick="sbGo('instructions')">Continue →</button>`) };
+  return { body, bar: sbBar(`${sbCount(rows.length)} · ${SB.minutes} min`, `<button type="button" class="btn-nav primary" ${rows.length ? '' : 'disabled'} onclick="sbGo('instructions')">${tx('Continue →', 'आगे →')}</button>`) };
 }
 function sbRenderPyq() {
   if (SB.step === 'pyq_exam') {
@@ -724,7 +748,7 @@ function sbRenderPyq() {
     <div class="sb-inline" style="margin-top:12px;"><label for="sbPyqMin">Minutes</label><input id="sbPyqMin" type="number" inputmode="numeric" min="1" max="300" value="${SB.pyqMinutes}" oninput="sbPyqMinutesInput(this.value)"></div>
     <p class="sj-note sj-muted">${SB.pyqMinutesTouched ? 'Custom time.' : 'Suggested: 1 minute per question.'}${final.length > 500 ? ' Only the first 500 questions are used.' : ''}</p>
     ${blocked > 0 ? `<p class="sj-note">${blocked} question(s) of this exam/year are not included because their source exam/year differs from their topic's assignment. <button type="button" class="sj-inline-link" onclick="openDataControlModal()">Review in Data Control</button></p>` : ''}`;
-  return { body, bar: sbBar(`${sbCount(Math.min(final.length, 500))} · ${SB.pyqMinutes} min`, `<button type="button" class="btn-nav primary" ${final.length ? '' : 'disabled'} onclick="sbPyqToInstructions()">Continue →</button>`) };
+  return { body, bar: sbBar(`${sbCount(Math.min(final.length, 500))} · ${SB.pyqMinutes} min`, `<button type="button" class="btn-nav primary" ${final.length ? '' : 'disabled'} onclick="sbPyqToInstructions()">${tx('Continue →', 'आगे →')}</button>`) };
 }
 function sbRenderInstructions() {
   const byId = new Map(sbAll().map(r => [r.id, r]));
@@ -745,8 +769,24 @@ function sbRenderInstructions() {
     <div class="sb-seg" role="group" aria-label="Question language">${langBtn('both', 'English + हिंदी')}${langBtn('en', 'English')}${langBtn('hi', 'हिंदी')}</div>
     <p class="sj-note sj-muted">${L.hi} of ${L.total} questions have Hindi text. You can switch language inside the test with A/अ.</p>`
     : `<div class="sj-empty"><strong>Nothing to start</strong><span>Go back and choose questions.</span></div>`;
-  return { body, bar: sbBar(`${sbCount(rows.length)} · ${SB.minutes} min`, `<button type="button" class="btn-nav primary" ${rows.length ? '' : 'disabled'} onclick="sbStartFromInstructions()">I'm ready — Start</button>`) };
+  return { body, bar: sbBar(`${sbCount(rows.length)} · ${SB.minutes} min`, `<button type="button" class="btn-nav primary" ${rows.length ? '' : 'disabled'} onclick="sbStartFromInstructions()">${tx("I'm ready — Start", 'मैं तैयार हूँ — शुरू करें')}</button>`) };
 }
+// Each step renders its final body and footer directly from SB state.
+const SB_RENDERERS = {
+  mode: sbRenderMode, quick: sbRenderQuick,
+  pyq_exam: sbRenderPyq, pyq_year: sbRenderPyq, pyq_shift: sbRenderPyq, pyq_scope: sbRenderPyq,
+  board: () => sbRenderChoice('board'), exam: () => sbRenderChoice('exam'), year: () => sbRenderChoice('year'),
+  subject: () => sbRenderMulti('subject'), topic: () => sbRenderMulti('topic'), subtopic: () => sbRenderMulti('subtopic'),
+  type: sbRenderType, questions: sbRenderQuestions, settings: sbRenderSettings,
+  preview: () => { if (!SB.previewIds.length && SB.mode === 'custom') sbBuildPreview(); return sbRenderPreview(); },
+  instructions: sbRenderInstructions
+};
+const SB_TITLES_HI = {
+  mode: 'टेस्ट बनाएँ', quick: 'झटपट टेस्ट', pyq_exam: 'PYQ · परीक्षा चुनें', pyq_year: 'PYQ · वर्ष चुनें',
+  pyq_shift: 'PYQ · पेपर चुनें', pyq_scope: 'PYQ · पेपर', board: 'बोर्ड चुनें', exam: 'परीक्षा चुनें',
+  year: 'वर्ष चुनें', subject: 'विषय चुनें', topic: 'टॉपिक चुनें', subtopic: 'उपविषय चुनें',
+  type: 'सवाल का प्रकार और कठिनाई', questions: 'सवाल', settings: 'टेस्ट सेटिंग', preview: 'पूर्वावलोकन', instructions: 'निर्देश'
+};
 function sbRender(v) {
   SBCache = null;
   if (!SB.inited) SB = sbLoadDraft() || sbFresh();
@@ -754,21 +794,11 @@ function sbRender(v) {
     v.innerHTML = `<div class="sb-shell"><header class="sb-top"><button type="button" class="sb-back" onclick="navigate('home')">← Back</button><div class="sb-title">Create a test</div></header><div class="sb-body"><div class="sj-empty"><strong>Test Builder is for competitive exam workspaces</strong><span>Switch to a competitive workspace to build a test.</span><button type="button" class="btn-nav" onclick="openWorkspaceSwitcher()">Switch workspace</button></div></div></div>`;
     return;
   }
-  let out;
-  const s = SB.step;
-  if (s === 'mode') out = sbRenderMode();
-  else if (s === 'quick') out = sbRenderQuick();
-  else if (s.startsWith('pyq_')) out = sbRenderPyq();
-  else if (s === 'board' || s === 'exam' || s === 'year') out = sbRenderChoice(s);
-  else if (s === 'subject' || s === 'topic' || s === 'subtopic') out = sbRenderMulti(s);
-  else if (s === 'type') out = sbRenderType();
-  else if (s === 'questions') out = sbRenderQuestions();
-  else if (s === 'settings') out = sbRenderSettings();
-  else if (s === 'preview') { if (!SB.previewIds.length && SB.mode === 'custom') sbBuildPreview(); out = sbRenderPreview(); }
-  else if (s === 'instructions') out = sbRenderInstructions();
-  else { SB = sbFresh(); out = sbRenderMode(); }
+  const renderer = SB_RENDERERS[SB.step];
+  if (!renderer) SB = sbFresh();
+  const out = (renderer || sbRenderMode)();
   v.innerHTML = `<div class="sb-shell" data-step="${escapeHtml(SB.step)}">
-    <header class="sb-top"><button type="button" class="sb-back" onclick="sbBack()" aria-label="Back">← Back</button><div class="sb-title">${escapeHtml(SB_TITLES[SB.step] || 'Create a test')}</div>${SB.step !== 'mode' ? `<button type="button" class="sb-restart" onclick="sbStartOver()">Start over</button>` : ''}</header>
+    <header class="sb-top"><button type="button" class="sb-back" onclick="sbBack()" aria-label="${tx('Back', 'वापस')}">← ${tx('Back', 'वापस')}</button><div class="sb-title">${escapeHtml(tx(SB_TITLES[SB.step] || 'Create Test', SB_TITLES_HI[SB.step]))}</div>${SB.step !== 'mode' ? `<button type="button" class="sb-restart" onclick="sbStartOver()">${tx('Start over', 'फिर से शुरू करें')}</button>` : ''}</header>
     ${sbCrumbs()}
     <div class="sb-body" id="sbBody">${out.body}</div>
     <footer class="sb-bar">${out.bar}</footer>

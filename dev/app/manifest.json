@@ -250,6 +250,10 @@
    "script": true
   },
   {
+   "file": "src/js/17d-study-feedback.js",
+   "script": true
+  },
+  {
    "file": "src/js/18-cbt-subjects-results.js",
    "script": true
   },

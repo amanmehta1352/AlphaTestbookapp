@@ -310,12 +310,12 @@ function renderHomePage(v) {
   // Features without a real data source (live classes/current affairs/AI doubt chat) are intentionally not faked.
   const quick = [
     { icon: '🏛️', label: tx('Exams','परीक्षाएँ'), call: `navigate('exam_hub')` },
-    { icon: '⏱️', label: tx('Mock tests','मॉक टेस्ट'), call: `navigate('test_hub')` },
+    { icon: '⏱️', label: tx('Tests','टेस्ट'), call: `navigate('test_hub')` },
     { icon: '🎯', label: tx('PYQ papers','PYQ पेपर'), call: `navigate('pyq_hub')` },
     { icon: '✍️', label: tx('Topic practice','टॉपिक अभ्यास'), call: `navigate('subjects')` },
-    { icon: '🧩', label: tx('Test builder','टेस्ट बनाएँ'), call: `navigate('native_builder')` },
+    { icon: '🧩', label: tx('Create Test','टेस्ट बनाएँ'), call: `navigate('native_builder')` },
     { icon: '📖', label: tx('Study library','स्टडी लाइब्रेरी'), call: `navigate('digital_library')` },
-    { icon: '🔎', label: tx('Question bank','प्रश्न बैंक'), call: `navigate('taxonomy_explorer')` },
+    { icon: '🔎', label: tx('Question Bank','प्रश्न बैंक'), call: `navigate('taxonomy_explorer')` },
     { icon: '🔄', label: tx('Revision','दोहराई'), call: `navigate('revision_hub')` }
   ];
 
