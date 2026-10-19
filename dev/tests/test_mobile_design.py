@@ -127,13 +127,14 @@ with sync_playwright() as p:
         ),
     )
     page.locator(".me-row", has_text="Dark mode").click()
+    # Wait for the storage commit before reading it back and unloading the page.
+    page.evaluate("StorageWriteQueue.flush()")
     rec(
         "Me theme control changes and persists theme",
         page.evaluate(
-            "UserState.theme === 'dark' && document.body.classList.contains('dark')"
+            "async () => UserState.theme === 'dark' && document.body.classList.contains('dark') && (await loadUserState()).theme === 'dark'"
         ),
     )
-    page.evaluate("StorageWriteQueue.flush()")
     page.reload()
     page.wait_for_selector(".me-head")
     rec(
