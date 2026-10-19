@@ -89,7 +89,7 @@ with sync_playwright() as p:
     page.locator('.gx-rev .gx-btn').click()
     rec('revision widget starts a revision session', page.evaluate("Route.page==='revision_hub' && !!RevisionSession"))
     page.evaluate("revisionEnd(); navigate('home')")
-    page.locator('.gx-next .gx-btn').click()
+    page.locator('.ao-next .gx-btn').click()
     rec('next best action button works', page.evaluate("Route.page") != 'home' or page.evaluate("!!RevisionSession"))
     page.evaluate("RevisionSession=null; closeModal(); navigate('home')")
 

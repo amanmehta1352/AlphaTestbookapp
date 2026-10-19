@@ -444,14 +444,14 @@ function renderTopicHubPage(v, moduleId) {
       <span class="sep">/</span>
       <button onclick="navigate('subjects')">Subjects</button>
       <span class="sep">/</span>
-      <button onclick="navigate('subject', {subject:'${mod.subject}'})">${mod.subject.toUpperCase()}</button>
+      <button onclick="navigate('subject', {subject:${nbJsAttr(mod.subject)}})">${escapeHtml(mod.subject.toUpperCase())}</button>
       <span class="sep">/</span>
-      <span>${mod.topicTitle}</span>
+      <span>${escapeHtml(mod.topicTitle)}</span>
     </div>
 
     <div class="student-hero-card ao-page-head">
-      <span class="journey-pill">📍 TOPIC: ${mod.topicTitle.toUpperCase()}</span>
-      <h1>${mod.topicTitle} Hub</h1>
+      <span class="journey-pill">📍 TOPIC: ${escapeHtml(mod.topicTitle.toUpperCase())}</span>
+      <h1>${escapeHtml(mod.topicTitle)} Hub</h1>
       <p>${sjM.enough ? `Mastery: ${Math.round(sjM.score * 100)}% (${sjM.level})` : `Mastery: shown after ${MASTERY_MIN_ANSWERS} answers (${sjM.answered} so far)`} • ${mod.groups.length} Groups • ${totalQuestions} Questions</p>
     </div>
 
@@ -460,7 +460,7 @@ function renderTopicHubPage(v, moduleId) {
     </div>
 
     <div class="intent-matrix-grid">
-      <div class="intent-tile practice ao-primary-card" onclick="navigate('practice', {moduleId:'${mod.moduleId}', qIndex:0})">
+      <div class="intent-tile practice ao-primary-card" onclick="navigate('practice', {moduleId:${nbJsAttr(mod.moduleId)}, qIndex:0})">
         <div>
           <div class="intent-tile-header">
             <span class="intent-tile-title">✏️ ${tx('START PRACTICE', 'अभ्यास शुरू करें')}</span>
@@ -470,7 +470,7 @@ function renderTopicHubPage(v, moduleId) {
         </div>
         <div class="intent-tile-action" style="color:#10b981;">${tx('Practise this topic', 'इस टॉपिक का अभ्यास करें')} ➔</div>
       </div>
-      <div class="intent-tile learn" onclick="navigate('learn', {moduleId:'${mod.moduleId}'})">
+      <div class="intent-tile learn" onclick="navigate('learn', {moduleId:${nbJsAttr(mod.moduleId)}})">
         <div>
           <div class="intent-tile-header">
             <span class="intent-tile-title">📖 LEARN</span>
@@ -481,7 +481,7 @@ function renderTopicHubPage(v, moduleId) {
         <div class="intent-tile-action" style="color:#3b82f6;">Read Notes ➔</div>
       </div>
 
-      <div class="intent-tile revision" onclick="navigate('revision', {moduleId:'${mod.moduleId}'})">
+      <div class="intent-tile revision" onclick="navigate('revision', {moduleId:${nbJsAttr(mod.moduleId)}})">
         <div>
           <div class="intent-tile-header">
             <span class="intent-tile-title">🔄 REVISION</span>
@@ -493,7 +493,7 @@ function renderTopicHubPage(v, moduleId) {
       </div>
 
 
-      <div class="intent-tile class" onclick="navigate('class', {moduleId:'${mod.moduleId}'})">
+      <div class="intent-tile class" onclick="navigate('class', {moduleId:${nbJsAttr(mod.moduleId)}})">
         <div>
           <div class="intent-tile-header">
             <span class="intent-tile-title">🎥 CLASS</span>
@@ -504,7 +504,7 @@ function renderTopicHubPage(v, moduleId) {
         <div class="intent-tile-action" style="color:var(--text-muted);">Not available</div>
       </div>
 
-      <div class="intent-tile pyq" onclick="navigate('pyq', {moduleId:'${mod.moduleId}'})">
+      <div class="intent-tile pyq" onclick="navigate('pyq', {moduleId:${nbJsAttr(mod.moduleId)}})">
         <div>
           <div class="intent-tile-header">
             <span class="intent-tile-title">🎯 PYQ</span>
@@ -515,7 +515,7 @@ function renderTopicHubPage(v, moduleId) {
         <div class="intent-tile-action" style="color:#06b6d4;">Explore Archive ➔</div>
       </div>
 
-      <div class="intent-tile test" onclick="initTestSession(${nbJsAttr(mod.moduleId)}, ${nbJsAttr(mod.groups[0]?.groupId || '')}, 0)">
+      <div class="intent-tile test" onclick="initTestSession(${nbJsAttr(mod.moduleId)}, ${nbJsAttr(mod.groups.find(g => g.questions?.length)?.groupId || '')}, 0)">
         <div>
           <div class="intent-tile-header">
             <span class="intent-tile-title">⏱️ TEST</span>
@@ -526,7 +526,7 @@ function renderTopicHubPage(v, moduleId) {
         <div class="intent-tile-action" style="color:#ef4444;">Start CBT ➔</div>
       </div>
 
-      <div class="intent-tile test" onclick="sbOpenForModule('${mod.moduleId}')">
+      <div class="intent-tile test" onclick="sbOpenForModule(${nbJsAttr(mod.moduleId)})">
         <div>
           <div class="intent-tile-header">
             <span class="intent-tile-title">🧩 BUILD TEST</span>
@@ -550,14 +550,14 @@ function renderTopicHubPage(v, moduleId) {
       ${mod.groups.map(g => `
         <div class="card-btn">
           <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-            <strong>${g.title}</strong>
+            <strong>${escapeHtml(g.title)}</strong>
             <span style="font-size:11px; font-weight:800; background:var(--primary-light); color:var(--primary); padding:2px 8px; border-radius:999px;">
               ${g.questions.length} Qs
             </span>
           </div>
-          <small style="margin-bottom:10px;">${g.description}</small>
+          <small style="margin-bottom:10px;">${escapeHtml(g.description)}</small>
           <div style="display:flex; gap:8px;">
-            <button class="btn-nav secondary" style="flex:1; min-height:38px; font-size:12px; padding:6px;" onclick="navigate('practice', {moduleId:'${mod.moduleId}', qIndex:0})">
+            <button class="btn-nav secondary" style="flex:1; min-height:38px; font-size:12px; padding:6px;" onclick="navigate('practice', {moduleId:${nbJsAttr(mod.moduleId)}, qIndex:0})">
               Drill
             </button>
             <button class="btn-nav primary" style="flex:1; min-height:38px; font-size:12px; padding:6px;" onclick="initTestSession(${nbJsAttr(mod.moduleId)}, ${nbJsAttr(g.groupId)}, 0)">
@@ -665,7 +665,7 @@ function renderGlobalTestHub(v) {
     ${mod ? `<div class="resume-action-card ao-primary-card">
       <div class="resume-info">
         <span class="resume-badge">🎯 READY ASSESSMENT</span>
-        <div class="resume-title">${escapeHtml(mod.topicTitle)} — ${group.title || 'G-01'}</div>
+        <div class="resume-title">${escapeHtml(mod.topicTitle)} — ${escapeHtml(group.title || 'G-01')}</div>
         <div class="resume-subtitle">${Number(exam?.defaultDurationMinutes) || 30} ${tx('Mins', 'मिनट')} • ${group.questions.length} ${tx('Questions', 'सवाल')}</div>
       </div>
       <button class="btn-nav primary" style="min-height:40px; padding:8px 14px; font-size:13px;" onclick="initTestSession(${nbJsAttr(mod.moduleId)}, ${nbJsAttr(group.groupId || '')}, 0, null, {curriculumContext:true})">
@@ -692,7 +692,7 @@ function renderGlobalTestHub(v) {
           <small>${escapeHtml(m.subjectTitle)} • Class Test Series</small>
           <div style="margin-top:12px;">
             <button class="btn-nav primary" style="width:100%; min-height:40px; font-size:12px;" onclick="initTestSession(${nbJsAttr(m.moduleId)}, ${nbJsAttr(g.groupId)}, 0, null, {curriculumContext:true})">
-              Launch ${g.title || 'G-01'} CBT Test ➔
+              Launch ${escapeHtml(g.title || 'G-01')} CBT Test ➔
             </button>
           </div>
         </div>

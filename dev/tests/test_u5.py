@@ -15,6 +15,7 @@ with sync_playwright() as p:
     page.goto('file://' + PATH); page.wait_for_selector('.sj-dash', timeout=15000)
 
     # --- Display sheet + dialog a11y
+    page.evaluate("navigate('me')")
     page.locator('#btnTextSize').focus(); page.keyboard.press('Enter')
     rec('Aa button opens Display sheet', page.evaluate("document.getElementById('modalSheet').classList.contains('open')") and 'Text size' in page.inner_text('#modalSheetBody'))
     rec('sheet is a modal dialog', page.evaluate("(()=>{const s=document.getElementById('modalSheet');return s.getAttribute('role')==='dialog'&&s.getAttribute('aria-modal')==='true'})()"))
@@ -22,6 +23,8 @@ with sync_playwright() as p:
     rec('focus moves into the sheet', page.evaluate("document.getElementById('modalSheet').contains(document.activeElement)"))
     page.keyboard.press('Escape')
     rec('Escape closes sheet and focus returns to Aa', not page.evaluate("document.getElementById('modalSheet').classList.contains('open')") and page.evaluate("document.activeElement.id") == 'btnTextSize')
+
+    page.evaluate("navigate('home')")
 
     # --- Hindi
     page.evaluate("openDisplaySettings()")
@@ -31,7 +34,7 @@ with sync_playwright() as p:
     t = page.inner_text('#mainView')
     rec('dashboard in Hindi', 'दैनिक लक्ष्य' in t and 'Daily goal' not in t)
     rec('bottom nav in Hindi', page.inner_text('#tabHome') .strip().endswith('होम') and 'रिवीज़न' in page.inner_text('#tabRevision'))
-    rec('header title in Hindi', 'स्टूडेंट हब' in page.inner_text('#txtHeaderTitle'))
+    rec('header title in Hindi', 'होम' in page.inner_text('#txtHeaderTitle'))
     rec('html lang = hi', page.evaluate("document.documentElement.lang") == 'hi')
     page.wait_for_timeout(300); page.reload(); page.wait_for_selector('.sj-dash', timeout=15000); page.wait_for_timeout(300)
     rec('Hindi survives reload', 'दैनिक लक्ष्य' in page.inner_text('#mainView') and 'होम' in page.inner_text('#tabHome'))
@@ -85,7 +88,7 @@ with sync_playwright() as p:
     rec('syllabus has no fake "Mapped" claim', 'Mapped' not in page.inner_text('#mainView'))
     page.click('#btnMenu'); page.keyboard.press('Escape')
     rec('Escape closes the menu', not page.evaluate("document.getElementById('sideDrawer').classList.contains('open')"))
-    rec('menu labels are clear', 'Question bank' in page.evaluate("document.getElementById('sideDrawer').textContent") and 'ALL DATA CONTROL' not in page.evaluate("document.getElementById('sideDrawer').textContent"))
+    rec('menu labels are clear', 'Question Bank' in page.evaluate("document.getElementById('sideDrawer').textContent") and 'ALL DATA CONTROL' not in page.evaluate("document.getElementById('sideDrawer').textContent"))
 
     # --- Subjects navigation redesign: validate data and the new tab/accordion UI
     page.evaluate("navigate('subjects')")
@@ -106,9 +109,9 @@ with sync_playwright() as p:
     topic = page.locator('.sn-chapter.open .sn-topic').first
     if topic.count():
         topic.click()
-        rec('topic opens existing chapter route', page.evaluate("Route.page") == 'chapter' and bool(page.evaluate("Route.params && Route.params.chapter")), page.evaluate("({page:Route.page,params:Route.params})"))
+        rec('topic opens its own topic route', page.evaluate("Route.page") == 'topic' and bool(page.evaluate("Route.params && Route.params.moduleId")), page.evaluate("({page:Route.page,params:Route.params})"))
     else:
-        rec('topic opens existing chapter route', False, 'no topic button in expanded chapter')
+        rec('topic opens its own topic route', False, 'no topic button in expanded chapter')
 
     # --- Question Bank
     page.evaluate("navigate('taxonomy_explorer')")

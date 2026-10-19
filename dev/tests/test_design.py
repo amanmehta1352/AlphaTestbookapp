@@ -54,7 +54,7 @@ with sync_playwright() as p:
             rec(f'{width}px {"dark" if dark else "light"}: content fits every hub', not bad, bad)
     # Reading settings remain available with keyboard access in the simpler shell.
     page.set_viewport_size({'width': 360, 'height': 780})
-    page.evaluate("document.body.classList.remove('dark'); navigate('subjects')")
+    page.evaluate("document.body.classList.remove('dark'); navigate('me')")
     page.locator('#btnTextSize').focus()
     page.keyboard.press('Enter')
     rec('Display settings remain keyboard accessible', page.locator('#modalSheet.open .ds').count() == 1)
@@ -130,6 +130,8 @@ with sync_playwright() as p:
         const mod = AppModules[0];
         mod.topicTitle = '<img src=x onerror="window.__hubInjected=true">';
         mod.moduleId = "module');window.__hubInjected=true;//";
+        mod.groups[1].title = '<img src=x onerror="window.__hubInjected=true">';
+        mod.groups[1].description = '<img src=x onerror="window.__hubInjected=true">';
         mod.groups[1].groupId = "group');window.__hubInjected=true;//";
         UserState.resumeState = null;
         navigate('test_hub');
@@ -148,7 +150,29 @@ with sync_playwright() as p:
                 const args = window.__capturedTestLaunch, mod = AppModules[0];
                 return !window.__hubInjected && args?.[0] === mod.moduleId && args?.[1] === mod.groups[1].groupId;
             }"""))
-        page.evaluate("AppModules[0].topicTitle='Safe topic';renderTopicHubPage(document.getElementById('mainView'),AppModules[0].moduleId)")
+        rec('Assessment group titles render as literal text',
+            page.locator('#mainView img').count() == 0 and
+            '<img src=x' in page.locator('.grid-cards .btn-nav.primary').inner_text())
+        page.evaluate("renderTopicHubPage(document.getElementById('mainView'),AppModules[0].moduleId)")
+        rec('Topic titles, group titles and descriptions render as literal text',
+            page.locator('#mainView img').count() == 0 and
+            '<img src=x' in page.locator('.student-hero-card h1').inner_text() and
+            '<img src=x' in page.locator('.grid-cards .card-btn strong').last.inner_text() and
+            '<img src=x' in page.locator('.grid-cards .card-btn small').last.inner_text())
+        page.locator('.intent-tile[onclick^="initTestSession"]').click()
+        rec('Topic CBT shortcut selects the later nonempty group',
+            page.evaluate("window.__capturedTestLaunch?.[1] === AppModules[0].groups[1].groupId"))
+        page.evaluate("window.__originalNavigate=navigate;navigate=(...args)=>{window.__capturedNavigate=args;};void 0")
+        try:
+            navigation_actions = page.locator('.intent-tile[onclick^="navigate"]')
+            literal_routes = navigation_actions.count() == 5
+            for index in range(navigation_actions.count()):
+                page.evaluate('window.__capturedNavigate=null')
+                navigation_actions.nth(index).click()
+                literal_routes = page.evaluate("!window.__hubInjected && window.__capturedNavigate?.[1]?.moduleId===AppModules[0].moduleId") and literal_routes
+            rec('Topic study actions preserve quoted module IDs', literal_routes)
+        finally:
+            page.evaluate('navigate=window.__originalNavigate;void 0')
         topic_launchers = page.locator('#mainView [onclick^="initTestSession"]')
         topic_args_ok = topic_launchers.count() >= 2
         for index in range(topic_launchers.count()):

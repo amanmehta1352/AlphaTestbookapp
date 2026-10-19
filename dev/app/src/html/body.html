@@ -10,15 +10,12 @@
 <!-- Application Header -->
 <header id="appHeader">
   <div class="header-left">
-    <button class="header-btn" id="btnMenu" aria-label="Menu" title="Menu">☰</button>
+    <button class="header-btn" id="btnMenu" aria-label="Menu" title="Menu"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
     <button class="header-btn app-one-step-back" id="btnAppBack" aria-label="ONE STEP BACK" title="ONE STEP BACK" hidden onclick="appNavigateBack()">← Back</button>
     <div class="header-title" id="txtHeaderTitle">📚 MASTER TEST-BOOK</div>
   </div>
   <div class="header-right">
-    <button class="header-btn" id="btnMe" onclick="navigate('me')" aria-label="Me: progress and settings" title="Me">👤</button>
-    <button class="header-btn" id="btnQuestionBank" onclick="navigate('taxonomy_explorer')" aria-label="Question Bank" title="Question Bank">🔎</button>
-    <button class="header-btn ds-btn" id="btnTextSize" onclick="openDisplaySettings()" aria-label="Display settings: language, text size, theme" title="Display">Aa</button>
-    <button class="header-btn" id="btnTheme" aria-label="Toggle Theme" title="Theme">🌙</button>
+    <button class="header-btn" onclick="navigate('taxonomy_explorer')" aria-label="Question Bank" title="Question Bank"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 21l-5-5M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0"/></svg></button>
   </div>
 </header>
 
@@ -32,21 +29,21 @@
   <nav class="drawer-nav" aria-label="Main menu">
     <div class="drawer-section-title" data-en="PREPARE" data-hi="तैयारी शुरू करें">PREPARE</div>
     <button class="drawer-item" id="drwHome" onclick="navigate('home')" data-en="🏠 Home" data-hi="🏠 होम">🏠 Home</button>
-    <button class="drawer-item" id="drwExams" onclick="navigate('exam_hub')" data-en="🏛️ Exam hub" data-hi="🏛️ परीक्षा केंद्र">🏛️ Exam hub</button>
-    <button class="drawer-item" id="drwTest" onclick="navigate('test_hub')" data-en="⏱️ Mock tests" data-hi="⏱️ मॉक टेस्ट">⏱️ Mock tests</button>
+    <button class="drawer-item" id="drwExams" onclick="navigate('exam_hub')" data-en="🏛️ Exams" data-hi="🏛️ परीक्षाएँ">🏛️ Exams</button>
+    <button class="drawer-item" id="drwTest" onclick="navigate('test_hub')" data-en="⏱️ Tests" data-hi="⏱️ टेस्ट">⏱️ Tests</button>
     <button class="drawer-item" id="drwPYQ" onclick="navigate('pyq_hub')" data-en="🎯 Previous year papers (PYQ)" data-hi="🎯 पिछले वर्ष के पेपर (PYQ)">🎯 Previous year papers (PYQ)</button>
     <button class="drawer-item" id="drwSubjects" onclick="navigate('subjects')" data-en="📚 Subjects & topic practice" data-hi="📚 विषय और टॉपिक अभ्यास">📚 Subjects &amp; topic practice</button>
 
     <div class="drawer-section-title" data-en="LEARN & PRACTICE" data-hi="सीखें और अभ्यास करें">LEARN &amp; PRACTICE</div>
-    <button class="drawer-item" id="drwNativeBuilder" onclick="navigate('native_builder')" data-en="🧩 Create a test" data-hi="🧩 टेस्ट बनाएँ">🧩 Create a test</button>
+    <button class="drawer-item" id="drwNativeBuilder" onclick="navigate('native_builder')" data-en="🧩 Create Test" data-hi="🧩 टेस्ट बनाएँ">🧩 Create Test</button>
     <button class="drawer-item" id="drwLibrary" onclick="navigate('digital_library')" data-en="📖 Study library" data-hi="📖 स्टडी लाइब्रेरी">📖 Study library</button>
-    <button class="drawer-item" id="drwTaxonomy" onclick="navigate('taxonomy_explorer')" data-en="🔎 Question bank" data-hi="🔎 प्रश्न बैंक">🔎 Question bank</button>
+    <button class="drawer-item" id="drwTaxonomy" onclick="navigate('taxonomy_explorer')" data-en="🔎 Question Bank" data-hi="🔎 प्रश्न बैंक">🔎 Question Bank</button>
 
     <div class="drawer-section-title" data-en="REVISE & TRACK" data-hi="दोहराएँ और प्रगति देखें">REVISE &amp; TRACK</div>
     <button class="drawer-item" id="drwRevision" onclick="navigate('revision_hub')" data-en="🔄 Revision centre" data-hi="🔄 रिवीज़न सेंटर">🔄 Revision centre</button>
     <button class="drawer-item" onclick="navigate('mistakes')" data-en="📕 Mistake book" data-hi="📕 गलतियों की किताब">📕 Mistake book</button>
     <button class="drawer-item" onclick="navigate('mastery')" data-en="🎯 Topic mastery" data-hi="🎯 टॉपिक महारत">🎯 Topic mastery</button>
-    <button class="drawer-item" id="drwMe" onclick="navigate('me')" data-en="👤 My progress & settings" data-hi="👤 मेरी प्रगति और सेटिंग">👤 My progress &amp; settings</button>
+    <button class="drawer-item" id="drwMe" onclick="navigate('me')" data-en="👤 Me" data-hi="👤 मैं">👤 My progress &amp; settings</button>
 
     <div class="drawer-section-title" data-en="APP TOOLS & DATA" data-hi="ऐप टूल्स और डेटा">APP TOOLS &amp; DATA</div>
     <button class="drawer-item" onclick="openDisplaySettings()" data-en="Aa Display (language, text size)" data-hi="Aa डिस्प्ले (भाषा, अक्षर आकार)">Aa Display (language, text size)</button>
@@ -70,23 +67,23 @@
 <!-- 5-Tier Strict Global Bottom Navigation: Home, Subjects, PYQ, Test, Revision -->
 <nav id="bottomNav" aria-label="Main navigation">
   <button class="nav-tab active" id="tabHome" onclick="navigate('home')" aria-label="Home">
-    <span class="nav-tab-icon">🏠</span>
+    <span class="nav-tab-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 10l9-7 9 7v11h-6v-7H9v7H3z"/></svg></span>
     <span data-en="HOME" data-hi="होम">HOME</span>
   </button>
   <button class="nav-tab" id="tabSubjects" onclick="navigate('subjects')" aria-label="Subjects">
-    <span class="nav-tab-icon">📚</span>
+    <span class="nav-tab-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 5v16M12 5C9 3 5 3 2 4v15c3-1 7-1 10 2 3-3 7-3 10-2V4c-3-1-7-1-10 1z"/></svg></span>
     <span data-en="SUBJECTS" data-hi="विषय">SUBJECTS</span>
   </button>
   <button class="nav-tab" id="tabPYQ" onclick="navigate('exam_hub')" aria-label="Exams">
-    <span class="nav-tab-icon">🏛️</span>
+    <span class="nav-tab-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 9h18M4 9v11m5-11v11m6-11v11m5-11v11M2 21h20M2 7l10-5 10 5z"/></svg></span>
     <span data-en="EXAMS" data-hi="परीक्षा">EXAMS</span>
   </button>
   <button class="nav-tab" id="tabTest" onclick="navigate('test_hub')" aria-label="Tests">
-    <span class="nav-tab-icon">⏱️</span>
-    <span data-en="TEST" data-hi="टेस्ट">TEST</span>
+    <span class="nav-tab-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 2h6M12 6v2m0 4v4l3 2M21 14a9 9 0 1 1-18 0 9 9 0 0 1 18 0"/></svg></span>
+    <span data-en="TESTS" data-hi="टेस्ट">TESTS</span>
   </button>
   <button class="nav-tab" id="tabRevision" onclick="navigate('revision_hub')" aria-label="Revision">
-    <span class="nav-tab-icon">🔄</span>
+    <span class="nav-tab-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 10a9 9 0 1 1 1 8M3 4v6h6"/></svg></span>
     <span data-en="REVISION" data-hi="रिवीज़न">REVISION</span>
   </button>
 </nav>

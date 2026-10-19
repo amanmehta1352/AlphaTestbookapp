@@ -2,6 +2,10 @@
 # Run every test suite against the built index.html. Usage: dev/tests/run_all.sh
 cd "$(dirname "$0")"
 ROOT="$(cd ../.. && pwd)"
+if ! python3 "$ROOT/dev/app/build.py" --check; then
+  echo "✕ Generated release files are stale; rebuild before running the suites."
+  exit 1
+fi
 OUT="$(mktemp -d)"
 SITE="$OUT/AlphaTestbookapp"
 mkdir -p "$SITE"
@@ -18,14 +22,14 @@ if ! (cd "$SITE/dev/app" && python3 build.py "$SITE/admin/index.html" --studio);
   exit 1
 fi
 export MTB_SITE="$SITE"
-SUITES="test_u1_reg test_u2_v4 test_u3 test_u4a test_u4b test_u4c test_u5 test_a test_c1 test_c2 test_f1 test_clean test_pwa test_defaults test_sql_v2 test_studio test_robot test_hindi test_tagger test_profile test_v3 test_design test_keycheck test_health test_ops"
+SUITES="test_build test_u1_reg test_u2_v4 test_u3 test_u4a test_u4b test_u4c test_u5 test_a test_c1 test_c2 test_f1 test_clean test_pwa test_defaults test_sql_v2 test_studio test_robot test_hindi test_tagger test_profile test_v3 test_design test_mobile_design test_navigation test_keycheck test_health test_ops"
 fail=0
 for t in $SUITES; do
   case $t in
     test_clean) args="$APP $OUT/$t.json $PWD/old_backup.json" ;;
     test_c2) args="$OUT" ;;
     test_a) args="$APP $OUT" ;;
-    test_pwa|test_sql_v2|test_robot|test_hindi|test_tagger|test_keycheck|test_health|test_ops) args="" ;;
+    test_build|test_pwa|test_sql_v2|test_robot|test_hindi|test_tagger|test_keycheck|test_health|test_ops) args="" ;;
     test_studio|test_profile) args="$OUT" ;;
     *) args="$APP $OUT/$t.json" ;;
   esac
