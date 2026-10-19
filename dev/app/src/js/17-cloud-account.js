@@ -191,7 +191,9 @@ async function cloudSync(reason = 'manual') {
       if (CloudState.isAdmin === null || CloudState.userId !== uid) CloudState.isAdmin = await Server.checkAdmin();
       let content = null;
       if (!CloudState.isAdmin) {
-        content = typeof studentQualification === 'function' && !studentQualification()
+        const qualification = typeof studentQualification === 'function' ? studentQualification() : null;
+        const examChosen = !!(typeof studentProfile === 'function' && studentProfile()?.examId);
+        content = (!qualification || (!qualification.branch && !examChosen))
           ? await cloudPullQualificationIndex()
           : await cloudPullContent();
       }
