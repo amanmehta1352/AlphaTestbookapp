@@ -12879,8 +12879,9 @@ renderHomePage = function(v) {
     if (element) target.appendChild(element);
   };
 
-  move('.gx-hero', main);
+  // Keep the primary Continue action before the hero's daily-goal content in DOM reading order.
   move('.ao-next', main);
+  move('.gx-hero', main);
   move('.gx-quick', main);
   move('.gx-search', main);
   move('.ao-followups', side);
