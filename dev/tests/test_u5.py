@@ -109,9 +109,9 @@ with sync_playwright() as p:
     topic = page.locator('.sn-chapter.open .sn-topic').first
     if topic.count():
         topic.click()
-        rec('topic opens existing chapter route', page.evaluate("Route.page") == 'chapter' and bool(page.evaluate("Route.params && Route.params.chapter")), page.evaluate("({page:Route.page,params:Route.params})"))
+        rec('topic opens its own topic route', page.evaluate("Route.page") == 'topic' and bool(page.evaluate("Route.params && Route.params.moduleId")), page.evaluate("({page:Route.page,params:Route.params})"))
     else:
-        rec('topic opens existing chapter route', False, 'no topic button in expanded chapter')
+        rec('topic opens its own topic route', False, 'no topic button in expanded chapter')
 
     # --- Question Bank
     page.evaluate("navigate('taxonomy_explorer')")

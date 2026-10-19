@@ -173,60 +173,95 @@ function nbSubjectGroups() {
   return Array.from(map.values()).filter(g => g.qs > 0).sort((a, b) => b.qs - a.qs);
 }
 /* Subject navigation redesign — scoped only to the Subjects catalog. */
-let SubjectNavState = { selected: '', expanded: '' };
+let SubjectNavState = { selected: "", expanded: "" };
+function shFocusCatalogControl(selector, key) {
+  const control = Array.from(document.querySelectorAll(selector)).find(
+    (el) => el.dataset.catalogKey === key,
+  );
+  control?.focus({ preventScroll: true });
+  control?.scrollIntoView({ block: "nearest", inline: "nearest" });
+}
 function shSelectCatalogSubject(key) {
-  SubjectNavState.selected = String(key || '');
-  SubjectNavState.expanded = '';
+  SubjectNavState.selected = String(key || "");
+  SubjectNavState.expanded = "";
   renderView();
+  shFocusCatalogControl(".sn-tab", SubjectNavState.selected);
 }
 function shToggleCatalogChapter(key) {
-  SubjectNavState.expanded = SubjectNavState.expanded === key ? '' : key;
+  SubjectNavState.expanded = SubjectNavState.expanded === key ? "" : key;
   renderView();
+  shFocusCatalogControl(".sn-chapter-toggle", key);
 }
 function renderSubjectsCatalog(v) {
   const groups = nbSubjectGroups();
   const total = groups.reduce((n, g) => n + g.qs, 0);
-  if (!groups.some(g => g.key === SubjectNavState.selected)) SubjectNavState.selected = groups[0]?.key || '';
-  const selected = groups.find(g => g.key === SubjectNavState.selected) || null;
-  const chapters = selected ? Array.from(selected.chapters.entries()).map(([id, name]) => {
-    const mods = selected.mods.filter(m => String(m.chapter || '').trim().toLowerCase() === String(name).trim().toLowerCase());
-    return { id: String(id), name, mods, qs: mods.reduce((n, m) => n + nbModuleQCount(m), 0) };
-  }) : [];
-  const subjectTabs = groups.map(g => {
-    const active = selected && g.key === selected.key;
-    const k = g.key.toLowerCase();
-    return `<button type="button" class="sn-tab ${active ? "on" : ""}" aria-pressed="${!!active}" onclick="shSelectCatalogSubject(${nbJsAttr(g.key)})">
+  if (!groups.some((g) => g.key === SubjectNavState.selected))
+    SubjectNavState.selected = groups[0]?.key || "";
+  const selected =
+    groups.find((g) => g.key === SubjectNavState.selected) || null;
+  const chapters = selected
+    ? Array.from(selected.chapters.entries()).map(([id, name]) => {
+        const mods = selected.mods.filter(
+          (m) =>
+            (
+              String(m.chapter || "").trim() || tx("Other", "अन्य")
+            ).toLowerCase() === id,
+        );
+        return {
+          id: String(id),
+          name,
+          mods,
+          qs: mods.reduce((n, m) => n + nbModuleQCount(m), 0),
+        };
+      })
+    : [];
+  const subjectTabs = groups
+    .map((g) => {
+      const active = selected && g.key === selected.key;
+      return `<button type="button" class="sn-tab ${active ? "on" : ""}" data-catalog-key="${escapeHtml(g.key)}" aria-pressed="${!!active}" onclick="shSelectCatalogSubject(${nbJsAttr(g.key)})">
       <span class="sn-tab-icon" aria-hidden="true">${uiIcon("book")}</span>
       <span>${escapeHtml(subjectLabel(g.key))}</span><small>${g.qs} ${tx("Qs", "सवाल")}</small>
     </button>`;
-  }).join('');
-  const chapterRows = chapters.map(c => {
-    const open = SubjectNavState.expanded === c.id;
-    const topicRows = c.mods.map(m => {
-      const topic = String(m.topicTitle || m.topic || '').trim();
-      const subtopic = String(m.subtopic || '').trim();
-      const label = [topic, subtopic].filter((x, i, a) => x && a.indexOf(x) === i).join(' › ') || tx('Open topic', 'टॉपिक खोलें');
-      return `<button type="button" class="sn-topic" onclick="navigate('chapter', {subject:${nbJsAttr(selected.key)}, chapter:${nbJsAttr(c.name)}})">
-        <span class="sn-topic-dot" aria-hidden="true">•</span><span class="sn-topic-label">${escapeHtml(label)}</span><span class="sn-topic-count">${nbModuleQCount(m)} ${tx('Qs', 'सवाल')}</span><span aria-hidden="true">›</span>
+    })
+    .join("");
+  const chapterRows = chapters
+    .map((c) => {
+      const open = SubjectNavState.expanded === c.id;
+      const topicRows = c.mods
+        .map((m) => {
+          const topic = String(m.topicTitle || m.topic || "").trim();
+          const subtopic = String(m.subtopic || "").trim();
+          const label =
+            [topic, subtopic]
+              .filter((x, i, a) => x && a.indexOf(x) === i)
+              .join(" › ") || tx("Open topic", "टॉपिक खोलें");
+          return `<button type="button" class="sn-topic" onclick="navigate('topic', {moduleId:${nbJsAttr(m.moduleId)}})">
+        <span class="sn-topic-dot" aria-hidden="true">•</span><span class="sn-topic-label">${escapeHtml(label)}</span><span class="sn-topic-count">${nbModuleQCount(m)} ${tx("Qs", "सवाल")}</span><span aria-hidden="true">›</span>
       </button>`;
-    }).join('');
-    return `<section class="sn-chapter ${open ? 'open' : ''}">
-      <button type="button" class="sn-chapter-toggle" aria-expanded="${!!open}" onclick="shToggleCatalogChapter(${nbJsAttr(c.id)})">
-        <span class="sn-chapter-mark" aria-hidden="true">${open ? '−' : '+'}</span>
-        <span class="sn-chapter-main"><strong>${escapeHtml(c.name)}</strong><small>${c.mods.length} ${tx('topics', 'टॉपिक')} · ${c.qs} ${tx('questions', 'सवाल')}</small></span>
-        <span class="sn-chevron" aria-hidden="true">${open ? '⌄' : '›'}</span>
+        })
+        .join("");
+      return `<section class="sn-chapter ${open ? "open" : ""}">
+      <button type="button" class="sn-chapter-toggle" data-catalog-key="${escapeHtml(c.id)}" aria-expanded="${!!open}" onclick="shToggleCatalogChapter(${nbJsAttr(c.id)})">
+        <span class="sn-chapter-mark" aria-hidden="true">${open ? "−" : "+"}</span>
+        <span class="sn-chapter-main"><strong>${escapeHtml(c.name)}</strong><small>${c.mods.length} ${tx("topics", "टॉपिक")} · ${c.qs} ${tx("questions", "सवाल")}</small></span>
+        <span class="sn-chevron" aria-hidden="true">${open ? "⌄" : "›"}</span>
       </button>
-      ${open ? `<div class="sn-topic-list">${topicRows || `<p class="sn-empty-topic">${tx('No topics available yet.', 'अभी कोई टॉपिक उपलब्ध नहीं है।')}</p>`}</div><div class="sn-chapter-action"><button type="button" class="btn-action-sm" onclick="navigate('chapter', {subject:${nbJsAttr(selected.key)}, chapter:${nbJsAttr(c.name)}})">${tx('Open chapter', 'अध्याय खोलें')} →</button></div>` : ''}
+      ${open ? `<div class="sn-topic-list">${topicRows || `<p class="sn-empty-topic">${tx("No topics available yet.", "अभी कोई टॉपिक उपलब्ध नहीं है।")}</p>`}</div><div class="sn-chapter-action"><button type="button" class="btn-action-sm" onclick="navigate('chapter', {subject:${nbJsAttr(selected.key)}, chapter:${nbJsAttr(c.name)}})">${tx("Open chapter", "अध्याय खोलें")} →</button></div>` : ""}
     </section>`;
-  }).join('');
+    })
+    .join("");
   v.innerHTML = `
-    <div class="sc-head"><div><h1>${tx('Subjects', 'विषय')}</h1><p>${groups.length ? tx(`${groups.length} subjects · ${total} questions in this workspace`, `${groups.length} विषय · इस workspace में ${total} सवाल`) : tx('No questions available yet', 'अभी सवाल उपलब्ध नहीं हैं')}</p></div>
-      <button type="button" class="btn-action-sm" onclick="navigate('taxonomy_explorer')">🔎 ${tx('Question Bank', 'प्रश्न बैंक')}</button>
+    <div class="sc-head"><div><h1>${tx("Subjects", "विषय")}</h1><p>${groups.length ? tx(`${groups.length} subjects · ${total} questions in this workspace`, `${groups.length} विषय · इस workspace में ${total} सवाल`) : tx("No questions available yet", "अभी सवाल उपलब्ध नहीं हैं")}</p></div>
+      <button type="button" class="btn-action-sm" onclick="navigate('taxonomy_explorer')">🔎 ${tx("Question Bank", "प्रश्न बैंक")}</button>
     </div>
-    ${groups.length ? `<nav class="sn-subject-tabs" aria-label="${tx('Main subjects', 'मुख्य विषय')}" role="tablist">${subjectTabs}</nav>
-      <section class="sn-topic-panel"><div class="sn-panel-head"><div><h2>${selected ? escapeHtml(subjectLabel(selected.key)) : tx('Choose a subject', 'विषय चुनें')}</h2><p>${selected ? tx('Choose a chapter to expand its topics.', 'टॉपिक्स देखने के लिए अध्याय खोलें।') : ''}</p></div>${selected ? `<span class="sn-total">${selected.qs} ${tx('questions', 'सवाल')}</span>` : ''}</div>
+    ${
+      groups.length
+        ? `<nav class="sn-subject-tabs" aria-label="${tx("Main subjects", "मुख्य विषय")}">${subjectTabs}</nav>
+      <section class="sn-topic-panel"><div class="sn-panel-head"><div><h2>${selected ? escapeHtml(subjectLabel(selected.key)) : tx("Choose a subject", "विषय चुनें")}</h2><p>${selected ? tx("Choose a chapter to expand its topics.", "टॉपिक्स देखने के लिए अध्याय खोलें।") : ""}</p></div>${selected ? `<span class="sn-total">${selected.qs} ${tx("questions", "सवाल")}</span>` : ""}</div>
         ${chapters.length ? `<div class="sn-chapter-list">${chapterRows}</div>` : studyEmptyState()}
-      </section>` : studyEmptyState()}`;
+      </section>`
+        : studyEmptyState()
+    }`;
 }
 
 /* ---------- Question Bank ---------- */

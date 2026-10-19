@@ -1260,7 +1260,7 @@ body.native-builder-active .nb-wizard-nav .nb-row-meta{flex:1 1 auto;min-width:0
 </style>
 <meta name="phase3" content="Profile-Driven Workspace + Data Airlock"><meta name="phase3-status" content="IMPLEMENTED"><meta name="phase3-frozen" content="Phase1A Storage; Phase2 QuestionUI; CBT scoring/timer"><meta name="master-testbook-candidate" content="V2.1.8 Smart Builder repair; child of V2.1.7; parent and data contracts preserved"><meta name="release-status" content="PARTIAL-HOLD-RUNTIME-VERIFICATION-PENDING">
 <meta name="master-testbook-candidate-version" content="V2.11.0_ADMIN_STUDIO">
-<meta name="app-version" content="V3.4.4">
+<meta name="app-version" content="V3.4.5">
 
 <style id="v2-3-2-deep-functional-repair">
 /* Root cause: display:contents exposed Previous, Clear, Mark and Next as four grid items for a three-column footer. */
@@ -2565,6 +2565,69 @@ body.dark { --on-primary: #07090e; }
   padding: 12px 0;
   color: var(--text-muted);
   cursor: pointer;
+}
+
+/* Account status stays below the main task and remains readable in both themes. */
+.study-account-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 0;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.study-account-status > span {
+  flex: 1 1 180px;
+}
+.sn-topic-panel .sn-topic {
+  min-height: 48px;
+}
+.sn-tab small,
+.sn-topic-count {
+  font-size: 12px;
+}
+
+/* Solid hero surfaces keep text contrast predictable throughout the study journey. */
+:is(.student-hero-card:not(.rs-score), .rv-hero) {
+  background: var(--surface);
+  color: var(--text-main);
+  border: 1px solid var(--border);
+}
+:is(.student-hero-card:not(.rs-score), .rv-hero) h1 {
+  color: var(--text-main);
+}
+:is(.student-hero-card:not(.rs-score), .rv-hero) p {
+  color: var(--text-muted);
+  opacity: 1;
+}
+:is(.student-hero-card:not(.rs-score), .rv-hero) .journey-pill {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+.rv-hero .rv-start {
+  background: var(--primary);
+  color: var(--on-primary, #fff);
+}
+.nav-breadcrumb button,
+.bm-btn,
+.modal-close {
+  min-width: 44px;
+  min-height: 44px;
+}
+.btn-nav.primary {
+  color: var(--on-primary, #fff);
+  /* Older screens set a 40px inline minimum; preserve a 44px touch target. */
+  min-height: 44px !important;
+}
+.gx-seg button {
+  min-height: 44px;
+}
+.gx-seg button.on {
+  background: var(--primary);
+  color: var(--on-primary, #fff);
 }
 
 </style>
@@ -5479,7 +5542,7 @@ function gxBackupBanner() {
   const days =
     last && !isNaN(last) ? Math.floor((Date.now() - last) / 86400000) : null;
   if (days !== null && days < 7) return "";
-  return `<section class="gx-card gx-backup" role="status"><span aria-hidden="true">💾</span><div><strong>${days === null ? tx("Your progress is not backed up yet", "आपकी progress का backup अभी नहीं है") : tx(`Last backup ${days} days ago`, `आख़िरी backup ${days} दिन पहले`)}</strong><small>${tx("All your answers live only on this device. Save a backup file so a phone change or cleared data never erases your work.", "आपके सारे जवाब सिर्फ़ इसी phone में हैं। Backup file बचाएँ, ताकि phone बदलने या data साफ़ होने पर मेहनत न खोए।")}</small></div><button type="button" class="gx-btn" onclick="downloadDataSnapshot()">${tx("Back up", "Backup लें")}</button></section>`;
+  return `<section class="gx-card gx-backup" role="status"><span aria-hidden="true">💾</span><div><strong>${days === null ? tx("No backup file saved yet", "अभी कोई बैकअप फ़ाइल नहीं बचाई गई") : tx(`Last backup file ${days} days ago`, `आख़िरी backup ${days} दिन पहले`)}</strong><small>${tx("Save an extra copy of your progress before changing phones or clearing app data. Check Account for cloud sync status.", "फ़ोन बदलने या ऐप डेटा साफ़ करने से पहले प्रगति की एक और कॉपी बचाएँ। क्लाउड सिंक की स्थिति अकाउंट में देखें।")}</small></div><button type="button" class="gx-btn" onclick="downloadDataSnapshot()">${tx("Back up", "Backup लें")}</button></section>`;
 }
 function sjNextActions(d) {
   const actions = [];
@@ -6005,60 +6068,95 @@ function nbSubjectGroups() {
   return Array.from(map.values()).filter(g => g.qs > 0).sort((a, b) => b.qs - a.qs);
 }
 /* Subject navigation redesign — scoped only to the Subjects catalog. */
-let SubjectNavState = { selected: '', expanded: '' };
+let SubjectNavState = { selected: "", expanded: "" };
+function shFocusCatalogControl(selector, key) {
+  const control = Array.from(document.querySelectorAll(selector)).find(
+    (el) => el.dataset.catalogKey === key,
+  );
+  control?.focus({ preventScroll: true });
+  control?.scrollIntoView({ block: "nearest", inline: "nearest" });
+}
 function shSelectCatalogSubject(key) {
-  SubjectNavState.selected = String(key || '');
-  SubjectNavState.expanded = '';
+  SubjectNavState.selected = String(key || "");
+  SubjectNavState.expanded = "";
   renderView();
+  shFocusCatalogControl(".sn-tab", SubjectNavState.selected);
 }
 function shToggleCatalogChapter(key) {
-  SubjectNavState.expanded = SubjectNavState.expanded === key ? '' : key;
+  SubjectNavState.expanded = SubjectNavState.expanded === key ? "" : key;
   renderView();
+  shFocusCatalogControl(".sn-chapter-toggle", key);
 }
 function renderSubjectsCatalog(v) {
   const groups = nbSubjectGroups();
   const total = groups.reduce((n, g) => n + g.qs, 0);
-  if (!groups.some(g => g.key === SubjectNavState.selected)) SubjectNavState.selected = groups[0]?.key || '';
-  const selected = groups.find(g => g.key === SubjectNavState.selected) || null;
-  const chapters = selected ? Array.from(selected.chapters.entries()).map(([id, name]) => {
-    const mods = selected.mods.filter(m => String(m.chapter || '').trim().toLowerCase() === String(name).trim().toLowerCase());
-    return { id: String(id), name, mods, qs: mods.reduce((n, m) => n + nbModuleQCount(m), 0) };
-  }) : [];
-  const subjectTabs = groups.map(g => {
-    const active = selected && g.key === selected.key;
-    const k = g.key.toLowerCase();
-    return `<button type="button" class="sn-tab ${active ? "on" : ""}" aria-pressed="${!!active}" onclick="shSelectCatalogSubject(${nbJsAttr(g.key)})">
+  if (!groups.some((g) => g.key === SubjectNavState.selected))
+    SubjectNavState.selected = groups[0]?.key || "";
+  const selected =
+    groups.find((g) => g.key === SubjectNavState.selected) || null;
+  const chapters = selected
+    ? Array.from(selected.chapters.entries()).map(([id, name]) => {
+        const mods = selected.mods.filter(
+          (m) =>
+            (
+              String(m.chapter || "").trim() || tx("Other", "अन्य")
+            ).toLowerCase() === id,
+        );
+        return {
+          id: String(id),
+          name,
+          mods,
+          qs: mods.reduce((n, m) => n + nbModuleQCount(m), 0),
+        };
+      })
+    : [];
+  const subjectTabs = groups
+    .map((g) => {
+      const active = selected && g.key === selected.key;
+      return `<button type="button" class="sn-tab ${active ? "on" : ""}" data-catalog-key="${escapeHtml(g.key)}" aria-pressed="${!!active}" onclick="shSelectCatalogSubject(${nbJsAttr(g.key)})">
       <span class="sn-tab-icon" aria-hidden="true">${uiIcon("book")}</span>
       <span>${escapeHtml(subjectLabel(g.key))}</span><small>${g.qs} ${tx("Qs", "सवाल")}</small>
     </button>`;
-  }).join('');
-  const chapterRows = chapters.map(c => {
-    const open = SubjectNavState.expanded === c.id;
-    const topicRows = c.mods.map(m => {
-      const topic = String(m.topicTitle || m.topic || '').trim();
-      const subtopic = String(m.subtopic || '').trim();
-      const label = [topic, subtopic].filter((x, i, a) => x && a.indexOf(x) === i).join(' › ') || tx('Open topic', 'टॉपिक खोलें');
-      return `<button type="button" class="sn-topic" onclick="navigate('chapter', {subject:${nbJsAttr(selected.key)}, chapter:${nbJsAttr(c.name)}})">
-        <span class="sn-topic-dot" aria-hidden="true">•</span><span class="sn-topic-label">${escapeHtml(label)}</span><span class="sn-topic-count">${nbModuleQCount(m)} ${tx('Qs', 'सवाल')}</span><span aria-hidden="true">›</span>
+    })
+    .join("");
+  const chapterRows = chapters
+    .map((c) => {
+      const open = SubjectNavState.expanded === c.id;
+      const topicRows = c.mods
+        .map((m) => {
+          const topic = String(m.topicTitle || m.topic || "").trim();
+          const subtopic = String(m.subtopic || "").trim();
+          const label =
+            [topic, subtopic]
+              .filter((x, i, a) => x && a.indexOf(x) === i)
+              .join(" › ") || tx("Open topic", "टॉपिक खोलें");
+          return `<button type="button" class="sn-topic" onclick="navigate('topic', {moduleId:${nbJsAttr(m.moduleId)}})">
+        <span class="sn-topic-dot" aria-hidden="true">•</span><span class="sn-topic-label">${escapeHtml(label)}</span><span class="sn-topic-count">${nbModuleQCount(m)} ${tx("Qs", "सवाल")}</span><span aria-hidden="true">›</span>
       </button>`;
-    }).join('');
-    return `<section class="sn-chapter ${open ? 'open' : ''}">
-      <button type="button" class="sn-chapter-toggle" aria-expanded="${!!open}" onclick="shToggleCatalogChapter(${nbJsAttr(c.id)})">
-        <span class="sn-chapter-mark" aria-hidden="true">${open ? '−' : '+'}</span>
-        <span class="sn-chapter-main"><strong>${escapeHtml(c.name)}</strong><small>${c.mods.length} ${tx('topics', 'टॉपिक')} · ${c.qs} ${tx('questions', 'सवाल')}</small></span>
-        <span class="sn-chevron" aria-hidden="true">${open ? '⌄' : '›'}</span>
+        })
+        .join("");
+      return `<section class="sn-chapter ${open ? "open" : ""}">
+      <button type="button" class="sn-chapter-toggle" data-catalog-key="${escapeHtml(c.id)}" aria-expanded="${!!open}" onclick="shToggleCatalogChapter(${nbJsAttr(c.id)})">
+        <span class="sn-chapter-mark" aria-hidden="true">${open ? "−" : "+"}</span>
+        <span class="sn-chapter-main"><strong>${escapeHtml(c.name)}</strong><small>${c.mods.length} ${tx("topics", "टॉपिक")} · ${c.qs} ${tx("questions", "सवाल")}</small></span>
+        <span class="sn-chevron" aria-hidden="true">${open ? "⌄" : "›"}</span>
       </button>
-      ${open ? `<div class="sn-topic-list">${topicRows || `<p class="sn-empty-topic">${tx('No topics available yet.', 'अभी कोई टॉपिक उपलब्ध नहीं है।')}</p>`}</div><div class="sn-chapter-action"><button type="button" class="btn-action-sm" onclick="navigate('chapter', {subject:${nbJsAttr(selected.key)}, chapter:${nbJsAttr(c.name)}})">${tx('Open chapter', 'अध्याय खोलें')} →</button></div>` : ''}
+      ${open ? `<div class="sn-topic-list">${topicRows || `<p class="sn-empty-topic">${tx("No topics available yet.", "अभी कोई टॉपिक उपलब्ध नहीं है।")}</p>`}</div><div class="sn-chapter-action"><button type="button" class="btn-action-sm" onclick="navigate('chapter', {subject:${nbJsAttr(selected.key)}, chapter:${nbJsAttr(c.name)}})">${tx("Open chapter", "अध्याय खोलें")} →</button></div>` : ""}
     </section>`;
-  }).join('');
+    })
+    .join("");
   v.innerHTML = `
-    <div class="sc-head"><div><h1>${tx('Subjects', 'विषय')}</h1><p>${groups.length ? tx(`${groups.length} subjects · ${total} questions in this workspace`, `${groups.length} विषय · इस workspace में ${total} सवाल`) : tx('No questions available yet', 'अभी सवाल उपलब्ध नहीं हैं')}</p></div>
-      <button type="button" class="btn-action-sm" onclick="navigate('taxonomy_explorer')">🔎 ${tx('Question Bank', 'प्रश्न बैंक')}</button>
+    <div class="sc-head"><div><h1>${tx("Subjects", "विषय")}</h1><p>${groups.length ? tx(`${groups.length} subjects · ${total} questions in this workspace`, `${groups.length} विषय · इस workspace में ${total} सवाल`) : tx("No questions available yet", "अभी सवाल उपलब्ध नहीं हैं")}</p></div>
+      <button type="button" class="btn-action-sm" onclick="navigate('taxonomy_explorer')">🔎 ${tx("Question Bank", "प्रश्न बैंक")}</button>
     </div>
-    ${groups.length ? `<nav class="sn-subject-tabs" aria-label="${tx('Main subjects', 'मुख्य विषय')}" role="tablist">${subjectTabs}</nav>
-      <section class="sn-topic-panel"><div class="sn-panel-head"><div><h2>${selected ? escapeHtml(subjectLabel(selected.key)) : tx('Choose a subject', 'विषय चुनें')}</h2><p>${selected ? tx('Choose a chapter to expand its topics.', 'टॉपिक्स देखने के लिए अध्याय खोलें।') : ''}</p></div>${selected ? `<span class="sn-total">${selected.qs} ${tx('questions', 'सवाल')}</span>` : ''}</div>
+    ${
+      groups.length
+        ? `<nav class="sn-subject-tabs" aria-label="${tx("Main subjects", "मुख्य विषय")}">${subjectTabs}</nav>
+      <section class="sn-topic-panel"><div class="sn-panel-head"><div><h2>${selected ? escapeHtml(subjectLabel(selected.key)) : tx("Choose a subject", "विषय चुनें")}</h2><p>${selected ? tx("Choose a chapter to expand its topics.", "टॉपिक्स देखने के लिए अध्याय खोलें।") : ""}</p></div>${selected ? `<span class="sn-total">${selected.qs} ${tx("questions", "सवाल")}</span>` : ""}</div>
         ${chapters.length ? `<div class="sn-chapter-list">${chapterRows}</div>` : studyEmptyState()}
-      </section>` : studyEmptyState()}`;
+      </section>`
+        : studyEmptyState()
+    }`;
 }
 
 /* ---------- Question Bank ---------- */
@@ -7281,7 +7379,7 @@ function cloudSheetHtml() {
   const s = ServerState.session;
   const msg = CloudState.msg ? `<div class="srv-msg ${CloudState.msgKind}" role="status">${escapeHtml(CloudState.msg)}</div>` : '';
   if (!s) return `${msg}
-    <div class="cl-hero"><b>अपना account बनाइए</b><span>Google से login करने पर सारे सवाल server से आते हैं, और आपकी progress — जवाब, टेस्ट, bookmark, लक्ष्य — सुरक्षित रहती है। फ़ोन बदलें तो login करते ही सब वापस।</span></div>
+    <div class="cl-hero"><b>अपना account बनाइए</b><span>Google से login करने पर आपकी परीक्षा के प्रकाशित सवाल डाउनलोड होते हैं। सफल sync के बाद जवाब, टेस्ट, bookmark और लक्ष्य दूसरे फ़ोन पर वापस मिल सकते हैं। Guest mode में इस डिवाइस पर सहेजे सवाल ही दिखते हैं।</span></div>
     <button type="button" class="cl-google" onclick="cloudLoginGoogle()" ${cloudOnline() ? '' : 'disabled'}><span class="g">G</span> Google से login करें</button>
     ${cloudOnline() ? '' : '<p class="srv-note">Login सिर्फ़ install वाले ऐप या link में चलता है, फ़ोन में खोली file में नहीं।</p>'}
     <button type="button" class="btn-action-sm" onclick="closeModal();openServerSync()">Admin? Email से login</button>`;
@@ -7304,12 +7402,23 @@ async function cloudLogout() {
 }
 // Home: a gentle prompt until the student logs in
 function cloudHomePrompt() {
-  if (Route?.page !== 'home' || ServerState.session || !cloudOnline() || WorkspaceManager.current().type === 'BOARD') return;
-  const v = document.getElementById('mainView'); if (!v || v.querySelector('.cl-prompt')) return;
-  const el = document.createElement('button'); el.type = 'button'; el.className = 'cl-prompt'; el.onclick = openAccount;
-  el.innerHTML = `<span class="g">G</span><span><b>Google से login करें</b><small>सारे सवाल पाएँ और progress सुरक्षित रखें</small></span><span aria-hidden="true">›</span>`;
+  if (
+    Route?.page !== "home" ||
+    ServerState.session ||
+    !cloudOnline() ||
+    WorkspaceManager.current().type === "BOARD"
+  )
+    return;
+  const v = document.getElementById("mainView");
+  if (!v || v.querySelector(".cl-prompt")) return;
+  const el = document.createElement("button");
+  el.type = "button";
+  el.className = "cl-prompt";
+  el.onclick = openAccount;
+  el.innerHTML = `<span class="g">G</span><span><b>${tx("Sign in with Google", "Google से login करें")}</b><small>${tx("Download published questions for your exam and sync progress", "अपनी परीक्षा के प्रकाशित सवाल डाउनलोड करें और प्रगति सिंक करें")}</small></span><span aria-hidden="true">›</span>`;
   v.prepend(el);
 }
+
 async function cloudBoot() {
   await cloudLoadState();
   Server.loadSession();
@@ -7678,6 +7787,8 @@ registerViewHook("after", "study-context", () => {
       "native_builder",
       "test_hub",
       "pyq_hub",
+      "home",
+      "me",
     ].includes(Route.page)
   )
     return;
@@ -7686,7 +7797,14 @@ registerViewHook("after", "study-context", () => {
     view
       .querySelector(".sb-top")
       ?.insertAdjacentHTML("afterend", studyContextHtml());
-  else view.insertAdjacentHTML("afterbegin", studyContextHtml());
+  else if (["home", "me"].includes(Route.page)) {
+    view
+      .querySelector(Route.page === "home" ? ".gx-hero" : ".me-head")
+      ?.insertAdjacentHTML(
+        "afterend",
+        `<aside class="study-account-status" aria-label="${tx("Account and sync", "अकाउंट और सिंक")}"><span data-study-sync role="status" aria-live="polite">${escapeHtml(studySyncLabel())}</span><button type="button" class="study-action" onclick="openAccount()">${ServerState.session ? tx("Account", "अकाउंट") : tx("Sign in", "लॉगिन करें")}</button></aside>`,
+      );
+  } else view.insertAdjacentHTML("afterbegin", studyContextHtml());
 });
 window.addEventListener("online", refreshStudyFeedback);
 window.addEventListener("offline", refreshStudyFeedback);

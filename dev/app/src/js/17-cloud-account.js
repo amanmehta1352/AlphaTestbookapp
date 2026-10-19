@@ -199,7 +199,7 @@ function cloudSheetHtml() {
   const s = ServerState.session;
   const msg = CloudState.msg ? `<div class="srv-msg ${CloudState.msgKind}" role="status">${escapeHtml(CloudState.msg)}</div>` : '';
   if (!s) return `${msg}
-    <div class="cl-hero"><b>अपना account बनाइए</b><span>Google से login करने पर सारे सवाल server से आते हैं, और आपकी progress — जवाब, टेस्ट, bookmark, लक्ष्य — सुरक्षित रहती है। फ़ोन बदलें तो login करते ही सब वापस।</span></div>
+    <div class="cl-hero"><b>अपना account बनाइए</b><span>Google से login करने पर आपकी परीक्षा के प्रकाशित सवाल डाउनलोड होते हैं। सफल sync के बाद जवाब, टेस्ट, bookmark और लक्ष्य दूसरे फ़ोन पर वापस मिल सकते हैं। Guest mode में इस डिवाइस पर सहेजे सवाल ही दिखते हैं।</span></div>
     <button type="button" class="cl-google" onclick="cloudLoginGoogle()" ${cloudOnline() ? '' : 'disabled'}><span class="g">G</span> Google से login करें</button>
     ${cloudOnline() ? '' : '<p class="srv-note">Login सिर्फ़ install वाले ऐप या link में चलता है, फ़ोन में खोली file में नहीं।</p>'}
     <button type="button" class="btn-action-sm" onclick="closeModal();openServerSync()">Admin? Email से login</button>`;
@@ -222,12 +222,23 @@ async function cloudLogout() {
 }
 // Home: a gentle prompt until the student logs in
 function cloudHomePrompt() {
-  if (Route?.page !== 'home' || ServerState.session || !cloudOnline() || WorkspaceManager.current().type === 'BOARD') return;
-  const v = document.getElementById('mainView'); if (!v || v.querySelector('.cl-prompt')) return;
-  const el = document.createElement('button'); el.type = 'button'; el.className = 'cl-prompt'; el.onclick = openAccount;
-  el.innerHTML = `<span class="g">G</span><span><b>Google से login करें</b><small>सारे सवाल पाएँ और progress सुरक्षित रखें</small></span><span aria-hidden="true">›</span>`;
+  if (
+    Route?.page !== "home" ||
+    ServerState.session ||
+    !cloudOnline() ||
+    WorkspaceManager.current().type === "BOARD"
+  )
+    return;
+  const v = document.getElementById("mainView");
+  if (!v || v.querySelector(".cl-prompt")) return;
+  const el = document.createElement("button");
+  el.type = "button";
+  el.className = "cl-prompt";
+  el.onclick = openAccount;
+  el.innerHTML = `<span class="g">G</span><span><b>${tx("Sign in with Google", "Google से login करें")}</b><small>${tx("Download published questions for your exam and sync progress", "अपनी परीक्षा के प्रकाशित सवाल डाउनलोड करें और प्रगति सिंक करें")}</small></span><span aria-hidden="true">›</span>`;
   v.prepend(el);
 }
+
 async function cloudBoot() {
   await cloudLoadState();
   Server.loadSession();

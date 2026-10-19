@@ -54,6 +54,15 @@ with sync_playwright() as p:
         pg.evaluate(f"document.body.classList.toggle('dark',{str(dark).lower()})"); pg.evaluate("navigate('home')"); pg.wait_for_timeout(200)
         c1 = pg.evaluate(f"({CONTRAST})('.gx-hero h1')"); c2 = pg.evaluate(f"({CONTRAST})('.gx-hero p')"); c3 = pg.evaluate(f"({CONTRAST})('#bottomNav .nav-tab.active')")
         rec(f'{"dark" if dark else "light"}: text contrast ≥ 4.5 (title, body, active tab)', min(c1, c2, c3) >= 4.5, (round(c1, 1), round(c2, 1), round(c3, 1)))
+        rec(f'{"dark" if dark else "light"}: active focus mode contrast ≥ 4.5', pg.evaluate(f"({CONTRAST})('.gx-seg button.on')") >= 4.5)
+        for route, hero in [('test_hub', '.student-hero-card'), ('revision_hub', '.rv-hero')]:
+            pg.evaluate(f"navigate('{route}')")
+            values = [pg.evaluate(f"({CONTRAST})('{hero} {child}')") for child in ['h1', 'p', '.journey-pill']]
+            rec(f'{"dark" if dark else "light"}: {route} hero text contrast ≥ 4.5', min(values) >= 4.5, values)
+        for route in ['test_hub', 'taxonomy_explorer']:
+            pg.evaluate(f"navigate('{route}')")
+            contrast = pg.evaluate(f"({CONTRAST})('.btn-nav.primary')")
+            rec(f'{"dark" if dark else "light"}: {route} primary action contrast ≥ 4.5', contrast >= 4.5, contrast)
     pg.evaluate("document.body.classList.remove('dark')")
     # CBT confidence
     pg.evaluate("(()=>{const m=getWorkspaceModule('maths-percentage-class-test');initTestSession(m.moduleId,m.groups[0].groupId,0)})()"); pg.wait_for_timeout(400)

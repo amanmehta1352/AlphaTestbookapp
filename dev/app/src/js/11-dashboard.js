@@ -301,7 +301,7 @@ function gxBackupBanner() {
   const days =
     last && !isNaN(last) ? Math.floor((Date.now() - last) / 86400000) : null;
   if (days !== null && days < 7) return "";
-  return `<section class="gx-card gx-backup" role="status"><span aria-hidden="true">💾</span><div><strong>${days === null ? tx("Your progress is not backed up yet", "आपकी progress का backup अभी नहीं है") : tx(`Last backup ${days} days ago`, `आख़िरी backup ${days} दिन पहले`)}</strong><small>${tx("All your answers live only on this device. Save a backup file so a phone change or cleared data never erases your work.", "आपके सारे जवाब सिर्फ़ इसी phone में हैं। Backup file बचाएँ, ताकि phone बदलने या data साफ़ होने पर मेहनत न खोए।")}</small></div><button type="button" class="gx-btn" onclick="downloadDataSnapshot()">${tx("Back up", "Backup लें")}</button></section>`;
+  return `<section class="gx-card gx-backup" role="status"><span aria-hidden="true">💾</span><div><strong>${days === null ? tx("No backup file saved yet", "अभी कोई बैकअप फ़ाइल नहीं बचाई गई") : tx(`Last backup file ${days} days ago`, `आख़िरी backup ${days} दिन पहले`)}</strong><small>${tx("Save an extra copy of your progress before changing phones or clearing app data. Check Account for cloud sync status.", "फ़ोन बदलने या ऐप डेटा साफ़ करने से पहले प्रगति की एक और कॉपी बचाएँ। क्लाउड सिंक की स्थिति अकाउंट में देखें।")}</small></div><button type="button" class="gx-btn" onclick="downloadDataSnapshot()">${tx("Back up", "Backup लें")}</button></section>`;
 }
 function sjNextActions(d) {
   const actions = [];

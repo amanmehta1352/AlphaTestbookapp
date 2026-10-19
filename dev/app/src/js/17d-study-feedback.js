@@ -194,6 +194,8 @@ registerViewHook("after", "study-context", () => {
       "native_builder",
       "test_hub",
       "pyq_hub",
+      "home",
+      "me",
     ].includes(Route.page)
   )
     return;
@@ -202,7 +204,14 @@ registerViewHook("after", "study-context", () => {
     view
       .querySelector(".sb-top")
       ?.insertAdjacentHTML("afterend", studyContextHtml());
-  else view.insertAdjacentHTML("afterbegin", studyContextHtml());
+  else if (["home", "me"].includes(Route.page)) {
+    view
+      .querySelector(Route.page === "home" ? ".gx-hero" : ".me-head")
+      ?.insertAdjacentHTML(
+        "afterend",
+        `<aside class="study-account-status" aria-label="${tx("Account and sync", "अकाउंट और सिंक")}"><span data-study-sync role="status" aria-live="polite">${escapeHtml(studySyncLabel())}</span><button type="button" class="study-action" onclick="openAccount()">${ServerState.session ? tx("Account", "अकाउंट") : tx("Sign in", "लॉगिन करें")}</button></aside>`,
+      );
+  } else view.insertAdjacentHTML("afterbegin", studyContextHtml());
 });
 window.addEventListener("online", refreshStudyFeedback);
 window.addEventListener("offline", refreshStudyFeedback);
