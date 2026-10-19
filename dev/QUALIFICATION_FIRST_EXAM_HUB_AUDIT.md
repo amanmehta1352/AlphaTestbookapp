@@ -22,6 +22,7 @@ Repository scope: primary AlphaTestbookapp only. Control Room was excluded.
 ## Data and eligibility guardrails
 
 - Branch availability and counts are derived from indexed rows currently visible through the student session and RLS; no question row is changed by this feature.
+- Before a student chooses a qualification, login sync fetches only exam/subject metadata for the profile index; full stems/options are not pulled into the device question bank. After a qualification is saved, the existing branch filter selects the relevant published content.
 - Common subjects are retained by the existing branch filter, but after an exam is selected the content is scoped to that exam and the selected branch plus common subjects.
 - Matching question coverage is not proof of official recruitment eligibility. The app explicitly tells students to verify the current official notification.
 - For non-technical levels, this patch stores qualification but does not invent an official qualification-to-exam eligibility table. A validated eligibility catalogue is a separate data requirement.
