@@ -1260,7 +1260,7 @@ body.native-builder-active .nb-wizard-nav .nb-row-meta{flex:1 1 auto;min-width:0
 </style>
 <meta name="phase3" content="Profile-Driven Workspace + Data Airlock"><meta name="phase3-status" content="IMPLEMENTED"><meta name="phase3-frozen" content="Phase1A Storage; Phase2 QuestionUI; CBT scoring/timer"><meta name="master-testbook-candidate" content="V2.1.8 Smart Builder repair; child of V2.1.7; parent and data contracts preserved"><meta name="release-status" content="PARTIAL-HOLD-RUNTIME-VERIFICATION-PENDING">
 <meta name="master-testbook-candidate-version" content="V2.11.0_ADMIN_STUDIO">
-<meta name="app-version" content="V3.4.5">
+<meta name="app-version" content="V3.4.6">
 
 <style id="v2-3-2-deep-functional-repair">
 /* Root cause: display:contents exposed Previous, Clear, Mark and Next as four grid items for a three-column footer. */
@@ -7374,20 +7374,26 @@ async function cloudSync(reason = 'manual') {
 }
 
 /* ---------- account sheet ---------- */
-function cloudPaint() { const el = document.getElementById('cloudSheet'); if (el) el.innerHTML = cloudSheetHtml(); }
+function cloudPaint() {
+  const el = document.getElementById("cloudSheet");
+  if (el) el.innerHTML = cloudSheetHtml();
+}
 function cloudSheetHtml() {
   const s = ServerState.session;
-  const msg = CloudState.msg ? `<div class="srv-msg ${CloudState.msgKind}" role="status">${escapeHtml(CloudState.msg)}</div>` : '';
-  if (!s) return `${msg}
-    <div class="cl-hero"><b>अपना account बनाइए</b><span>Google से login करने पर आपकी परीक्षा के प्रकाशित सवाल डाउनलोड होते हैं। सफल sync के बाद जवाब, टेस्ट, bookmark और लक्ष्य दूसरे फ़ोन पर वापस मिल सकते हैं। Guest mode में इस डिवाइस पर सहेजे सवाल ही दिखते हैं।</span></div>
-    <button type="button" class="cl-google" onclick="cloudLoginGoogle()" ${cloudOnline() ? '' : 'disabled'}><span class="g">G</span> Google से login करें</button>
-    ${cloudOnline() ? '' : '<p class="srv-note">Login सिर्फ़ install वाले ऐप या link में चलता है, फ़ोन में खोली file में नहीं।</p>'}
+  const msg = CloudState.msg
+    ? `<div class="srv-msg ${CloudState.msgKind}" role="status">${escapeHtml(CloudState.msg)}</div>`
+    : "";
+  if (!s)
+    return `${msg}
+    <div class="cl-hero"><b>अपना account बनाइए</b><span>${tx("Signing in with Google downloads published questions for your exam. After a successful sync, your answers, tests, bookmarks and goals can be restored on another phone. Guest mode shows only questions saved on this device.", "Google से login करने पर आपकी परीक्षा के प्रकाशित सवाल डाउनलोड होते हैं। सफल sync के बाद जवाब, टेस्ट, bookmark और लक्ष्य दूसरे फ़ोन पर वापस मिल सकते हैं। Guest mode में इस डिवाइस पर सहेजे सवाल ही दिखते हैं।")}</span></div>
+    <button type="button" class="cl-google" onclick="cloudLoginGoogle()" ${cloudOnline() ? "" : "disabled"}><span class="g">G</span> Google से login करें</button>
+    ${cloudOnline() ? "" : '<p class="srv-note">Login सिर्फ़ install वाले ऐप या link में चलता है, फ़ोन में खोली file में नहीं।</p>'}
     <button type="button" class="btn-action-sm" onclick="closeModal();openServerSync()">Admin? Email से login</button>`;
   return `${msg}
-    <div class="cl-user"><span class="cl-avatar" aria-hidden="true">${escapeHtml((CloudState.name || s.email || '?').trim().charAt(0).toUpperCase())}</span><span><b>${escapeHtml(CloudState.name || s.email || 'Login हो गया')}</b><small>${escapeHtml(s.email || '')}${CloudState.isAdmin ? ' · Admin' : ''}</small></span></div>
-    <div class="cl-stats"><span><b>${CloudState.lastSyncAt ? fmtWhen(CloudState.lastSyncAt) : '—'}</b>आख़िरी sync</span><span><b>${CloudState.isAdmin ? '—' : (CloudState.serverQuestions || 0)}</b>server के सवाल</span><span><b>${AttemptHistory.filter(a => !a.synced && !a.syncSkip).length}</b>भेजने बाकी</span></div>
-    ${CloudState.isAdmin ? '<p class="srv-note">आप admin हैं: इस फ़ोन पर server से सवाल नहीं आते। सवाल डालने, जाँचने और publish करने के लिए <a href="admin/">🛠️ Admin Studio</a> खोलें। आपकी progress यहाँ से sync होती है।</p>' : ''}
-    <button type="button" class="btn-nav primary srv-wide" onclick="cloudSync('manual')" ${CloudState.busy ? 'disabled' : ''}>${CloudState.busy ? '⏳ Sync हो रहा है…' : '🔄 अभी sync करें'}</button>
+    <div class="cl-user"><span class="cl-avatar" aria-hidden="true">${escapeHtml((CloudState.name || s.email || "?").trim().charAt(0).toUpperCase())}</span><span><b>${escapeHtml(CloudState.name || s.email || "Login हो गया")}</b><small>${escapeHtml(s.email || "")}${CloudState.isAdmin ? " · Admin" : ""}</small></span></div>
+    <div class="cl-stats"><span><b>${CloudState.lastSyncAt ? fmtWhen(CloudState.lastSyncAt) : "—"}</b>आख़िरी sync</span><span><b>${CloudState.isAdmin ? "—" : CloudState.serverQuestions || 0}</b>server के सवाल</span><span><b>${AttemptHistory.filter((a) => !a.synced && !a.syncSkip).length}</b>भेजने बाकी</span></div>
+    ${CloudState.isAdmin ? '<p class="srv-note">आप admin हैं: इस फ़ोन पर server से सवाल नहीं आते। सवाल डालने, जाँचने और publish करने के लिए <a href="admin/">🛠️ Admin Studio</a> खोलें। आपकी progress यहाँ से sync होती है।</p>' : ""}
+    <button type="button" class="btn-nav primary srv-wide" onclick="cloudSync('manual')" ${CloudState.busy ? "disabled" : ""}>${CloudState.busy ? "⏳ Sync हो रहा है…" : "🔄 अभी sync करें"}</button>
     <p class="srv-note">ऐप खुलते समय और हर 10 मिनट में अपने-आप sync होता है। बिना internet के जो करेंगे, वह internet आने पर भेजा जाएगा। (Revision cards अभी सिर्फ़ इसी फ़ोन में रहते हैं।)</p>
     <button type="button" class="btn-action-sm" onclick="cloudLogout()">Logout</button>`;
 }
