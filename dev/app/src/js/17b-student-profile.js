@@ -39,7 +39,7 @@ const QualificationRules = {
     Object.values(idx).forEach(ex => Object.entries(ex.branches || {}).forEach(([b, n]) => {
       counts[b] = (counts[b] || 0) + (Number(n) || 0);
     }));
-    return this.branches.map(b => ({ ...b, count: counts[b.id] || 0 })).filter(b => !known || b.count > 0);
+    return this.branches.map(b => ({ ...b, count: counts[b.id] || 0 }));
   },
   needsBranch(level) { return ['iti', 'diploma', 'graduate', 'postgraduate'].includes(level); }
 };
