@@ -9656,7 +9656,7 @@ function renderTopicHubPage(v, moduleId) {
         <div class="intent-tile-action" style="color:#06b6d4;">Explore Archive ➔</div>
       </div>
 
-      <div class="intent-tile test" onclick="initTestSession('${mod.moduleId}', '${mod.groups[0]?.groupId || ''}', 0)">
+      <div class="intent-tile test" onclick="initTestSession(${nbJsAttr(mod.moduleId)}, ${nbJsAttr(mod.groups[0]?.groupId || '')}, 0)">
         <div>
           <div class="intent-tile-header">
             <span class="intent-tile-title">⏱️ TEST</span>
@@ -9701,7 +9701,7 @@ function renderTopicHubPage(v, moduleId) {
             <button class="btn-nav secondary" style="flex:1; min-height:38px; font-size:12px; padding:6px;" onclick="navigate('practice', {moduleId:'${mod.moduleId}', qIndex:0})">
               Drill
             </button>
-            <button class="btn-nav primary" style="flex:1; min-height:38px; font-size:12px; padding:6px;" onclick="initTestSession('${mod.moduleId}', '${g.groupId}', 0)">
+            <button class="btn-nav primary" style="flex:1; min-height:38px; font-size:12px; padding:6px;" onclick="initTestSession(${nbJsAttr(mod.moduleId)}, ${nbJsAttr(g.groupId)}, 0)">
               CBT Test
             </button>
           </div>
@@ -9806,10 +9806,10 @@ function renderGlobalTestHub(v) {
     ${mod ? `<div class="resume-action-card ao-primary-card">
       <div class="resume-info">
         <span class="resume-badge">🎯 READY ASSESSMENT</span>
-        <div class="resume-title">${mod.topicTitle} — ${group.title || 'G-01'}</div>
+        <div class="resume-title">${escapeHtml(mod.topicTitle)} — ${group.title || 'G-01'}</div>
         <div class="resume-subtitle">${Number(exam?.defaultDurationMinutes) || 30} ${tx('Mins', 'मिनट')} • ${group.questions.length} ${tx('Questions', 'सवाल')}</div>
       </div>
-      <button class="btn-nav primary" style="min-height:40px; padding:8px 14px; font-size:13px;" onclick="initTestSession('${mod.moduleId}', '${group.groupId || ''}', 0, null, {curriculumContext:true})">
+      <button class="btn-nav primary" style="min-height:40px; padding:8px 14px; font-size:13px;" onclick="initTestSession(${nbJsAttr(mod.moduleId)}, ${nbJsAttr(group.groupId || '')}, 0, null, {curriculumContext:true})">
         ${tx('Start Test', 'टेस्ट शुरू करें')} ➔
       </button>
     </div>` : `<div class="sj-empty"><strong>${tx('No tests available yet', 'अभी कोई टेस्ट उपलब्ध नहीं है')}</strong><span>${tx('Choose your exam and sync its questions to start.', 'शुरू करने के लिए अपनी परीक्षा चुनें और सवाल सिंक करें।')}</span><button type="button" class="btn-nav primary" onclick="navigate('me')">${tx('Open exam settings', 'परीक्षा सेटिंग खोलें')} →</button></div>`}
@@ -9827,12 +9827,12 @@ function renderGlobalTestHub(v) {
       ${assessments.map(({mod: m, group: g}) => `
         <div class="card-btn">
           <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-            <strong>${m.topicTitle}</strong>
+            <strong>${escapeHtml(m.topicTitle)}</strong>
             <span class="mastery-badge good">${m.groups.filter(group => group.questions?.length).length} Tests</span>
           </div>
-          <small>${m.subjectTitle} • Class Test Series</small>
+          <small>${escapeHtml(m.subjectTitle)} • Class Test Series</small>
           <div style="margin-top:12px;">
-            <button class="btn-nav primary" style="width:100%; min-height:40px; font-size:12px;" onclick="initTestSession('${m.moduleId}', '${g.groupId}', 0, null, {curriculumContext:true})">
+            <button class="btn-nav primary" style="width:100%; min-height:40px; font-size:12px;" onclick="initTestSession(${nbJsAttr(m.moduleId)}, ${nbJsAttr(g.groupId)}, 0, null, {curriculumContext:true})">
               Launch ${g.title || 'G-01'} CBT Test ➔
             </button>
           </div>
