@@ -1,21 +1,88 @@
-"""Join src/ (manifest.json order) into one app file: python3 build.py out.html [version] [--studio]
---studio builds the Admin Studio page (admin/index.html): same code, boots studioBoot() instead of the app."""
-import json, sys, re
-m = json.load(open('manifest.json', encoding='utf-8'))
-out, script_open = [], False
-for p in m['parts']:
-    body = open(p['file'], encoding='utf-8').read()
-    if p.get('script') and not script_open: out.append('<script>'); script_open = True
-    if not p.get('script') and script_open: out.append('</script>'); script_open = False
-    if 'wrap' in p: out += [p['wrap'][0], body, p['wrap'][1]]
-    else: out.append(body)
-html = '\n'.join(out)
-if len(sys.argv) > 2 and not sys.argv[2].startswith('--'):
-    html = re.sub(r'(<meta name="app-version" content=")[^"]*(")', r'\g<1>' + sys.argv[2] + r'\2', html)
-if '--studio' in sys.argv:
-    html = html.replace('<head>', '<head>\n<script>window.MTB_STUDIO = true;</script>\n<meta name="robots" content="noindex">', 1)
-    html = html.replace('<title>TestBook</title>', '<title>TestBook Admin Studio</title>', 1)
-    html = html.replace('<link rel="manifest" href="manifest.webmanifest">', '', 1)
-    html = re.sub(r'href="(icon-192\.png|apple-touch-icon\.png)"', r'href="../\1"', html)
-open(sys.argv[1], 'w', encoding='utf-8').write(html)
-print('built', sys.argv[1], len(html), 'chars')
+"""Build the student/Admin Studio HTML, or check both release files for drift."""
+
+import argparse
+import json
+from pathlib import Path
+import re
+
+APP = Path(__file__).resolve().parent
+ROOT = APP.parent.parent
+
+
+def render(version=None, studio=False):
+    """Assemble UTF-8 release bytes with optional version and studio overrides."""
+    manifest = json.loads((APP / "manifest.json").read_text(encoding="utf-8"))
+    parts, script_open = [], False
+    for part in manifest["parts"]:
+        body = (APP / part["file"]).read_text(encoding="utf-8")
+        if part.get("script") and not script_open:
+            parts.append("<script>")
+            script_open = True
+        if not part.get("script") and script_open:
+            parts.append("</script>")
+            script_open = False
+        if "wrap" in part:
+            parts.extend([part["wrap"][0], body, part["wrap"][1]])
+        else:
+            parts.append(body)
+    html = "\n".join(parts)
+    if version:
+        html = re.sub(
+            r'(<meta name="app-version" content=")[^"]*(")',
+            lambda match: match[1] + version + match[2],
+            html,
+        )
+    if studio:
+        html = html.replace(
+            "<head>",
+            '<head>\n<script>window.MTB_STUDIO = true;</script>\n<meta name="robots" content="noindex">',
+            1,
+        )
+        html = html.replace(
+            "<title>TestBook</title>", "<title>TestBook Admin Studio</title>", 1
+        )
+        html = html.replace('<link rel="manifest" href="manifest.webmanifest">', "", 1)
+        html = re.sub(
+            r'href="(icon-192\.png|apple-touch-icon\.png)"', r'href="../\1"', html
+        )
+    return html.encode("utf-8")
+
+
+def main():
+    """Build a release, or return a nonzero status if checked releases have drifted."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("output", nargs="?", type=Path)
+    parser.add_argument("version", nargs="?")
+    parser.add_argument("--studio", action="store_true")
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="Verify both checked-in release files without writing",
+    )
+    args = parser.parse_args()
+    if args.check:
+        if args.output or args.version or args.studio:
+            parser.error(
+                "--check checks both release files; do not combine it with build arguments"
+            )
+        stale = False
+        for relative, studio in [("index.html", False), ("admin/index.html", True)]:
+            target = ROOT / relative
+            matches = target.is_file() and target.read_bytes() == render(studio=studio)
+            print(
+                f"{'PASS' if matches else 'FAIL'} generated release matches source: {relative}"
+            )
+            stale |= not matches
+        if stale:
+            print("Rebuild both files using the commands in dev/app/README.md.")
+        return int(stale)
+    if not args.output:
+        parser.error("provide an output path or use --check")
+    data = render(args.version, args.studio)
+    args.output.write_bytes(data)
+    print(f"built {args.output} ({len(data)} bytes)")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -18,9 +18,9 @@ with sync_playwright() as p:
     pg.goto('file://' + APP); pg.wait_for_selector('.sj-dash', timeout=20000); pg.wait_for_timeout(300)
     # Exam-first home launcher must only expose real, wired routes.
     expected_tiles = [
-        ('Exams', 'exam_hub'), ('Mock tests', 'test_hub'), ('PYQ papers', 'pyq_hub'),
-        ('Topic practice', 'subjects'), ('Test builder', 'native_builder'),
-        ('Study library', 'digital_library'), ('Question bank', 'taxonomy_explorer'),
+        ('Exams', 'exam_hub'), ('Tests', 'test_hub'), ('PYQ papers', 'pyq_hub'),
+        ('Topic practice', 'subjects'), ('Create Test', 'native_builder'),
+        ('Study library', 'digital_library'), ('Question Bank', 'taxonomy_explorer'),
         ('Revision', 'revision_hub')
     ]
     labels = pg.locator('.gx-quick .sj-quick-btn').all_inner_texts()
@@ -54,6 +54,15 @@ with sync_playwright() as p:
         pg.evaluate(f"document.body.classList.toggle('dark',{str(dark).lower()})"); pg.evaluate("navigate('home')"); pg.wait_for_timeout(200)
         c1 = pg.evaluate(f"({CONTRAST})('.gx-hero h1')"); c2 = pg.evaluate(f"({CONTRAST})('.gx-hero p')"); c3 = pg.evaluate(f"({CONTRAST})('#bottomNav .nav-tab.active')")
         rec(f'{"dark" if dark else "light"}: text contrast ≥ 4.5 (title, body, active tab)', min(c1, c2, c3) >= 4.5, (round(c1, 1), round(c2, 1), round(c3, 1)))
+        rec(f'{"dark" if dark else "light"}: active focus mode contrast ≥ 4.5', pg.evaluate(f"({CONTRAST})('.gx-seg button.on')") >= 4.5)
+        for route, hero in [('test_hub', '.student-hero-card'), ('revision_hub', '.rv-hero')]:
+            pg.evaluate(f"navigate('{route}')")
+            values = [pg.evaluate(f"({CONTRAST})('{hero} {child}')") for child in ['h1', 'p', '.journey-pill']]
+            rec(f'{"dark" if dark else "light"}: {route} hero text contrast ≥ 4.5', min(values) >= 4.5, values)
+        for route in ['test_hub', 'taxonomy_explorer']:
+            pg.evaluate(f"navigate('{route}')")
+            contrast = pg.evaluate(f"({CONTRAST})('.btn-nav.primary')")
+            rec(f'{"dark" if dark else "light"}: {route} primary action contrast ≥ 4.5', contrast >= 4.5, contrast)
     pg.evaluate("document.body.classList.remove('dark')")
     # CBT confidence
     pg.evaluate("(()=>{const m=getWorkspaceModule('maths-percentage-class-test');initTestSession(m.moduleId,m.groups[0].groupId,0)})()"); pg.wait_for_timeout(400)
@@ -106,10 +115,10 @@ with sync_playwright() as p:
     rec('subject hub: Test button opens the CBT room', pg.locator('#cbtViewport').count() == 1)
     pg.evaluate("ActiveTestSession.sessionStatus='DONE'; clearCbtRecoveryState(); ActiveTestSession=null; navigate('home')"); pg.wait_for_timeout(200)
     # Me screen
-    pg.click('#btnMe'); pg.wait_for_timeout(300)
-    rec('Me screen opens from header with progress tiles and shortcuts', pg.locator('.me-tile').count() == 6 and pg.locator('.me-row').count() >= 8)
+    pg.click('#btnMenu'); pg.click('#drwMe'); pg.wait_for_timeout(300)
+    rec('Me screen opens from menu with progress tiles and shortcuts', pg.locator('.me-tile').count() == 6 and pg.locator('.me-row').count() >= 8)
     rec('Me screen: no sideways scroll, rows ≥ 48px', pg.evaluate(OVER) and pg.evaluate("[...document.querySelectorAll('.me-row')].every(b=>b.getBoundingClientRect().height>=48)"))
-    rec('header fits at 360px with the Me button', pg.evaluate("(()=>{const h=document.getElementById('appHeader');return h.scrollWidth<=h.clientWidth+1})()"))
+    rec('header fits at 360px with a clear page title', pg.evaluate("(()=>{const h=document.getElementById('appHeader');return h.scrollWidth<=h.clientWidth+1})()"))
     # V3.3 maintenance banner from the Control Room
     pg.evaluate("navigate('home')"); pg.evaluate("opsApplyMaintenance({on:true,message:'Test maintenance message'})"); pg.wait_for_timeout(150)
     rec('maintenance banner shows on Home with the admin message', pg.locator('#opsMaintBanner').count() == 1 and 'Test maintenance message' in pg.inner_text('#opsMaintBanner'))

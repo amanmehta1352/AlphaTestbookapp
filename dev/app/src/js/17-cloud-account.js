@@ -168,11 +168,12 @@ async function cloudSyncProgress() {
 
 /* ---------- one sync ---------- */
 var CloudSyncRunning = null;
+/** Sync student content and account progress, sharing any in-flight sync promise; return null on failure or when unavailable. */
 async function cloudSync(reason = 'manual') {
   if (!ServerState.session || DataHealth.readOnly) return null;
   if (CloudSyncRunning) return CloudSyncRunning;
   CloudSyncRunning = (async () => {
-    CloudState.busy = true; cloudPaint();
+    CloudState.busy = true; cloudPaint(); refreshStudyFeedback();
     try {
       await Server.ensureFresh();
       const uid = ServerState.session.user_id;
@@ -188,26 +189,34 @@ async function cloudSync(reason = 'manual') {
     } catch (e) {
       CloudState.msg = (reason === 'auto' ? 'Sync बाद में होगा: ' : '') + e.message; CloudState.msgKind = e.network ? 'warn' : 'bad';
       return null;
-    } finally { CloudState.busy = false; CloudSyncRunning = null; cloudPaint(); }
+    } finally { CloudState.busy = false; CloudSyncRunning = null; cloudPaint(); refreshStudyFeedback(); }
   })();
   return CloudSyncRunning;
 }
 
 /* ---------- account sheet ---------- */
-function cloudPaint() { const el = document.getElementById('cloudSheet'); if (el) el.innerHTML = cloudSheetHtml(); }
+/** Refresh the account sheet from current cloud state when the sheet is present. */
+function cloudPaint() {
+  const el = document.getElementById("cloudSheet");
+  if (el) el.innerHTML = cloudSheetHtml();
+}
+/** Return account-sheet HTML for sign-in, sync status or signed-in account controls. */
 function cloudSheetHtml() {
   const s = ServerState.session;
-  const msg = CloudState.msg ? `<div class="srv-msg ${CloudState.msgKind}" role="status">${escapeHtml(CloudState.msg)}</div>` : '';
-  if (!s) return `${msg}
-    <div class="cl-hero"><b>अपना account बनाइए</b><span>Google से login करने पर सारे सवाल server से आते हैं, और आपकी progress — जवाब, टेस्ट, bookmark, लक्ष्य — सुरक्षित रहती है। फ़ोन बदलें तो login करते ही सब वापस।</span></div>
-    <button type="button" class="cl-google" onclick="cloudLoginGoogle()" ${cloudOnline() ? '' : 'disabled'}><span class="g">G</span> Google से login करें</button>
-    ${cloudOnline() ? '' : '<p class="srv-note">Login सिर्फ़ install वाले ऐप या link में चलता है, फ़ोन में खोली file में नहीं।</p>'}
+  const msg = CloudState.msg
+    ? `<div class="srv-msg ${CloudState.msgKind}" role="status">${escapeHtml(CloudState.msg)}</div>`
+    : "";
+  if (!s)
+    return `${msg}
+    <div class="cl-hero"><b>अपना account बनाइए</b><span>${tx("Signing in with Google downloads published questions for your exam. After a successful sync, your answers, tests, bookmarks and goals can be restored on another phone. Guest mode shows only questions saved on this device.", "Google से login करने पर आपकी परीक्षा के प्रकाशित सवाल डाउनलोड होते हैं। सफल sync के बाद जवाब, टेस्ट, bookmark और लक्ष्य दूसरे फ़ोन पर वापस मिल सकते हैं। Guest mode में इस डिवाइस पर सहेजे सवाल ही दिखते हैं।")}</span></div>
+    <button type="button" class="cl-google" onclick="cloudLoginGoogle()" ${cloudOnline() ? "" : "disabled"}><span class="g">G</span> Google से login करें</button>
+    ${cloudOnline() ? "" : '<p class="srv-note">Login सिर्फ़ install वाले ऐप या link में चलता है, फ़ोन में खोली file में नहीं।</p>'}
     <button type="button" class="btn-action-sm" onclick="closeModal();openServerSync()">Admin? Email से login</button>`;
   return `${msg}
-    <div class="cl-user"><span class="cl-avatar" aria-hidden="true">${escapeHtml((CloudState.name || s.email || '?').trim().charAt(0).toUpperCase())}</span><span><b>${escapeHtml(CloudState.name || s.email || 'Login हो गया')}</b><small>${escapeHtml(s.email || '')}${CloudState.isAdmin ? ' · Admin' : ''}</small></span></div>
-    <div class="cl-stats"><span><b>${CloudState.lastSyncAt ? fmtWhen(CloudState.lastSyncAt) : '—'}</b>आख़िरी sync</span><span><b>${CloudState.isAdmin ? '—' : (CloudState.serverQuestions || 0)}</b>server के सवाल</span><span><b>${AttemptHistory.filter(a => !a.synced && !a.syncSkip).length}</b>भेजने बाकी</span></div>
-    ${CloudState.isAdmin ? '<p class="srv-note">आप admin हैं: इस फ़ोन पर server से सवाल नहीं आते। सवाल डालने, जाँचने और publish करने के लिए <a href="admin/">🛠️ Admin Studio</a> खोलें। आपकी progress यहाँ से sync होती है।</p>' : ''}
-    <button type="button" class="btn-nav primary srv-wide" onclick="cloudSync('manual')" ${CloudState.busy ? 'disabled' : ''}>${CloudState.busy ? '⏳ Sync हो रहा है…' : '🔄 अभी sync करें'}</button>
+    <div class="cl-user"><span class="cl-avatar" aria-hidden="true">${escapeHtml((CloudState.name || s.email || "?").trim().charAt(0).toUpperCase())}</span><span><b>${escapeHtml(CloudState.name || s.email || "Login हो गया")}</b><small>${escapeHtml(s.email || "")}${CloudState.isAdmin ? " · Admin" : ""}</small></span></div>
+    <div class="cl-stats"><span><b>${CloudState.lastSyncAt ? fmtWhen(CloudState.lastSyncAt) : "—"}</b>आख़िरी sync</span><span><b>${CloudState.isAdmin ? "—" : CloudState.serverQuestions || 0}</b>server के सवाल</span><span><b>${AttemptHistory.filter((a) => !a.synced && !a.syncSkip).length}</b>भेजने बाकी</span></div>
+    ${CloudState.isAdmin ? '<p class="srv-note">आप admin हैं: इस फ़ोन पर server से सवाल नहीं आते। सवाल डालने, जाँचने और publish करने के लिए <a href="admin/">🛠️ Admin Studio</a> खोलें। आपकी progress यहाँ से sync होती है।</p>' : ""}
+    <button type="button" class="btn-nav primary srv-wide" onclick="cloudSync('manual')" ${CloudState.busy ? "disabled" : ""}>${CloudState.busy ? "⏳ Sync हो रहा है…" : "🔄 अभी sync करें"}</button>
     <p class="srv-note">ऐप खुलते समय और हर 10 मिनट में अपने-आप sync होता है। बिना internet के जो करेंगे, वह internet आने पर भेजा जाएगा। (Revision cards अभी सिर्फ़ इसी फ़ोन में रहते हैं।)</p>
     <button type="button" class="btn-action-sm" onclick="cloudLogout()">Logout</button>`;
 }
@@ -221,13 +230,25 @@ async function cloudLogout() {
   await Server.logout(); CloudState.isAdmin = null; CloudState.msg = 'Logout हो गया।'; CloudState.msgKind = ''; await cloudSaveState(); cloudPaint(); try { renderView(); } catch (_) {}
 }
 // Home: a gentle prompt until the student logs in
+/** Insert one sign-in prompt on online guest Home in a competitive workspace. */
 function cloudHomePrompt() {
-  if (Route?.page !== 'home' || ServerState.session || !cloudOnline() || WorkspaceManager.current().type === 'BOARD') return;
-  const v = document.getElementById('mainView'); if (!v || v.querySelector('.cl-prompt')) return;
-  const el = document.createElement('button'); el.type = 'button'; el.className = 'cl-prompt'; el.onclick = openAccount;
-  el.innerHTML = `<span class="g">G</span><span><b>Google से login करें</b><small>सारे सवाल पाएँ और progress सुरक्षित रखें</small></span><span aria-hidden="true">›</span>`;
+  if (
+    Route?.page !== "home" ||
+    ServerState.session ||
+    !cloudOnline() ||
+    WorkspaceManager.current().type === "BOARD"
+  )
+    return;
+  const v = document.getElementById("mainView");
+  if (!v || v.querySelector(".cl-prompt")) return;
+  const el = document.createElement("button");
+  el.type = "button";
+  el.className = "cl-prompt";
+  el.onclick = openAccount;
+  el.innerHTML = `<span class="g">G</span><span><b>${tx("Sign in with Google", "Google से login करें")}</b><small>${tx("Download published questions for your exam and sync progress", "अपनी परीक्षा के प्रकाशित सवाल डाउनलोड करें और प्रगति सिंक करें")}</small></span><span aria-hidden="true">›</span>`;
   v.prepend(el);
 }
+
 async function cloudBoot() {
   await cloudLoadState();
   Server.loadSession();
@@ -238,5 +259,4 @@ async function cloudBoot() {
   window.addEventListener('online', () => { if (ServerState.session) cloudSync('auto'); });
 }
 
-const _c2RenderView = renderView;
-renderView = function () { _c2RenderView(); try { cloudHomePrompt(); } catch (_) {} };
+registerViewHook('after', 'account-prompt', cloudHomePrompt);

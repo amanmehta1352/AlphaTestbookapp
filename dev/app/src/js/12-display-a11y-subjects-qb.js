@@ -52,20 +52,15 @@ function openDisplaySettings() {
 }
 
 /* ---------- route titles ---------- */
-const ROUTE_TITLES = {
-  home: ['📚 Student Hub', '📚 स्टूडेंट हब'], subjects: ['📚 Subjects', '📚 विषय'], subject: ['📚 Chapters', '📚 अध्याय'], chapter: ['📚 Topics', '📚 टॉपिक'],
-  exam_hub: ['🏛️ Exams', '🏛️ परीक्षाएँ'], exam_profile: ['🎓 Exam', '🎓 परीक्षा'], syllabus: ['📚 Syllabus', '📚 सिलेबस'],
-  test_hub: ['⏱️ Tests', '⏱️ टेस्ट'], revision_hub: ['🔄 Revision', '🔄 रिवीज़न'], mistakes: ['📕 Mistake Book', '📕 गलतियों की किताब'],
-  mastery: ['🎯 Mastery', '🎯 महारत'], taxonomy_explorer: ['🔎 Question Bank', '🔎 प्रश्न बैंक'], pyq_hub: ['🎯 PYQ Archive', '🎯 PYQ संग्रह'],
-  digital_library: ['📖 Library', '📖 लाइब्रेरी'], result: ['📊 Result', '📊 परिणाम']
-};
+/** Return the localized registered page title, leaving the Board Home title to its renderer. */
 function nbRouteTitle(page) {
   if (page === 'home' && WorkspaceManager.current().type === 'BOARD') return null;
-  const t = ROUTE_TITLES[page]; return t ? tx(t[0], t[1]) : null;
+  const title = AppRoutes[page]?.title;
+  return title ? tx(...title) : null;
 }
 
 /* ---------- accessibility ---------- */
-let A11yQueued = false, ModalReturnFocus = null;
+let A11yQueued = false, ModalReturnFocus = null, ModalFocusTimer = null;
 function nbA11yEnhance() {
   A11yQueued = false;
   document.querySelectorAll('[onclick]:not(button):not(a):not(input):not(select):not(textarea):not(label):not(summary):not([role])').forEach(el => {
@@ -76,25 +71,54 @@ function nbA11yEnhance() {
 }
 function nbQueueA11y() { if (A11yQueued) return; A11yQueued = true; setTimeout(nbA11yEnhance, 0); }
 function nbModalIsOpen() { return document.getElementById('modalSheet')?.classList.contains('open'); }
+/** Focus an open sheet's first form field, or the sheet when autofocus is disabled. */
 function nbFocusModal() {
-  const sheet = document.getElementById('modalSheet'); if (!sheet) return;
+  ModalFocusTimer = null;
+  const sheet = document.getElementById("modalSheet");
+  if (!sheet?.classList.contains("open")) return;
   // A form field gets focus directly; otherwise the dialog itself (no stray focus ring on a button).
   // Sheets marked data-no-autofocus (long lists with inputs) should not pop the phone keyboard open.
-  const first = sheet.querySelector('[data-no-autofocus]') ? null : sheet.querySelector('#modalSheetBody input:not([type=hidden]):not([disabled]), #modalSheetBody select, #modalSheetBody textarea');
-  try { (first || sheet).focus({ preventScroll: true }); } catch (_) {}
+  const first = sheet.querySelector("[data-no-autofocus]")
+    ? null
+    : sheet.querySelector(
+        "#modalSheetBody input:not([type=hidden]):not([disabled]), #modalSheetBody select, #modalSheetBody textarea",
+      );
+  try {
+    (first || sheet).focus({ preventScroll: true });
+  } catch (_) {}
 }
-const _u5OpenModal = openModal, _u5CloseModal = closeModal;
+const _u5OpenModal = openModal,
+  _u5CloseModal = closeModal;
+/** Open or update a sheet, remembering its trigger and scheduling focus when needed. */
 openModal = function (title, contentHtml) {
   const wasOpen = nbModalIsOpen();
   if (!wasOpen) ModalReturnFocus = document.activeElement;
   _u5OpenModal(title, contentHtml);
   nbQueueA11y();
-  if (!wasOpen || !document.getElementById('modalSheet').contains(document.activeElement)) setTimeout(nbFocusModal, 0);
+  if (
+    !wasOpen ||
+    !document.getElementById("modalSheet").contains(document.activeElement)
+  ) {
+    clearTimeout(ModalFocusTimer);
+    ModalFocusTimer = setTimeout(nbFocusModal, 0);
+  }
 };
+/** Close the sheet, cancel pending autofocus and restore focus to its surviving trigger. */
 closeModal = function () {
+  clearTimeout(ModalFocusTimer);
+  ModalFocusTimer = null;
   const wasOpen = nbModalIsOpen();
   _u5CloseModal();
-  if (wasOpen && ModalReturnFocus && document.contains(ModalReturnFocus) && ModalReturnFocus !== document.body) { try { ModalReturnFocus.focus({ preventScroll: true }); } catch (_) {} }
+  if (
+    wasOpen &&
+    ModalReturnFocus &&
+    document.contains(ModalReturnFocus) &&
+    ModalReturnFocus !== document.body
+  ) {
+    try {
+      ModalReturnFocus.focus({ preventScroll: true });
+    } catch (_) {}
+  }
   if (wasOpen) ModalReturnFocus = null;
 };
 document.addEventListener('keydown', e => {
@@ -112,17 +136,13 @@ try {
   ['mainView', 'modalSheetBody', 'sideDrawer'].forEach(id => { const el = document.getElementById(id); if (el) a11yObs.observe(el, { childList: true, subtree: true }); });
 } catch (_) {}
 
-/* renderView wrapper: default title before, localized title + a11y after. */
-const _u5RenderView = renderView;
-renderView = function () {
-  const titleElem = document.getElementById('txtHeaderTitle');
-  if (titleElem) titleElem.textContent = '📚 MASTER TEST-BOOK';
-  _u5RenderView();
-  const t = nbRouteTitle(Route?.page);
-  if (titleElem && t) titleElem.textContent = t;
+registerViewHook('after', 'display', () => {
+  const title = document.getElementById('txtHeaderTitle');
+  const text = nbRouteTitle(Route.page);
+  if (title && text) title.textContent = text;
   nbLocalizeShell();
   nbQueueA11y();
-};
+});
 
 /* ---------- honest subject catalog ---------- */
 const SUBJECT_ICONS = { maths: '📐', mathematics: '📐', science: '🔬', 'general science': '🔬', reasoning: '🧠', english: '📝', gk: '🌍', 'general-awareness': '🌍', hindi: '🅷', computer: '💻' };
@@ -157,61 +177,99 @@ function nbSubjectGroups() {
   return Array.from(map.values()).filter(g => g.qs > 0).sort((a, b) => b.qs - a.qs);
 }
 /* Subject navigation redesign — scoped only to the Subjects catalog. */
-let SubjectNavState = { selected: '', expanded: '' };
+let SubjectNavState = { selected: "", expanded: "" };
+/** Focus and reveal the catalog control matching the selector and catalog key. */
+function shFocusCatalogControl(selector, key) {
+  const control = Array.from(document.querySelectorAll(selector)).find(
+    (el) => el.dataset.catalogKey === key,
+  );
+  control?.focus({ preventScroll: true });
+  control?.scrollIntoView({ block: "nearest", inline: "nearest" });
+}
+/** Select a subject, collapse its chapters and restore focus after rendering. */
 function shSelectCatalogSubject(key) {
-  SubjectNavState.selected = String(key || '');
-  SubjectNavState.expanded = '';
+  SubjectNavState.selected = String(key || "");
+  SubjectNavState.expanded = "";
   renderView();
+  shFocusCatalogControl(".sn-tab", SubjectNavState.selected);
 }
+/** Toggle the selected chapter and restore focus to its control after rendering. */
 function shToggleCatalogChapter(key) {
-  SubjectNavState.expanded = SubjectNavState.expanded === key ? '' : key;
+  SubjectNavState.expanded = SubjectNavState.expanded === key ? "" : key;
   renderView();
+  shFocusCatalogControl(".sn-chapter-toggle", key);
 }
+/** Render subject tabs and expandable chapters with direct links to their topics. */
 function renderSubjectsCatalog(v) {
   const groups = nbSubjectGroups();
   const total = groups.reduce((n, g) => n + g.qs, 0);
-  if (!groups.some(g => g.key === SubjectNavState.selected)) SubjectNavState.selected = groups[0]?.key || '';
-  const selected = groups.find(g => g.key === SubjectNavState.selected) || null;
-  const chapters = selected ? Array.from(selected.chapters.entries()).map(([id, name]) => {
-    const mods = selected.mods.filter(m => String(m.chapter || '').trim().toLowerCase() === String(name).trim().toLowerCase());
-    return { id: String(id), name, mods, qs: mods.reduce((n, m) => n + nbModuleQCount(m), 0) };
-  }) : [];
-  const subjectTabs = groups.map(g => {
-    const active = selected && g.key === selected.key;
-    const k = g.key.toLowerCase();
-    return `<button type="button" class="sn-tab ${active ? 'on' : ''}" aria-pressed="${!!active}" onclick="shSelectCatalogSubject(${nbJsAttr(g.key)})">
-      <span class="sn-tab-icon" aria-hidden="true">${SUBJECT_ICONS[k] || '📘'}</span>
-      <span>${escapeHtml(subjectLabel(g.key))}</span><small>${g.qs} ${tx('Qs', 'सवाल')}</small>
+  if (!groups.some((g) => g.key === SubjectNavState.selected))
+    SubjectNavState.selected = groups[0]?.key || "";
+  const selected =
+    groups.find((g) => g.key === SubjectNavState.selected) || null;
+  const chapters = selected
+    ? Array.from(selected.chapters.entries()).map(([id, name]) => {
+        const mods = selected.mods.filter(
+          (m) =>
+            (
+              String(m.chapter || "").trim() || tx("Other", "अन्य")
+            ).toLowerCase() === id,
+        );
+        return {
+          id: String(id),
+          name,
+          mods,
+          qs: mods.reduce((n, m) => n + nbModuleQCount(m), 0),
+        };
+      })
+    : [];
+  const subjectTabs = groups
+    .map((g) => {
+      const active = selected && g.key === selected.key;
+      return `<button type="button" class="sn-tab ${active ? "on" : ""}" data-catalog-key="${escapeHtml(g.key)}" aria-pressed="${!!active}" onclick="shSelectCatalogSubject(${nbJsAttr(g.key)})">
+      <span class="sn-tab-icon" aria-hidden="true">${uiIcon("book")}</span>
+      <span>${escapeHtml(subjectLabel(g.key))}</span><small>${g.qs} ${tx("Qs", "सवाल")}</small>
     </button>`;
-  }).join('');
-  const chapterRows = chapters.map(c => {
-    const open = SubjectNavState.expanded === c.id;
-    const topicRows = c.mods.map(m => {
-      const topic = String(m.topicTitle || m.topic || '').trim();
-      const subtopic = String(m.subtopic || '').trim();
-      const label = [topic, subtopic].filter((x, i, a) => x && a.indexOf(x) === i).join(' › ') || tx('Open topic', 'टॉपिक खोलें');
-      return `<button type="button" class="sn-topic" onclick="navigate('chapter', {subject:${nbJsAttr(selected.key)}, chapter:${nbJsAttr(c.name)}})">
-        <span class="sn-topic-dot" aria-hidden="true">•</span><span class="sn-topic-label">${escapeHtml(label)}</span><span class="sn-topic-count">${nbModuleQCount(m)} ${tx('Qs', 'सवाल')}</span><span aria-hidden="true">›</span>
+    })
+    .join("");
+  const chapterRows = chapters
+    .map((c) => {
+      const open = SubjectNavState.expanded === c.id;
+      const topicRows = c.mods
+        .map((m) => {
+          const topic = String(m.topicTitle || m.topic || "").trim();
+          const subtopic = String(m.subtopic || "").trim();
+          const label =
+            [topic, subtopic]
+              .filter((x, i, a) => x && a.indexOf(x) === i)
+              .join(" › ") || tx("Open topic", "टॉपिक खोलें");
+          return `<button type="button" class="sn-topic" onclick="navigate('topic', {moduleId:${nbJsAttr(m.moduleId)}})">
+        <span class="sn-topic-dot" aria-hidden="true">•</span><span class="sn-topic-label">${escapeHtml(label)}</span><span class="sn-topic-count">${nbModuleQCount(m)} ${tx("Qs", "सवाल")}</span><span aria-hidden="true">›</span>
       </button>`;
-    }).join('');
-    return `<section class="sn-chapter ${open ? 'open' : ''}">
-      <button type="button" class="sn-chapter-toggle" aria-expanded="${!!open}" onclick="shToggleCatalogChapter(${nbJsAttr(c.id)})">
-        <span class="sn-chapter-mark" aria-hidden="true">${open ? '−' : '+'}</span>
-        <span class="sn-chapter-main"><strong>${escapeHtml(c.name)}</strong><small>${c.mods.length} ${tx('topics', 'टॉपिक')} · ${c.qs} ${tx('questions', 'सवाल')}</small></span>
-        <span class="sn-chevron" aria-hidden="true">${open ? '⌄' : '›'}</span>
+        })
+        .join("");
+      return `<section class="sn-chapter ${open ? "open" : ""}">
+      <button type="button" class="sn-chapter-toggle" data-catalog-key="${escapeHtml(c.id)}" aria-expanded="${!!open}" onclick="shToggleCatalogChapter(${nbJsAttr(c.id)})">
+        <span class="sn-chapter-mark" aria-hidden="true">${open ? "−" : "+"}</span>
+        <span class="sn-chapter-main"><strong>${escapeHtml(c.name)}</strong><small>${c.mods.length} ${tx("topics", "टॉपिक")} · ${c.qs} ${tx("questions", "सवाल")}</small></span>
+        <span class="sn-chevron" aria-hidden="true">${open ? "⌄" : "›"}</span>
       </button>
-      ${open ? `<div class="sn-topic-list">${topicRows || `<p class="sn-empty-topic">${tx('No topics available yet.', 'अभी कोई टॉपिक उपलब्ध नहीं है।')}</p>`}</div><div class="sn-chapter-action"><button type="button" class="btn-action-sm" onclick="navigate('chapter', {subject:${nbJsAttr(selected.key)}, chapter:${nbJsAttr(c.name)}})">${tx('Open chapter', 'अध्याय खोलें')} →</button></div>` : ''}
+      ${open ? `<div class="sn-topic-list">${topicRows || `<p class="sn-empty-topic">${tx("No topics available yet.", "अभी कोई टॉपिक उपलब्ध नहीं है।")}</p>`}</div><div class="sn-chapter-action"><button type="button" class="btn-action-sm" onclick="navigate('chapter', {subject:${nbJsAttr(selected.key)}, chapter:${nbJsAttr(c.name)}})">${tx("Open chapter", "अध्याय खोलें")} →</button></div>` : ""}
     </section>`;
-  }).join('');
+    })
+    .join("");
   v.innerHTML = `
-    <div class="nav-breadcrumb"><button type="button" onclick="navigate('home')">${tx('Home', 'होम')}</button><span class="sep">/</span><span>${tx('Subjects', 'विषय')}</span></div>
-    <div class="sc-head"><div><h1>${tx('Subjects', 'विषय')}</h1><p>${groups.length ? tx(`${groups.length} subjects · ${total} questions in this workspace`, `${groups.length} विषय · इस workspace में ${total} सवाल`) : tx('No questions imported yet', 'अभी कोई सवाल import नहीं हुआ')}</p></div>
-      <button type="button" class="btn-action-sm" onclick="navigate('taxonomy_explorer')">🔎 ${tx('Question Bank', 'प्रश्न बैंक')}</button>
+    <div class="sc-head"><div><h1>${tx("Subjects", "विषय")}</h1><p>${groups.length ? tx(`${groups.length} subjects · ${total} questions in this workspace`, `${groups.length} विषय · इस workspace में ${total} सवाल`) : tx("No questions available yet", "अभी सवाल उपलब्ध नहीं हैं")}</p></div>
+      <button type="button" class="btn-action-sm" onclick="navigate('taxonomy_explorer')">🔎 ${tx("Question Bank", "प्रश्न बैंक")}</button>
     </div>
-    ${groups.length ? `<nav class="sn-subject-tabs" aria-label="${tx('Main subjects', 'मुख्य विषय')}" role="tablist">${subjectTabs}</nav>
-      <section class="sn-topic-panel"><div class="sn-panel-head"><div><h2>${selected ? escapeHtml(subjectLabel(selected.key)) : tx('Choose a subject', 'विषय चुनें')}</h2><p>${selected ? tx('Choose a chapter to expand its topics.', 'टॉपिक्स देखने के लिए अध्याय खोलें।') : ''}</p></div>${selected ? `<span class="sn-total">${selected.qs} ${tx('questions', 'सवाल')}</span>` : ''}</div>
-        ${chapters.length ? `<div class="sn-chapter-list">${chapterRows}</div>` : `<div class="sc-empty"><strong>${tx('No chapters with questions', 'सवालों वाला कोई अध्याय नहीं')}</strong><span>${tx('Import a topic for this subject to start.', 'शुरू करने के लिए इस विषय का topic import करें।')}</span><button type="button" class="btn-nav primary" onclick="openImportModal()">${tx('Import questions', 'सवाल import करें')}</button></div>`}
-      </section>` : `<div class="sc-empty"><strong>${tx('Nothing to show yet', 'अभी दिखाने को कुछ नहीं')}</strong><span>${tx('Import a topic file to see its subjects here.', 'Topic file import करें, उसके विषय यहाँ दिखेंगे।')}</span><button type="button" class="btn-nav primary" onclick="openImportModal()">${tx('Import questions', 'सवाल import करें')}</button></div>`}`;
+    ${
+      groups.length
+        ? `<nav class="sn-subject-tabs" aria-label="${tx("Main subjects", "मुख्य विषय")}">${subjectTabs}</nav>
+      <section class="sn-topic-panel"><div class="sn-panel-head"><div><h2>${selected ? escapeHtml(subjectLabel(selected.key)) : tx("Choose a subject", "विषय चुनें")}</h2><p>${selected ? tx("Choose a chapter to expand its topics.", "टॉपिक्स देखने के लिए अध्याय खोलें।") : ""}</p></div>${selected ? `<span class="sn-total">${selected.qs} ${tx("questions", "सवाल")}</span>` : ""}</div>
+        ${chapters.length ? `<div class="sn-chapter-list">${chapterRows}</div>` : studyEmptyState()}
+      </section>`
+        : studyEmptyState()
+    }`;
 }
 
 /* ---------- Question Bank ---------- */
@@ -240,13 +298,14 @@ function qbCardHtml(q) {
     <div class="qb-actions">${bookmarkButtonHtml(cid)}<button type="button" class="btn-action-sm qb-practice" onclick="startSinglePractice(${nbJsAttr(cid)})">${tx('Practice', 'अभ्यास')} ➔</button></div>
   </article>`;
 }
+/** Render matching question cards, pagination and contextual empty-state guidance. */
 function qbRenderList() {
   const box = document.getElementById('qbList'); if (!box) return;
   const rows = qbFiltered(); const shown = rows.slice(0, QBState.show);
   const c = document.getElementById('qbCount'); if (c) c.textContent = tx(`${rows.length} question${rows.length === 1 ? '' : 's'}`, `${rows.length} सवाल`);
   box.innerHTML = rows.length ? `${shown.map(qbCardHtml).join('')}
     ${rows.length > shown.length ? `<button type="button" class="qb-moreBtn" onclick="QBState.show+=20; qbRenderList()">${tx(`Show 20 more (${rows.length - shown.length} left)`, `20 और दिखाएँ (${rows.length - shown.length} बाकी)`)}</button>` : `<p class="qb-end">${tx('End of list', 'सूची समाप्त')}</p>`}`
-    : `<div class="sc-empty"><strong>${tx('No questions match', 'कोई सवाल मेल नहीं खाता')}</strong><span>${tx('Try another word or clear the filters.', 'दूसरा शब्द आज़माएँ या फ़िल्टर हटाएँ।')}</span></div>`;
+    : studyEmptyState(QBState.q || QBState.pyq || Object.values(ActiveTaxonomyFilters).some(Boolean) ? 'bank' : '');
   const s = document.getElementById('qbStart'); if (s) s.disabled = !rows.length;
 }
 let QBSearchTimer = null;
@@ -280,3 +339,29 @@ function renderTaxonomyExplorer(v, params = {}) {
     <div id="qbList" class="qb-list"></div>`;
   qbRenderList();
 }
+
+registerRouteViewState('subjects', {
+  /** Copy the catalog selection and expanded chapter for route restoration. */
+  capture: () => ({ ...SubjectNavState }),
+  /** Restore the catalog selection or reset it for a fresh route. */
+  restore: state => { SubjectNavState = state ? { ...state } : { selected: '', expanded: '' }; }
+});
+let QBWorkspaceId = '';
+registerRouteViewState('taxonomy_explorer', {
+  /** Copy Question Bank filters, search and pagination for route restoration. */
+  capture: () => ({ filters: { ...ActiveTaxonomyFilters }, bank: { ...QBState } }),
+  /** Restore remembered bank state on Back or workspace changes, preserving explicit entry filters otherwise. */
+  restore: (state, fromHistory) => {
+    const workspaceId = WorkspaceManager.current().id;
+    const switchedWorkspace = QBWorkspaceId && QBWorkspaceId !== workspaceId;
+    if (switchedWorkspace) {
+      ActiveTaxonomyFilters = { subject: '', type: '', difficulty: '', length: '', examId: '' };
+      QBState = { q: '', show: 20, pyq: false };
+    }
+    // Explicit exam/topic entry points take precedence over remembered filters.
+    if (state && (fromHistory || switchedWorkspace)) {
+      ActiveTaxonomyFilters = { ...state.filters }; QBState = { ...state.bank };
+    }
+    QBWorkspaceId = workspaceId;
+  }
+});

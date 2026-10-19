@@ -166,6 +166,10 @@
    "file": "src/html/body.html"
   },
   {
+   "file": "src/js/00-ui-icons.js",
+   "script": true
+  },
+  {
    "file": "src/js/00-boot-navigate.js",
    "script": true
   },
@@ -247,6 +251,10 @@
   },
   {
    "file": "src/js/17c-ops-client.js",
+   "script": true
+  },
+  {
+   "file": "src/js/17d-study-feedback.js",
    "script": true
   },
   {

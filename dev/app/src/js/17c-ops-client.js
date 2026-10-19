@@ -40,8 +40,7 @@ async function opsReportError(message, stack) {
 }
 window.addEventListener('error', e => { opsReportError(e.message || 'error', e.error && e.error.stack); });
 window.addEventListener('unhandledrejection', e => { const r = e.reason; opsReportError('Unhandled: ' + (r && r.message || String(r)), r && r.stack); });
-const _opsRenderView = renderView;
-renderView = function () { _opsRenderView(); try { opsMaintenanceBanner(); } catch (_) {} };
+registerViewHook('after', 'maintenance', opsMaintenanceBanner);
 const _opsCloudSync = cloudSync;
 cloudSync = async function (...args) { const r = await _opsCloudSync(...args); opsFetchMaintenance(); return r; };
 setTimeout(opsFetchMaintenance, 1500);
