@@ -642,10 +642,12 @@ function launchFilteredDrill() {
 function renderGlobalPYQHub(v) { renderUniversalExamHub(v); }
 function renderGlobalTestHub(v) {
   const resume = UserState.resumeState;
-  const curriculumModules = CurriculumContext.filterModules(AppModules).filter(m => m.groups?.[0]?.questions?.length);
-  const resumeMod = resume?.moduleId ? curriculumModules.find(m => m.moduleId === resume.moduleId) : null;
-  const mod = resumeMod || curriculumModules[0];
-  const exam = mod ? UniversalExamRegistry.registry.get(mod.examId || mod.groups[0].questions[0]?.metadata?.examId) : null;
+  const assessments = CurriculumContext.filterModules(AppModules)
+    .map(mod => ({mod, group: mod.groups?.find(g => g.questions?.length)}))
+    .filter(item => item.group);
+  const selected = assessments.find(item => item.mod.moduleId === resume?.moduleId) || assessments[0];
+  const {mod, group} = selected || {};
+  const exam = mod ? UniversalExamRegistry.registry.get(mod.examId || group.questions[0]?.metadata?.examId) : null;
 
   v.innerHTML = `
     <div class="nav-breadcrumb">
@@ -663,10 +665,10 @@ function renderGlobalTestHub(v) {
     ${mod ? `<div class="resume-action-card ao-primary-card">
       <div class="resume-info">
         <span class="resume-badge">🎯 READY ASSESSMENT</span>
-        <div class="resume-title">${mod.topicTitle} — ${mod.groups[0]?.title || 'G-01'}</div>
-        <div class="resume-subtitle">${Number(exam?.defaultDurationMinutes) || 30} ${tx('Mins', 'मिनट')} • ${mod.groups[0].questions.length} ${tx('Questions', 'सवाल')}</div>
+        <div class="resume-title">${mod.topicTitle} — ${group.title || 'G-01'}</div>
+        <div class="resume-subtitle">${Number(exam?.defaultDurationMinutes) || 30} ${tx('Mins', 'मिनट')} • ${group.questions.length} ${tx('Questions', 'सवाल')}</div>
       </div>
-      <button class="btn-nav primary" style="min-height:40px; padding:8px 14px; font-size:13px;" onclick="initTestSession('${mod.moduleId}', '${mod.groups[0]?.groupId || ''}', 0, null, {curriculumContext:true})">
+      <button class="btn-nav primary" style="min-height:40px; padding:8px 14px; font-size:13px;" onclick="initTestSession('${mod.moduleId}', '${group.groupId || ''}', 0, null, {curriculumContext:true})">
         ${tx('Start Test', 'टेस्ट शुरू करें')} ➔
       </button>
     </div>` : `<div class="sj-empty"><strong>${tx('No tests available yet', 'अभी कोई टेस्ट उपलब्ध नहीं है')}</strong><span>${tx('Choose your exam and sync its questions to start.', 'शुरू करने के लिए अपनी परीक्षा चुनें और सवाल सिंक करें।')}</span><button type="button" class="btn-nav primary" onclick="navigate('me')">${tx('Open exam settings', 'परीक्षा सेटिंग खोलें')} →</button></div>`}
@@ -681,16 +683,16 @@ function renderGlobalTestHub(v) {
     </div>
 
     <div class="grid-cards">
-      ${curriculumModules.map(m => `
+      ${assessments.map(({mod: m, group: g}) => `
         <div class="card-btn">
           <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
             <strong>${m.topicTitle}</strong>
-            <span class="mastery-badge good">${m.groups.length} Tests</span>
+            <span class="mastery-badge good">${m.groups.filter(group => group.questions?.length).length} Tests</span>
           </div>
           <small>${m.subjectTitle} • Class Test Series</small>
           <div style="margin-top:12px;">
-            <button class="btn-nav primary" style="width:100%; min-height:40px; font-size:12px;" onclick="initTestSession('${m.moduleId}', '${m.groups[0]?.groupId}', 0, null, {curriculumContext:true})">
-              Launch ${m.groups[0]?.title || 'G-01'} CBT Test ➔
+            <button class="btn-nav primary" style="width:100%; min-height:40px; font-size:12px;" onclick="initTestSession('${m.moduleId}', '${g.groupId}', 0, null, {curriculumContext:true})">
+              Launch ${g.title || 'G-01'} CBT Test ➔
             </button>
           </div>
         </div>

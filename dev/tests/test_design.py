@@ -99,7 +99,49 @@ with sync_playwright() as p:
     rec('Empty test hub explains availability without a broken start action',
         page.locator('#mainView .btn-nav.primary').count() == 1 and
         page.locator('#mainView .btn-nav.primary').get_attribute('onclick') == "navigate('me')")
+    # A valid test can live after an empty group in the same module.
+    page.evaluate("""() => {
+        const mod = window.__savedModules.find(m => m.moduleId === 'maths-percentage-class-test');
+        AppModules = [{...mod, groups: [
+            {...mod.groups[0], groupId: 'empty-first', questions: []},
+            {...mod.groups[0], groupId: 'ready-later', title: 'Later group', questions: mod.groups[0].questions.slice(0, 2)}
+        ]}];
+        synchronizeTaxonomyEngine();
+        UserState.resumeState = null;
+        navigate('test_hub');
+    }""")
+    launchers = page.locator('#mainView button[onclick^="initTestSession"]')
+    rec('Test hub retains a module with an empty first group', launchers.count() == 2)
+    for index, label in enumerate(('featured assessment', 'module card')):
+        if launchers.count() > index:
+            launchers.nth(index).click()
+            rec(f'{label} launches the later nonempty group',
+                page.evaluate("Route.page==='test' && ActiveTestSession.groupId==='ready-later' && ActiveTestSession.questions.length===2"))
+            page.evaluate("submitTestSession();navigate('test_hub')")
+        else:
+            rec(f'{label} launches the later nonempty group', False, 'No launch action')
     rec('No browser errors across hubs and the complete test/retry flow', not errors, errors)
+
+    # Check effective text contrast, including the hint's opacity, in both dark modes.
+    control = browser.new_page()
+    control.set_content('<div class="cmd-q">Question <small>Command hint</small></div><button class="chip on">Active</button>')
+    control.add_style_tag(path=str(Path(APP).parent / 'control' / 'cr.css'))
+    for theme, system in [('light', 'light'), ('dark', 'light'), ('system', 'dark')]:
+        control.emulate_media(color_scheme=system)
+        control.evaluate("theme => {if(theme==='system') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme=theme}", theme)
+        ratios = control.evaluate("""() => {
+            const rgb = value => value.match(/[0-9.]+/g).slice(0, 3).map(Number);
+            const lum = color => color.map(c => {c /= 255; return c <= .04045 ? c / 12.92 : ((c + .055) / 1.055) ** 2.4})
+                .reduce((sum, c, i) => sum + c * [.2126, .7152, .0722][i], 0);
+            return ['.cmd-q small', '.chip.on'].map(selector => {
+                const el = document.querySelector(selector), style = getComputedStyle(el);
+                const bg = rgb(getComputedStyle(selector === '.cmd-q small' ? el.parentElement : el).backgroundColor);
+                const fg = rgb(style.color).map((c, i) => c * Number(style.opacity) + bg[i] * (1 - Number(style.opacity)));
+                const a = lum(fg), b = lum(bg);
+                return (Math.max(a, b) + .05) / (Math.min(a, b) + .05);
+            });
+        }""")
+        rec(f'Control {theme}: command hint and active chip contrast ≥ 4.5', min(ratios) >= 4.5, ratios)
     browser.close()
 Path(OUT).write_text(json.dumps(results, indent=1), encoding='utf-8')
 if any(result[1] == 'FAIL' for result in results):
