@@ -1,0 +1,42 @@
+/* Alpha TestBook Home — responsive 60/30/10-inspired layout. */
+.sj-dash.ao-home.ao-home-601010 {
+  display: grid;
+  grid-template-columns: minmax(0, 1.95fr) minmax(280px, 1fr);
+  align-items: start;
+  gap: 12px;
+  min-width: 0;
+}
+.ao-home-601010 .ao-home-main,
+.ao-home-601010 .ao-home-side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.ao-home-601010 .ao-home-main > *,
+.ao-home-601010 .ao-home-side > * { min-width: 0; }
+.ao-home-601010 .ao-home-main > .gx-card,
+.ao-home-601010 .ao-home-side > .gx-card { margin: 0; }
+.ao-home-601010 > .ao-details { grid-column: 1 / -1; min-width: 0; }
+.ao-home-601010 .ao-home-side > .ao-today {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ao-home-601010 .ao-home-side .gx-card,
+.ao-home-601010 .ao-home-main .gx-card { overflow-wrap: anywhere; }
+@media (min-width: 1100px) {
+  .sj-dash.ao-home.ao-home-601010 {
+    grid-template-columns: minmax(0, 2fr) minmax(300px, 0.95fr);
+    gap: 16px;
+  }
+}
+@media (max-width: 760px) {
+  .sj-dash.ao-home.ao-home-601010 {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+  .ao-home-601010 > .ao-details { grid-column: 1; }
+  .ao-home-601010 .ao-home-main,
+  .ao-home-601010 .ao-home-side { gap: 10px; }
+}
