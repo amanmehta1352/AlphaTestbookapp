@@ -8554,7 +8554,7 @@ function profileClear() { profileApply(null); }
 
 /* Gentle prompt on Home for a logged-in student who has not chosen yet (never blocks the screen) */
 function profileHomePrompt() {
-  if (Route?.page !== 'home' || !profileAvailable() || studentProfile()) return;
+  if (Route?.page !== 'home' || !profileAvailable() || studentProfile() || studentQualification()) return;
   const v = document.getElementById('mainView'); if (!v || v.querySelector('.pf-prompt, [data-home-setup]')) return;
   const q = studentQualification();
   const el = document.createElement('button'); el.type = 'button'; el.className = 'pf-prompt';
