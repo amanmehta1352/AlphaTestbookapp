@@ -36,7 +36,11 @@ try:
         st.locator('.cl-prompt').click(); st.wait_for_timeout(200)
         rec('account sheet explains why to log in', 'Google से login करें' in st.inner_text('#cloudSheet'))
         st.locator('.cl-google').click()
-        st.wait_for_selector('.sj-dash', timeout=15000); st.wait_for_function("ServerState.session && ServerState.session.user_id", timeout=10000); idle(st)
+        st.wait_for_function("ServerState.session && ServerState.session.user_id", timeout=15000); idle(st)
+        if st.locator('.qualification-setup').count():
+            st.locator('[data-qf-level="10th"]').click(); st.locator('#qualificationSave').click()
+            st.wait_for_selector('.exam-hub-page', timeout=15000); idle(st)
+            st.evaluate("navigate('home')"); st.wait_for_selector('.sj-dash', timeout=15000)
         rec('Google login returns to the app, address cleaned', 'access_token' not in st.url and st.evaluate("ServerState.session.email") == F.STUDENT[1])
         rec('student is not admin; questions came from the server', st.evaluate("CloudState.isAdmin===false && CloudState.serverQuestions===362 && AppModules.filter(m=>m.source==='server').length===3"))
         rec('home prompt disappears after login', st.locator('.cl-prompt').count() == 0)
@@ -77,7 +81,11 @@ try:
         # ---- student on a NEW phone ----
         n2ctx, st2 = phone()
         st2.locator('.cl-prompt').click(); st2.locator('.cl-google').click()
-        st2.wait_for_selector('.sj-dash', timeout=15000); st2.wait_for_function("ServerState.session && ServerState.session.user_id", timeout=10000); idle(st2)
+        st2.wait_for_function("ServerState.session && ServerState.session.user_id", timeout=15000); idle(st2)
+        if st2.locator('.qualification-setup').count():
+            st2.locator('[data-qf-level="10th"]').click(); st2.locator('#qualificationSave').click()
+            st2.wait_for_selector('.exam-hub-page', timeout=15000); idle(st2)
+            st2.evaluate("navigate('home')"); st2.wait_for_selector('.sj-dash', timeout=15000)
         rec('new phone: history comes back (4 answers, 1 test)', st2.evaluate("AttemptHistory.length") == 4 and st2.evaluate("ResultHistory.length") == 1, (st2.evaluate("AttemptHistory.length"), st2.evaluate("ResultHistory.length")))
         rec('new phone: bookmark and daily goal come back', st2.evaluate("ReviewState.bookmarks.length") == 1 and st2.evaluate("StudySettings.dailyGoal") == 25)
         st2.evaluate("closeModal(); navigate('home')"); st2.wait_for_timeout(300)
