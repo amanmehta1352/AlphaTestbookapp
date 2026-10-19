@@ -60,6 +60,10 @@ with sync_playwright() as p:
     rec('Display settings remain keyboard accessible', page.locator('#modalSheet.open .ds').count() == 1)
     page.keyboard.press('Escape')
     rec('Closing settings restores focus to its trigger', page.evaluate("document.activeElement.id==='btnTextSize'"))
+    # Simulate the queued open callback arriving after Escape closed the dialog.
+    page.evaluate('nbFocusModal()')
+    rec('A deferred focus callback cannot focus a closed dialog',
+        page.evaluate("!nbModalIsOpen() && document.activeElement.id==='btnTextSize'"))
     # Active exam chrome must fit small/landscape screens and keep a useful reading area.
     page.evaluate("initTestSession('maths-percentage-class-test',getWorkspaceModule('maths-percentage-class-test').groups[0].groupId,0)")
     for width, height in [(360, 780), (412, 900), (844, 390)]:
@@ -132,29 +136,31 @@ with sync_playwright() as p:
         window.__originalTestLaunch = initTestSession;
         initTestSession = (...args) => { window.__capturedTestLaunch = args; };
     }""")
-    rec('Synced topic titles render as text in both assessment cards',
-        page.locator('#mainView img').count() == 0 and
-        '<img src=x' in page.locator('.resume-title').inner_text() and
-        '<img src=x' in page.locator('.grid-cards strong').first.inner_text())
-    for index, label in enumerate(('featured assessment', 'module card')):
-        page.evaluate('window.__capturedTestLaunch = null')
-        page.locator('#mainView button[onclick^="initTestSession"]').nth(index).click()
-        rec(f'{label} treats quoted IDs as literal arguments', page.evaluate("""() => {
-            const args = window.__capturedTestLaunch, mod = AppModules[0];
-            return !window.__hubInjected && args?.[0] === mod.moduleId && args?.[1] === mod.groups[1].groupId;
-        }"""))
-    page.evaluate("AppModules[0].topicTitle='Safe topic';renderTopicHubPage(document.getElementById('mainView'),AppModules[0].moduleId)")
-    topic_launchers = page.locator('#mainView [onclick^="initTestSession"]')
-    topic_args_ok = topic_launchers.count() >= 2
-    for index in range(topic_launchers.count()):
-        page.evaluate('window.__capturedTestLaunch = null')
-        topic_launchers.nth(index).click()
-        topic_args_ok = page.evaluate("""() => {
-            const args = window.__capturedTestLaunch, mod = AppModules[0];
-            return !window.__hubInjected && args?.[0] === mod.moduleId && mod.groups.some(g => g.groupId === args?.[1]);
-        }""") and topic_args_ok
-    rec('Topic assessment actions preserve quoted module and group IDs', topic_args_ok)
-    page.evaluate('initTestSession = window.__originalTestLaunch;void 0')
+    try:
+        rec('Synced topic titles render as text in both assessment cards',
+            page.locator('#mainView img').count() == 0 and
+            '<img src=x' in page.locator('.resume-title').inner_text() and
+            '<img src=x' in page.locator('.grid-cards strong').first.inner_text())
+        for index, label in enumerate(('featured assessment', 'module card')):
+            page.evaluate('window.__capturedTestLaunch = null')
+            page.locator('#mainView button[onclick^="initTestSession"]').nth(index).click()
+            rec(f'{label} treats quoted IDs as literal arguments', page.evaluate("""() => {
+                const args = window.__capturedTestLaunch, mod = AppModules[0];
+                return !window.__hubInjected && args?.[0] === mod.moduleId && args?.[1] === mod.groups[1].groupId;
+            }"""))
+        page.evaluate("AppModules[0].topicTitle='Safe topic';renderTopicHubPage(document.getElementById('mainView'),AppModules[0].moduleId)")
+        topic_launchers = page.locator('#mainView [onclick^="initTestSession"]')
+        topic_args_ok = topic_launchers.count() >= 2
+        for index in range(topic_launchers.count()):
+            page.evaluate('window.__capturedTestLaunch = null')
+            topic_launchers.nth(index).click()
+            topic_args_ok = page.evaluate("""() => {
+                const args = window.__capturedTestLaunch, mod = AppModules[0];
+                return !window.__hubInjected && args?.[0] === mod.moduleId && mod.groups.some(g => g.groupId === args?.[1]);
+            }""") and topic_args_ok
+        rec('Topic assessment actions preserve quoted module and group IDs', topic_args_ok)
+    finally:
+        page.evaluate('initTestSession = window.__originalTestLaunch;void 0')
     rec('No browser errors across hubs and the complete test/retry flow', not errors, errors)
 
     # Check effective text contrast, including the hint's opacity, in both dark modes.

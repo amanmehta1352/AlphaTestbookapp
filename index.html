@@ -6456,7 +6456,7 @@ function nbA11yEnhance() {
 function nbQueueA11y() { if (A11yQueued) return; A11yQueued = true; setTimeout(nbA11yEnhance, 0); }
 function nbModalIsOpen() { return document.getElementById('modalSheet')?.classList.contains('open'); }
 function nbFocusModal() {
-  const sheet = document.getElementById('modalSheet'); if (!sheet) return;
+  const sheet = document.getElementById('modalSheet'); if (!sheet || !sheet.classList.contains('open')) return;
   // A form field gets focus directly; otherwise the dialog itself (no stray focus ring on a button).
   // Sheets marked data-no-autofocus (long lists with inputs) should not pop the phone keyboard open.
   const first = sheet.querySelector('[data-no-autofocus]') ? null : sheet.querySelector('#modalSheetBody input:not([type=hidden]):not([disabled]), #modalSheetBody select, #modalSheetBody textarea');
