@@ -281,6 +281,20 @@ function gxSubjectWidget() {
 /** Return this week's study totals and their changes from last week as HTML. */
 function gxWeeklyWidget() {
   const w = sjWeekly();
+  const stats = learningStats();
+  const today = sjLocalDay();
+  const days = Array.from({ length: 7 }, (_, i) => {
+    const day = sjAddDays(today, i - 6);
+    const row = stats.byDay.get(day) || { answered: 0, correct: 0, sec: 0 };
+    return { day, answered: row.answered, correct: row.correct, sec: row.sec };
+  });
+  const maxAnswered = Math.max(1, ...days.map(d => d.answered));
+  const dateLabel = day => new Date(day + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'short' });
+  const chart = `<div class="gx-week-chart" role="img" aria-label="${escapeHtml(tx('Questions answered each day over the last seven days','पिछले सात दिनों में हर दिन हल किए गए सवाल'))}">${days.map(d => {
+    const pct = d.answered ? Math.max(5, Math.round(d.answered / maxAnswered * 100)) : 0;
+    const label = `${dateLabel(d.day)}: ${d.answered} ${tx('answered','हल किए')}`;
+    return `<div class="gx-week-day" data-day="${d.day}" title="${escapeHtml(label)}"><span class="gx-week-count">${d.answered}</span><span class="gx-week-track" aria-hidden="true"><span style="height:${pct}%"></span></span><span class="gx-week-label">${escapeHtml(dateLabel(d.day))}</span></div>`;
+  }).join('')}</div>`;
   /** Return directional change markup, or an empty string if either value is unknown. */
   const delta = (a, b, unit = "") => {
     if (b === null || a === null) return "";
@@ -293,7 +307,9 @@ function gxWeeklyWidget() {
     <div class="gx-kv"><span>${tx("Answered", "हल किए")}</span><b>${w.thisW.a}</b>${delta(w.thisW.a, w.lastW.a)}</div>
     <div class="gx-kv"><span>Accuracy</span><b>${w.thisW.acc === null ? "—" : w.thisW.acc + "%"}</b>${delta(w.thisW.acc, w.lastW.acc, "%")}</div>
     <div class="gx-kv"><span>${tx("Tests", "Test")}</span><b>${w.thisW.t}</b>${delta(w.thisW.t, w.lastW.t)}</div>
-    <div class="gx-kv"><span>${tx("Answering time", "जवाब का समय")}</span><b>${sjFmtMin(w.thisW.s)}</b></div></section>`;
+    <div class="gx-kv"><span>${tx("Answering time", "जवाब का समय")}</span><b>${sjFmtMin(w.thisW.s)}</b></div>
+    <div class="gx-week-chart-wrap"><div class="gx-week-chart-title">${tx("Daily activity", "रोज़ की गतिविधि")}</div>${chart}</div>
+    <p class="gx-note">${tx("Bars show answered questions for the last 7 calendar days in this workspace.", "बार इस workspace में पिछले 7 कैलेंडर दिनों के हल किए सवाल दिखाते हैं।")}</p></section>`;
 }
 /** Return the share of available questions answered at least once as a ring card. */
 function gxCoverageWidget() {

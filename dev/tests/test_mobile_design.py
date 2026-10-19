@@ -191,6 +191,35 @@ with sync_playwright() as p:
         "सवालों की संख्या" in page.locator(".sb-body").inner_text()
         and "Number of questions" not in page.locator(".sb-body").inner_text(),
     )
+    # The Home activity chart must render seven real calendar-day buckets and track learningStats.
+    page.evaluate("""() => {
+      const ws = WorkspaceManager.current().id;
+      for (let i = 0; i < 3; i++) AttemptHistory.push({
+        v: 1, ts: new Date(Date.now() - i * 1000).toISOString(), day: sjLocalDay(),
+        mode: 'practice', ws, moduleId: 'chart-audit', cid: 'chart-audit-q' + i,
+        subject: 'maths', topic: 'Chart audit', correct: i !== 1, sec: 30, answer: 'A'
+      });
+      LearningStatsCache = { key: '', value: null };
+      navigate('home');
+    }""")
+    page.wait_for_selector(".gx-week-chart")
+    chart_count = page.locator(".gx-week-chart .gx-week-day").count()
+    chart_values_match = page.evaluate("""() => {
+      const today = sjLocalDay();
+      const expected = learningStats().byDay.get(today)?.answered || 0;
+      const node = document.querySelector('.gx-week-day[data-day="' + today + '"] .gx-week-count');
+      return !!node && Number(node.textContent) === expected;
+    }""")
+    rec("Weekly activity chart renders seven days", chart_count == 7, chart_count)
+    rec("Weekly chart bars match current workspace learning data", chart_values_match)
+    for width in [360, 1280]:
+        page.set_viewport_size({"width": width, "height": 900})
+        overflow = page.evaluate("""() => {
+          const chart = document.querySelector('.gx-week-chart');
+          return !chart || chart.scrollWidth > chart.clientWidth + 1 ||
+            document.documentElement.scrollWidth > innerWidth + 1;
+        }""")
+        rec(f"Weekly chart fits {width}px viewport", not overflow, overflow)
     rec("No runtime errors in the layout/settings journey", not errors, errors)
     browser.close()
 

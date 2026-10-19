@@ -1,29 +1,21 @@
-# Build and release files
+# Alpha Testbook App — Build & Release Verification
 
-`src/` and `manifest.json` are the source of truth. Root `index.html` and
-`admin/index.html` are generated releases; never edit them by hand.
+## 1. Source of Truth
 
-Run these commands from the repository root (Python standard library only):
+All application source code is maintained in `dev/app/src/`.
 
-```sh
+The following files are generated release files and must never be edited manually:
+
+- `index.html`
+- `admin/index.html`
+
+Always regenerate both files using the official build commands before running tests or creating a pull request.
+
+## 2. Build Commands
+
+Run all commands from the repository root.
+
+### Build the Student App
+
+```bash
 python3 dev/app/build.py index.html
-python3 dev/app/build.py admin/index.html --studio
-python3 dev/app/build.py --check
-```
-
-The builder resolves source paths relative to itself, so it also works from
-`dev/app/`. Output paths are relative to the caller's working directory.
-`--check` compares both release files byte for byte and exits nonzero on missing
-or stale output without writing anything. The full test runner runs this check
-before testing its disposable build so a passing suite also covers the files
-that GitHub Pages will serve.
-
-Before a release, update the `app-version` in `src/html/head-01.html`, advance the
-shell `CACHE` in `../../sw.js`, rebuild both files, and run
-`sudo -E bash dev/tests/run_all.sh` from the root in the CI test environment
-(Playwright/Chromium and PostgreSQL 16; see `.github/workflows/tests.yml`). The
-optional positional version argument is for standalone candidate exports; use
-the source version for checked-in releases so `--check` stays reproducible.
-
-Generating matching files does not approve a candidate or deploy it. Keep the
-existing release-review markers until baseline/runtime approval is resolved.

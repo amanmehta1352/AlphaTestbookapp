@@ -1821,6 +1821,99 @@ body:not(.dark) .gx-kv em.up{color:#047857}body:not(.dark) .gx-kv em.down{color:
   .gx-hero h1{font-size:34px}
 }
 @media(prefers-reduced-motion:reduce){.gx-ring-val,.gx-flash{transition:none}}
+
+/* Glass dashboard refinement — clearer depth, focus states and data-chart legibility. */
+.gx-card {
+  background-image: linear-gradient(145deg, rgba(255,255,255,.16), transparent 48%);
+  border-color: color-mix(in srgb, var(--gx-border) 78%, var(--gx-blue));
+}
+body.dark .gx-card {
+  background-image: linear-gradient(145deg, rgba(148,163,184,.10), transparent 52%);
+}
+@media (hover:hover) and (prefers-reduced-motion:no-preference) {
+  .gx-card { transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease; }
+  .gx-card:hover {
+    border-color: color-mix(in srgb, var(--gx-border) 52%, var(--gx-blue));
+    box-shadow: var(--gx-shadow), 0 8px 24px rgba(59,130,246,.08);
+  }
+}
+.gx-week-chart-wrap {
+  margin-top: 12px;
+  padding: 12px 10px 8px;
+  border: 1px solid var(--gx-border);
+  border-radius: 16px;
+  background: rgba(255,255,255,.055);
+  min-width: 0;
+}
+.gx-week-chart-title {
+  margin: 0 0 8px;
+  color: var(--gx-muted);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.gx-week-chart {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  align-items: end;
+  gap: clamp(4px, 1.5vw, 10px);
+  width: 100%;
+  min-width: 0;
+}
+.gx-week-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+  min-width: 0;
+}
+.gx-week-count {
+  color: var(--gx-text);
+  font-size: 10px;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+}
+.gx-week-track {
+  display: flex;
+  align-items: flex-end;
+  width: min(100%, 24px);
+  height: 66px;
+  overflow: hidden;
+  border-radius: 7px;
+  background: var(--gx-track);
+}
+.gx-week-track > span {
+  display: block;
+  width: 100%;
+  min-height: 0;
+  border-radius: 6px;
+  background: linear-gradient(180deg, var(--gx-cyan), var(--gx-blue) 58%, var(--gx-purple));
+  box-shadow: 0 0 12px rgba(96,165,250,.22);
+  transition: height .25s ease;
+}
+.gx-week-label {
+  color: var(--gx-muted);
+  font-size: 10px;
+  font-weight: 750;
+  line-height: 1.2;
+}
+.gx-week-day[data-day] { cursor: help; }
+.gx-week-day:focus-visible {
+  outline: 2px solid var(--gx-blue);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+@media (max-width: 380px) {
+  .gx-week-chart-wrap { padding-inline: 7px; }
+  .gx-week-chart { gap: 3px; }
+  .gx-week-track { height: 54px; }
+  .gx-week-label { font-size: 9px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gx-card, .gx-week-track > span { transition: none !important; }
+}
 </style>
 
 <style id="v241-update5">
@@ -6507,6 +6600,20 @@ function gxSubjectWidget() {
 /** Return this week's study totals and their changes from last week as HTML. */
 function gxWeeklyWidget() {
   const w = sjWeekly();
+  const stats = learningStats();
+  const today = sjLocalDay();
+  const days = Array.from({ length: 7 }, (_, i) => {
+    const day = sjAddDays(today, i - 6);
+    const row = stats.byDay.get(day) || { answered: 0, correct: 0, sec: 0 };
+    return { day, answered: row.answered, correct: row.correct, sec: row.sec };
+  });
+  const maxAnswered = Math.max(1, ...days.map(d => d.answered));
+  const dateLabel = day => new Date(day + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'short' });
+  const chart = `<div class="gx-week-chart" role="img" aria-label="${escapeHtml(tx('Questions answered each day over the last seven days','पिछले सात दिनों में हर दिन हल किए गए सवाल'))}">${days.map(d => {
+    const pct = d.answered ? Math.max(5, Math.round(d.answered / maxAnswered * 100)) : 0;
+    const label = `${dateLabel(d.day)}: ${d.answered} ${tx('answered','हल किए')}`;
+    return `<div class="gx-week-day" data-day="${d.day}" title="${escapeHtml(label)}"><span class="gx-week-count">${d.answered}</span><span class="gx-week-track" aria-hidden="true"><span style="height:${pct}%"></span></span><span class="gx-week-label">${escapeHtml(dateLabel(d.day))}</span></div>`;
+  }).join('')}</div>`;
   /** Return directional change markup, or an empty string if either value is unknown. */
   const delta = (a, b, unit = "") => {
     if (b === null || a === null) return "";
@@ -6519,7 +6626,9 @@ function gxWeeklyWidget() {
     <div class="gx-kv"><span>${tx("Answered", "हल किए")}</span><b>${w.thisW.a}</b>${delta(w.thisW.a, w.lastW.a)}</div>
     <div class="gx-kv"><span>Accuracy</span><b>${w.thisW.acc === null ? "—" : w.thisW.acc + "%"}</b>${delta(w.thisW.acc, w.lastW.acc, "%")}</div>
     <div class="gx-kv"><span>${tx("Tests", "Test")}</span><b>${w.thisW.t}</b>${delta(w.thisW.t, w.lastW.t)}</div>
-    <div class="gx-kv"><span>${tx("Answering time", "जवाब का समय")}</span><b>${sjFmtMin(w.thisW.s)}</b></div></section>`;
+    <div class="gx-kv"><span>${tx("Answering time", "जवाब का समय")}</span><b>${sjFmtMin(w.thisW.s)}</b></div>
+    <div class="gx-week-chart-wrap"><div class="gx-week-chart-title">${tx("Daily activity", "रोज़ की गतिविधि")}</div>${chart}</div>
+    <p class="gx-note">${tx("Bars show answered questions for the last 7 calendar days in this workspace.", "बार इस workspace में पिछले 7 कैलेंडर दिनों के हल किए सवाल दिखाते हैं।")}</p></section>`;
 }
 /** Return the share of available questions answered at least once as a ring card. */
 function gxCoverageWidget() {
