@@ -8103,6 +8103,17 @@ function cloudQuestionFromRow(r, examName, ws, idx) {
     metadata: meta, workspaceId: ws.id, workspaceType: ws.type, contentHash: r.content_hash || '', importState: 'READY', version: 'server'
   };
 }
+/* Fetch only exam/subject metadata before qualification is chosen; no question stems/options are downloaded. */
+async function cloudPullQualificationIndex() {
+  const exams = await cloudPullAll('exams', 'id,name', 'id');
+  const rows = await cloudPullAll('questions', 'exam_id,subject', 'exam_id,subject');
+  const examName = new Map(exams.map(e => [e.id, e.name]));
+  CloudState.profileIndex = typeof profileIndex === 'function' ? profileIndex(rows, examName) : null;
+  CloudState.serverQuestions = 0;
+  CloudState.serverQuestionsAll = rows.length;
+  return { questions: 0, topics: 0, changed: false, waitingForQualification: true };
+}
+
 async function cloudPullContent() {
   const ws = cloudTargetWorkspace();
   const exams = await cloudPullAll('exams', 'id,name', 'id');
@@ -8224,7 +8235,11 @@ async function cloudSync(reason = 'manual') {
       const uid = ServerState.session.user_id;
       if (CloudState.isAdmin === null || CloudState.userId !== uid) CloudState.isAdmin = await Server.checkAdmin();
       let content = null;
-      if (!CloudState.isAdmin) content = await cloudPullContent();
+      if (!CloudState.isAdmin) {
+        content = typeof studentQualification === 'function' && !studentQualification()
+          ? await cloudPullQualificationIndex()
+          : await cloudPullContent();
+      }
       const prog = await cloudSyncProgress();
       CloudState.userId = uid; CloudState.email = ServerState.session.email || CloudState.email; CloudState.lastSyncAt = new Date().toISOString();
       CloudState.msg = `✓ Sync हो गया${content?.changed ? ` · ${content.questions} सवाल server से आए` : ''}${prog.up ? ` · ${prog.up} जवाब भेजे` : ''}${prog.down ? ` · ${prog.down} पुराने जवाब वापस आए` : ''}`; CloudState.msgKind = 'good';
@@ -8301,8 +8316,13 @@ async function cloudBoot() {
   await cloudLoadState();
   Server.loadSession();
   const came = await cloudFinishRedirect();
-  if (ServerState.session) { await cloudSync('auto'); if (came) openAccount(); }
-  else if (came) openAccount();
+  if (ServerState.session) {
+    await cloudSync('auto');
+    if (came) {
+      if (CloudState.isAdmin === false && !studentQualification()) navigate('qualification_setup');
+      else openAccount();
+    }
+  } else if (came) openAccount();
   setInterval(() => { if (ServerState.session && navigator.onLine !== false) cloudSync('auto'); }, 10 * 60 * 1000);
   window.addEventListener('online', () => { if (ServerState.session) cloudSync('auto'); });
 }
@@ -8317,11 +8337,127 @@ registerViewHook('after', 'account-prompt', cloudHomePrompt);
    ========================================================================= */
 const ProfileRules = {
   branchOf(subject) { const m = /^([a-z]+)-engineering$/.exec(String(subject || '')); return m ? m[1] : ''; },
-  branchLabel(b) { return ({ civil: 'Civil', electrical: 'Electrical', mechanical: 'Mechanical' })[b] || (b ? b.charAt(0).toUpperCase() + b.slice(1) : ''); },
-  branchHi(b) { return ({ civil: 'सिविल', electrical: 'इलेक्ट्रिकल', mechanical: 'मैकेनिकल' })[b] || ''; },
+  branchLabel(b) { return ({ civil: 'Civil', electrical: 'Electrical', mechanical: 'Mechanical', electronics: 'Electronics', computer: 'Computer', instrumentation: 'Instrumentation', automobile: 'Automobile' })[b] || (b ? b.charAt(0).toUpperCase() + b.slice(1) : ''); },
+  branchHi(b) { return ({ civil: 'सिविल', electrical: 'इलेक्ट्रिकल', mechanical: 'मैकेनिकल', electronics: 'इलेक्ट्रॉनिक्स', computer: 'कंप्यूटर', instrumentation: 'इंस्ट्रूमेंटेशन', automobile: 'ऑटोमोबाइल' })[b] || ''; },
   validExam(e) { return !!e && e !== 'not-provided-in-source' && /^[a-z0-9][a-z0-9-]{1,80}$/.test(e); }
 };
 function studentProfile() { return (typeof UserState !== 'undefined' && UserState && UserState.studentProfile && UserState.studentProfile.examId) ? UserState.studentProfile : null; }
+
+const QualificationRules = {
+  levels: [
+    { id: '10th', en: '10th / Secondary', hi: '10वीं / सेकेंडरी' },
+    { id: '12th', en: '12th / Senior Secondary', hi: '12वीं / सीनियर सेकेंडरी' },
+    { id: 'iti', en: 'ITI / Industrial Training', hi: 'ITI / औद्योगिक प्रशिक्षण' },
+    { id: 'diploma', en: 'Diploma / Polytechnic', hi: 'डिप्लोमा / पॉलिटेक्निक' },
+    { id: 'graduate', en: 'Graduate / Bachelor', hi: 'ग्रेजुएट / स्नातक' },
+    { id: 'postgraduate', en: 'Postgraduate', hi: 'पोस्ट ग्रेजुएट' }
+  ],
+  branches: [
+    { id: 'mechanical', en: 'Mechanical Engineering', hi: 'मैकेनिकल इंजीनियरिंग' },
+    { id: 'civil', en: 'Civil Engineering', hi: 'सिविल इंजीनियरिंग' },
+    { id: 'electrical', en: 'Electrical Engineering', hi: 'इलेक्ट्रिकल इंजीनियरिंग' },
+    { id: 'electronics', en: 'Electronics Engineering', hi: 'इलेक्ट्रॉनिक्स इंजीनियरिंग' },
+    { id: 'computer', en: 'Computer Engineering', hi: 'कंप्यूटर इंजीनियरिंग' },
+    { id: 'instrumentation', en: 'Instrumentation Engineering', hi: 'इंस्ट्रूमेंटेशन इंजीनियरिंग' },
+    { id: 'automobile', en: 'Automobile Engineering', hi: 'ऑटोमोबाइल इंजीनियरिंग' }
+  ],
+  levelLabel(level) { return (this.levels.find(x => x.id === level) || {}).en || String(level || ''); },
+  branchOptions() {
+    const idx = CloudState.profileIndex || {};
+    const known = Object.keys(idx).length > 0;
+    const counts = {};
+    Object.values(idx).forEach(ex => Object.entries(ex.branches || {}).forEach(([b, n]) => {
+      counts[b] = (counts[b] || 0) + (Number(n) || 0);
+    }));
+    return this.branches.map(b => ({ ...b, count: counts[b.id] || 0 }));
+  },
+  needsBranch(level) { return ['iti', 'diploma', 'graduate', 'postgraduate'].includes(level); }
+};
+function studentQualification() {
+  const q = UserState?.studentQualification || UserState?.studentProfile?.qualificationProfile || null;
+  return q && q.level ? q : null;
+}
+function qualificationLabel(q = studentQualification()) {
+  if (!q) return '';
+  const level = QualificationRules.levelLabel(q.level);
+  if (!q.branch) return level;
+  return level + ' · ' + ProfileRules.branchLabel(q.branch);
+}
+let QualificationDraft = { level: '', branch: '', initialized: false };
+function openQualificationSetup() {
+  const q = studentQualification();
+  QualificationDraft = { level: q?.level || '', branch: q?.branch || '', initialized: true };
+  navigate('qualification_setup');
+}
+function qualificationPick(kind, value) {
+  if (kind === 'level') {
+    QualificationDraft.level = value;
+    QualificationDraft.branch = '';
+    const branches = QualificationRules.branchOptions();
+    if (branches.length === 1 && QualificationRules.needsBranch(value)) QualificationDraft.branch = branches[0].id;
+  } else if (kind === 'branch') QualificationDraft.branch = value;
+  renderView();
+}
+function qualificationBranchCount(examId, branch) {
+  return Number(CloudState.profileIndex?.[examId]?.branches?.[branch]) || 0;
+}
+function qualificationFilteredExams(exams) {
+  const q = studentQualification();
+  if (!q?.branch || !ServerState?.session || CloudState.isAdmin !== false) return exams || [];
+  const idx = CloudState.profileIndex || {};
+  if (!Object.keys(idx).length) return [];
+  return (exams || []).filter(ex => qualificationBranchCount(ex.examId, q.branch) > 0);
+}
+function qualificationExamAction(examId) {
+  if (studentQualification() && ServerState?.session && CloudState.isAdmin === false)
+    return 'qualificationChooseExam(' + nbJsAttr(examId) + ')';
+  return "navigate('exam_profile', {examId:" + nbJsAttr(examId) + '})';
+}
+async function qualificationRefreshContent() {
+  if (!ServerState?.session || CloudState.isAdmin !== false) return true;
+  try {
+    if (CloudSyncRunning) await CloudSyncRunning;
+    await cloudPullContent();
+    return true;
+  } catch (e) {
+    openCustomToast('Question list अपडेट नहीं हो सकी। Internet जाँचें और Sync फिर चलाएँ।');
+    return false;
+  }
+}
+async function qualificationSave() {
+  const level = QualificationDraft.level;
+  const branch = QualificationDraft.branch || '';
+  if (!level) { openCustomToast('पहले qualification चुनें।'); return; }
+  if (QualificationRules.needsBranch(level) && (!branch || !QualificationRules.branchOptions().some(x => x.id === branch))) {
+    openCustomToast('इस qualification के लिए उपलब्ध branch चुनें।'); return;
+  }
+  UserState.studentQualification = { level, branch, at: new Date().toISOString() };
+  UserState.studentProfile = null;
+  UserState.selectedExam = '';
+  UserState.selectedYear = '';
+  saveUserState();
+  await qualificationRefreshContent();
+  QualificationDraft.initialized = false;
+  navigate('exam_hub');
+}
+async function qualificationChooseExam(examId) {
+  const q = studentQualification();
+  const ex = UniversalExamRegistry.registry.get(String(examId || ''));
+  if (!ex) { openCustomToast('यह exam अभी उपलब्ध नहीं है।'); return; }
+  if (!q) { navigate('qualification_setup'); return; }
+  if (q.branch && qualificationBranchCount(examId, q.branch) <= 0 && Object.keys(CloudState.profileIndex || {}).length) {
+    openCustomToast('इस exam में चुनी branch के प्रकाशित सवाल उपलब्ध नहीं हैं।'); return;
+  }
+  UserState.studentProfile = {
+    examId: String(examId), branch: q.branch || '', qualification: q.level,
+    qualificationProfile: { level: q.level, branch: q.branch || '' }, at: new Date().toISOString()
+  };
+  UserState.selectedExam = String(examId);
+  UserState.selectedYear = '';
+  saveUserState();
+  await qualificationRefreshContent();
+  navigate('exam_profile', { examId: String(examId) });
+}
 
 /* examId -> { id, name, count, branches: { civil: n, … } } from all published rows */
 function profileIndex(rows, examName) {
@@ -8335,7 +8471,16 @@ function profileIndex(rows, examName) {
   return idx;
 }
 function profileFilterRows(rows) {
-  const p = studentProfile(); if (!p) return rows;
+  const p = studentProfile();
+  const q = studentQualification();
+  const profileMatchesQualification = !!(p && (!q || (p.qualification === q.level && String(p.branch || '') === String(q.branch || ''))));
+  if (q && q.branch && !profileMatchesQualification) {
+    return (rows || []).filter(r => {
+      const b = ProfileRules.branchOf(r.subject);
+      return !b || b === q.branch;
+    });
+  }
+  if (!profileMatchesQualification) return rows || [];
   return (rows || []).filter(r => {
     if (r.exam_id !== p.examId) return false;
     const b = ProfileRules.branchOf(r.subject);
@@ -8345,15 +8490,24 @@ function profileFilterRows(rows) {
 function profileLabel(p = studentProfile()) {
   if (!p) return '';
   const ex = CloudState.profileIndex?.[p.examId]?.name || p.examId.toUpperCase();
-  return p.branch ? `${ex} · ${tx(ProfileRules.branchLabel(p.branch), ProfileRules.branchHi(p.branch) || ProfileRules.branchLabel(p.branch))}` : ex;
+  if (p.qualification) {
+    const q = { level: p.qualification, branch: p.branch || '' };
+    return ex + ' · ' + qualificationLabel(q);
+  }
+  return p.branch ? ex + ' · ' + tx(ProfileRules.branchLabel(p.branch), ProfileRules.branchHi(p.branch) || ProfileRules.branchLabel(p.branch)) : ex;
 }
 function profileAvailable() { return !!(ServerState?.session && CloudState.isAdmin === false && CloudState.profileIndex && Object.keys(CloudState.profileIndex).length); }
 
 /* Hero chip used by the Home screen; falls back to the old exam pill */
 function profileHeroChip(examLine) {
-  if (!profileAvailable()) return `<span class="gx-pill">🏛️ ${examLine}</span><button type="button" class="gx-link" onclick="navigate('exam_hub')">${tx('Change exam','Exam बदलें')}</button>`;
+  const q = studentQualification();
   const p = studentProfile();
-  return `<button type="button" class="pf-chip" onclick="openProfileSheet()" aria-label="${tx('Change exam and branch','Exam और branch बदलें')}">🎯 ${escapeHtml(p ? profileLabel(p) : tx('Choose your exam','अपना exam चुनें'))} ▾</button><button type="button" class="gx-link" onclick="navigate('exam_hub')">${tx('All exams','सारे exam')}</button>`;
+  const label = p ? profileLabel(p) : q ? qualificationLabel(q) + ' · ' + tx('Choose exam','परीक्षा चुनें') : tx('Choose qualification','योग्यता चुनें');
+  if (!profileAvailable()) {
+    if (!ServerState?.session || CloudState.isAdmin !== false) return `<span class="gx-pill">🏛️ ${examLine}</span><button type="button" class="gx-link" onclick="navigate('exam_hub')">${tx('Change exam','Exam बदलें')}</button>`;
+    return '<button type="button" class="pf-chip" onclick="openQualificationSetup()" aria-label="Qualification बदलें">🎓 ' + escapeHtml(q ? qualificationLabel(q) : examLine) + ' ▾</button><button type="button" class="gx-link" onclick="navigate(\'exam_hub\')">' + tx('All exams','सारे exam') + '</button>';
+  }
+  return '<button type="button" class="pf-chip" onclick="openQualificationSetup()" aria-label="Qualification बदलें">🎓 ' + escapeHtml(label) + ' ▾</button><button type="button" class="gx-link" onclick="navigate(\'exam_hub\')">' + tx('All exams','सारे exam') + '</button>';
 }
 
 /* ---------- sheet: step 1 exam, step 2 branch ---------- */
@@ -8403,11 +8557,25 @@ function profileClear() { profileApply(null); }
 function profileHomePrompt() {
   if (Route?.page !== 'home' || !profileAvailable() || studentProfile()) return;
   const v = document.getElementById('mainView'); if (!v || v.querySelector('.pf-prompt, [data-home-setup]')) return;
-  const el = document.createElement('button'); el.type = 'button'; el.className = 'pf-prompt'; el.onclick = openProfileSheet;
-  el.innerHTML = `<span class="pf-ico" aria-hidden="true">🎯</span><span style="flex:1"><b>${tx('Choose your exam and branch','अपना exam और branch चुनें')}</b><small>${tx('Then only your questions appear — no other branch mixed in.','फिर सिर्फ़ आपके सवाल दिखेंगे — दूसरी branch के नहीं।')}</small></span><span aria-hidden="true">›</span>`;
+  const q = studentQualification();
+  const el = document.createElement('button'); el.type = 'button'; el.className = 'pf-prompt';
+  el.onclick = q ? () => navigate('exam_hub') : openQualificationSetup;
+  el.innerHTML = '<span class="pf-ico" aria-hidden="true">🎯</span><span style="flex:1"><b>' +
+    (q ? tx('Choose your exam','अपनी परीक्षा चुनें') : tx('Choose your qualification','अपनी qualification चुनें')) +
+    '</b><small>' + tx('Your subjects and questions will follow your selected qualification and branch.','आपके विषय और सवाल चुनी qualification और branch के अनुसार दिखेंगे।') +
+    '</small></span><span aria-hidden="true">›</span>';
   v.prepend(el);
 }
 registerViewHook('after', 'profile-prompt', profileHomePrompt);
+
+/* After login, qualification is the first required student step; admins and Board workspaces are untouched. */
+function qualificationFirstGate() {
+  if (Route?.page === 'qualification_setup' || Route?.page === 'test' || Route?.page === 'result') return;
+  if (!ServerState?.session || CloudState.isAdmin !== false || WorkspaceManager.current().type === 'BOARD') return;
+  if (studentQualification()) return;
+  navigate('qualification_setup');
+}
+registerViewHook('after', 'qualification-first-gate', qualificationFirstGate);
 /* After a sync the login state is known: repaint Home once if the chip is not there yet */
 const _pfCloudSync = cloudSync;
 cloudSync = async function (...args) {
@@ -8417,8 +8585,19 @@ cloudSync = async function (...args) {
 };
 /* Display filter (read-only screens): with a profile, demo/other-exam local topics are hidden */
 function profileVisible(mods) {
-  const p = studentProfile(); if (!p) return mods || [];
-  return (mods || []).filter(m => m.source === 'server' || (m.examId && m.examId === p.examId));
+  const source = mods || [];
+  const p = studentProfile();
+  const q = studentQualification();
+  const profileMatchesQualification = !!(p && (!q || (p.qualification === q.level && String(p.branch || '') === String(q.branch || ''))));
+  if (q && q.branch && !profileMatchesQualification) {
+    return source.filter(m => {
+      if (m.source === 'server') return true;
+      const b = ProfileRules.branchOf(m.subject);
+      return !b || b === q.branch;
+    });
+  }
+  if (!profileMatchesQualification) return source;
+  return source.filter(m => m.source === 'server' || (m.examId && m.examId === p.examId));
 }
 
 /* =========================================================================
@@ -12810,6 +12989,102 @@ function studioBulk(status) {
   if (!confirm(`"${t?.title || ''}" के ${rows.length} सवाल ${what}?`)) return;
   studioSetStatus(rows.map(r => r.id), status);
 }
+
+/* =========================================================================
+   Qualification-first onboarding + Exam Hub branch filter.
+   Reuses current app classes, routes, question index and profile filter.
+   No new CSS system, question schema, or question-data writer is introduced.
+   ========================================================================= */
+function renderQualificationSetup(v) {
+  if (!QualificationDraft.initialized) {
+    const q = studentQualification();
+    QualificationDraft = { level: q?.level || '', branch: q?.branch || '', initialized: true };
+  }
+  const levels = QualificationRules.levels;
+  const branchOptions = QualificationRules.branchOptions();
+  const levelHtml = levels.map(level =>
+    '<button type="button" class="pf-opt ' + (level.id === QualificationDraft.level ? 'on' : '') +
+    '" data-qf-level="' + escapeHtml(level.id) + '" onclick="qualificationPick(\'level\',' + nbJsAttr(level.id) + ')"><b>' +
+    escapeHtml(tx(level.en, level.hi)) + '</b><small>' + escapeHtml(level.id.toUpperCase()) + '</small></button>'
+  ).join('');
+  const branchHtml = branchOptions.map(item =>
+    '<button type="button" class="pf-opt ' + (item.id === QualificationDraft.branch ? 'on' : '') +
+    '" data-qf-branch="' + escapeHtml(item.id) + '" onclick="qualificationPick(\'branch\',' + nbJsAttr(item.id) + ')"><b>' +
+    escapeHtml(tx(item.en, item.hi)) + '</b><small>' +
+    (item.count ? item.count + ' ' + tx('published branch questions', 'प्रकाशित branch सवाल') : tx('No branch questions indexed yet', 'अभी branch के सवाल index नहीं हुए')) +
+    '</small></button>'
+  ).join('');
+  const needsBranch = QualificationRules.needsBranch(QualificationDraft.level);
+  const ready = !!QualificationDraft.level && (!needsBranch || (!!QualificationDraft.branch && branchOptions.some(x => x.id === QualificationDraft.branch)));
+  v.innerHTML =
+    '<div class="nav-breadcrumb"><button type="button" onclick="navigate(\'home\')">Home</button><span class="sep">/</span><span>Qualification</span></div>' +
+    '<div id="qualificationSetup" class="qualification-setup">' +
+      '<div class="student-hero-card ao-page-head">' +
+        '<span class="journey-pill">🎓 ' + tx('Step 1 · Qualification', 'चरण 1 · योग्यता') + '</span>' +
+        '<h1>' + tx('Choose your qualification', 'अपनी qualification चुनें') + '</h1>' +
+        '<p>' + tx('Select your education level first. Matching branch-based preparation content will be shown next.', 'पहले अपनी शिक्षा चुनें। इसके बाद संबंधित branch की तैयारी सामग्री दिखाई जाएगी।') + '</p>' +
+      '</div>' +
+      '<div class="section-title ao-page-head"><span>1 · ' + tx('Education level', 'शिक्षा स्तर') + '</span></div>' +
+      '<div class="pf-grid">' + levelHtml + '</div>' +
+      (needsBranch ?
+        '<div class="section-title ao-page-head"><span>2 · ' + tx('Branch / Specialization', 'ब्रांच / विशेषज्ञता') + '</span></div>' +
+        (branchOptions.length ? '<div class="pf-grid">' + branchHtml + '</div>' :
+          '<div class="card-btn"><strong>' + tx('Branch-wise question content is not indexed yet.', 'अभी branch-wise सवाल उपलब्ध नहीं हैं।') + '</strong><small>' + tx('Continue after the relevant published question pack is available.', 'संबंधित प्रकाशित प्रश्न उपलब्ध होने के बाद आगे बढ़ें।') + '</small></div>')
+        : '') +
+      '<div class="pf-actions"><button type="button" id="qualificationSave" class="gx-btn" ' + (ready ? '' : 'disabled aria-disabled="true"') + ' onclick="qualificationSave()">' +
+      tx('Save & Continue to Exam Hub', 'सहेजें और Exam Hub खोलें') + ' →</button></div>' +
+      '<p class="gx-note">' + tx('Exam cards match indexed question content. Final recruitment eligibility must be checked in the current official notification.', 'Exam cards उपलब्ध question content से मिलाए जाते हैं। अंतिम पात्रता नवीन आधिकारिक notification से जाँचें।') + '</p>' +
+    '</div>';
+}
+
+/* Keep the existing Exam Hub layout; only its exam list is filtered for the selected technical branch. */
+const renderUniversalExamHubBeforeQualification = renderUniversalExamHub;
+renderUniversalExamHub = function(v) {
+  const q = studentQualification();
+  const isStudent = !!(q && ServerState?.session && CloudState.isAdmin === false);
+  if (!isStudent) return renderUniversalExamHubBeforeQualification(v);
+  const allExams = UniversalExamRegistry.getAllExams();
+  const exams = qualificationFilteredExams(allExams);
+  const totalQuestions = IndexEngine.registry.size;
+  const list = exams.map(ex => {
+    const n = q.branch ? qualificationBranchCount(ex.examId, q.branch) : ex.questionCount;
+    const action = qualificationExamAction(ex.examId);
+    return '<div class="card-btn" role="button" tabindex="0" data-exam-id="' + escapeHtml(ex.examId) + '" onclick="' + action + '" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();this.click();}">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><strong>' + escapeHtml(ex.examName) + '</strong>' +
+      '<span style="font-size:11px;font-weight:800;background:var(--primary-light);color:var(--primary);padding:2px 8px;border-radius:999px;">' +
+      n + (q.branch ? ' Branch Questions' : ' Questions') + '</span></div>' +
+      '<small>🏛️ Board: <b>' + escapeHtml(ex.examBoard || '—') + '</b> • ' + escapeHtml(ex.category || 'Exam') + '</small>' +
+      '<div style="margin-top:6px;font-size:11px;color:var(--text-muted);">Years: <b>' + escapeHtml(Array.from(ex.years || []).join(', ') || '—') + '</b> • Marking: <b>' + escapeHtml(ex.markingScheme || '—') + '</b></div>' +
+      '<div style="margin-top:12px;display:flex;gap:6px;"><span class="btn-action-sm" style="background:var(--primary);color:var(--on-primary);width:100%;justify-content:center;">Open Exam Profile ➔</span></div></div>';
+  }).join('');
+  v.innerHTML =
+    '<div class="nav-breadcrumb exam-hub-page"><button type="button" onclick="navigate(\'home\')">Home</button><span class="sep">/</span><span>Universal Exam Hub</span></div>' +
+    '<div class="student-hero-card ao-page-head"><span class="journey-pill">🎯 ' + tx('Qualification matched', 'Qualification के अनुसार') + '</span>' +
+      '<h1>' + tx('Your Exam Hub', 'आपका Exam Hub') + '</h1>' +
+      '<p>' + escapeHtml(qualificationLabel(q)) + ' · ' + tx('Choose an exam to open its subjects, PYQs and practice tests.', 'Subjects, PYQ और practice tests के लिए परीक्षा चुनें।') + '</p>' +
+      '<p class="gx-note">' + (q.branch ? tx('Showing exams with published questions for your selected branch.', 'आपकी चुनी branch के प्रकाशित सवाल वाले exams दिख रहे हैं।') : tx('Exam list uses indexed app content; check official eligibility in each notification.', 'Exam list ऐप में उपलब्ध content पर आधारित है; पात्रता notification में जाँचें।')) + '</p>' +
+      '<button type="button" class="gx-link" onclick="openQualificationSetup()">✎ ' + tx('Change qualification', 'Qualification बदलें') + '</button></div>' +
+    '<div class="section-title ao-page-head"><span>' + tx('Matching Exam Frameworks', 'आपकी तैयारी से संबंधित परीक्षाएँ') + ' (' + exams.length + ' Exams · ' + totalQuestions + ' Indexed Questions)</span>' +
+      '<div style="display:flex;gap:6px;"><button class="btn-action-sm" onclick="navigate(\'competitive_hub\')">🏆 Competitive Hub</button>' +
+      (ServerState?.isAdmin === true ? '<button class="btn-action-sm" onclick="openImportModal()">+ Import New Exam</button>' : '') + '</div></div>' +
+    '<div class="grid-cards" style="margin-bottom:20px;">' +
+      (list || ('<div class="card-btn"><strong>' + tx('No matching published questions found for this branch.', 'इस branch के लिए प्रकाशित सवाल नहीं मिले।') + '</strong><small>' + tx('Try another branch or return after its question pack is reviewed and published.', 'दूसरी branch चुनें या उसके प्रश्न प्रकाशित होने के बाद लौटें।') + '</small></div>')) +
+    '</div>';
+};
+
+/* Legacy dashboard setup button now opens qualification first, then Exam Hub on subsequent visits. */
+const openProfileSheetBeforeQualification = openProfileSheet;
+openProfileSheet = function() {
+  if (studentQualification()) return navigate('exam_hub');
+  return openQualificationSetup();
+};
+
+/* The qualification setup is a route within the existing app shell. */
+AppRoutes.qualification_setup = {
+  nav: 'exams',
+  title: ['🎓 Qualification', '🎓 योग्यता'],
+  render: v => renderQualificationSetup(v)
+};
 
 /* =========================================================================
    9. MODAL & DIALOG CONTROLLERS
