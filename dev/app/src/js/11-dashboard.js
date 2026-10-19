@@ -320,7 +320,8 @@ function sjHomeSetupAction(d) {
   if (typeof profileAvailable === 'function' && profileAvailable() && !studentProfile()) return {
     kind: 'setup', icon: '🎯', title: tx('Choose your exam and branch','अपना exam और branch चुनें'),
     why: tx('See the right subjects and questions for your preparation.','अपनी तैयारी के सही विषय और सवाल देखें।'),
-    cta: tx('Choose my exam','अपना exam चुनें'), call: 'openProfileSheet()'
+    cta: (typeof studentQualification === 'function' && studentQualification()) ? tx('Choose my exam','अपना exam चुनें') : tx('Choose qualification','योग्यता चुनें'),
+    call: (typeof studentQualification === 'function' && studentQualification()) ? "navigate('exam_hub')" : "navigate('qualification_setup')"
   };
   if (d.totalQuestions) return null;
   if (!signedIn) return {
