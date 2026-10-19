@@ -2734,6 +2734,7 @@ body.dark { --on-primary: #07090e; }
 
 <script>
 /* Shared decorative icons: labels remain on their surrounding controls. */
+/** Return decorative outline SVG markup for a known name, falling back to the book icon. */
 function uiIcon(name) {
   const paths = {
     menu: "M4 6h16M4 12h16M4 18h16",
@@ -4134,18 +4135,23 @@ const ViewHooks = { before: new Map(), after: new Map() };
 const RouteViewStates = new Map();
 const RouteUiMemory = new Map();
 let RenderedRouteKey = '';
+/** Register or replace a named callback in the before or after render phase. */
 function registerViewHook(phase, name, hook) {
   ViewHooks[phase].set(name, hook);
 }
+/** Run every hook in a render phase, logging failures without stopping other hooks. */
 function runViewHooks(phase) {
   ViewHooks[phase].forEach((hook, name) => {
     try { hook(); } catch (error) { console.warn('[View hook]', name, error); }
   });
 }
+/** Register capture() and restore(state, fromHistory) callbacks for a page. */
 function registerRouteViewState(page, adapter) { RouteViewStates.set(page, adapter); }
+/** Return a workspace-specific key for a route and its parameters. */
 function routeUiKey(route = Route) {
   return JSON.stringify([WorkspaceManager.current().id, route.page, route.params]);
 }
+/** Remember the rendered route's scroll and adapter state, retaining at most 40 entries. */
 function captureRouteView() {
   if (RenderedRouteKey !== routeUiKey()) return;
   const adapter = RouteViewStates.get(Route.page);
@@ -4170,6 +4176,7 @@ function restoreAppRoute(){
     Route=candidate; AppRouteRestoring=true; return true;
   } catch(_) { return false; }
 }
+/** Update the Back control's availability and localized label from route history. */
 function updateAppBackButton(){
   const b=document.getElementById('btnAppBack'); if(!b)return;
   const canBack=Route.page!=='home' || AppRouteStack.length>0;
@@ -4183,6 +4190,7 @@ function currentPreviousAppRoute(){ return AppRouteStack.length ? routeSnapshot(
 function appBackWouldExitMode(target=currentPreviousAppRoute()){
   return APP_ACTIVE_MODE_PAGES.has(Route.page) && (!target || target.page !== Route.page);
 }
+/** Restore the previous route, requesting confirmation when leaving an active study mode. */
 function appNavigateBack(confirmed=false){
   const previous=currentPreviousAppRoute();
   if(!confirmed && ActiveTestSession?.sessionStatus==='ACTIVE'){ CbtExitGuard.requestExit(); return; }
@@ -4218,17 +4226,20 @@ function practiceSessionSummary(){
   const wrong=qs.filter(q=>Object.prototype.hasOwnProperty.call(PracticeAnswerState,String(q.originalQNo))&&PracticeAnswerState[String(q.originalQNo)]!==q.answer).length;
   return {total:qs.length,answered,correct,wrong,unanswered:Math.max(0,qs.length-answered)};
 }
+/** Offer submit, exit and cancel actions with current practice answer counts. */
 function requestPracticeBackOptions(){
   if(AppBackConfirmationOpen)return;AppBackConfirmationOpen=true;
   const x=practiceSessionSummary();
   openModal(tx('Practice is in progress', 'अभ्यास चल रहा है'),`<div style="font-size:14px;line-height:1.6;color:var(--text-main);">${tx('You have an active practice session. Submit shows a summary; Exit returns to the previous screen; Cancel keeps this question open. Existing answers and mistake-book entries are not deleted.', 'आपका अभ्यास चल रहा है। जमा करें से सारांश दिखेगा; बाहर निकलें से पिछला पेज खुलेगा; रद्द करें से यही सवाल खुला रहेगा। सहेजे जवाब और गलतियों की किताब सुरक्षित रहेंगे।')}</div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:12px;font-size:12px;"><div class="nb-stat"><small>${tx('ANSWERED', 'हल किए')}</small><strong>${x.answered} / ${x.total}</strong></div><div class="nb-stat"><small>${tx('UNANSWERED', 'बिना हल किए')}</small><strong>${x.unanswered}</strong></div></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap;"><button onclick="submitPracticeSessionSummary()" class="btn-nav primary">${tx('SUBMIT', 'जमा करें')}</button><button onclick="exitPracticeSession()" class="btn-nav">${tx('EXIT', 'बाहर निकलें')}</button><button onclick="cancelAppBack()" class="btn-nav">${tx('CANCEL', 'रद्द करें')}</button></div>`);
 }
+/** Show practice answer totals without saving a separate scored exam result. */
 function submitPracticeSessionSummary(){
   const x=practiceSessionSummary();AppBackConfirmationOpen=true;
   openModal(tx('Practice summary', 'अभ्यास का सारांश'),`<div style="font-size:14px;line-height:1.6;color:var(--text-main);">${tx('Practice review summary from the questions available in this session. This does not write a separate scored exam result.', 'इस अभ्यास के सवालों का सारांश। इसे अलग परीक्षा परिणाम के रूप में नहीं सहेजा जाएगा।')}</div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:12px;font-size:12px;"><div class="nb-stat"><small>${tx('ANSWERED', 'हल किए')}</small><strong>${x.answered} / ${x.total}</strong></div><div class="nb-stat"><small>${tx('CORRECT', 'सही')}</small><strong>${x.correct}</strong></div><div class="nb-stat"><small>${tx('WRONG', 'गलत')}</small><strong>${x.wrong}</strong></div><div class="nb-stat"><small>${tx('UNANSWERED', 'बिना हल किए')}</small><strong>${x.unanswered}</strong></div></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap;"><button onclick="cancelAppBack()" class="btn-nav">${tx('KEEP REVIEWING', 'देखते रहें')}</button><button onclick="exitPracticeSession()" class="btn-nav primary">${tx('FINISH PRACTICE', 'अभ्यास पूरा करें')}</button></div>`);
 }
 function exitPracticeSession(){AppBackConfirmationOpen=false;closeModal();appNavigateBack(true);}
 
+/** Show the appropriate exit confirmation, deferring active tests to the CBT guard. */
 function requestAppBackConfirmation(){
   if(AppBackConfirmationOpen) return;
   if(ActiveTestSession?.sessionStatus==='ACTIVE'){ CbtExitGuard.requestExit(); return; }
@@ -4245,6 +4256,7 @@ function confirmAppBack(){
   if(ActiveTestSession?.sessionStatus==='ACTIVE'){ CbtExitGuard.confirmExit(); return; }
   AppBackConfirmationOpen=false; closeModal(); appNavigateBack(true);
 }
+/** Navigate with workspace and active-test guards, saving the outgoing route's UI state. */
 function navigate(page, params = {}) {
   if (ActiveTestSession?.sessionStatus === 'ACTIVE' && page !== 'test') {
     if (page === 'result') { /* submitTestSession clears the session before the result route is reached */ }
@@ -4281,45 +4293,45 @@ function navigate(page, params = {}) {
 }
 
 const AppRoutes = {
-  home: { nav: 'home', title: ['🏠 Home', '🏠 होम'], render: v => {
+  home: { nav: 'home', title: ['🏠 Home', '🏠 होम'], render: /** Render the current workspace's Board or competitive Home dashboard. */ v => {
     if (WorkspaceManager.current().type === 'BOARD') {
       document.getElementById('txtHeaderTitle').textContent = '🎓 CBSE CAMPUS';
       renderBoardDashboard(v);
     } else renderHomePage(v);
   } },
-  competitive_hub: { nav: 'exams', title: ['🏆 Competitive exams', '🏆 प्रतियोगी परीक्षाएँ'], render: v => renderCompetitiveDashboard(v) },
-  competitive_subjects: { nav: 'exams', title: ['📚 Subjects', '📚 विषय'], render: v => renderCompetitiveSubjects(v) },
-  competitive_chapters: { nav: 'exams', title: ['📚 Chapters', '📚 अध्याय'], render: (v, p) => renderCompetitiveChapters(v, p.subject) },
-  competitive_topics: { nav: 'exams', title: ['📚 Topics', '📚 टॉपिक'], render: (v, p) => renderCompetitiveTopics(v, p.subject, p.chapter) },
-  competitive_topic: { nav: 'exams', title: ['📚 Topic', '📚 टॉपिक'], render: (v, p) => renderCompetitiveTopic(v, p.moduleId) },
-  exam_hub: { nav: 'exams', title: ['🏛️ Exams', '🏛️ परीक्षाएँ'], render: v => renderUniversalExamHub(v) },
-  exam_profile: { nav: 'exams', title: ['🎓 Exam', '🎓 परीक्षा'], render: (v, p) => renderExamProfile(v, p.examId) },
-  syllabus: { nav: 'exams', title: ['📚 Syllabus', '📚 पाठ्यक्रम'], render: (v, p) => renderSyllabusMatrix(v, p.examId) },
-  board_subjects: { nav: 'subjects', title: ['📚 Subjects', '📚 विषय'], render: v => renderBoardSubjects(v) },
-  board_chapters: { nav: 'subjects', title: ['📚 Chapters', '📚 अध्याय'], render: (v, p) => renderBoardChapters(v, p.subjectId) },
-  board_topics: { nav: 'subjects', title: ['📚 Topics', '📚 टॉपिक'], render: (v, p) => renderBoardTopics(v, p.chapterId, p.subjectId) },
-  board_topic: { nav: 'subjects', title: ['📚 Topic', '📚 टॉपिक'], render: (v, p) => renderBoardTopic(v, p.topicId, p.chapterId, p.subjectId) },
-  digital_library: { nav: 'library', title: ['📖 Study library', '📖 स्टडी लाइब्रेरी'], render: v => renderDigitalLibrary(v) },
-  native_builder: { nav: 'builder', title: ['🧩 Create Test', '🧩 टेस्ट बनाएँ'], render: v => renderNativeBuilder(v) },
-  subjects: { nav: 'subjects', title: ['📚 Subjects', '📚 विषय'], render: v => renderSubjectsCatalog(v) },
-  subject: { nav: 'subjects', title: ['📚 Chapters', '📚 अध्याय'], render: (v, p) => renderSubjectPage(v, p.subject) },
-  chapter: { nav: 'subjects', title: ['📚 Topics', '📚 टॉपिक'], render: (v, p) => renderChapterPage(v, p.subject, p.chapter) },
-  topic: { nav: 'subjects', title: ['📚 Topic', '📚 टॉपिक'], render: (v, p) => renderTopicHubPage(v, p.moduleId) },
-  subtopic: { nav: 'subjects', title: ['📚 Subtopic', '📚 उपविषय'], render: (v, p) => renderSubtopicConceptPage(v, p.moduleId, p.subtopic) },
-  taxonomy_explorer: { nav: 'bank', title: ['🔎 Question Bank', '🔎 प्रश्न बैंक'], render: (v, p) => renderTaxonomyExplorer(v, p) },
-  learn: { nav: 'subjects', title: ['📖 Learn', '📖 सीखें'], render: (v, p) => renderLearnEngine(v, p.moduleId) },
-  revision: { nav: 'revision', title: ['🔄 Revision', '🔄 रिवीज़न'], render: (v, p) => renderRevisionEngine(v, p.moduleId) },
-  practice: { nav: 'subjects', title: ['✍️ Practice', '✍️ अभ्यास'], render: (v, p) => renderPracticeEngine(v, p.moduleId, p.qIndex || 0, p.customQuestions) },
-  class: { nav: 'subjects', title: ['📚 Class', '📚 कक्षा'], render: (v, p) => renderClassEngine(v, p.moduleId) },
-  pyq: { nav: 'pyq', title: ['🎯 PYQ papers', '🎯 पिछले वर्ष के पेपर'], render: (v, p) => renderPYQEngine(v, p.moduleId) },
-  pyq_hub: { nav: 'pyq', title: ['🎯 PYQ papers', '🎯 पिछले वर्ष के पेपर'], render: v => renderGlobalPYQHub(v) },
-  test_hub: { nav: 'tests', title: ['⏱️ Tests', '⏱️ टेस्ट'], render: v => renderGlobalTestHub(v) },
-  revision_hub: { nav: 'revision', title: ['🔄 Revision', '🔄 रिवीज़न'], render: v => renderGlobalRevisionHub(v) },
-  test: { nav: 'tests', title: ['⏱️ Test', '⏱️ टेस्ट'], render: (v, p) => renderTestPage(v, p.moduleId, p.groupId, p.qIndex || 0) },
-  mistakes: { nav: 'revision', title: ['📕 Mistake Book', '📕 गलतियों की किताब'], render: v => renderMistakeBookPage(v) },
-  mastery: { nav: 'revision', title: ['🎯 Mastery', '🎯 महारत'], render: v => renderMasteryPage(v) },
-  result: { nav: 'tests', title: ['📊 Result', '📊 परिणाम'], render: (v, p) => renderResultPage(v, p.result) },
-  me: { nav: 'me', title: ['👤 Me', '👤 मैं'], render: v => renderMePage(v) }
+  competitive_hub: { nav: 'exams', title: ['🏆 Competitive exams', '🏆 प्रतियोगी परीक्षाएँ'], render: /** Render the competitive exam dashboard into the route container. */ v => renderCompetitiveDashboard(v) },
+  competitive_subjects: { nav: 'exams', title: ['📚 Subjects', '📚 विषय'], render: /** Render subjects for competitive exam preparation. */ v => renderCompetitiveSubjects(v) },
+  competitive_chapters: { nav: 'exams', title: ['📚 Chapters', '📚 अध्याय'], render: /** Render competitive chapters for the subject in the route parameters. */ (v, p) => renderCompetitiveChapters(v, p.subject) },
+  competitive_topics: { nav: 'exams', title: ['📚 Topics', '📚 टॉपिक'], render: /** Render competitive topics for the routed subject and chapter. */ (v, p) => renderCompetitiveTopics(v, p.subject, p.chapter) },
+  competitive_topic: { nav: 'exams', title: ['📚 Topic', '📚 टॉपिक'], render: /** Render the competitive topic identified by the routed module ID. */ (v, p) => renderCompetitiveTopic(v, p.moduleId) },
+  exam_hub: { nav: 'exams', title: ['🏛️ Exams', '🏛️ परीक्षाएँ'], render: /** Render the universal exam selection hub. */ v => renderUniversalExamHub(v) },
+  exam_profile: { nav: 'exams', title: ['🎓 Exam', '🎓 परीक्षा'], render: /** Render the profile of the exam identified by the route. */ (v, p) => renderExamProfile(v, p.examId) },
+  syllabus: { nav: 'exams', title: ['📚 Syllabus', '📚 पाठ्यक्रम'], render: /** Render the syllabus matrix for the routed exam ID. */ (v, p) => renderSyllabusMatrix(v, p.examId) },
+  board_subjects: { nav: 'subjects', title: ['📚 Subjects', '📚 विषय'], render: /** Render the Board workspace's subject list. */ v => renderBoardSubjects(v) },
+  board_chapters: { nav: 'subjects', title: ['📚 Chapters', '📚 अध्याय'], render: /** Render Board chapters for the routed subject ID. */ (v, p) => renderBoardChapters(v, p.subjectId) },
+  board_topics: { nav: 'subjects', title: ['📚 Topics', '📚 टॉपिक'], render: /** Render Board topics for the routed chapter and subject IDs. */ (v, p) => renderBoardTopics(v, p.chapterId, p.subjectId) },
+  board_topic: { nav: 'subjects', title: ['📚 Topic', '📚 टॉपिक'], render: /** Render the routed Board topic within its chapter and subject. */ (v, p) => renderBoardTopic(v, p.topicId, p.chapterId, p.subjectId) },
+  digital_library: { nav: 'library', title: ['📖 Study library', '📖 स्टडी लाइब्रेरी'], render: /** Render the study library and its resource-availability guidance. */ v => renderDigitalLibrary(v) },
+  native_builder: { nav: 'builder', title: ['🧩 Create Test', '🧩 टेस्ट बनाएँ'], render: /** Render the native test builder into the route container. */ v => renderNativeBuilder(v) },
+  subjects: { nav: 'subjects', title: ['📚 Subjects', '📚 विषय'], render: /** Render the subject catalog for the current study context. */ v => renderSubjectsCatalog(v) },
+  subject: { nav: 'subjects', title: ['📚 Chapters', '📚 अध्याय'], render: /** Render chapters and topics for the routed subject. */ (v, p) => renderSubjectPage(v, p.subject) },
+  chapter: { nav: 'subjects', title: ['📚 Topics', '📚 टॉपिक'], render: /** Render topics for the routed subject and chapter. */ (v, p) => renderChapterPage(v, p.subject, p.chapter) },
+  topic: { nav: 'subjects', title: ['📚 Topic', '📚 टॉपिक'], render: /** Render the topic hub for the routed module ID. */ (v, p) => renderTopicHubPage(v, p.moduleId) },
+  subtopic: { nav: 'subjects', title: ['📚 Subtopic', '📚 उपविषय'], render: /** Render concepts for the routed module and subtopic. */ (v, p) => renderSubtopicConceptPage(v, p.moduleId, p.subtopic) },
+  taxonomy_explorer: { nav: 'bank', title: ['🔎 Question Bank', '🔎 प्रश्न बैंक'], render: /** Render the Question Bank using the supplied route filters. */ (v, p) => renderTaxonomyExplorer(v, p) },
+  learn: { nav: 'subjects', title: ['📖 Learn', '📖 सीखें'], render: /** Render the learning engine for the routed module. */ (v, p) => renderLearnEngine(v, p.moduleId) },
+  revision: { nav: 'revision', title: ['🔄 Revision', '🔄 रिवीज़न'], render: /** Render the revision engine for the routed module. */ (v, p) => renderRevisionEngine(v, p.moduleId) },
+  practice: { nav: 'subjects', title: ['✍️ Practice', '✍️ अभ्यास'], render: /** Render routed practice questions, defaulting to the first question. */ (v, p) => renderPracticeEngine(v, p.moduleId, p.qIndex || 0, p.customQuestions) },
+  class: { nav: 'subjects', title: ['📚 Class', '📚 कक्षा'], render: /** Render the class engine for the routed module. */ (v, p) => renderClassEngine(v, p.moduleId) },
+  pyq: { nav: 'pyq', title: ['🎯 PYQ papers', '🎯 पिछले वर्ष के पेपर'], render: /** Render previous-year questions for the routed module. */ (v, p) => renderPYQEngine(v, p.moduleId) },
+  pyq_hub: { nav: 'pyq', title: ['🎯 PYQ papers', '🎯 पिछले वर्ष के पेपर'], render: /** Render the global previous-year paper hub. */ v => renderGlobalPYQHub(v) },
+  test_hub: { nav: 'tests', title: ['⏱️ Tests', '⏱️ टेस्ट'], render: /** Render the global test hub. */ v => renderGlobalTestHub(v) },
+  revision_hub: { nav: 'revision', title: ['🔄 Revision', '🔄 रिवीज़न'], render: /** Render the global revision hub. */ v => renderGlobalRevisionHub(v) },
+  test: { nav: 'tests', title: ['⏱️ Test', '⏱️ टेस्ट'], render: /** Render the routed test group, defaulting to its first question. */ (v, p) => renderTestPage(v, p.moduleId, p.groupId, p.qIndex || 0) },
+  mistakes: { nav: 'revision', title: ['📕 Mistake Book', '📕 गलतियों की किताब'], render: /** Render the saved mistake book. */ v => renderMistakeBookPage(v) },
+  mastery: { nav: 'revision', title: ['🎯 Mastery', '🎯 महारत'], render: /** Render the mastery overview. */ v => renderMasteryPage(v) },
+  result: { nav: 'tests', title: ['📊 Result', '📊 परिणाम'], render: /** Render the test result supplied in the route parameters. */ (v, p) => renderResultPage(v, p.result) },
+  me: { nav: 'me', title: ['👤 Me', '👤 मैं'], render: /** Render the account and study settings page. */ v => renderMePage(v) }
 };
 const RouteNavItems = {
   home: ['tabHome', 'drwHome'], subjects: ['tabSubjects', 'drwSubjects'],
@@ -4328,6 +4340,7 @@ const RouteNavItems = {
   revision: ['tabRevision', 'drwRevision'], bank: ['drwTaxonomy'],
   library: ['drwLibrary'], me: ['drwMe', 'btnMe']
 };
+/** Mark the current route's dock, drawer and Me controls as active. */
 function updateRouteNavigation() {
   document.querySelectorAll('.nav-tab, .drawer-item, #btnMe').forEach(el => {
     el.classList.remove('active'); el.removeAttribute('aria-current');
@@ -4337,6 +4350,7 @@ function updateRouteNavigation() {
     if (el) { el.classList.add('active'); el.setAttribute('aria-current', 'page'); }
   });
 }
+/** Render the registered page with shared hooks and restore its remembered UI state. */
 function renderView() {
   const container = document.getElementById('mainView');
   if (!container) return;
@@ -5440,12 +5454,14 @@ function gxTrendWidget(results) {
       <text x="${x(pts.length - 1) - 6}" y="${y(Number(last.accuracy) || 0) - 10}" class="gx-lastlabel" text-anchor="end">${Number(last.accuracy) || 0}%</text>
     </svg><p class="gx-note" id="gxTrendNote">${tx('Tap a point for details.','जानकारी के लिए किसी बिंदु पर tap करें।')}</p></section>`;
 }
+/** Show the selected trend point's test score, accuracy and time in the chart note. */
 function gxTrendInfo(i) {
   const r = (gxTrendInfo.pts || [])[i];
   const el = document.getElementById("gxTrendNote");
   if (r && el)
     el.textContent = `${r.topicTitle || "Test"} · ${Number(r.score) || 0}/${Number(r.total) || 0} · ${Number(r.accuracy) || 0}% · ${sjFormatWhen(r.ts)}`;
 }
+/** Return a revision card with up to four due items or upcoming-review guidance. */
 function gxRevisionWidget() {
   const due = reviewDue();
   return `<section class="gx-card gx-rev"><div class="gx-head"><h2>${tx("Spaced revision", "दोहराई (Revision)")}</h2><span class="gx-chip">${tx(`${due.length} due today`, `आज ${due.length} बाकी`)}</span></div>
@@ -5463,11 +5479,13 @@ function gxRevisionWidget() {
         : `<div class="gx-empty"><strong>${tx("All caught up", "सब पूरा")}</strong><span>${reviewUpcoming(7) ? tx(`${reviewUpcoming(7)} card(s) come back in the next 7 days.`, `अगले 7 दिनों में ${reviewUpcoming(7)} card लौटेंगे।`) : tx("Wrong answers become revision cards automatically.", "गलत जवाब अपने-आप revision cards बन जाते हैं।")}</span></div>`
     }</section>`;
 }
+/** Return focus/break timer controls and today's completed focus time as HTML. */
 function gxPomodoroWidget() {
   const p = pomoState();
   const r = pomoRemaining();
   const len = pomoPhaseLength(p.phase);
   const focusToday = Number(StudySettings.focusLog[sjLocalDay()]) || 0;
+  /** Return a duration button that is disabled while the Pomodoro timer runs. */
   const lenChip = (kind, m) =>
     `<button type="button" class="gx-mini ${StudySettings.pomo[kind] === m ? "on" : ""}" ${p.running ? "disabled" : ""} onclick="pomoSetLength('${kind}', ${m})">${m}m</button>`;
   return `<section class="gx-card gx-pomo"><div class="gx-head"><h2>Pomodoro</h2><span class="gx-chip">${tx("Focus today", "आज focus")} ${sjFmtMin(focusToday)}</span></div>
@@ -5480,6 +5498,7 @@ function gxPomodoroWidget() {
     <div class="gx-pomo-len"><span>${tx("Focus", "पढ़ाई")}</span>${[15, 25, 50].map((m) => lenChip("focus", m)).join("")}<span>${tx("Break", "आराम")}</span>${[5, 10].map((m) => lenChip("brk", m)).join("")}</div>
     <p class="gx-note">${tx("Only completed focus sessions are added to your focus time.", "सिर्फ़ पूरे हुए focus sessions ही focus time में जुड़ते हैं।")}</p></section>`;
 }
+/** Return today's answer, test, time and saved-mistake statistics as HTML. */
 function gxTodayWidget(d) {
   const st = learningStats();
   const today = st.byDay.get(sjLocalDay()) || { sec: 0 };
@@ -5495,6 +5514,7 @@ function gxTodayWidget(d) {
     </div>
     <p class="gx-note">${tx("Accuracy = correct ÷ answered. Answering time counts at most 10 minutes per question.", "Accuracy = सही ÷ हल किए। हर सवाल पर अधिकतम 10 मिनट ही गिने जाते हैं।")}</p></section>`;
 }
+/** Return accuracy bars for up to six subjects with recorded answers. */
 function gxSubjectWidget() {
   const st = learningStats();
   const rows = [...st.bySubject.values()]
@@ -5513,8 +5533,10 @@ function gxSubjectWidget() {
       "",
     )}</div><p class="gx-note">${tx('"few" = under 5 answers, not enough to judge.', '"कम" = 5 से कम जवाब, अभी अंदाज़ा लगाना ठीक नहीं।')}</p></section>`;
 }
+/** Return this week's study totals and their changes from last week as HTML. */
 function gxWeeklyWidget() {
   const w = sjWeekly();
+  /** Return directional change markup, or an empty string if either value is unknown. */
   const delta = (a, b, unit = "") => {
     if (b === null || a === null) return "";
     const d = a - b;
@@ -5528,11 +5550,13 @@ function gxWeeklyWidget() {
     <div class="gx-kv"><span>${tx("Tests", "Test")}</span><b>${w.thisW.t}</b>${delta(w.thisW.t, w.lastW.t)}</div>
     <div class="gx-kv"><span>${tx("Answering time", "जवाब का समय")}</span><b>${sjFmtMin(w.thisW.s)}</b></div></section>`;
 }
+/** Return the share of available questions answered at least once as a ring card. */
 function gxCoverageWidget() {
   const c = sjCoverage();
   const pct = c.total ? c.done / c.total : 0;
   return `<section class="gx-card gx-cov"><div class="gx-head"><h2>${tx("Coverage", "कवरेज")}</h2></div><div class="gx-cov-body">${gxRing(pct, 108, "gxCovGrad", `${Math.round(pct * 100)}%`, `${c.done} / ${c.total}`)}<p>${tx("questions answered at least once", "सवाल कम से कम एक बार हल किए")}</p></div></section>`;
 }
+/** Return a backup reminder when progress exists and no export was saved in seven days. */
 function gxBackupBanner() {
   const has = AttemptHistory.length || ResultHistory.length;
   if (!has) return "";
@@ -5544,6 +5568,7 @@ function gxBackupBanner() {
   if (days !== null && days < 7) return "";
   return `<section class="gx-card gx-backup" role="status"><span aria-hidden="true">💾</span><div><strong>${days === null ? tx("No backup file saved yet", "अभी कोई बैकअप फ़ाइल नहीं बचाई गई") : tx(`Last backup file ${days} days ago`, `आख़िरी backup ${days} दिन पहले`)}</strong><small>${tx("Save an extra copy of your progress before changing phones or clearing app data. Check Account for cloud sync status.", "फ़ोन बदलने या ऐप डेटा साफ़ करने से पहले प्रगति की एक और कॉपी बचाएँ। क्लाउड सिंक की स्थिति अकाउंट में देखें।")}</small></div><button type="button" class="gx-btn" onclick="downloadDataSnapshot()">${tx("Back up", "Backup लें")}</button></section>`;
 }
+/** Return up to three study suggestions prioritized by resume, revision and weak topics. */
 function sjNextActions(d) {
   const actions = [];
   const firstModule = d.modules[0] || null;
@@ -5672,6 +5697,7 @@ function sjNextActions(d) {
     });
   return actions.slice(0, 3);
 }
+/** Render study actions, goals, progress and preparation shortcuts into the supplied view. */
 function renderHomePage(v) {
   const d = sjCollectDashboardData();
   const actions = sjNextActions(d);
@@ -5947,6 +5973,7 @@ function openDisplaySettings() {
 }
 
 /* ---------- route titles ---------- */
+/** Return the localized registered page title, leaving the Board Home title to its renderer. */
 function nbRouteTitle(page) {
   if (page === 'home' && WorkspaceManager.current().type === 'BOARD') return null;
   const title = AppRoutes[page]?.title;
@@ -5965,6 +5992,7 @@ function nbA11yEnhance() {
 }
 function nbQueueA11y() { if (A11yQueued) return; A11yQueued = true; setTimeout(nbA11yEnhance, 0); }
 function nbModalIsOpen() { return document.getElementById('modalSheet')?.classList.contains('open'); }
+/** Focus an open sheet's first form field, or the sheet when autofocus is disabled. */
 function nbFocusModal() {
   ModalFocusTimer = null;
   const sheet = document.getElementById("modalSheet");
@@ -5982,6 +6010,7 @@ function nbFocusModal() {
 }
 const _u5OpenModal = openModal,
   _u5CloseModal = closeModal;
+/** Open or update a sheet, remembering its trigger and scheduling focus when needed. */
 openModal = function (title, contentHtml) {
   const wasOpen = nbModalIsOpen();
   if (!wasOpen) ModalReturnFocus = document.activeElement;
@@ -5995,6 +6024,7 @@ openModal = function (title, contentHtml) {
     ModalFocusTimer = setTimeout(nbFocusModal, 0);
   }
 };
+/** Close the sheet, cancel pending autofocus and restore focus to its surviving trigger. */
 closeModal = function () {
   clearTimeout(ModalFocusTimer);
   ModalFocusTimer = null;
@@ -6069,6 +6099,7 @@ function nbSubjectGroups() {
 }
 /* Subject navigation redesign — scoped only to the Subjects catalog. */
 let SubjectNavState = { selected: "", expanded: "" };
+/** Focus and reveal the catalog control matching the selector and catalog key. */
 function shFocusCatalogControl(selector, key) {
   const control = Array.from(document.querySelectorAll(selector)).find(
     (el) => el.dataset.catalogKey === key,
@@ -6076,17 +6107,20 @@ function shFocusCatalogControl(selector, key) {
   control?.focus({ preventScroll: true });
   control?.scrollIntoView({ block: "nearest", inline: "nearest" });
 }
+/** Select a subject, collapse its chapters and restore focus after rendering. */
 function shSelectCatalogSubject(key) {
   SubjectNavState.selected = String(key || "");
   SubjectNavState.expanded = "";
   renderView();
   shFocusCatalogControl(".sn-tab", SubjectNavState.selected);
 }
+/** Toggle the selected chapter and restore focus to its control after rendering. */
 function shToggleCatalogChapter(key) {
   SubjectNavState.expanded = SubjectNavState.expanded === key ? "" : key;
   renderView();
   shFocusCatalogControl(".sn-chapter-toggle", key);
 }
+/** Render subject tabs and expandable chapters with direct links to their topics. */
 function renderSubjectsCatalog(v) {
   const groups = nbSubjectGroups();
   const total = groups.reduce((n, g) => n + g.qs, 0);
@@ -6185,6 +6219,7 @@ function qbCardHtml(q) {
     <div class="qb-actions">${bookmarkButtonHtml(cid)}<button type="button" class="btn-action-sm qb-practice" onclick="startSinglePractice(${nbJsAttr(cid)})">${tx('Practice', 'अभ्यास')} ➔</button></div>
   </article>`;
 }
+/** Render matching question cards, pagination and contextual empty-state guidance. */
 function qbRenderList() {
   const box = document.getElementById('qbList'); if (!box) return;
   const rows = qbFiltered(); const shown = rows.slice(0, QBState.show);
@@ -6227,12 +6262,16 @@ function renderTaxonomyExplorer(v, params = {}) {
 }
 
 registerRouteViewState('subjects', {
+  /** Copy the catalog selection and expanded chapter for route restoration. */
   capture: () => ({ ...SubjectNavState }),
+  /** Restore the catalog selection or reset it for a fresh route. */
   restore: state => { SubjectNavState = state ? { ...state } : { selected: '', expanded: '' }; }
 });
 let QBWorkspaceId = '';
 registerRouteViewState('taxonomy_explorer', {
+  /** Copy Question Bank filters, search and pagination for route restoration. */
   capture: () => ({ filters: { ...ActiveTaxonomyFilters }, bank: { ...QBState } }),
+  /** Restore remembered bank state on Back or workspace changes, preserving explicit entry filters otherwise. */
   restore: (state, fromHistory) => {
     const workspaceId = WorkspaceManager.current().id;
     const switchedWorkspace = QBWorkspaceId && QBWorkspaceId !== workspaceId;
@@ -7348,6 +7387,7 @@ async function cloudSyncProgress() {
 
 /* ---------- one sync ---------- */
 var CloudSyncRunning = null;
+/** Sync student content and account progress, sharing any in-flight sync promise; return null on failure or when unavailable. */
 async function cloudSync(reason = 'manual') {
   if (!ServerState.session || DataHealth.readOnly) return null;
   if (CloudSyncRunning) return CloudSyncRunning;
@@ -7374,10 +7414,12 @@ async function cloudSync(reason = 'manual') {
 }
 
 /* ---------- account sheet ---------- */
+/** Refresh the account sheet from current cloud state when the sheet is present. */
 function cloudPaint() {
   const el = document.getElementById("cloudSheet");
   if (el) el.innerHTML = cloudSheetHtml();
 }
+/** Return account-sheet HTML for sign-in, sync status or signed-in account controls. */
 function cloudSheetHtml() {
   const s = ServerState.session;
   const msg = CloudState.msg
@@ -7407,6 +7449,7 @@ async function cloudLogout() {
   await Server.logout(); CloudState.isAdmin = null; CloudState.msg = 'Logout हो गया।'; CloudState.msgKind = ''; await cloudSaveState(); cloudPaint(); try { renderView(); } catch (_) {}
 }
 // Home: a gentle prompt until the student logs in
+/** Insert one sign-in prompt on online guest Home in a competitive workspace. */
 function cloudHomePrompt() {
   if (
     Route?.page !== "home" ||
@@ -7598,6 +7641,7 @@ setTimeout(opsFetchMaintenance, 1500);
 
 
 /* Shared student guidance. It only reads sync/profile state; question writes stay in DataCore. */
+/** Return localized empty-state guidance, prioritizing a filter reset over sync and account status. */
 function studyFeedbackModel(reset = "") {
   if (reset)
     return {
@@ -7678,6 +7722,7 @@ function studyFeedbackModel(reset = "") {
     label: tx("Change exam", "परीक्षा बदलें"),
   };
 }
+/** Return accessible guidance HTML and its action button for the optional reset action. */
 function studyFeedbackBody(reset) {
   const model = studyFeedbackModel(reset);
   return `<div class="study-feedback" data-state="${model.kind}" role="status" aria-live="polite" aria-busy="${model.kind === "loading"}">
@@ -7685,9 +7730,11 @@ function studyFeedbackBody(reset) {
     ${model.action ? `<button type="button" class="study-action" onclick="studyFeedbackAction('${model.action}')" ${DataHealth.readOnly && model.action === "sync" ? "disabled" : ""}>${escapeHtml(model.label)}</button>` : ""}
   </div>`;
 }
+/** Wrap guidance HTML in a refreshable container that remembers its reset action. */
 function studyEmptyState(reset = "") {
   return `<div data-study-feedback="${escapeHtml(reset)}">${studyFeedbackBody(reset)}</div>`;
 }
+/** Dispatch a guidance action to sign-in, sync, filter reset or exam selection. */
 function studyFeedbackAction(action) {
   if (action === "login") openAccount();
   else if (action === "sync") cloudSync("manual");
@@ -7695,6 +7742,7 @@ function studyFeedbackAction(action) {
   else if (action === "subject") shSetFilter("all");
   else if (action === "context") changeStudyContext();
 }
+/** Return a localized status label for syncing, offline, guest, failed or completed sync. */
 function studySyncLabel() {
   if (CloudState.busy) return tx("Syncing…", "सिंक हो रहा है…");
   if (navigator.onLine === false)
@@ -7719,6 +7767,7 @@ function studySyncLabel() {
       )
     : tx("Questions not synced yet", "सवाल अभी सिंक नहीं हुए हैं");
 }
+/** Refresh visible guidance containers and sync labels from current application state. */
 function refreshStudyFeedback() {
   document.querySelectorAll("[data-study-feedback]").forEach((el) => {
     el.innerHTML = studyFeedbackBody(el.dataset.studyFeedback);
@@ -7727,6 +7776,7 @@ function refreshStudyFeedback() {
     el.textContent = studySyncLabel();
   });
 }
+/** Open the builder selection, student profile sheet or exam hub for the current route. */
 function changeStudyContext() {
   if (Route.page === "native_builder") {
     sbOpenContextPicker();
@@ -7735,6 +7785,7 @@ function changeStudyContext() {
   if (profileAvailable()) openProfileSheet();
   else navigate("exam_hub");
 }
+/** Return exam, branch, year and sync guidance reflecting the current page's selection. */
 function studyContextHtml() {
   const profile = studentProfile();
   let examId = profile?.examId || UserState.selectedExam || "";
@@ -8128,12 +8179,14 @@ function sbTypeOf(r) { const t = String(r.q.metadata?.theoryOrNumerical || '').t
 function sbDiffOf(r) { const d = String(r.q.metadata?.difficulty || r.difficulty || '').toUpperCase(); return ['EASY', 'MODERATE', 'HARD'].includes(d) ? d : 'OTHER'; }
 const SB_TYPE_LABEL = { NUMERICAL: 'Numerical', THEORY: 'Theory', OTHER: 'Unclassified' };
 const SB_DIFF_LABEL = { EASY: 'Easy', MODERATE: 'Medium', HARD: 'Hard', OTHER: 'Unrated' };
+/** Return the localized label for a theory, numerical or unknown question type. */
 function sbTypeLabel(key) {
   return tx(
     SB_TYPE_LABEL[key],
     { NUMERICAL: "संख्यात्मक", THEORY: "सैद्धांतिक", OTHER: "अवर्गीकृत" }[key],
   );
 }
+/** Return the localized label for a known difficulty, falling back to Other. */
 function sbDiffLabel(key) {
   return tx(
     SB_DIFF_LABEL[key],
@@ -8142,6 +8195,7 @@ function sbDiffLabel(key) {
     ],
   );
 }
+/** Return a quick-test preset label in the current interface language. */
 function sbPresetLabel(preset) {
   return tx(
     preset.label,
@@ -8383,6 +8437,7 @@ function sbMinutesInput(v) {
   sbSettingsRefresh();
 }
 // Update only the parts that depend on the typed numbers, so focus and the next tap are never lost.
+/** Update count, duration and start controls in place, then save the builder draft. */
 function sbSettingsRefresh() {
   const n = sbCustomRows("pick").length;
   const short = SB.pick !== "pick" && SB.count > n;
@@ -8400,6 +8455,7 @@ function sbSettingsRefresh() {
   if (btn) btn.disabled = !n || short;
   sbSaveDraft();
 }
+/** Validate and clamp the typed PYQ duration, update its summary and save the draft. */
 function sbPyqMinutesInput(v) {
   const n = Math.round(Number(v));
   if (!Number.isFinite(n) || n < 1) return;
@@ -8420,6 +8476,7 @@ function sbBuildPreview() {
   const ordered = SB.shuffle ? sbShuffle(pool) : pool.slice().sort((a, b) => a.subject.localeCompare(b.subject) || a.topic.localeCompare(b.topic) || (Number(a.q.originalQNo) || 0) - (Number(b.q.originalQNo) || 0));
   SB.previewIds = sbGroupBySubject(ordered.slice(0, n)).map(r => r.id);
 }
+/** Remove a preview question while retaining at least one and adjusting automatic duration. */
 function sbRemoveFromPreview(id) {
   if (SB.previewIds.length <= 1) {
     openCustomToast(
@@ -8434,6 +8491,7 @@ function sbRemoveFromPreview(id) {
   if (!SB.minutesTouched) SB.minutes = SB.previewIds.length;
   sbRerender(false);
 }
+/** Replace a preview question with an unused eligible question from the same exam and year. */
 function sbReplaceInPreview(id) {
   const used = new Set(SB.previewIds);
   const pool = (SB.mode === "custom" ? sbCustomRows("pick") : sbAll()).filter(
@@ -8481,6 +8539,7 @@ function sbPyqChoose(level, key) {
   sbRerender(true);
 }
 function sbPyqSetScope(scope, subject) { SB.pyqScope = scope; SB.pyqSubject = subject || ''; SB.pyqMinutesTouched = false; sbRerender(false); }
+/** Prepare up to 500 selected PYQ questions and advance to the instructions step. */
 function sbPyqToInstructions() {
   const rows = sbPyqFinalRows().slice(0, 500);
   if (!rows.length) {
@@ -8508,6 +8567,7 @@ function sbQuickRows() {
 }
 function sbQuickToggleSubject(subject) { if (SB.quickEx.has(subject)) SB.quickEx.delete(subject); else SB.quickEx.add(subject); sbRerender(false); }
 function sbQuickSetContext(key) { SB.quickCtx = key; SB.quickEx.clear(); sbRerender(false); }
+/** Launch a preset test, preferring unattempted questions and scaling time for a smaller pool. */
 function sbQuickStart(presetId) {
   const p = SB_QUICK_PRESETS.find((x) => x.id === presetId);
   const rows = sbQuickRows();
@@ -8550,6 +8610,7 @@ function sbQuickStart(presetId) {
 }
 
 /* ---------- templates ---------- */
+/** Return a workspace-scoped template of current filters and settings, without fixed question IDs. */
 function sbTemplateFromState(name) {
   return {
     v: 1,
@@ -8575,12 +8636,14 @@ function sbTemplateFromState(name) {
     shuffle: SB.shuffle,
   };
 }
+/** Open the template naming dialog with a summary of the saved settings. */
 function sbOpenSaveTemplate() {
   openModal(
     tx("⭐ Save as template", "⭐ टेम्पलेट के रूप में सहेजें"),
     `<label for="sbTplName" style="display:block;font-size:12px;font-weight:800;color:var(--text-muted);margin-bottom:6px;">${tx("Template name", "टेम्पलेट का नाम")}</label><input id="sbTplName" class="search-input" style="padding-left:14px;margin:0;" maxlength="60" placeholder="${tx("e.g. Daily Maths 20", "जैसे रोज़ के 20 गणित सवाल")}" value="${escapeHtml(sbExamName(SB.examId) + " · " + SB.count + tx(" Q", " सवाल"))}"><p class="sj-note sj-muted">${tx("Saves the filters and settings, not a fixed set of questions. Each run picks fresh questions.", "फ़िल्टर और सेटिंग सहेजी जाएँगी, सवालों की तय सूची नहीं। हर बार नए सवाल चुने जाएँगे।")}</p><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;"><button class="btn-nav" onclick="closeModal()">${tx("Cancel", "रद्द करें")}</button><button class="btn-nav primary" onclick="sbSaveTemplate(document.getElementById('sbTplName').value)">${tx("Save", "सहेजें")}</button></div>`,
   );
 }
+/** Save the named selection template, retain the newest 30 and close the dialog. */
 function sbSaveTemplate(name) {
   BuilderTemplates.unshift(sbTemplateFromState(name));
   if (BuilderTemplates.length > 30) BuilderTemplates.length = 30;
@@ -8593,6 +8656,7 @@ function sbSaveTemplate(name) {
     ),
   );
 }
+/** Delete a saved template after confirmation and refresh the builder. */
 function sbDeleteTemplate(id) {
   const t = BuilderTemplates.find((x) => x.id === id);
   if (
@@ -8604,6 +8668,7 @@ function sbDeleteTemplate(id) {
   saveBuilderTemplates();
   sbRerender(false);
 }
+/** Load a template for the current workspace, rejecting an exam/year with no available questions. */
 function sbApplyTemplate(id) {
   const t = BuilderTemplates.find(
     (x) => x.id === id && x.ws === WorkspaceManager.current().id,
@@ -8644,6 +8709,7 @@ function sbApplyTemplate(id) {
 }
 
 /* ---------- entry points from other screens ---------- */
+/** Initialize a custom test selection for one topic and navigate to its settings. */
 function sbOpenForModule(moduleId) {
   const m = getWorkspaceModule(moduleId);
   const rows = sbAll().filter((r) => r.mod.moduleId === moduleId);
@@ -8678,6 +8744,7 @@ function sbOpenForModule(moduleId) {
   SB.step = "settings";
   navigate("native_builder");
 }
+/** Open a custom test of saved mistakes from the first available exam/year context. */
 function sbOpenMistakeTest() {
   SBCache = null;
   const wrong = sbWrongIds();
@@ -8720,6 +8787,7 @@ function sbOpenMistakeTest() {
 }
 
 /* ---------- launch (single path for all modes) ---------- */
+/** Validate unique questions from one exam/year and launch a CBT session; return whether it started. */
 function sbLaunch(ids, minutes, lang, title) {
   if (ActiveTestSession?.sessionStatus === "ACTIVE") {
     openCustomToast(
@@ -8790,24 +8858,29 @@ function sbLaunch(ids, minutes, lang, title) {
   sbReset();
   return true;
 }
+/** Return the PYQ title or a localized title for the selected custom-test history filter. */
 function sbTestTitle() {
   if (SB.mode === "pyq") return SB.title;
   if (SB.hist === "wrong") return tx("Mistakes Test", "गलतियों का टेस्ट");
   if (SB.hist === "bookmarked") return tx("Bookmarks Test", "बुकमार्क टेस्ट");
   return tx("Custom Test", "अपना टेस्ट");
 }
+/** Launch the previewed questions using the chosen duration, language and test title. */
 function sbStartFromInstructions() {
   sbLaunch(SB.previewIds.slice(), SB.minutes, SB.lang, sbTestTitle());
 }
 
 // Change the builder selection without changing the student's downloaded profile.
+/** Return exam/year choices from eligible PYQ rows or all rows for the current builder mode. */
 function sbContextChoices() { return sbContexts(SB.mode === 'pyq' ? sbPyqRows() : sbAll()); }
+/** Show available builder exam/year contexts with question counts or empty-state guidance. */
 function sbOpenContextPicker() {
   const choices = sbContextChoices();
   openModal(tx('Choose exam and year', 'परीक्षा और वर्ष चुनें'), `
     <p class="sj-note">${tx('Choosing an exam starts a new test selection.', 'परीक्षा चुनने पर टेस्ट का चयन फिर से शुरू होगा।')}</p>
     <div class="sb-list">${choices.map(c => sbItemChoice(`sbChooseContext(${nbJsAttr(c.key)})`, sbExamName(c.examId), c.year, c.count)).join('') || studyEmptyState()}</div>`);
 }
+/** Reset the selection to a valid exam/year while retaining the current builder mode. */
 function sbChooseContext(key) {
   const choice = sbContextChoices().find(c => c.key === key);
   if (!choice) return;
@@ -8828,12 +8901,15 @@ function sbChooseContext(key) {
 function sbBar(left, buttonHtml) {
   return `<div class="sb-bar-info" id="sbBarInfo">${left}</div>${buttonHtml || ''}`;
 }
+/** Return localized question-count HTML with English singular/plural agreement. */
 function sbCount(n) {
   return tx(`<b>${n}</b> question${n === 1 ? "" : "s"}`, `<b>${n}</b> सवाल`);
 }
+/** Return breadcrumb controls for completed and current builder steps. */
 function sbCrumbs() {
   if (SB.mode !== "custom") return "";
   const parts = [];
+  /** Append a breadcrumb, enabling jumps only to steps in the builder history. */
   const add = (step, label) =>
     parts.push(
       SB.stack.includes(step)
@@ -8884,6 +8960,7 @@ function sbItemMulti(level, it, on) {
 function sbItemChoice(onclick, label, meta, count) {
   return `<button type="button" class="sb-item sb-choice" onclick="${onclick}"><span class="sb-item-main"><strong>${escapeHtml(label)}</strong>${meta ? `<small>${escapeHtml(meta)}</small>` : ''}</span><span class="sb-count">${count}</span><span class="sb-go" aria-hidden="true">›</span></button>`;
 }
+/** Return the builder mode chooser and templates saved for the current workspace. */
 function sbRenderMode() {
   const all = sbAll();
   const pyqN = sbPyqRows().length;
@@ -8911,6 +8988,7 @@ function sbRenderMode() {
     ),
   };
 }
+/** Return quick-test context, subject controls and available preset choices. */
 function sbRenderQuick() {
   const ctxs = sbContexts();
   const key = sbQuickContextKey();
@@ -8942,6 +9020,7 @@ function sbRenderQuick() {
     ),
   };
 }
+/** Return a board, exam or year chooser with counts and contextual guidance. */
 function sbRenderChoice(step) {
   const items = sbLevelItems(step);
   const hint = {
@@ -8949,12 +9028,14 @@ function sbRenderChoice(step) {
     exam: tx("Tap an exam to continue.", "आगे बढ़ने के लिए परीक्षा चुनें।"),
     year: tx("Tap a year to continue.", "आगे बढ़ने के लिए वर्ष चुनें।"),
   }[step];
+  /** Return a board label for exam choices, or no metadata for other choice steps. */
   const metaFor = (it) => (step === "exam" ? sbBoardOf(it.key) : "");
   const body = items.length
     ? `<p class="sb-hint">${hint}</p><div class="sb-list">${items.map((it) => sbItemChoice(`sbChoose('${step}', ${nbJsAttr(it.key)})`, it.label, metaFor(it), it.count)).join("")}</div>`
     : `<div class="sj-empty"><strong>${tx("Nothing to choose here", "यहाँ चुनने के लिए कुछ नहीं है")}</strong><span>${tx("No questions match the earlier choices.", "पिछले चयन से कोई सवाल नहीं मिला।")}</span></div>`;
   return { body, bar: sbBar(hint, "") };
 }
+/** Return inclusion controls for the subject, topic or subtopic selection step. */
 function sbRenderMulti(level) {
   const items = sbLevelItems(level);
   const ex = SB[SB_EX_FOR[level]];
@@ -8970,6 +9051,7 @@ function sbRenderMulti(level) {
     ),
   };
 }
+/** Return question-type and difficulty filters with eligible question counts. */
 function sbRenderType() {
   const rows = sbCustomRows("subtopic");
   const types = sbGroup(rows, sbTypeOf, (r) => sbTypeLabel(sbTypeOf(r)));
@@ -8977,6 +9059,7 @@ function sbRenderType() {
   const order = ["EASY", "MODERATE", "HARD", "OTHER"];
   diffs.sort((a, b) => order.indexOf(a.key) - order.indexOf(b.key));
   const pool = sbCustomRows("type").length;
+  /** Return a filter chip showing whether its key is included in the selection. */
   const chip = (kind, it, set) => {
     const on = !set.has(it.key);
     return `<button type="button" class="sb-chip ${on ? "on" : ""}" aria-pressed="${on}" onclick="sbToggleType('${kind}', '${it.key}')">${on ? "✓ " : ""}${escapeHtml(it.label)} <span>${it.count}</span></button>`;
@@ -8992,6 +9075,7 @@ function sbRenderType() {
     ),
   };
 }
+/** Return a selectable question row with its number, topic, subtopic and difficulty. */
 function sbQuestionRow(r, on) {
   const text =
     r.q.QUESTION_EN ||
@@ -8999,6 +9083,7 @@ function sbQuestionRow(r, on) {
     tx("Question text unavailable", "सवाल का पाठ उपलब्ध नहीं है");
   return `<button type="button" class="sb-item sb-q ${on ? "on" : ""}" aria-pressed="${on}" onclick="sbTogglePicked(${nbJsAttr(r.id)})"><span class="sb-check" aria-hidden="true">${on ? "✓" : ""}</span><span class="sb-item-main"><strong>${escapeHtml(text)}</strong><small>Q.${escapeHtml(r.q.originalQNo ?? "")} · ${escapeHtml(r.topic)} · ${escapeHtml(sbSubtopic(r))} · ${escapeHtml(sbDiffLabel(sbDiffOf(r)))}</small></span></button>`;
 }
+/** Return question selection controls with search, answer-history filters and pagination. */
 function sbRenderQuestions() {
   const base = sbCustomRows("history");
   const attempted = sbAttemptedIds();
@@ -9006,6 +9091,7 @@ function sbRenderQuestions() {
   const all = sbCustomRows("type");
   const unattN = all.filter((r) => !attempted.has(r.id)).length;
   const wrongN = all.filter((r) => wrong.has(r.id)).length;
+  /** Return a history-filter chip with its matching question count and active state. */
   const histChip = (id, label, n) =>
     `<button type="button" class="sb-chip ${SB.hist === id ? "on" : ""}" aria-pressed="${SB.hist === id}" ${n ? "" : "disabled"} onclick="sbSetHist('${id}')">${escapeHtml(label)} <span>${n}</span></button>`;
   let list = "";
@@ -9049,6 +9135,7 @@ function sbLangInfo(rows) {
   const en = rows.filter(r => String(r.q.QUESTION_EN || r.q.QUESTION || '').trim()).length;
   return { hi, en, total: rows.length };
 }
+/** Return count, duration, question-language and shuffle controls for the selection. */
 function sbRenderSettings() {
   sbSyncCountDefaults();
   const pool = sbCustomRows("pick");
@@ -9062,6 +9149,7 @@ function sbRenderSettings() {
       : `<div class="sb-chips">${presets.map((x) => `<button type="button" class="sb-chip ${SB.count === x ? "on" : ""}" data-sb-count="${x}" onclick="sbSetCount(${x})">${x}</button>`).join("")}<button type="button" class="sb-chip ${SB.count === Math.min(n, 500) ? "on" : ""}" data-sb-count="${Math.min(n, 500)}" onclick="sbSetCount(${Math.min(n, 500)})">${tx(`All ${Math.min(n, 500)}`, `सभी ${Math.min(n, 500)}`)}</button></div>
        <div class="sb-inline"><label for="sbCountIn">${tx("Or type a number", "या संख्या लिखें")}</label><input id="sbCountIn" type="number" inputmode="numeric" min="1" max="500" value="${SB.count}" oninput="sbCountInput(this.value)"></div>
        <div id="sbWarn" class="sb-warn" ${short ? "" : "hidden"}>${tx(`Only ${n} question${n === 1 ? " is" : "s are"} available.`, `केवल ${n} सवाल उपलब्ध हैं।`)} <button type="button" class="btn-nav primary" onclick="sbSetCount(${n})">${tx(`Use ${n}`, `${n} चुनें`)}</button></div>`;
+  /** Return a question-language button reflecting the current builder language choice. */
   const langBtn = (id, label) =>
     `<button type="button" class="${SB.lang === id ? "on" : ""}" aria-pressed="${SB.lang === id}" onclick="sbSet('lang','${id}')">${label}</button>`;
   const body = `<div class="sb-label">${tx("Number of questions", "सवालों की संख्या")}</div>${countHtml}
@@ -9083,6 +9171,7 @@ function sbRenderSettings() {
     ),
   };
 }
+/** Return labeled question-count bars for up to eight subject/topic groups. */
 function sbDistribution(rows) {
   const g = sbGroup(
     rows,
@@ -9102,6 +9191,7 @@ function sbDistribution(rows) {
     null,
   );
 }
+/** Return available preview questions with distribution, replace and remove controls. */
 function sbRenderPreview() {
   const byId = new Map(sbAll().map((r) => [r.id, r]));
   const rows = SB.previewIds.map((id) => byId.get(id)).filter(Boolean);
@@ -9122,6 +9212,7 @@ function sbRenderPreview() {
     ),
   };
 }
+/** Return the current PYQ exam, year, paper or scope selection screen. */
 function sbRenderPyq() {
   if (SB.step === "pyq_exam") {
     const items = sbPyqExams();
@@ -9195,6 +9286,7 @@ function sbRenderPyq() {
     ),
   };
 }
+/** Return pre-test instructions, selection totals, language controls and the start action. */
 function sbRenderInstructions() {
   const byId = new Map(sbAll().map((r) => [r.id, r]));
   const rows = SB.previewIds.map((id) => byId.get(id)).filter(Boolean);
@@ -9204,6 +9296,7 @@ function sbRenderInstructions() {
     (r) => r.subject,
     (r) => sbSubjectLabel(r.subject),
   );
+  /** Return a question-language button reflecting the current builder language choice. */
   const langBtn = (id, label) =>
     `<button type="button" class="${SB.lang === id ? "on" : ""}" aria-pressed="${SB.lang === id}" onclick="sbSet('lang','${id}')">${label}</button>`;
   const body = rows.length
@@ -9236,15 +9329,22 @@ const SB_RENDERERS = {
   pyq_year: sbRenderPyq,
   pyq_shift: sbRenderPyq,
   pyq_scope: sbRenderPyq,
+  /** Render the custom-test board selection step. */
   board: () => sbRenderChoice("board"),
+  /** Render the custom-test exam selection step. */
   exam: () => sbRenderChoice("exam"),
+  /** Render the custom-test year selection step. */
   year: () => sbRenderChoice("year"),
+  /** Render the subject inclusion step. */
   subject: () => sbRenderMulti("subject"),
+  /** Render the topic inclusion step. */
   topic: () => sbRenderMulti("topic"),
+  /** Render the subtopic inclusion step. */
   subtopic: () => sbRenderMulti("subtopic"),
   type: sbRenderType,
   questions: sbRenderQuestions,
   settings: sbRenderSettings,
+  /** Build missing preview IDs before rendering the preview and its footer. */
   preview: () => {
     if (!SB.previewIds.length && SB.mode === "custom") sbBuildPreview();
     return sbRenderPreview();
@@ -9270,6 +9370,7 @@ const SB_TITLES_HI = {
   preview: "पूर्वावलोकन",
   instructions: "निर्देश",
 };
+/** Render the active builder step and footer, initializing and restoring draft state as needed. */
 function sbRender(v) {
   SBCache = null;
   if (!SB.inited) SB = sbLoadDraft() || sbFresh();
@@ -11077,6 +11178,7 @@ function shMatch(st) {
 function shSetFilter(f) { SubjectHubState.filter = f; renderView(); }
 function shToggle(key, el) { SubjectHubState.open[key] = el.open; }
 
+/** Render a subject's filtered topic accordions or contextual empty-state guidance. */
 function renderSubjectPage(v, subject) {
   const key = String(subject || '').trim().toLowerCase();
   const mods = (typeof profileVisible === 'function' ? profileVisible : (x => x))(CurriculumContext.filterModules(AppModules))
@@ -11147,6 +11249,7 @@ function resultTimeCard(res, keyFor) {
 }
 
 /* ---------- Me screen ---------- */
+/** Render account, profile, display, backup and study-preference controls into the view. */
 function renderMePage(v) {
   const s = (typeof ServerState !== 'undefined') ? ServerState.session : null;
   const ls = learningStats();
@@ -11159,6 +11262,7 @@ function renderMePage(v) {
   const mistakes = (UserState.mistakeBook || []).length;
   const marks = typeof bookmarkedIds === 'function' ? bookmarkedIds().size : 0;
   const tile = (b, l) => `<span class="me-tile"><b>${b}</b>${l}</span>`;
+  /** Return a settings button with its icon, label, detail and optional enabled indicator. */
   const row = (ico, label, sub, on, id = "") =>
     `<button type="button" ${id ? `id="${id}"` : ""} class="me-row" onclick="${on}"><span class="me-ico" aria-hidden="true">${ico}</span><span class="me-row-main"><b>${label}</b>${sub ? `<small>${sub}</small>` : ""}</span><span aria-hidden="true">›</span></button>`;
   v.innerHTML = `
@@ -11188,7 +11292,9 @@ function renderMePage(v) {
     <p class="me-ver">Master TestBook ${escapeHtml(document.querySelector('meta[name="app-version"]')?.content || "")}</p>`;
 }
 registerRouteViewState('subject', {
+  /** Copy the subject filter and accordion state for route restoration. */
   capture: () => ({ filter: SubjectHubState.filter, open: { ...SubjectHubState.open } }),
+  /** Restore the subject filter and accordions, or reset them for a fresh route. */
   restore: state => { SubjectHubState = state ? { filter: state.filter, open: { ...state.open } } : { filter: 'all', open: {} }; }
 });
 

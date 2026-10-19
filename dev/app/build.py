@@ -10,6 +10,7 @@ ROOT = APP.parent.parent
 
 
 def render(version=None, studio=False):
+    """Assemble UTF-8 release bytes with optional version and studio overrides."""
     manifest = json.loads((APP / "manifest.json").read_text(encoding="utf-8"))
     parts, script_open = [], False
     for part in manifest["parts"]:
@@ -48,6 +49,7 @@ def render(version=None, studio=False):
 
 
 def main():
+    """Build a release, or return a nonzero status if checked releases have drifted."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("output", nargs="?", type=Path)
     parser.add_argument("version", nargs="?")

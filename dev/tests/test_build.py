@@ -10,6 +10,7 @@ source = Path(__file__).resolve().parents[1] / "app"
 
 
 def rec(name, ok):
+    """Print a check result and raise immediately when the assertion fails."""
     print("PASS" if ok else "FAIL", name, flush=True)
     if not ok:
         raise AssertionError(name)
@@ -22,6 +23,7 @@ with tempfile.TemporaryDirectory() as tmp:
     (root / "admin").mkdir()
 
     def run(*args, cwd=root):
+        """Run the copied builder with the given arguments and capture its output and exit status."""
         return subprocess.run(
             [sys.executable, str(app / "build.py"), *args],
             cwd=cwd,

@@ -1,4 +1,5 @@
 /* Shared student guidance. It only reads sync/profile state; question writes stay in DataCore. */
+/** Return localized empty-state guidance, prioritizing a filter reset over sync and account status. */
 function studyFeedbackModel(reset = "") {
   if (reset)
     return {
@@ -79,6 +80,7 @@ function studyFeedbackModel(reset = "") {
     label: tx("Change exam", "परीक्षा बदलें"),
   };
 }
+/** Return accessible guidance HTML and its action button for the optional reset action. */
 function studyFeedbackBody(reset) {
   const model = studyFeedbackModel(reset);
   return `<div class="study-feedback" data-state="${model.kind}" role="status" aria-live="polite" aria-busy="${model.kind === "loading"}">
@@ -86,9 +88,11 @@ function studyFeedbackBody(reset) {
     ${model.action ? `<button type="button" class="study-action" onclick="studyFeedbackAction('${model.action}')" ${DataHealth.readOnly && model.action === "sync" ? "disabled" : ""}>${escapeHtml(model.label)}</button>` : ""}
   </div>`;
 }
+/** Wrap guidance HTML in a refreshable container that remembers its reset action. */
 function studyEmptyState(reset = "") {
   return `<div data-study-feedback="${escapeHtml(reset)}">${studyFeedbackBody(reset)}</div>`;
 }
+/** Dispatch a guidance action to sign-in, sync, filter reset or exam selection. */
 function studyFeedbackAction(action) {
   if (action === "login") openAccount();
   else if (action === "sync") cloudSync("manual");
@@ -96,6 +100,7 @@ function studyFeedbackAction(action) {
   else if (action === "subject") shSetFilter("all");
   else if (action === "context") changeStudyContext();
 }
+/** Return a localized status label for syncing, offline, guest, failed or completed sync. */
 function studySyncLabel() {
   if (CloudState.busy) return tx("Syncing…", "सिंक हो रहा है…");
   if (navigator.onLine === false)
@@ -120,6 +125,7 @@ function studySyncLabel() {
       )
     : tx("Questions not synced yet", "सवाल अभी सिंक नहीं हुए हैं");
 }
+/** Refresh visible guidance containers and sync labels from current application state. */
 function refreshStudyFeedback() {
   document.querySelectorAll("[data-study-feedback]").forEach((el) => {
     el.innerHTML = studyFeedbackBody(el.dataset.studyFeedback);
@@ -128,6 +134,7 @@ function refreshStudyFeedback() {
     el.textContent = studySyncLabel();
   });
 }
+/** Open the builder selection, student profile sheet or exam hub for the current route. */
 function changeStudyContext() {
   if (Route.page === "native_builder") {
     sbOpenContextPicker();
@@ -136,6 +143,7 @@ function changeStudyContext() {
   if (profileAvailable()) openProfileSheet();
   else navigate("exam_hub");
 }
+/** Return exam, branch, year and sync guidance reflecting the current page's selection. */
 function studyContextHtml() {
   const profile = studentProfile();
   let examId = profile?.examId || UserState.selectedExam || "";

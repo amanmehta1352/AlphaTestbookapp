@@ -12,18 +12,23 @@ const ViewHooks = { before: new Map(), after: new Map() };
 const RouteViewStates = new Map();
 const RouteUiMemory = new Map();
 let RenderedRouteKey = '';
+/** Register or replace a named callback in the before or after render phase. */
 function registerViewHook(phase, name, hook) {
   ViewHooks[phase].set(name, hook);
 }
+/** Run every hook in a render phase, logging failures without stopping other hooks. */
 function runViewHooks(phase) {
   ViewHooks[phase].forEach((hook, name) => {
     try { hook(); } catch (error) { console.warn('[View hook]', name, error); }
   });
 }
+/** Register capture() and restore(state, fromHistory) callbacks for a page. */
 function registerRouteViewState(page, adapter) { RouteViewStates.set(page, adapter); }
+/** Return a workspace-specific key for a route and its parameters. */
 function routeUiKey(route = Route) {
   return JSON.stringify([WorkspaceManager.current().id, route.page, route.params]);
 }
+/** Remember the rendered route's scroll and adapter state, retaining at most 40 entries. */
 function captureRouteView() {
   if (RenderedRouteKey !== routeUiKey()) return;
   const adapter = RouteViewStates.get(Route.page);
@@ -48,6 +53,7 @@ function restoreAppRoute(){
     Route=candidate; AppRouteRestoring=true; return true;
   } catch(_) { return false; }
 }
+/** Update the Back control's availability and localized label from route history. */
 function updateAppBackButton(){
   const b=document.getElementById('btnAppBack'); if(!b)return;
   const canBack=Route.page!=='home' || AppRouteStack.length>0;
@@ -61,6 +67,7 @@ function currentPreviousAppRoute(){ return AppRouteStack.length ? routeSnapshot(
 function appBackWouldExitMode(target=currentPreviousAppRoute()){
   return APP_ACTIVE_MODE_PAGES.has(Route.page) && (!target || target.page !== Route.page);
 }
+/** Restore the previous route, requesting confirmation when leaving an active study mode. */
 function appNavigateBack(confirmed=false){
   const previous=currentPreviousAppRoute();
   if(!confirmed && ActiveTestSession?.sessionStatus==='ACTIVE'){ CbtExitGuard.requestExit(); return; }
@@ -96,17 +103,20 @@ function practiceSessionSummary(){
   const wrong=qs.filter(q=>Object.prototype.hasOwnProperty.call(PracticeAnswerState,String(q.originalQNo))&&PracticeAnswerState[String(q.originalQNo)]!==q.answer).length;
   return {total:qs.length,answered,correct,wrong,unanswered:Math.max(0,qs.length-answered)};
 }
+/** Offer submit, exit and cancel actions with current practice answer counts. */
 function requestPracticeBackOptions(){
   if(AppBackConfirmationOpen)return;AppBackConfirmationOpen=true;
   const x=practiceSessionSummary();
   openModal(tx('Practice is in progress', 'अभ्यास चल रहा है'),`<div style="font-size:14px;line-height:1.6;color:var(--text-main);">${tx('You have an active practice session. Submit shows a summary; Exit returns to the previous screen; Cancel keeps this question open. Existing answers and mistake-book entries are not deleted.', 'आपका अभ्यास चल रहा है। जमा करें से सारांश दिखेगा; बाहर निकलें से पिछला पेज खुलेगा; रद्द करें से यही सवाल खुला रहेगा। सहेजे जवाब और गलतियों की किताब सुरक्षित रहेंगे।')}</div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:12px;font-size:12px;"><div class="nb-stat"><small>${tx('ANSWERED', 'हल किए')}</small><strong>${x.answered} / ${x.total}</strong></div><div class="nb-stat"><small>${tx('UNANSWERED', 'बिना हल किए')}</small><strong>${x.unanswered}</strong></div></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap;"><button onclick="submitPracticeSessionSummary()" class="btn-nav primary">${tx('SUBMIT', 'जमा करें')}</button><button onclick="exitPracticeSession()" class="btn-nav">${tx('EXIT', 'बाहर निकलें')}</button><button onclick="cancelAppBack()" class="btn-nav">${tx('CANCEL', 'रद्द करें')}</button></div>`);
 }
+/** Show practice answer totals without saving a separate scored exam result. */
 function submitPracticeSessionSummary(){
   const x=practiceSessionSummary();AppBackConfirmationOpen=true;
   openModal(tx('Practice summary', 'अभ्यास का सारांश'),`<div style="font-size:14px;line-height:1.6;color:var(--text-main);">${tx('Practice review summary from the questions available in this session. This does not write a separate scored exam result.', 'इस अभ्यास के सवालों का सारांश। इसे अलग परीक्षा परिणाम के रूप में नहीं सहेजा जाएगा।')}</div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:12px;font-size:12px;"><div class="nb-stat"><small>${tx('ANSWERED', 'हल किए')}</small><strong>${x.answered} / ${x.total}</strong></div><div class="nb-stat"><small>${tx('CORRECT', 'सही')}</small><strong>${x.correct}</strong></div><div class="nb-stat"><small>${tx('WRONG', 'गलत')}</small><strong>${x.wrong}</strong></div><div class="nb-stat"><small>${tx('UNANSWERED', 'बिना हल किए')}</small><strong>${x.unanswered}</strong></div></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap;"><button onclick="cancelAppBack()" class="btn-nav">${tx('KEEP REVIEWING', 'देखते रहें')}</button><button onclick="exitPracticeSession()" class="btn-nav primary">${tx('FINISH PRACTICE', 'अभ्यास पूरा करें')}</button></div>`);
 }
 function exitPracticeSession(){AppBackConfirmationOpen=false;closeModal();appNavigateBack(true);}
 
+/** Show the appropriate exit confirmation, deferring active tests to the CBT guard. */
 function requestAppBackConfirmation(){
   if(AppBackConfirmationOpen) return;
   if(ActiveTestSession?.sessionStatus==='ACTIVE'){ CbtExitGuard.requestExit(); return; }
@@ -123,6 +133,7 @@ function confirmAppBack(){
   if(ActiveTestSession?.sessionStatus==='ACTIVE'){ CbtExitGuard.confirmExit(); return; }
   AppBackConfirmationOpen=false; closeModal(); appNavigateBack(true);
 }
+/** Navigate with workspace and active-test guards, saving the outgoing route's UI state. */
 function navigate(page, params = {}) {
   if (ActiveTestSession?.sessionStatus === 'ACTIVE' && page !== 'test') {
     if (page === 'result') { /* submitTestSession clears the session before the result route is reached */ }
@@ -159,45 +170,45 @@ function navigate(page, params = {}) {
 }
 
 const AppRoutes = {
-  home: { nav: 'home', title: ['🏠 Home', '🏠 होम'], render: v => {
+  home: { nav: 'home', title: ['🏠 Home', '🏠 होम'], render: /** Render the current workspace's Board or competitive Home dashboard. */ v => {
     if (WorkspaceManager.current().type === 'BOARD') {
       document.getElementById('txtHeaderTitle').textContent = '🎓 CBSE CAMPUS';
       renderBoardDashboard(v);
     } else renderHomePage(v);
   } },
-  competitive_hub: { nav: 'exams', title: ['🏆 Competitive exams', '🏆 प्रतियोगी परीक्षाएँ'], render: v => renderCompetitiveDashboard(v) },
-  competitive_subjects: { nav: 'exams', title: ['📚 Subjects', '📚 विषय'], render: v => renderCompetitiveSubjects(v) },
-  competitive_chapters: { nav: 'exams', title: ['📚 Chapters', '📚 अध्याय'], render: (v, p) => renderCompetitiveChapters(v, p.subject) },
-  competitive_topics: { nav: 'exams', title: ['📚 Topics', '📚 टॉपिक'], render: (v, p) => renderCompetitiveTopics(v, p.subject, p.chapter) },
-  competitive_topic: { nav: 'exams', title: ['📚 Topic', '📚 टॉपिक'], render: (v, p) => renderCompetitiveTopic(v, p.moduleId) },
-  exam_hub: { nav: 'exams', title: ['🏛️ Exams', '🏛️ परीक्षाएँ'], render: v => renderUniversalExamHub(v) },
-  exam_profile: { nav: 'exams', title: ['🎓 Exam', '🎓 परीक्षा'], render: (v, p) => renderExamProfile(v, p.examId) },
-  syllabus: { nav: 'exams', title: ['📚 Syllabus', '📚 पाठ्यक्रम'], render: (v, p) => renderSyllabusMatrix(v, p.examId) },
-  board_subjects: { nav: 'subjects', title: ['📚 Subjects', '📚 विषय'], render: v => renderBoardSubjects(v) },
-  board_chapters: { nav: 'subjects', title: ['📚 Chapters', '📚 अध्याय'], render: (v, p) => renderBoardChapters(v, p.subjectId) },
-  board_topics: { nav: 'subjects', title: ['📚 Topics', '📚 टॉपिक'], render: (v, p) => renderBoardTopics(v, p.chapterId, p.subjectId) },
-  board_topic: { nav: 'subjects', title: ['📚 Topic', '📚 टॉपिक'], render: (v, p) => renderBoardTopic(v, p.topicId, p.chapterId, p.subjectId) },
-  digital_library: { nav: 'library', title: ['📖 Study library', '📖 स्टडी लाइब्रेरी'], render: v => renderDigitalLibrary(v) },
-  native_builder: { nav: 'builder', title: ['🧩 Create Test', '🧩 टेस्ट बनाएँ'], render: v => renderNativeBuilder(v) },
-  subjects: { nav: 'subjects', title: ['📚 Subjects', '📚 विषय'], render: v => renderSubjectsCatalog(v) },
-  subject: { nav: 'subjects', title: ['📚 Chapters', '📚 अध्याय'], render: (v, p) => renderSubjectPage(v, p.subject) },
-  chapter: { nav: 'subjects', title: ['📚 Topics', '📚 टॉपिक'], render: (v, p) => renderChapterPage(v, p.subject, p.chapter) },
-  topic: { nav: 'subjects', title: ['📚 Topic', '📚 टॉपिक'], render: (v, p) => renderTopicHubPage(v, p.moduleId) },
-  subtopic: { nav: 'subjects', title: ['📚 Subtopic', '📚 उपविषय'], render: (v, p) => renderSubtopicConceptPage(v, p.moduleId, p.subtopic) },
-  taxonomy_explorer: { nav: 'bank', title: ['🔎 Question Bank', '🔎 प्रश्न बैंक'], render: (v, p) => renderTaxonomyExplorer(v, p) },
-  learn: { nav: 'subjects', title: ['📖 Learn', '📖 सीखें'], render: (v, p) => renderLearnEngine(v, p.moduleId) },
-  revision: { nav: 'revision', title: ['🔄 Revision', '🔄 रिवीज़न'], render: (v, p) => renderRevisionEngine(v, p.moduleId) },
-  practice: { nav: 'subjects', title: ['✍️ Practice', '✍️ अभ्यास'], render: (v, p) => renderPracticeEngine(v, p.moduleId, p.qIndex || 0, p.customQuestions) },
-  class: { nav: 'subjects', title: ['📚 Class', '📚 कक्षा'], render: (v, p) => renderClassEngine(v, p.moduleId) },
-  pyq: { nav: 'pyq', title: ['🎯 PYQ papers', '🎯 पिछले वर्ष के पेपर'], render: (v, p) => renderPYQEngine(v, p.moduleId) },
-  pyq_hub: { nav: 'pyq', title: ['🎯 PYQ papers', '🎯 पिछले वर्ष के पेपर'], render: v => renderGlobalPYQHub(v) },
-  test_hub: { nav: 'tests', title: ['⏱️ Tests', '⏱️ टेस्ट'], render: v => renderGlobalTestHub(v) },
-  revision_hub: { nav: 'revision', title: ['🔄 Revision', '🔄 रिवीज़न'], render: v => renderGlobalRevisionHub(v) },
-  test: { nav: 'tests', title: ['⏱️ Test', '⏱️ टेस्ट'], render: (v, p) => renderTestPage(v, p.moduleId, p.groupId, p.qIndex || 0) },
-  mistakes: { nav: 'revision', title: ['📕 Mistake Book', '📕 गलतियों की किताब'], render: v => renderMistakeBookPage(v) },
-  mastery: { nav: 'revision', title: ['🎯 Mastery', '🎯 महारत'], render: v => renderMasteryPage(v) },
-  result: { nav: 'tests', title: ['📊 Result', '📊 परिणाम'], render: (v, p) => renderResultPage(v, p.result) },
-  me: { nav: 'me', title: ['👤 Me', '👤 मैं'], render: v => renderMePage(v) }
+  competitive_hub: { nav: 'exams', title: ['🏆 Competitive exams', '🏆 प्रतियोगी परीक्षाएँ'], render: /** Render the competitive exam dashboard into the route container. */ v => renderCompetitiveDashboard(v) },
+  competitive_subjects: { nav: 'exams', title: ['📚 Subjects', '📚 विषय'], render: /** Render subjects for competitive exam preparation. */ v => renderCompetitiveSubjects(v) },
+  competitive_chapters: { nav: 'exams', title: ['📚 Chapters', '📚 अध्याय'], render: /** Render competitive chapters for the subject in the route parameters. */ (v, p) => renderCompetitiveChapters(v, p.subject) },
+  competitive_topics: { nav: 'exams', title: ['📚 Topics', '📚 टॉपिक'], render: /** Render competitive topics for the routed subject and chapter. */ (v, p) => renderCompetitiveTopics(v, p.subject, p.chapter) },
+  competitive_topic: { nav: 'exams', title: ['📚 Topic', '📚 टॉपिक'], render: /** Render the competitive topic identified by the routed module ID. */ (v, p) => renderCompetitiveTopic(v, p.moduleId) },
+  exam_hub: { nav: 'exams', title: ['🏛️ Exams', '🏛️ परीक्षाएँ'], render: /** Render the universal exam selection hub. */ v => renderUniversalExamHub(v) },
+  exam_profile: { nav: 'exams', title: ['🎓 Exam', '🎓 परीक्षा'], render: /** Render the profile of the exam identified by the route. */ (v, p) => renderExamProfile(v, p.examId) },
+  syllabus: { nav: 'exams', title: ['📚 Syllabus', '📚 पाठ्यक्रम'], render: /** Render the syllabus matrix for the routed exam ID. */ (v, p) => renderSyllabusMatrix(v, p.examId) },
+  board_subjects: { nav: 'subjects', title: ['📚 Subjects', '📚 विषय'], render: /** Render the Board workspace's subject list. */ v => renderBoardSubjects(v) },
+  board_chapters: { nav: 'subjects', title: ['📚 Chapters', '📚 अध्याय'], render: /** Render Board chapters for the routed subject ID. */ (v, p) => renderBoardChapters(v, p.subjectId) },
+  board_topics: { nav: 'subjects', title: ['📚 Topics', '📚 टॉपिक'], render: /** Render Board topics for the routed chapter and subject IDs. */ (v, p) => renderBoardTopics(v, p.chapterId, p.subjectId) },
+  board_topic: { nav: 'subjects', title: ['📚 Topic', '📚 टॉपिक'], render: /** Render the routed Board topic within its chapter and subject. */ (v, p) => renderBoardTopic(v, p.topicId, p.chapterId, p.subjectId) },
+  digital_library: { nav: 'library', title: ['📖 Study library', '📖 स्टडी लाइब्रेरी'], render: /** Render the study library and its resource-availability guidance. */ v => renderDigitalLibrary(v) },
+  native_builder: { nav: 'builder', title: ['🧩 Create Test', '🧩 टेस्ट बनाएँ'], render: /** Render the native test builder into the route container. */ v => renderNativeBuilder(v) },
+  subjects: { nav: 'subjects', title: ['📚 Subjects', '📚 विषय'], render: /** Render the subject catalog for the current study context. */ v => renderSubjectsCatalog(v) },
+  subject: { nav: 'subjects', title: ['📚 Chapters', '📚 अध्याय'], render: /** Render chapters and topics for the routed subject. */ (v, p) => renderSubjectPage(v, p.subject) },
+  chapter: { nav: 'subjects', title: ['📚 Topics', '📚 टॉपिक'], render: /** Render topics for the routed subject and chapter. */ (v, p) => renderChapterPage(v, p.subject, p.chapter) },
+  topic: { nav: 'subjects', title: ['📚 Topic', '📚 टॉपिक'], render: /** Render the topic hub for the routed module ID. */ (v, p) => renderTopicHubPage(v, p.moduleId) },
+  subtopic: { nav: 'subjects', title: ['📚 Subtopic', '📚 उपविषय'], render: /** Render concepts for the routed module and subtopic. */ (v, p) => renderSubtopicConceptPage(v, p.moduleId, p.subtopic) },
+  taxonomy_explorer: { nav: 'bank', title: ['🔎 Question Bank', '🔎 प्रश्न बैंक'], render: /** Render the Question Bank using the supplied route filters. */ (v, p) => renderTaxonomyExplorer(v, p) },
+  learn: { nav: 'subjects', title: ['📖 Learn', '📖 सीखें'], render: /** Render the learning engine for the routed module. */ (v, p) => renderLearnEngine(v, p.moduleId) },
+  revision: { nav: 'revision', title: ['🔄 Revision', '🔄 रिवीज़न'], render: /** Render the revision engine for the routed module. */ (v, p) => renderRevisionEngine(v, p.moduleId) },
+  practice: { nav: 'subjects', title: ['✍️ Practice', '✍️ अभ्यास'], render: /** Render routed practice questions, defaulting to the first question. */ (v, p) => renderPracticeEngine(v, p.moduleId, p.qIndex || 0, p.customQuestions) },
+  class: { nav: 'subjects', title: ['📚 Class', '📚 कक्षा'], render: /** Render the class engine for the routed module. */ (v, p) => renderClassEngine(v, p.moduleId) },
+  pyq: { nav: 'pyq', title: ['🎯 PYQ papers', '🎯 पिछले वर्ष के पेपर'], render: /** Render previous-year questions for the routed module. */ (v, p) => renderPYQEngine(v, p.moduleId) },
+  pyq_hub: { nav: 'pyq', title: ['🎯 PYQ papers', '🎯 पिछले वर्ष के पेपर'], render: /** Render the global previous-year paper hub. */ v => renderGlobalPYQHub(v) },
+  test_hub: { nav: 'tests', title: ['⏱️ Tests', '⏱️ टेस्ट'], render: /** Render the global test hub. */ v => renderGlobalTestHub(v) },
+  revision_hub: { nav: 'revision', title: ['🔄 Revision', '🔄 रिवीज़न'], render: /** Render the global revision hub. */ v => renderGlobalRevisionHub(v) },
+  test: { nav: 'tests', title: ['⏱️ Test', '⏱️ टेस्ट'], render: /** Render the routed test group, defaulting to its first question. */ (v, p) => renderTestPage(v, p.moduleId, p.groupId, p.qIndex || 0) },
+  mistakes: { nav: 'revision', title: ['📕 Mistake Book', '📕 गलतियों की किताब'], render: /** Render the saved mistake book. */ v => renderMistakeBookPage(v) },
+  mastery: { nav: 'revision', title: ['🎯 Mastery', '🎯 महारत'], render: /** Render the mastery overview. */ v => renderMasteryPage(v) },
+  result: { nav: 'tests', title: ['📊 Result', '📊 परिणाम'], render: /** Render the test result supplied in the route parameters. */ (v, p) => renderResultPage(v, p.result) },
+  me: { nav: 'me', title: ['👤 Me', '👤 मैं'], render: /** Render the account and study settings page. */ v => renderMePage(v) }
 };
 const RouteNavItems = {
   home: ['tabHome', 'drwHome'], subjects: ['tabSubjects', 'drwSubjects'],
@@ -206,6 +217,7 @@ const RouteNavItems = {
   revision: ['tabRevision', 'drwRevision'], bank: ['drwTaxonomy'],
   library: ['drwLibrary'], me: ['drwMe', 'btnMe']
 };
+/** Mark the current route's dock, drawer and Me controls as active. */
 function updateRouteNavigation() {
   document.querySelectorAll('.nav-tab, .drawer-item, #btnMe').forEach(el => {
     el.classList.remove('active'); el.removeAttribute('aria-current');
@@ -215,6 +227,7 @@ function updateRouteNavigation() {
     if (el) { el.classList.add('active'); el.setAttribute('aria-current', 'page'); }
   });
 }
+/** Render the registered page with shared hooks and restore its remembered UI state. */
 function renderView() {
   const container = document.getElementById('mainView');
   if (!container) return;

@@ -8,6 +8,7 @@ results = []
 
 
 def rec(name, ok, detail=''):
+    """Record and print a navigation regression result with bounded diagnostic details."""
     results.append((name, 'PASS' if ok else 'FAIL', str(detail)[:260]))
     print('PASS' if ok else 'FAIL', name, str(detail)[:260], flush=True)
 

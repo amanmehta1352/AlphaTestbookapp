@@ -1,4 +1,5 @@
 /* Shared decorative icons: labels remain on their surrounding controls. */
+/** Return decorative outline SVG markup for a known name, falling back to the book icon. */
 function uiIcon(name) {
   const paths = {
     menu: "M4 6h16M4 12h16M4 18h16",

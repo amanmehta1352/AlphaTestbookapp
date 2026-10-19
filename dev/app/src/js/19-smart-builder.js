@@ -94,12 +94,14 @@ function sbTypeOf(r) { const t = String(r.q.metadata?.theoryOrNumerical || '').t
 function sbDiffOf(r) { const d = String(r.q.metadata?.difficulty || r.difficulty || '').toUpperCase(); return ['EASY', 'MODERATE', 'HARD'].includes(d) ? d : 'OTHER'; }
 const SB_TYPE_LABEL = { NUMERICAL: 'Numerical', THEORY: 'Theory', OTHER: 'Unclassified' };
 const SB_DIFF_LABEL = { EASY: 'Easy', MODERATE: 'Medium', HARD: 'Hard', OTHER: 'Unrated' };
+/** Return the localized label for a theory, numerical or unknown question type. */
 function sbTypeLabel(key) {
   return tx(
     SB_TYPE_LABEL[key],
     { NUMERICAL: "संख्यात्मक", THEORY: "सैद्धांतिक", OTHER: "अवर्गीकृत" }[key],
   );
 }
+/** Return the localized label for a known difficulty, falling back to Other. */
 function sbDiffLabel(key) {
   return tx(
     SB_DIFF_LABEL[key],
@@ -108,6 +110,7 @@ function sbDiffLabel(key) {
     ],
   );
 }
+/** Return a quick-test preset label in the current interface language. */
 function sbPresetLabel(preset) {
   return tx(
     preset.label,
@@ -349,6 +352,7 @@ function sbMinutesInput(v) {
   sbSettingsRefresh();
 }
 // Update only the parts that depend on the typed numbers, so focus and the next tap are never lost.
+/** Update count, duration and start controls in place, then save the builder draft. */
 function sbSettingsRefresh() {
   const n = sbCustomRows("pick").length;
   const short = SB.pick !== "pick" && SB.count > n;
@@ -366,6 +370,7 @@ function sbSettingsRefresh() {
   if (btn) btn.disabled = !n || short;
   sbSaveDraft();
 }
+/** Validate and clamp the typed PYQ duration, update its summary and save the draft. */
 function sbPyqMinutesInput(v) {
   const n = Math.round(Number(v));
   if (!Number.isFinite(n) || n < 1) return;
@@ -386,6 +391,7 @@ function sbBuildPreview() {
   const ordered = SB.shuffle ? sbShuffle(pool) : pool.slice().sort((a, b) => a.subject.localeCompare(b.subject) || a.topic.localeCompare(b.topic) || (Number(a.q.originalQNo) || 0) - (Number(b.q.originalQNo) || 0));
   SB.previewIds = sbGroupBySubject(ordered.slice(0, n)).map(r => r.id);
 }
+/** Remove a preview question while retaining at least one and adjusting automatic duration. */
 function sbRemoveFromPreview(id) {
   if (SB.previewIds.length <= 1) {
     openCustomToast(
@@ -400,6 +406,7 @@ function sbRemoveFromPreview(id) {
   if (!SB.minutesTouched) SB.minutes = SB.previewIds.length;
   sbRerender(false);
 }
+/** Replace a preview question with an unused eligible question from the same exam and year. */
 function sbReplaceInPreview(id) {
   const used = new Set(SB.previewIds);
   const pool = (SB.mode === "custom" ? sbCustomRows("pick") : sbAll()).filter(
@@ -447,6 +454,7 @@ function sbPyqChoose(level, key) {
   sbRerender(true);
 }
 function sbPyqSetScope(scope, subject) { SB.pyqScope = scope; SB.pyqSubject = subject || ''; SB.pyqMinutesTouched = false; sbRerender(false); }
+/** Prepare up to 500 selected PYQ questions and advance to the instructions step. */
 function sbPyqToInstructions() {
   const rows = sbPyqFinalRows().slice(0, 500);
   if (!rows.length) {
@@ -474,6 +482,7 @@ function sbQuickRows() {
 }
 function sbQuickToggleSubject(subject) { if (SB.quickEx.has(subject)) SB.quickEx.delete(subject); else SB.quickEx.add(subject); sbRerender(false); }
 function sbQuickSetContext(key) { SB.quickCtx = key; SB.quickEx.clear(); sbRerender(false); }
+/** Launch a preset test, preferring unattempted questions and scaling time for a smaller pool. */
 function sbQuickStart(presetId) {
   const p = SB_QUICK_PRESETS.find((x) => x.id === presetId);
   const rows = sbQuickRows();
@@ -516,6 +525,7 @@ function sbQuickStart(presetId) {
 }
 
 /* ---------- templates ---------- */
+/** Return a workspace-scoped template of current filters and settings, without fixed question IDs. */
 function sbTemplateFromState(name) {
   return {
     v: 1,
@@ -541,12 +551,14 @@ function sbTemplateFromState(name) {
     shuffle: SB.shuffle,
   };
 }
+/** Open the template naming dialog with a summary of the saved settings. */
 function sbOpenSaveTemplate() {
   openModal(
     tx("⭐ Save as template", "⭐ टेम्पलेट के रूप में सहेजें"),
     `<label for="sbTplName" style="display:block;font-size:12px;font-weight:800;color:var(--text-muted);margin-bottom:6px;">${tx("Template name", "टेम्पलेट का नाम")}</label><input id="sbTplName" class="search-input" style="padding-left:14px;margin:0;" maxlength="60" placeholder="${tx("e.g. Daily Maths 20", "जैसे रोज़ के 20 गणित सवाल")}" value="${escapeHtml(sbExamName(SB.examId) + " · " + SB.count + tx(" Q", " सवाल"))}"><p class="sj-note sj-muted">${tx("Saves the filters and settings, not a fixed set of questions. Each run picks fresh questions.", "फ़िल्टर और सेटिंग सहेजी जाएँगी, सवालों की तय सूची नहीं। हर बार नए सवाल चुने जाएँगे।")}</p><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;"><button class="btn-nav" onclick="closeModal()">${tx("Cancel", "रद्द करें")}</button><button class="btn-nav primary" onclick="sbSaveTemplate(document.getElementById('sbTplName').value)">${tx("Save", "सहेजें")}</button></div>`,
   );
 }
+/** Save the named selection template, retain the newest 30 and close the dialog. */
 function sbSaveTemplate(name) {
   BuilderTemplates.unshift(sbTemplateFromState(name));
   if (BuilderTemplates.length > 30) BuilderTemplates.length = 30;
@@ -559,6 +571,7 @@ function sbSaveTemplate(name) {
     ),
   );
 }
+/** Delete a saved template after confirmation and refresh the builder. */
 function sbDeleteTemplate(id) {
   const t = BuilderTemplates.find((x) => x.id === id);
   if (
@@ -570,6 +583,7 @@ function sbDeleteTemplate(id) {
   saveBuilderTemplates();
   sbRerender(false);
 }
+/** Load a template for the current workspace, rejecting an exam/year with no available questions. */
 function sbApplyTemplate(id) {
   const t = BuilderTemplates.find(
     (x) => x.id === id && x.ws === WorkspaceManager.current().id,
@@ -610,6 +624,7 @@ function sbApplyTemplate(id) {
 }
 
 /* ---------- entry points from other screens ---------- */
+/** Initialize a custom test selection for one topic and navigate to its settings. */
 function sbOpenForModule(moduleId) {
   const m = getWorkspaceModule(moduleId);
   const rows = sbAll().filter((r) => r.mod.moduleId === moduleId);
@@ -644,6 +659,7 @@ function sbOpenForModule(moduleId) {
   SB.step = "settings";
   navigate("native_builder");
 }
+/** Open a custom test of saved mistakes from the first available exam/year context. */
 function sbOpenMistakeTest() {
   SBCache = null;
   const wrong = sbWrongIds();
@@ -686,6 +702,7 @@ function sbOpenMistakeTest() {
 }
 
 /* ---------- launch (single path for all modes) ---------- */
+/** Validate unique questions from one exam/year and launch a CBT session; return whether it started. */
 function sbLaunch(ids, minutes, lang, title) {
   if (ActiveTestSession?.sessionStatus === "ACTIVE") {
     openCustomToast(
@@ -756,24 +773,29 @@ function sbLaunch(ids, minutes, lang, title) {
   sbReset();
   return true;
 }
+/** Return the PYQ title or a localized title for the selected custom-test history filter. */
 function sbTestTitle() {
   if (SB.mode === "pyq") return SB.title;
   if (SB.hist === "wrong") return tx("Mistakes Test", "गलतियों का टेस्ट");
   if (SB.hist === "bookmarked") return tx("Bookmarks Test", "बुकमार्क टेस्ट");
   return tx("Custom Test", "अपना टेस्ट");
 }
+/** Launch the previewed questions using the chosen duration, language and test title. */
 function sbStartFromInstructions() {
   sbLaunch(SB.previewIds.slice(), SB.minutes, SB.lang, sbTestTitle());
 }
 
 // Change the builder selection without changing the student's downloaded profile.
+/** Return exam/year choices from eligible PYQ rows or all rows for the current builder mode. */
 function sbContextChoices() { return sbContexts(SB.mode === 'pyq' ? sbPyqRows() : sbAll()); }
+/** Show available builder exam/year contexts with question counts or empty-state guidance. */
 function sbOpenContextPicker() {
   const choices = sbContextChoices();
   openModal(tx('Choose exam and year', 'परीक्षा और वर्ष चुनें'), `
     <p class="sj-note">${tx('Choosing an exam starts a new test selection.', 'परीक्षा चुनने पर टेस्ट का चयन फिर से शुरू होगा।')}</p>
     <div class="sb-list">${choices.map(c => sbItemChoice(`sbChooseContext(${nbJsAttr(c.key)})`, sbExamName(c.examId), c.year, c.count)).join('') || studyEmptyState()}</div>`);
 }
+/** Reset the selection to a valid exam/year while retaining the current builder mode. */
 function sbChooseContext(key) {
   const choice = sbContextChoices().find(c => c.key === key);
   if (!choice) return;
@@ -794,12 +816,15 @@ function sbChooseContext(key) {
 function sbBar(left, buttonHtml) {
   return `<div class="sb-bar-info" id="sbBarInfo">${left}</div>${buttonHtml || ''}`;
 }
+/** Return localized question-count HTML with English singular/plural agreement. */
 function sbCount(n) {
   return tx(`<b>${n}</b> question${n === 1 ? "" : "s"}`, `<b>${n}</b> सवाल`);
 }
+/** Return breadcrumb controls for completed and current builder steps. */
 function sbCrumbs() {
   if (SB.mode !== "custom") return "";
   const parts = [];
+  /** Append a breadcrumb, enabling jumps only to steps in the builder history. */
   const add = (step, label) =>
     parts.push(
       SB.stack.includes(step)
@@ -850,6 +875,7 @@ function sbItemMulti(level, it, on) {
 function sbItemChoice(onclick, label, meta, count) {
   return `<button type="button" class="sb-item sb-choice" onclick="${onclick}"><span class="sb-item-main"><strong>${escapeHtml(label)}</strong>${meta ? `<small>${escapeHtml(meta)}</small>` : ''}</span><span class="sb-count">${count}</span><span class="sb-go" aria-hidden="true">›</span></button>`;
 }
+/** Return the builder mode chooser and templates saved for the current workspace. */
 function sbRenderMode() {
   const all = sbAll();
   const pyqN = sbPyqRows().length;
@@ -877,6 +903,7 @@ function sbRenderMode() {
     ),
   };
 }
+/** Return quick-test context, subject controls and available preset choices. */
 function sbRenderQuick() {
   const ctxs = sbContexts();
   const key = sbQuickContextKey();
@@ -908,6 +935,7 @@ function sbRenderQuick() {
     ),
   };
 }
+/** Return a board, exam or year chooser with counts and contextual guidance. */
 function sbRenderChoice(step) {
   const items = sbLevelItems(step);
   const hint = {
@@ -915,12 +943,14 @@ function sbRenderChoice(step) {
     exam: tx("Tap an exam to continue.", "आगे बढ़ने के लिए परीक्षा चुनें।"),
     year: tx("Tap a year to continue.", "आगे बढ़ने के लिए वर्ष चुनें।"),
   }[step];
+  /** Return a board label for exam choices, or no metadata for other choice steps. */
   const metaFor = (it) => (step === "exam" ? sbBoardOf(it.key) : "");
   const body = items.length
     ? `<p class="sb-hint">${hint}</p><div class="sb-list">${items.map((it) => sbItemChoice(`sbChoose('${step}', ${nbJsAttr(it.key)})`, it.label, metaFor(it), it.count)).join("")}</div>`
     : `<div class="sj-empty"><strong>${tx("Nothing to choose here", "यहाँ चुनने के लिए कुछ नहीं है")}</strong><span>${tx("No questions match the earlier choices.", "पिछले चयन से कोई सवाल नहीं मिला।")}</span></div>`;
   return { body, bar: sbBar(hint, "") };
 }
+/** Return inclusion controls for the subject, topic or subtopic selection step. */
 function sbRenderMulti(level) {
   const items = sbLevelItems(level);
   const ex = SB[SB_EX_FOR[level]];
@@ -936,6 +966,7 @@ function sbRenderMulti(level) {
     ),
   };
 }
+/** Return question-type and difficulty filters with eligible question counts. */
 function sbRenderType() {
   const rows = sbCustomRows("subtopic");
   const types = sbGroup(rows, sbTypeOf, (r) => sbTypeLabel(sbTypeOf(r)));
@@ -943,6 +974,7 @@ function sbRenderType() {
   const order = ["EASY", "MODERATE", "HARD", "OTHER"];
   diffs.sort((a, b) => order.indexOf(a.key) - order.indexOf(b.key));
   const pool = sbCustomRows("type").length;
+  /** Return a filter chip showing whether its key is included in the selection. */
   const chip = (kind, it, set) => {
     const on = !set.has(it.key);
     return `<button type="button" class="sb-chip ${on ? "on" : ""}" aria-pressed="${on}" onclick="sbToggleType('${kind}', '${it.key}')">${on ? "✓ " : ""}${escapeHtml(it.label)} <span>${it.count}</span></button>`;
@@ -958,6 +990,7 @@ function sbRenderType() {
     ),
   };
 }
+/** Return a selectable question row with its number, topic, subtopic and difficulty. */
 function sbQuestionRow(r, on) {
   const text =
     r.q.QUESTION_EN ||
@@ -965,6 +998,7 @@ function sbQuestionRow(r, on) {
     tx("Question text unavailable", "सवाल का पाठ उपलब्ध नहीं है");
   return `<button type="button" class="sb-item sb-q ${on ? "on" : ""}" aria-pressed="${on}" onclick="sbTogglePicked(${nbJsAttr(r.id)})"><span class="sb-check" aria-hidden="true">${on ? "✓" : ""}</span><span class="sb-item-main"><strong>${escapeHtml(text)}</strong><small>Q.${escapeHtml(r.q.originalQNo ?? "")} · ${escapeHtml(r.topic)} · ${escapeHtml(sbSubtopic(r))} · ${escapeHtml(sbDiffLabel(sbDiffOf(r)))}</small></span></button>`;
 }
+/** Return question selection controls with search, answer-history filters and pagination. */
 function sbRenderQuestions() {
   const base = sbCustomRows("history");
   const attempted = sbAttemptedIds();
@@ -972,6 +1006,7 @@ function sbRenderQuestions() {
   const all = sbCustomRows("type");
   const unattN = all.filter((r) => !attempted.has(r.id)).length;
   const wrongN = all.filter((r) => wrong.has(r.id)).length;
+  /** Return a history-filter chip with its matching question count and active state. */
   const histChip = (id, label, n) =>
     `<button type="button" class="sb-chip ${SB.hist === id ? "on" : ""}" aria-pressed="${SB.hist === id}" ${n ? "" : "disabled"} onclick="sbSetHist('${id}')">${escapeHtml(label)} <span>${n}</span></button>`;
   let list = "";
@@ -1015,6 +1050,7 @@ function sbLangInfo(rows) {
   const en = rows.filter(r => String(r.q.QUESTION_EN || r.q.QUESTION || '').trim()).length;
   return { hi, en, total: rows.length };
 }
+/** Return count, duration, question-language and shuffle controls for the selection. */
 function sbRenderSettings() {
   sbSyncCountDefaults();
   const pool = sbCustomRows("pick");
@@ -1028,6 +1064,7 @@ function sbRenderSettings() {
       : `<div class="sb-chips">${presets.map((x) => `<button type="button" class="sb-chip ${SB.count === x ? "on" : ""}" data-sb-count="${x}" onclick="sbSetCount(${x})">${x}</button>`).join("")}<button type="button" class="sb-chip ${SB.count === Math.min(n, 500) ? "on" : ""}" data-sb-count="${Math.min(n, 500)}" onclick="sbSetCount(${Math.min(n, 500)})">${tx(`All ${Math.min(n, 500)}`, `सभी ${Math.min(n, 500)}`)}</button></div>
        <div class="sb-inline"><label for="sbCountIn">${tx("Or type a number", "या संख्या लिखें")}</label><input id="sbCountIn" type="number" inputmode="numeric" min="1" max="500" value="${SB.count}" oninput="sbCountInput(this.value)"></div>
        <div id="sbWarn" class="sb-warn" ${short ? "" : "hidden"}>${tx(`Only ${n} question${n === 1 ? " is" : "s are"} available.`, `केवल ${n} सवाल उपलब्ध हैं।`)} <button type="button" class="btn-nav primary" onclick="sbSetCount(${n})">${tx(`Use ${n}`, `${n} चुनें`)}</button></div>`;
+  /** Return a question-language button reflecting the current builder language choice. */
   const langBtn = (id, label) =>
     `<button type="button" class="${SB.lang === id ? "on" : ""}" aria-pressed="${SB.lang === id}" onclick="sbSet('lang','${id}')">${label}</button>`;
   const body = `<div class="sb-label">${tx("Number of questions", "सवालों की संख्या")}</div>${countHtml}
@@ -1049,6 +1086,7 @@ function sbRenderSettings() {
     ),
   };
 }
+/** Return labeled question-count bars for up to eight subject/topic groups. */
 function sbDistribution(rows) {
   const g = sbGroup(
     rows,
@@ -1068,6 +1106,7 @@ function sbDistribution(rows) {
     null,
   );
 }
+/** Return available preview questions with distribution, replace and remove controls. */
 function sbRenderPreview() {
   const byId = new Map(sbAll().map((r) => [r.id, r]));
   const rows = SB.previewIds.map((id) => byId.get(id)).filter(Boolean);
@@ -1088,6 +1127,7 @@ function sbRenderPreview() {
     ),
   };
 }
+/** Return the current PYQ exam, year, paper or scope selection screen. */
 function sbRenderPyq() {
   if (SB.step === "pyq_exam") {
     const items = sbPyqExams();
@@ -1161,6 +1201,7 @@ function sbRenderPyq() {
     ),
   };
 }
+/** Return pre-test instructions, selection totals, language controls and the start action. */
 function sbRenderInstructions() {
   const byId = new Map(sbAll().map((r) => [r.id, r]));
   const rows = SB.previewIds.map((id) => byId.get(id)).filter(Boolean);
@@ -1170,6 +1211,7 @@ function sbRenderInstructions() {
     (r) => r.subject,
     (r) => sbSubjectLabel(r.subject),
   );
+  /** Return a question-language button reflecting the current builder language choice. */
   const langBtn = (id, label) =>
     `<button type="button" class="${SB.lang === id ? "on" : ""}" aria-pressed="${SB.lang === id}" onclick="sbSet('lang','${id}')">${label}</button>`;
   const body = rows.length
@@ -1202,15 +1244,22 @@ const SB_RENDERERS = {
   pyq_year: sbRenderPyq,
   pyq_shift: sbRenderPyq,
   pyq_scope: sbRenderPyq,
+  /** Render the custom-test board selection step. */
   board: () => sbRenderChoice("board"),
+  /** Render the custom-test exam selection step. */
   exam: () => sbRenderChoice("exam"),
+  /** Render the custom-test year selection step. */
   year: () => sbRenderChoice("year"),
+  /** Render the subject inclusion step. */
   subject: () => sbRenderMulti("subject"),
+  /** Render the topic inclusion step. */
   topic: () => sbRenderMulti("topic"),
+  /** Render the subtopic inclusion step. */
   subtopic: () => sbRenderMulti("subtopic"),
   type: sbRenderType,
   questions: sbRenderQuestions,
   settings: sbRenderSettings,
+  /** Build missing preview IDs before rendering the preview and its footer. */
   preview: () => {
     if (!SB.previewIds.length && SB.mode === "custom") sbBuildPreview();
     return sbRenderPreview();
@@ -1236,6 +1285,7 @@ const SB_TITLES_HI = {
   preview: "पूर्वावलोकन",
   instructions: "निर्देश",
 };
+/** Render the active builder step and footer, initializing and restoring draft state as needed. */
 function sbRender(v) {
   SBCache = null;
   if (!SB.inited) SB = sbLoadDraft() || sbFresh();

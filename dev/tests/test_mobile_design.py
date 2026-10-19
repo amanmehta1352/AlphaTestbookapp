@@ -9,6 +9,7 @@ results = []
 
 
 def rec(name, ok, detail=""):
+    """Record and print a mobile regression result with bounded diagnostic details."""
     results.append((name, "PASS" if ok else "FAIL", str(detail)[:240]))
     print("PASS" if ok else "FAIL", name, detail, flush=True)
 

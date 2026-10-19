@@ -168,6 +168,7 @@ async function cloudSyncProgress() {
 
 /* ---------- one sync ---------- */
 var CloudSyncRunning = null;
+/** Sync student content and account progress, sharing any in-flight sync promise; return null on failure or when unavailable. */
 async function cloudSync(reason = 'manual') {
   if (!ServerState.session || DataHealth.readOnly) return null;
   if (CloudSyncRunning) return CloudSyncRunning;
@@ -194,10 +195,12 @@ async function cloudSync(reason = 'manual') {
 }
 
 /* ---------- account sheet ---------- */
+/** Refresh the account sheet from current cloud state when the sheet is present. */
 function cloudPaint() {
   const el = document.getElementById("cloudSheet");
   if (el) el.innerHTML = cloudSheetHtml();
 }
+/** Return account-sheet HTML for sign-in, sync status or signed-in account controls. */
 function cloudSheetHtml() {
   const s = ServerState.session;
   const msg = CloudState.msg
@@ -227,6 +230,7 @@ async function cloudLogout() {
   await Server.logout(); CloudState.isAdmin = null; CloudState.msg = 'Logout हो गया।'; CloudState.msgKind = ''; await cloudSaveState(); cloudPaint(); try { renderView(); } catch (_) {}
 }
 // Home: a gentle prompt until the student logs in
+/** Insert one sign-in prompt on online guest Home in a competitive workspace. */
 function cloudHomePrompt() {
   if (
     Route?.page !== "home" ||

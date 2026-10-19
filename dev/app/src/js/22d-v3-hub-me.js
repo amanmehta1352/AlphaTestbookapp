@@ -28,6 +28,7 @@ function shMatch(st) {
 function shSetFilter(f) { SubjectHubState.filter = f; renderView(); }
 function shToggle(key, el) { SubjectHubState.open[key] = el.open; }
 
+/** Render a subject's filtered topic accordions or contextual empty-state guidance. */
 function renderSubjectPage(v, subject) {
   const key = String(subject || '').trim().toLowerCase();
   const mods = (typeof profileVisible === 'function' ? profileVisible : (x => x))(CurriculumContext.filterModules(AppModules))
@@ -98,6 +99,7 @@ function resultTimeCard(res, keyFor) {
 }
 
 /* ---------- Me screen ---------- */
+/** Render account, profile, display, backup and study-preference controls into the view. */
 function renderMePage(v) {
   const s = (typeof ServerState !== 'undefined') ? ServerState.session : null;
   const ls = learningStats();
@@ -110,6 +112,7 @@ function renderMePage(v) {
   const mistakes = (UserState.mistakeBook || []).length;
   const marks = typeof bookmarkedIds === 'function' ? bookmarkedIds().size : 0;
   const tile = (b, l) => `<span class="me-tile"><b>${b}</b>${l}</span>`;
+  /** Return a settings button with its icon, label, detail and optional enabled indicator. */
   const row = (ico, label, sub, on, id = "") =>
     `<button type="button" ${id ? `id="${id}"` : ""} class="me-row" onclick="${on}"><span class="me-ico" aria-hidden="true">${ico}</span><span class="me-row-main"><b>${label}</b>${sub ? `<small>${sub}</small>` : ""}</span><span aria-hidden="true">›</span></button>`;
   v.innerHTML = `
@@ -139,6 +142,8 @@ function renderMePage(v) {
     <p class="me-ver">Master TestBook ${escapeHtml(document.querySelector('meta[name="app-version"]')?.content || "")}</p>`;
 }
 registerRouteViewState('subject', {
+  /** Copy the subject filter and accordion state for route restoration. */
   capture: () => ({ filter: SubjectHubState.filter, open: { ...SubjectHubState.open } }),
+  /** Restore the subject filter and accordions, or reset them for a fresh route. */
   restore: state => { SubjectHubState = state ? { filter: state.filter, open: { ...state.open } } : { filter: 'all', open: {} }; }
 });

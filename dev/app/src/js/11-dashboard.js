@@ -199,12 +199,14 @@ function gxTrendWidget(results) {
       <text x="${x(pts.length - 1) - 6}" y="${y(Number(last.accuracy) || 0) - 10}" class="gx-lastlabel" text-anchor="end">${Number(last.accuracy) || 0}%</text>
     </svg><p class="gx-note" id="gxTrendNote">${tx('Tap a point for details.','जानकारी के लिए किसी बिंदु पर tap करें।')}</p></section>`;
 }
+/** Show the selected trend point's test score, accuracy and time in the chart note. */
 function gxTrendInfo(i) {
   const r = (gxTrendInfo.pts || [])[i];
   const el = document.getElementById("gxTrendNote");
   if (r && el)
     el.textContent = `${r.topicTitle || "Test"} · ${Number(r.score) || 0}/${Number(r.total) || 0} · ${Number(r.accuracy) || 0}% · ${sjFormatWhen(r.ts)}`;
 }
+/** Return a revision card with up to four due items or upcoming-review guidance. */
 function gxRevisionWidget() {
   const due = reviewDue();
   return `<section class="gx-card gx-rev"><div class="gx-head"><h2>${tx("Spaced revision", "दोहराई (Revision)")}</h2><span class="gx-chip">${tx(`${due.length} due today`, `आज ${due.length} बाकी`)}</span></div>
@@ -222,11 +224,13 @@ function gxRevisionWidget() {
         : `<div class="gx-empty"><strong>${tx("All caught up", "सब पूरा")}</strong><span>${reviewUpcoming(7) ? tx(`${reviewUpcoming(7)} card(s) come back in the next 7 days.`, `अगले 7 दिनों में ${reviewUpcoming(7)} card लौटेंगे।`) : tx("Wrong answers become revision cards automatically.", "गलत जवाब अपने-आप revision cards बन जाते हैं।")}</span></div>`
     }</section>`;
 }
+/** Return focus/break timer controls and today's completed focus time as HTML. */
 function gxPomodoroWidget() {
   const p = pomoState();
   const r = pomoRemaining();
   const len = pomoPhaseLength(p.phase);
   const focusToday = Number(StudySettings.focusLog[sjLocalDay()]) || 0;
+  /** Return a duration button that is disabled while the Pomodoro timer runs. */
   const lenChip = (kind, m) =>
     `<button type="button" class="gx-mini ${StudySettings.pomo[kind] === m ? "on" : ""}" ${p.running ? "disabled" : ""} onclick="pomoSetLength('${kind}', ${m})">${m}m</button>`;
   return `<section class="gx-card gx-pomo"><div class="gx-head"><h2>Pomodoro</h2><span class="gx-chip">${tx("Focus today", "आज focus")} ${sjFmtMin(focusToday)}</span></div>
@@ -239,6 +243,7 @@ function gxPomodoroWidget() {
     <div class="gx-pomo-len"><span>${tx("Focus", "पढ़ाई")}</span>${[15, 25, 50].map((m) => lenChip("focus", m)).join("")}<span>${tx("Break", "आराम")}</span>${[5, 10].map((m) => lenChip("brk", m)).join("")}</div>
     <p class="gx-note">${tx("Only completed focus sessions are added to your focus time.", "सिर्फ़ पूरे हुए focus sessions ही focus time में जुड़ते हैं।")}</p></section>`;
 }
+/** Return today's answer, test, time and saved-mistake statistics as HTML. */
 function gxTodayWidget(d) {
   const st = learningStats();
   const today = st.byDay.get(sjLocalDay()) || { sec: 0 };
@@ -254,6 +259,7 @@ function gxTodayWidget(d) {
     </div>
     <p class="gx-note">${tx("Accuracy = correct ÷ answered. Answering time counts at most 10 minutes per question.", "Accuracy = सही ÷ हल किए। हर सवाल पर अधिकतम 10 मिनट ही गिने जाते हैं।")}</p></section>`;
 }
+/** Return accuracy bars for up to six subjects with recorded answers. */
 function gxSubjectWidget() {
   const st = learningStats();
   const rows = [...st.bySubject.values()]
@@ -272,8 +278,10 @@ function gxSubjectWidget() {
       "",
     )}</div><p class="gx-note">${tx('"few" = under 5 answers, not enough to judge.', '"कम" = 5 से कम जवाब, अभी अंदाज़ा लगाना ठीक नहीं।')}</p></section>`;
 }
+/** Return this week's study totals and their changes from last week as HTML. */
 function gxWeeklyWidget() {
   const w = sjWeekly();
+  /** Return directional change markup, or an empty string if either value is unknown. */
   const delta = (a, b, unit = "") => {
     if (b === null || a === null) return "";
     const d = a - b;
@@ -287,11 +295,13 @@ function gxWeeklyWidget() {
     <div class="gx-kv"><span>${tx("Tests", "Test")}</span><b>${w.thisW.t}</b>${delta(w.thisW.t, w.lastW.t)}</div>
     <div class="gx-kv"><span>${tx("Answering time", "जवाब का समय")}</span><b>${sjFmtMin(w.thisW.s)}</b></div></section>`;
 }
+/** Return the share of available questions answered at least once as a ring card. */
 function gxCoverageWidget() {
   const c = sjCoverage();
   const pct = c.total ? c.done / c.total : 0;
   return `<section class="gx-card gx-cov"><div class="gx-head"><h2>${tx("Coverage", "कवरेज")}</h2></div><div class="gx-cov-body">${gxRing(pct, 108, "gxCovGrad", `${Math.round(pct * 100)}%`, `${c.done} / ${c.total}`)}<p>${tx("questions answered at least once", "सवाल कम से कम एक बार हल किए")}</p></div></section>`;
 }
+/** Return a backup reminder when progress exists and no export was saved in seven days. */
 function gxBackupBanner() {
   const has = AttemptHistory.length || ResultHistory.length;
   if (!has) return "";
@@ -303,6 +313,7 @@ function gxBackupBanner() {
   if (days !== null && days < 7) return "";
   return `<section class="gx-card gx-backup" role="status"><span aria-hidden="true">💾</span><div><strong>${days === null ? tx("No backup file saved yet", "अभी कोई बैकअप फ़ाइल नहीं बचाई गई") : tx(`Last backup file ${days} days ago`, `आख़िरी backup ${days} दिन पहले`)}</strong><small>${tx("Save an extra copy of your progress before changing phones or clearing app data. Check Account for cloud sync status.", "फ़ोन बदलने या ऐप डेटा साफ़ करने से पहले प्रगति की एक और कॉपी बचाएँ। क्लाउड सिंक की स्थिति अकाउंट में देखें।")}</small></div><button type="button" class="gx-btn" onclick="downloadDataSnapshot()">${tx("Back up", "Backup लें")}</button></section>`;
 }
+/** Return up to three study suggestions prioritized by resume, revision and weak topics. */
 function sjNextActions(d) {
   const actions = [];
   const firstModule = d.modules[0] || null;
@@ -431,6 +442,7 @@ function sjNextActions(d) {
     });
   return actions.slice(0, 3);
 }
+/** Render study actions, goals, progress and preparation shortcuts into the supplied view. */
 function renderHomePage(v) {
   const d = sjCollectDashboardData();
   const actions = sjNextActions(d);

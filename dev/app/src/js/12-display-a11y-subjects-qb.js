@@ -52,6 +52,7 @@ function openDisplaySettings() {
 }
 
 /* ---------- route titles ---------- */
+/** Return the localized registered page title, leaving the Board Home title to its renderer. */
 function nbRouteTitle(page) {
   if (page === 'home' && WorkspaceManager.current().type === 'BOARD') return null;
   const title = AppRoutes[page]?.title;
@@ -70,6 +71,7 @@ function nbA11yEnhance() {
 }
 function nbQueueA11y() { if (A11yQueued) return; A11yQueued = true; setTimeout(nbA11yEnhance, 0); }
 function nbModalIsOpen() { return document.getElementById('modalSheet')?.classList.contains('open'); }
+/** Focus an open sheet's first form field, or the sheet when autofocus is disabled. */
 function nbFocusModal() {
   ModalFocusTimer = null;
   const sheet = document.getElementById("modalSheet");
@@ -87,6 +89,7 @@ function nbFocusModal() {
 }
 const _u5OpenModal = openModal,
   _u5CloseModal = closeModal;
+/** Open or update a sheet, remembering its trigger and scheduling focus when needed. */
 openModal = function (title, contentHtml) {
   const wasOpen = nbModalIsOpen();
   if (!wasOpen) ModalReturnFocus = document.activeElement;
@@ -100,6 +103,7 @@ openModal = function (title, contentHtml) {
     ModalFocusTimer = setTimeout(nbFocusModal, 0);
   }
 };
+/** Close the sheet, cancel pending autofocus and restore focus to its surviving trigger. */
 closeModal = function () {
   clearTimeout(ModalFocusTimer);
   ModalFocusTimer = null;
@@ -174,6 +178,7 @@ function nbSubjectGroups() {
 }
 /* Subject navigation redesign — scoped only to the Subjects catalog. */
 let SubjectNavState = { selected: "", expanded: "" };
+/** Focus and reveal the catalog control matching the selector and catalog key. */
 function shFocusCatalogControl(selector, key) {
   const control = Array.from(document.querySelectorAll(selector)).find(
     (el) => el.dataset.catalogKey === key,
@@ -181,17 +186,20 @@ function shFocusCatalogControl(selector, key) {
   control?.focus({ preventScroll: true });
   control?.scrollIntoView({ block: "nearest", inline: "nearest" });
 }
+/** Select a subject, collapse its chapters and restore focus after rendering. */
 function shSelectCatalogSubject(key) {
   SubjectNavState.selected = String(key || "");
   SubjectNavState.expanded = "";
   renderView();
   shFocusCatalogControl(".sn-tab", SubjectNavState.selected);
 }
+/** Toggle the selected chapter and restore focus to its control after rendering. */
 function shToggleCatalogChapter(key) {
   SubjectNavState.expanded = SubjectNavState.expanded === key ? "" : key;
   renderView();
   shFocusCatalogControl(".sn-chapter-toggle", key);
 }
+/** Render subject tabs and expandable chapters with direct links to their topics. */
 function renderSubjectsCatalog(v) {
   const groups = nbSubjectGroups();
   const total = groups.reduce((n, g) => n + g.qs, 0);
@@ -290,6 +298,7 @@ function qbCardHtml(q) {
     <div class="qb-actions">${bookmarkButtonHtml(cid)}<button type="button" class="btn-action-sm qb-practice" onclick="startSinglePractice(${nbJsAttr(cid)})">${tx('Practice', 'अभ्यास')} ➔</button></div>
   </article>`;
 }
+/** Render matching question cards, pagination and contextual empty-state guidance. */
 function qbRenderList() {
   const box = document.getElementById('qbList'); if (!box) return;
   const rows = qbFiltered(); const shown = rows.slice(0, QBState.show);
@@ -332,12 +341,16 @@ function renderTaxonomyExplorer(v, params = {}) {
 }
 
 registerRouteViewState('subjects', {
+  /** Copy the catalog selection and expanded chapter for route restoration. */
   capture: () => ({ ...SubjectNavState }),
+  /** Restore the catalog selection or reset it for a fresh route. */
   restore: state => { SubjectNavState = state ? { ...state } : { selected: '', expanded: '' }; }
 });
 let QBWorkspaceId = '';
 registerRouteViewState('taxonomy_explorer', {
+  /** Copy Question Bank filters, search and pagination for route restoration. */
   capture: () => ({ filters: { ...ActiveTaxonomyFilters }, bank: { ...QBState } }),
+  /** Restore remembered bank state on Back or workspace changes, preserving explicit entry filters otherwise. */
   restore: (state, fromHistory) => {
     const workspaceId = WorkspaceManager.current().id;
     const switchedWorkspace = QBWorkspaceId && QBWorkspaceId !== workspaceId;
