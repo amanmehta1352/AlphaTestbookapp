@@ -44,7 +44,9 @@ with sync_playwright() as p:
     rec('Rapidly closed Display never steals focus back into the closed dialog',
         page.evaluate("!nbModalIsOpen() && document.activeElement.id === 'btnTextSize'"))
     page.locator('.me-row', has_text='Dark mode').click()
-    rec('Me theme control changes and persists theme', page.evaluate("UserState.theme === 'dark' && document.body.classList.contains('dark')"))
+    # Theme saves use the asynchronous write queue; wait for the actual commit before unloading.
+    page.evaluate('StorageWriteQueue.flush()')
+    rec('Me theme control changes and persists theme', page.evaluate("async () => UserState.theme === 'dark' && document.body.classList.contains('dark') && (await loadUserState()).theme === 'dark'"))
     page.reload()
     page.wait_for_selector('.me-head')
     rec('Theme survives reload', page.evaluate("UserState.theme === 'dark' && document.body.classList.contains('dark')"))
