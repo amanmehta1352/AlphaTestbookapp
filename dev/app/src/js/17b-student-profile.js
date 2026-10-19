@@ -75,7 +75,7 @@ function qualificationFilteredExams(exams) {
   const q = studentQualification();
   if (!q?.branch || !ServerState?.session || CloudState.isAdmin !== false) return exams || [];
   const idx = CloudState.profileIndex || {};
-  if (!Object.keys(idx).length) return exams || [];
+  if (!Object.keys(idx).length) return [];
   return (exams || []).filter(ex => qualificationBranchCount(ex.examId, q.branch) > 0);
 }
 function qualificationExamAction(examId) {
@@ -173,7 +173,10 @@ function profileHeroChip(examLine) {
   const q = studentQualification();
   const p = studentProfile();
   const label = p ? profileLabel(p) : q ? qualificationLabel(q) + ' · ' + tx('Choose exam','परीक्षा चुनें') : tx('Choose qualification','योग्यता चुनें');
-  if (!profileAvailable()) return '<button type="button" class="pf-chip" onclick="openQualificationSetup()" aria-label="Qualification बदलें">🎓 ' + escapeHtml(q ? qualificationLabel(q) : examLine) + ' ▾</button><button type="button" class="gx-link" onclick="navigate(\'exam_hub\')">' + tx('All exams','सारे exam') + '</button>';
+  if (!profileAvailable()) {
+    if (!ServerState?.session || CloudState.isAdmin !== false) return `<span class="gx-pill">🏛️ ${examLine}</span><button type="button" class="gx-link" onclick="navigate('exam_hub')">${tx('Change exam','Exam बदलें')}</button>`;
+    return '<button type="button" class="pf-chip" onclick="openQualificationSetup()" aria-label="Qualification बदलें">🎓 ' + escapeHtml(q ? qualificationLabel(q) : examLine) + ' ▾</button><button type="button" class="gx-link" onclick="navigate(\'exam_hub\')">' + tx('All exams','सारे exam') + '</button>';
+  }
   return '<button type="button" class="pf-chip" onclick="openQualificationSetup()" aria-label="Qualification बदलें">🎓 ' + escapeHtml(label) + ' ▾</button><button type="button" class="gx-link" onclick="navigate(\'exam_hub\')">' + tx('All exams','सारे exam') + '</button>';
 }
 
