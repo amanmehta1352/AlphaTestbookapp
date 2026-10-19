@@ -256,8 +256,13 @@ async function cloudBoot() {
   await cloudLoadState();
   Server.loadSession();
   const came = await cloudFinishRedirect();
-  if (ServerState.session) { await cloudSync('auto'); if (came) openAccount(); }
-  else if (came) openAccount();
+  if (ServerState.session) {
+    await cloudSync('auto');
+    if (came) {
+      if (CloudState.isAdmin === false && !studentQualification()) navigate('qualification_setup');
+      else openAccount();
+    }
+  } else if (came) openAccount();
   setInterval(() => { if (ServerState.session && navigator.onLine !== false) cloudSync('auto'); }, 10 * 60 * 1000);
   window.addEventListener('online', () => { if (ServerState.session) cloudSync('auto'); });
 }
