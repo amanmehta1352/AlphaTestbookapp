@@ -58,6 +58,17 @@ function cloudQuestionFromRow(r, examName, ws, idx) {
     metadata: meta, workspaceId: ws.id, workspaceType: ws.type, contentHash: r.content_hash || '', importState: 'READY', version: 'server'
   };
 }
+/* Fetch only exam/subject metadata before qualification is chosen; no question stems/options are downloaded. */
+async function cloudPullQualificationIndex() {
+  const exams = await cloudPullAll('exams', 'id,name', 'id');
+  const rows = await cloudPullAll('questions', 'exam_id,subject', 'exam_id,subject');
+  const examName = new Map(exams.map(e => [e.id, e.name]));
+  CloudState.profileIndex = typeof profileIndex === 'function' ? profileIndex(rows, examName) : null;
+  CloudState.serverQuestions = 0;
+  CloudState.serverQuestionsAll = rows.length;
+  return { questions: 0, topics: 0, changed: false, waitingForQualification: true };
+}
+
 async function cloudPullContent() {
   const ws = cloudTargetWorkspace();
   const exams = await cloudPullAll('exams', 'id,name', 'id');
@@ -179,7 +190,11 @@ async function cloudSync(reason = 'manual') {
       const uid = ServerState.session.user_id;
       if (CloudState.isAdmin === null || CloudState.userId !== uid) CloudState.isAdmin = await Server.checkAdmin();
       let content = null;
-      if (!CloudState.isAdmin) content = await cloudPullContent();
+      if (!CloudState.isAdmin) {
+        content = typeof studentQualification === 'function' && !studentQualification()
+          ? await cloudPullQualificationIndex()
+          : await cloudPullContent();
+      }
       const prog = await cloudSyncProgress();
       CloudState.userId = uid; CloudState.email = ServerState.session.email || CloudState.email; CloudState.lastSyncAt = new Date().toISOString();
       CloudState.msg = `✓ Sync हो गया${content?.changed ? ` · ${content.questions} सवाल server से आए` : ''}${prog.up ? ` · ${prog.up} जवाब भेजे` : ''}${prog.down ? ` · ${prog.down} पुराने जवाब वापस आए` : ''}`; CloudState.msgKind = 'good';
