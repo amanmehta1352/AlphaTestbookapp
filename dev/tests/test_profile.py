@@ -53,7 +53,7 @@ try:
         st.locator('#qualificationSave').click(); st.wait_for_selector('.exam-hub-page', timeout=15000); idle()
         visible = st.locator('[data-exam-id]').evaluate_all("els=>els.map(e=>e.getAttribute('data-exam-id')).sort()")
         rec('Exam Hub hides exams with no Mechanical question coverage', visible == ['ssc-je'], visible)
-        rec('Exam Hub identifies branch-filtered results', 'Matching Exam Frameworks' in st.inner_text('.section-title'))
+        rec('Exam Hub identifies branch-filtered results', 'Exams matching' in st.inner_text('.section-title') and 'Mechanical' in st.inner_text('.section-title'))
         st.locator('[data-exam-id="ssc-je"]').click()
         st.wait_for_function("Route.page==='exam_profile' && UserState.studentProfile?.examId==='ssc-je'", timeout=15000); idle()
         rec('selected exam and qualification saved together', st.evaluate("UserState.studentProfile.qualification==='diploma' && UserState.studentProfile.branch==='mechanical'"))
