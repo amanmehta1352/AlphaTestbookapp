@@ -312,3 +312,149 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
 .study-feedback .study-action{margin-top:12px}
 .sb-shell .study-context{margin:8px 0 0}
 @media(max-width:380px){.study-context{flex-wrap:wrap}.study-context-copy{flex-basis:100%}}
+/* Mobile study layout: keep utility controls in Me and the drawer. */
+.ui-icon {
+  width: 22px;
+  height: 22px;
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+#appHeader .header-btn {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  flex: 0 0 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+#appHeader .app-one-step-back {
+  width: auto;
+  flex: 0 0 auto;
+  padding: 0 8px;
+}
+#appHeader .app-one-step-back[hidden] {
+  display: none;
+}
+#appHeader .header-title {
+  max-width: none;
+  min-width: 0;
+  flex: 1 1 auto;
+  font-size: 15px;
+}
+#appHeader .header-right {
+  flex: 0 0 auto;
+  margin-left: 8px;
+}
+#sideDrawer #workspaceSwitcherBtn {
+  width: 100%;
+  max-width: none;
+  min-height: 48px;
+  height: auto;
+  padding: 12px;
+  font-size: 14px;
+  justify-content: flex-start;
+  white-space: normal;
+}
+#sideDrawer #workspaceSwitcherBtn::after {
+  content: none;
+}
+.gx .gx-btn {
+  background: var(--surface);
+  color: var(--text-main);
+  border: 1px solid var(--border-strong);
+}
+.gx-continue .gx-btn:not(.ghost),
+.gx-next .gx-btn {
+  background: var(--primary);
+  color: var(--on-primary, #fff);
+  border-color: var(--primary);
+}
+.gx .gx-link,
+.sb-link {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+.gx-goal-body {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+  text-align: left;
+}
+.gx-goal-body .gx-ring {
+  width: 88px;
+  height: 88px;
+  flex-shrink: 0;
+}
+.gx-quick .sj-quick-btn {
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: none;
+}
+.gx-quick .sj-quick-btn .ui-icon {
+  color: var(--primary);
+}
+.study-context {
+  gap: 8px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+}
+.study-context .study-action {
+  flex: 0 0 auto;
+  max-width: 38%;
+}
+.study-context-copy strong {
+  font-size: 13px;
+  line-height: 1.5;
+}
+.study-context-copy small {
+  margin-top: 2px;
+}
+.study-context .study-action::before {
+  content: none;
+}
+@media (max-width: 380px) {
+  .study-context {
+    flex-wrap: nowrap;
+  }
+  .study-context-copy {
+    flex-basis: auto;
+  }
+}
+@media (min-width: 720px) {
+  .gx-hero,
+  .gx-continue,
+  .gx-next,
+  .gx-goal,
+  .gx-search,
+  .gx-subj,
+  .gx-today {
+    grid-column: 1/-1;
+  }
+}
+:where(
+  .header-btn,
+  .nav-tab,
+  .sj-quick-btn,
+  .sb-item,
+  .sb-link,
+  .me-row,
+  .study-action
+):focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+}
+
+body.dark { --on-primary: #07090e; }
+.gx-suggestions > summary {
+  min-height: 44px;
+  padding: 12px 0;
+  color: var(--text-muted);
+  cursor: pointer;
+}

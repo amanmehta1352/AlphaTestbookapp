@@ -166,6 +166,10 @@
    "file": "src/html/body.html"
   },
   {
+   "file": "src/js/00-ui-icons.js",
+   "script": true
+  },
+  {
    "file": "src/js/00-boot-navigate.js",
    "script": true
   },

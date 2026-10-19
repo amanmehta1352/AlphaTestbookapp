@@ -232,8 +232,9 @@ function renderView() {
   const header = document.getElementById('appHeader');
   if (header && !document.getElementById('workspaceSwitcherBtn')) {
     const b = document.createElement('button'); b.id = 'workspaceSwitcherBtn'; b.className = 'btn-action-sm';
-    b.textContent = '🧭 ' + tx('Workspace', 'वर्कस्पेस'); b.onclick = openWorkspaceSwitcher;
-    (header.querySelector('.header-right') || header).appendChild(b);
+    b.textContent = "🧭 " + tx("Workspace", "वर्कस्पेस");
+    b.onclick = openWorkspaceSwitcher;
+    document.querySelector("#sideDrawer .drawer-nav").appendChild(b);
   }
   const title = document.getElementById('txtHeaderTitle');
   if (title) title.textContent = '📚 Master TestBook';

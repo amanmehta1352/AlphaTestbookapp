@@ -110,31 +110,33 @@ function renderMePage(v) {
   const mistakes = (UserState.mistakeBook || []).length;
   const marks = typeof bookmarkedIds === 'function' ? bookmarkedIds().size : 0;
   const tile = (b, l) => `<span class="me-tile"><b>${b}</b>${l}</span>`;
-  const row = (ico, label, sub, on) => `<button type="button" class="me-row" onclick="${on}"><span class="me-ico" aria-hidden="true">${ico}</span><span class="me-row-main"><b>${label}</b>${sub ? `<small>${sub}</small>` : ''}</span><span aria-hidden="true">›</span></button>`;
+  const row = (ico, label, sub, on, id = "") =>
+    `<button type="button" ${id ? `id="${id}"` : ""} class="me-row" onclick="${on}"><span class="me-ico" aria-hidden="true">${ico}</span><span class="me-row-main"><b>${label}</b>${sub ? `<small>${sub}</small>` : ""}</span><span aria-hidden="true">›</span></button>`;
   v.innerHTML = `
     <section class="me-head">
-      <span class="me-avatar" aria-hidden="true">${escapeHtml(String(nameTxt).trim().charAt(0).toUpperCase() || '?')}</span>
-      <div class="me-id"><h1>${escapeHtml(nameTxt)}</h1><p>${s ? escapeHtml(s.email || '') : tx('Not logged in — progress stays on this phone only', 'Login नहीं — progress सिर्फ़ इस phone में')}</p></div>
-      <button type="button" class="btn-action-sm" onclick="openAccount()">${s ? tx('Account', 'Account') : tx('Login', 'Login')}</button>
+      <span class="me-avatar" aria-hidden="true">${escapeHtml(String(nameTxt).trim().charAt(0).toUpperCase() || "?")}</span>
+      <div class="me-id"><h1>${escapeHtml(nameTxt)}</h1><p>${s ? escapeHtml(s.email || "") : tx("Not logged in — progress stays on this phone only", "Login नहीं — progress सिर्फ़ इस phone में")}</p></div>
+      <button type="button" class="btn-action-sm" onclick="openAccount()">${s ? tx("Account", "Account") : tx("Login", "Login")}</button>
     </section>
-    ${typeof profileLabel === 'function' ? `<button type="button" class="me-profile" onclick="${typeof openProfileSheet === 'function' ? 'openProfileSheet()' : ''}">🎯 <span>${p ? escapeHtml(profileLabel(p)) : tx('Choose your exam and branch', 'अपना exam और branch चुनें')}</span><b>${tx('Change', 'बदलें')} ›</b></button>` : ''}
-    <section class="me-tiles" aria-label="${tx('Your progress', 'आपकी progress')}">
-      ${tile(ls.answered, tx('answered', 'सवाल हल'))}${tile(acc, tx('accuracy', 'सटीकता'))}${tile(tests.length, tx('tests', 'टेस्ट'))}${tile(st.streak + '🔥', tx('day streak', 'दिन लगातार'))}${tile(hrs, tx('study time', 'पढ़ाई का समय'))}${tile(st.best, tx('best streak', 'सबसे लंबा'))}
+    ${typeof profileLabel === "function" ? `<button type="button" class="me-profile" onclick="${typeof openProfileSheet === "function" ? "openProfileSheet()" : ""}">🎯 <span>${p ? escapeHtml(profileLabel(p)) : tx("Choose your exam and branch", "अपना exam और branch चुनें")}</span><b>${tx("Change", "बदलें")} ›</b></button>` : ""}
+    <section class="me-tiles" aria-label="${tx("Your progress", "आपकी progress")}">
+      ${tile(ls.answered, tx("answered", "सवाल हल"))}${tile(acc, tx("accuracy", "सटीकता"))}${tile(tests.length, tx("tests", "टेस्ट"))}${tile(st.streak + "🔥", tx("day streak", "दिन लगातार"))}${tile(hrs, tx("study time", "पढ़ाई का समय"))}${tile(st.best, tx("best streak", "सबसे लंबा"))}
     </section>
-    <section class="me-list" aria-label="${tx('Shortcuts', 'शॉर्टकट')}">
-      ${row('📜', tx('Test history', 'टेस्ट इतिहास'), tx(`${tests.length} saved`, `${tests.length} सहेजे`), 'openTestHistoryModal()')}
-      ${row('📕', tx('Mistake book', 'गलतियों की किताब'), tx(`${mistakes} questions`, `${mistakes} सवाल`), "navigate('mistakes')")}
-      ${row('⭐', tx('Bookmarks test', 'Bookmark टेस्ट'), tx(`${marks} saved`, `${marks} सहेजे`), 'sbOpenBookmarkTest()')}
-      ${row('🎯', tx('Mastery', 'महारत'), '', "navigate('mastery')")}
-      ${row('🏁', tx('Daily goal', 'रोज़ का लक्ष्य'), StudySettings && StudySettings.dailyGoal ? tx(`${StudySettings.dailyGoal} questions a day`, `रोज़ ${StudySettings.dailyGoal} सवाल`) : tx('Not set', 'तय नहीं'), 'sjOpenGoalSettings()')}
+    <section class="me-list" aria-label="${tx("Shortcuts", "शॉर्टकट")}">
+      ${row("📜", tx("Test history", "टेस्ट इतिहास"), tx(`${tests.length} saved`, `${tests.length} सहेजे`), "openTestHistoryModal()")}
+      ${row("📕", tx("Mistake book", "गलतियों की किताब"), tx(`${mistakes} questions`, `${mistakes} सवाल`), "navigate('mistakes')")}
+      ${row("⭐", tx("Bookmarks test", "Bookmark टेस्ट"), tx(`${marks} saved`, `${marks} सहेजे`), "sbOpenBookmarkTest()")}
+      ${row("🎯", tx("Mastery", "महारत"), "", "navigate('mastery')")}
+      ${row("🏁", tx("Daily goal", "रोज़ का लक्ष्य"), StudySettings && StudySettings.dailyGoal ? tx(`${StudySettings.dailyGoal} questions a day`, `रोज़ ${StudySettings.dailyGoal} सवाल`) : tx("Not set", "तय नहीं"), "sjOpenGoalSettings()")}
     </section>
-    <section class="me-list" aria-label="${tx('Settings', 'सेटिंग')}">
-      ${row('Aa', tx('Language & text size', 'भाषा और अक्षर आकार'), '', 'openDisplaySettings()')}
-      ${row(UserState.theme === 'dark' ? '☀️' : '🌙', tx('Dark mode', 'Dark mode'), UserState.theme === 'dark' ? tx('On', 'चालू') : tx('Off', 'बंद'), "document.getElementById('btnTheme').click(); renderView()")}
-      ${row('💾', tx('Backup & restore', 'Backup और Restore'), '', 'openBackupCenter()')}
-      ${s ? row('🔄', tx('Sync now', 'अभी sync करें'), '', "cloudSync('manual')") : ''}
+    <section class="me-list" aria-label="${tx("Settings", "सेटिंग")}">
+      ${row("Aa", tx("Language & text size", "भाषा और अक्षर आकार"), "", "openDisplaySettings()", "btnTextSize")}
+      ${row(UserState.theme === "dark" ? "☀️" : "🌙", tx("Dark mode", "डार्क मोड"), UserState.theme === "dark" ? tx("On", "चालू") : tx("Off", "बंद"), "toggleCbtDark()")}
+      ${row("🧭", tx("Workspace", "वर्कस्पेस"), escapeHtml(WorkspaceManager.current().name), "openWorkspaceSwitcher()")}
+      ${row("💾", tx("Backup & restore", "Backup और Restore"), "", "openBackupCenter()")}
+      ${s ? row("🔄", tx("Sync now", "अभी sync करें"), "", "cloudSync('manual')") : ""}
     </section>
-    <p class="me-ver">Master TestBook ${escapeHtml(document.querySelector('meta[name="app-version"]')?.content || '')}</p>`;
+    <p class="me-ver">Master TestBook ${escapeHtml(document.querySelector('meta[name="app-version"]')?.content || "")}</p>`;
 }
 registerRouteViewState('subject', {
   capture: () => ({ filter: SubjectHubState.filter, open: { ...SubjectHubState.open } }),

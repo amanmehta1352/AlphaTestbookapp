@@ -169,9 +169,9 @@ function renderSubjectsCatalog(v) {
   const subjectTabs = groups.map(g => {
     const active = selected && g.key === selected.key;
     const k = g.key.toLowerCase();
-    return `<button type="button" class="sn-tab ${active ? 'on' : ''}" aria-pressed="${!!active}" onclick="shSelectCatalogSubject(${nbJsAttr(g.key)})">
-      <span class="sn-tab-icon" aria-hidden="true">${SUBJECT_ICONS[k] || '📘'}</span>
-      <span>${escapeHtml(subjectLabel(g.key))}</span><small>${g.qs} ${tx('Qs', 'सवाल')}</small>
+    return `<button type="button" class="sn-tab ${active ? "on" : ""}" aria-pressed="${!!active}" onclick="shSelectCatalogSubject(${nbJsAttr(g.key)})">
+      <span class="sn-tab-icon" aria-hidden="true">${uiIcon("book")}</span>
+      <span>${escapeHtml(subjectLabel(g.key))}</span><small>${g.qs} ${tx("Qs", "सवाल")}</small>
     </button>`;
   }).join('');
   const chapterRows = chapters.map(c => {
@@ -194,7 +194,6 @@ function renderSubjectsCatalog(v) {
     </section>`;
   }).join('');
   v.innerHTML = `
-    <div class="nav-breadcrumb"><button type="button" onclick="navigate('home')">${tx('Home', 'होम')}</button><span class="sep">/</span><span>${tx('Subjects', 'विषय')}</span></div>
     <div class="sc-head"><div><h1>${tx('Subjects', 'विषय')}</h1><p>${groups.length ? tx(`${groups.length} subjects · ${total} questions in this workspace`, `${groups.length} विषय · इस workspace में ${total} सवाल`) : tx('No questions available yet', 'अभी सवाल उपलब्ध नहीं हैं')}</p></div>
       <button type="button" class="btn-action-sm" onclick="navigate('taxonomy_explorer')">🔎 ${tx('Question Bank', 'प्रश्न बैंक')}</button>
     </div>

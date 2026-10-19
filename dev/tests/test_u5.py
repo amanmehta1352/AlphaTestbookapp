@@ -15,6 +15,7 @@ with sync_playwright() as p:
     page.goto('file://' + PATH); page.wait_for_selector('.sj-dash', timeout=15000)
 
     # --- Display sheet + dialog a11y
+    page.evaluate("navigate('me')")
     page.locator('#btnTextSize').focus(); page.keyboard.press('Enter')
     rec('Aa button opens Display sheet', page.evaluate("document.getElementById('modalSheet').classList.contains('open')") and 'Text size' in page.inner_text('#modalSheetBody'))
     rec('sheet is a modal dialog', page.evaluate("(()=>{const s=document.getElementById('modalSheet');return s.getAttribute('role')==='dialog'&&s.getAttribute('aria-modal')==='true'})()"))
@@ -22,6 +23,8 @@ with sync_playwright() as p:
     rec('focus moves into the sheet', page.evaluate("document.getElementById('modalSheet').contains(document.activeElement)"))
     page.keyboard.press('Escape')
     rec('Escape closes sheet and focus returns to Aa', not page.evaluate("document.getElementById('modalSheet').classList.contains('open')") and page.evaluate("document.activeElement.id") == 'btnTextSize')
+
+    page.evaluate("navigate('home')")
 
     # --- Hindi
     page.evaluate("openDisplaySettings()")

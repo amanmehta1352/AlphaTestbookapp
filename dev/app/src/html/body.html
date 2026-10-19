@@ -10,15 +10,12 @@
 <!-- Application Header -->
 <header id="appHeader">
   <div class="header-left">
-    <button class="header-btn" id="btnMenu" aria-label="Menu" title="Menu">☰</button>
+    <button class="header-btn" id="btnMenu" aria-label="Menu" title="Menu"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
     <button class="header-btn app-one-step-back" id="btnAppBack" aria-label="ONE STEP BACK" title="ONE STEP BACK" hidden onclick="appNavigateBack()">← Back</button>
     <div class="header-title" id="txtHeaderTitle">📚 MASTER TEST-BOOK</div>
   </div>
   <div class="header-right">
-    <button class="header-btn" id="btnMe" onclick="navigate('me')" aria-label="Me: progress and settings" title="Me">👤</button>
-    <button class="header-btn" onclick="navigate('taxonomy_explorer')" aria-label="Question Bank" title="Question Bank">🔎</button>
-    <button class="header-btn ds-btn" id="btnTextSize" onclick="openDisplaySettings()" aria-label="Display settings: language, text size, theme" title="Display">Aa</button>
-    <button class="header-btn" id="btnTheme" aria-label="Toggle Theme" title="Theme">🌙</button>
+    <button class="header-btn" onclick="navigate('taxonomy_explorer')" aria-label="Question Bank" title="Question Bank"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 21l-5-5M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0"/></svg></button>
   </div>
 </header>
 
@@ -70,23 +67,23 @@
 <!-- 5-Tier Strict Global Bottom Navigation: Home, Subjects, PYQ, Test, Revision -->
 <nav id="bottomNav">
   <button class="nav-tab active" id="tabHome" onclick="navigate('home')" aria-label="Home">
-    <span class="nav-tab-icon">🏠</span>
+    <span class="nav-tab-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 10l9-7 9 7v11h-6v-7H9v7H3z"/></svg></span>
     <span data-en="HOME" data-hi="होम">HOME</span>
   </button>
   <button class="nav-tab" id="tabSubjects" onclick="navigate('subjects')" aria-label="Subjects">
-    <span class="nav-tab-icon">📚</span>
+    <span class="nav-tab-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 5v16M12 5C9 3 5 3 2 4v15c3-1 7-1 10 2 3-3 7-3 10-2V4c-3-1-7-1-10 1z"/></svg></span>
     <span data-en="SUBJECTS" data-hi="विषय">SUBJECTS</span>
   </button>
   <button class="nav-tab" id="tabPYQ" onclick="navigate('exam_hub')" aria-label="Exams">
-    <span class="nav-tab-icon">🏛️</span>
+    <span class="nav-tab-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 9h18M4 9v11m5-11v11m6-11v11m5-11v11M2 21h20M2 7l10-5 10 5z"/></svg></span>
     <span data-en="EXAMS" data-hi="परीक्षा">EXAMS</span>
   </button>
   <button class="nav-tab" id="tabTest" onclick="navigate('test_hub')" aria-label="Tests">
-    <span class="nav-tab-icon">⏱️</span>
+    <span class="nav-tab-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M9 2h6M12 6v2m0 4v4l3 2M21 14a9 9 0 1 1-18 0 9 9 0 0 1 18 0"/></svg></span>
     <span data-en="TESTS" data-hi="टेस्ट">TESTS</span>
   </button>
   <button class="nav-tab" id="tabRevision" onclick="navigate('revision_hub')" aria-label="Revision">
-    <span class="nav-tab-icon">🔄</span>
+    <span class="nav-tab-icon"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 10a9 9 0 1 1 1 8M3 4v6h6"/></svg></span>
     <span data-en="REVISION" data-hi="रिवीज़न">REVISION</span>
   </button>
 </nav>

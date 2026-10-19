@@ -106,10 +106,10 @@ with sync_playwright() as p:
     rec('subject hub: Test button opens the CBT room', pg.locator('#cbtViewport').count() == 1)
     pg.evaluate("ActiveTestSession.sessionStatus='DONE'; clearCbtRecoveryState(); ActiveTestSession=null; navigate('home')"); pg.wait_for_timeout(200)
     # Me screen
-    pg.click('#btnMe'); pg.wait_for_timeout(300)
-    rec('Me screen opens from header with progress tiles and shortcuts', pg.locator('.me-tile').count() == 6 and pg.locator('.me-row').count() >= 8)
+    pg.click('#btnMenu'); pg.click('#drwMe'); pg.wait_for_timeout(300)
+    rec('Me screen opens from menu with progress tiles and shortcuts', pg.locator('.me-tile').count() == 6 and pg.locator('.me-row').count() >= 8)
     rec('Me screen: no sideways scroll, rows ≥ 48px', pg.evaluate(OVER) and pg.evaluate("[...document.querySelectorAll('.me-row')].every(b=>b.getBoundingClientRect().height>=48)"))
-    rec('header fits at 360px with the Me button', pg.evaluate("(()=>{const h=document.getElementById('appHeader');return h.scrollWidth<=h.clientWidth+1})()"))
+    rec('header fits at 360px with a clear page title', pg.evaluate("(()=>{const h=document.getElementById('appHeader');return h.scrollWidth<=h.clientWidth+1})()"))
     # V3.3 maintenance banner from the Control Room
     pg.evaluate("navigate('home')"); pg.evaluate("opsApplyMaintenance({on:true,message:'Test maintenance message'})"); pg.wait_for_timeout(150)
     rec('maintenance banner shows on Home with the admin message', pg.locator('#opsMaintBanner').count() == 1 and 'Test maintenance message' in pg.inner_text('#opsMaintBanner'))
