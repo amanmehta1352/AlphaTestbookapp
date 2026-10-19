@@ -468,7 +468,7 @@ def collect_supabase():
         ts = sb_get_all('ops_tasks', 'id,title,intent,status,risk,mode,created_at,updated_at,started_at,finished_at,retry_count', '&order=id.desc')[:40]
         c = Counter(t['status'] for t in ts)
         stuck = [t['id'] for t in ts if t['status'] == 'running' and t.get('updated_at') and NOW - datetime.fromisoformat(t['updated_at'].replace('Z', '+00:00')) > timedelta(minutes=60)]
-        return {'by_status': dict(c), 'recent': ts[:15], 'stuck': stuck}
+        return {'by_status': dict(c), 'recent': ts[:15], 'failed_recent': [t for t in ts if t['status'] == 'failed'], 'stuck': stuck}
     out['tasks'] = safe(tasks, {})
     out['usage_stats'] = safe(lambda: sb_rpc('ops_usage_stats', {'p_days': 14}), {})
     out['roles'] = safe(lambda: dict(Counter(a['role'] for a in (sb_rpc('ops_admin_list') or []))), {})
@@ -552,7 +552,7 @@ def evaluate(s):
         add('db-up', 'Server', 'ok', f"Server चालू · {q['live']} सवाल live · {sb.get('ms')} ms")
         if q['broken_live']: add('q-broken', 'सवाल', 'bad', f"{q['broken_live']} live सवाल अधूरे/टूटे (answer, option या text)", 'Control Room → सवाल → "टूटे" → Hide करो या Claude से ठीक कराओ')
         if q.get('dup_options_live'): add('q-dupopt', 'सवाल', 'warn', f"{q['dup_options_live']} live सवालों में दो options एक जैसे", 'Control Room → सवाल → "Options एक जैसे" देखो')
-        if q['draft'] + q['reviewed']: add('q-pending', 'सवाल', 'warn', f"{q['draft'] + q['reviewed']} सवाल publish का इंतज़ार कर रहे", 'Control Room → Publish queue', SITE + 'control/#publish')
+        if q['draft'] + q['reviewed']: add('q-pending', 'सवाल', 'warn', f"{q['draft'] + q['reviewed']} सवाल Draft/Review में हैं — अभी publish नहीं हुए; manual review बाकी", 'Control Room → Publish queue में review करें; publish केवल आपके निर्णय पर', SITE + 'control/#publish')
         if q['untagged_live']: add('q-untagged', 'सवाल', 'warn', f"{q['untagged_live']} live सवाल अभी 'Mixed' में (chapter नहीं)", 'Tag Robot चलाओ या Claude को बोलो')
         if q['no_hindi_live'] > 50: add('q-hindi', 'सवाल', 'warn', f"{q['no_hindi_live']} live सवालों में Hindi नहीं", 'Hindi Robot चलाओ')
         if st.get('robots.paused') is True: add('paused', 'Control', 'warn', 'सारे robots रुके हुए हैं (Global pause)', 'Control Room → Emergency → Resume')
@@ -580,7 +580,28 @@ def evaluate(s):
     tk = (sb.get('tasks') or {})
     if tk.get('stuck'): add('tasks-stuck', 'Tasks', 'warn', f"{len(tk['stuck'])} task 1 घंटे से अटके: #{', #'.join(map(str, tk['stuck'][:5]))}", 'Control Room → Tasks → Pause/Retry')
     if (tk.get('by_status') or {}).get('waiting_approval'): add('tasks-approval', 'Tasks', 'warn', f"{tk['by_status']['waiting_approval']} task आपकी मंज़ूरी का इंतज़ार कर रहे", 'Control Room → Tasks → Approve / Reject', SITE + 'control/#tasks')
-    if (tk.get('by_status') or {}).get('failed'): add('tasks-failed', 'Tasks', 'warn', f"{tk['by_status']['failed']} task fail हुए (हाल के 40 में)", 'Control Room → Tasks → Retry')
+    failed_tasks = tk.get('failed_recent')
+    if isinstance(failed_tasks, list):
+        # A later successful PYQ Robot run supersedes older failed Control Room import attempts.
+        # Keep unrelated failed tasks visible; never mutate task records from the health audit.
+        pyq = next((w for w in g.get('workflows', []) if w.get('file') == 'pyq-robot.yml'), {})
+        success_at = pyq.get('last_success_at')
+        unresolved = []
+        for task in failed_tasks:
+            superseded = False
+            if task.get('intent') == 'import' and 'pyq import' in (task.get('title') or '').lower() and success_at and task.get('updated_at'):
+                try:
+                    task_at = datetime.fromisoformat(task['updated_at'].replace('Z', '+00:00'))
+                    success_time = datetime.fromisoformat(success_at.replace('Z', '+00:00'))
+                    superseded = success_time > task_at
+                except (TypeError, ValueError):
+                    superseded = False
+            if not superseded:
+                unresolved.append(task)
+        failed_count = len(unresolved)
+    else:
+        failed_count = (tk.get('by_status') or {}).get('failed', 0)
+    if failed_count: add('tasks-failed', 'Tasks', 'warn', f"{failed_count} unresolved task fail हुए (हाल के 40 में; बाद की सफल PYQ import से पुराने import failures अलग)", 'Control Room → Tasks → Retry')
     qu = sb.get('queue') or {}
     if qu.get('stuck'): add('queue-stuck', 'Robots', 'warn', f"{len(qu['stuck'])} request 30 मिनट से कतार में", 'Ops Robot का schedule देर से चल रहा — Robots → Ops Robot → Run')
     for w in g.get('workflows', []):

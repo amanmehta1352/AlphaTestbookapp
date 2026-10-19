@@ -62,6 +62,30 @@ def main():
     check('failed robot/test = RED', health.evaluate(s)[0] == 'bad')
     s['site'] = {'ok': False}
     check('site down = RED', health.evaluate(s)[0] == 'bad')
+
+    # A successful later PYQ Robot import resolves stale failed Control Room import attempts.
+    s['site'] = {'ok': True, 'version': 'V3.2.1', 'source_version': 'V3.2.1', 'ms': 300}
+    s['github']['workflows'] = [
+        {'file': 'tests.yml', 'label': 'Tests', 'what': 'x', 'page': 'p', 'last_conclusion': 'success'},
+        {'file': 'pyq-robot.yml', 'label': 'PYQ Robot', 'what': 'x', 'page': 'p', 'last_conclusion': 'success',
+         'last_success_at': '2026-10-18T05:50:00+00:00'}
+    ]
+    s['supabase']['tasks'] = {
+        'by_status': {'failed': 2},
+        'failed_recent': [
+            {'id': 1, 'intent': 'import', 'title': '📦 PYQ import: 1 links', 'status': 'failed',
+             'updated_at': '2026-10-17T19:13:47+00:00'},
+            {'id': 2, 'intent': 'fix', 'title': '🔧 अपने-आप ठीक होने वाली चीज़ें', 'status': 'failed',
+             'updated_at': '2026-10-17T17:20:32+00:00'}
+        ]
+    }
+    _, task_checks = health.evaluate(s)
+    task_warning = next((c for c in task_checks if c['id'] == 'tasks-failed'), None)
+    check('successful later PYQ import clears superseded import failures from health warning',
+          task_warning is not None and task_warning['msg'].startswith('1 unresolved task fail'))
+    check('unrelated failed task remains visible',
+          task_warning is not None and '1 unresolved task fail' in task_warning['msg'])
+
     blob = json.dumps(sb, ensure_ascii=False)
     check('report has no email or uuid', not re.search(r'@|[0-9a-f]{8}-[0-9a-f]{4}-', blob))
 
