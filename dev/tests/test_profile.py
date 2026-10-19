@@ -1,4 +1,4 @@
-"""V3 student profile: exam + branch → only that track's server questions reach the phone.
+"""Qualification-first flow: qualification → branch → Exam Hub → selected exam and branch-scoped published content.
 Usage: python3 test_profile.py OUTDIR"""
 import os, sys, json, subprocess, shutil
 from playwright.sync_api import sync_playwright
