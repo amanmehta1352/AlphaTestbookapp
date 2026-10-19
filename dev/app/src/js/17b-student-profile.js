@@ -87,7 +87,9 @@ async function qualificationRefreshContent() {
   if (!ServerState?.session || CloudState.isAdmin !== false) return true;
   try {
     if (CloudSyncRunning) await CloudSyncRunning;
-    await cloudPullContent();
+    const q = studentQualification();
+    if (q && !q.branch && !studentProfile()) await cloudPullQualificationIndex();
+    else await cloudPullContent();
     return true;
   } catch (e) {
     openCustomToast('Question list अपडेट नहीं हो सकी। Internet जाँचें और Sync फिर चलाएँ।');
