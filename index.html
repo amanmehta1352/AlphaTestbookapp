@@ -8235,7 +8235,9 @@ async function cloudSync(reason = 'manual') {
       if (CloudState.isAdmin === null || CloudState.userId !== uid) CloudState.isAdmin = await Server.checkAdmin();
       let content = null;
       if (!CloudState.isAdmin) {
-        content = typeof studentQualification === 'function' && !studentQualification()
+        const qualification = typeof studentQualification === 'function' ? studentQualification() : null;
+        const examChosen = !!(typeof studentProfile === 'function' && studentProfile()?.examId);
+        content = (!qualification || (!qualification.branch && !examChosen))
           ? await cloudPullQualificationIndex()
           : await cloudPullContent();
       }
@@ -8416,7 +8418,9 @@ async function qualificationRefreshContent() {
   if (!ServerState?.session || CloudState.isAdmin !== false) return true;
   try {
     if (CloudSyncRunning) await CloudSyncRunning;
-    await cloudPullContent();
+    const q = studentQualification();
+    if (q && !q.branch && !studentProfile()) await cloudPullQualificationIndex();
+    else await cloudPullContent();
     return true;
   } catch (e) {
     openCustomToast('Question list अपडेट नहीं हो सकी। Internet जाँचें और Sync फिर चलाएँ।');
