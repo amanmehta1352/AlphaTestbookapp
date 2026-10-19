@@ -321,6 +321,10 @@
    "script": true
   },
   {
+   "file": "src/js/24e-qualification-first-exam-hub.js",
+   "script": true
+  },
+  {
    "file": "src/js/25-modals-boot.js",
    "script": true
   },
