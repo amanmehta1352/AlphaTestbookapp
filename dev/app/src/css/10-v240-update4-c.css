@@ -173,3 +173,96 @@ body:not(.dark) .gx-kv em.up{color:#047857}body:not(.dark) .gx-kv em.down{color:
   .gx-hero h1{font-size:34px}
 }
 @media(prefers-reduced-motion:reduce){.gx-ring-val,.gx-flash{transition:none}}
+
+/* Glass dashboard refinement — clearer depth, focus states and data-chart legibility. */
+.gx-card {
+  background-image: linear-gradient(145deg, rgba(255,255,255,.16), transparent 48%);
+  border-color: color-mix(in srgb, var(--gx-border) 78%, var(--gx-blue));
+}
+body.dark .gx-card {
+  background-image: linear-gradient(145deg, rgba(148,163,184,.10), transparent 52%);
+}
+@media (hover:hover) and (prefers-reduced-motion:no-preference) {
+  .gx-card { transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease; }
+  .gx-card:hover {
+    border-color: color-mix(in srgb, var(--gx-border) 52%, var(--gx-blue));
+    box-shadow: var(--gx-shadow), 0 8px 24px rgba(59,130,246,.08);
+  }
+}
+.gx-week-chart-wrap {
+  margin-top: 12px;
+  padding: 12px 10px 8px;
+  border: 1px solid var(--gx-border);
+  border-radius: 16px;
+  background: rgba(255,255,255,.055);
+  min-width: 0;
+}
+.gx-week-chart-title {
+  margin: 0 0 8px;
+  color: var(--gx-muted);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.gx-week-chart {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  align-items: end;
+  gap: clamp(4px, 1.5vw, 10px);
+  width: 100%;
+  min-width: 0;
+}
+.gx-week-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+  min-width: 0;
+}
+.gx-week-count {
+  color: var(--gx-text);
+  font-size: 10px;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+}
+.gx-week-track {
+  display: flex;
+  align-items: flex-end;
+  width: min(100%, 24px);
+  height: 66px;
+  overflow: hidden;
+  border-radius: 7px;
+  background: var(--gx-track);
+}
+.gx-week-track > span {
+  display: block;
+  width: 100%;
+  min-height: 0;
+  border-radius: 6px;
+  background: linear-gradient(180deg, var(--gx-cyan), var(--gx-blue) 58%, var(--gx-purple));
+  box-shadow: 0 0 12px rgba(96,165,250,.22);
+  transition: height .25s ease;
+}
+.gx-week-label {
+  color: var(--gx-muted);
+  font-size: 10px;
+  font-weight: 750;
+  line-height: 1.2;
+}
+.gx-week-day[data-day] { cursor: help; }
+.gx-week-day:focus-visible {
+  outline: 2px solid var(--gx-blue);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+@media (max-width: 380px) {
+  .gx-week-chart-wrap { padding-inline: 7px; }
+  .gx-week-chart { gap: 3px; }
+  .gx-week-track { height: 54px; }
+  .gx-week-label { font-size: 9px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gx-card, .gx-week-track > span { transition: none !important; }
+}
