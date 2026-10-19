@@ -92,7 +92,7 @@ function profileClear() { profileApply(null); }
 /* Gentle prompt on Home for a logged-in student who has not chosen yet (never blocks the screen) */
 function profileHomePrompt() {
   if (Route?.page !== 'home' || !profileAvailable() || studentProfile()) return;
-  const v = document.getElementById('mainView'); if (!v || v.querySelector('.pf-prompt')) return;
+  const v = document.getElementById('mainView'); if (!v || v.querySelector('.pf-prompt, [data-home-setup]')) return;
   const el = document.createElement('button'); el.type = 'button'; el.className = 'pf-prompt'; el.onclick = openProfileSheet;
   el.innerHTML = `<span class="pf-ico" aria-hidden="true">🎯</span><span style="flex:1"><b>${tx('Choose your exam and branch','अपना exam और branch चुनें')}</b><small>${tx('Then only your questions appear — no other branch mixed in.','फिर सिर्फ़ आपके सवाल दिखेंगे — दूसरी branch के नहीं।')}</small></span><span aria-hidden="true">›</span>`;
   v.prepend(el);

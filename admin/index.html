@@ -1260,7 +1260,7 @@ body.native-builder-active .nb-wizard-nav .nb-row-meta{flex:1 1 auto;min-width:0
 </style>
 <meta name="phase3" content="Profile-Driven Workspace + Data Airlock"><meta name="phase3-status" content="IMPLEMENTED"><meta name="phase3-frozen" content="Phase1A Storage; Phase2 QuestionUI; CBT scoring/timer"><meta name="master-testbook-candidate" content="V2.1.8 Smart Builder repair; child of V2.1.7; parent and data contracts preserved"><meta name="release-status" content="PARTIAL-HOLD-RUNTIME-VERIFICATION-PENDING">
 <meta name="master-testbook-candidate-version" content="V2.11.0_ADMIN_STUDIO">
-<meta name="app-version" content="V3.4.1">
+<meta name="app-version" content="V3.5.0">
 
 <style id="v2-3-2-deep-functional-repair">
 /* Root cause: display:contents exposed Previous, Clear, Mark and Next as four grid items for a three-column footer. */
@@ -2104,6 +2104,58 @@ body.studio-mode > :not(#studioRoot):not(#modalOverlay):not(#modalSheet):not(scr
 a.drawer-item{text-decoration:none;box-sizing:border-box}
 body.studio-mode #modalSheet:not(.open),body.studio-mode #modalOverlay:not(.open){visibility:hidden}
 
+/* Shared action-first workspace, from overview through import and review. */
+#studioRoot{max-width:1040px}
+.st-head{padding-inline:24px;min-height:calc(76px + var(--safe-top,0px));align-items:center}
+.st-head>div{min-width:0}
+.st-head small{font-size:13px}
+.st-link{display:inline-flex;align-items:center;min-height:44px}
+.st-tabs{top:calc(76px + var(--safe-top,0px));padding:8px 24px;background:var(--surface);gap:8px}
+.st-tabs button{min-height:46px;padding:10px;border-radius:12px;border-bottom:0;font-weight:700}
+.st-tabs button.on{background:var(--primary-light);box-shadow:inset 0 -2px var(--primary)}
+.st-main{padding:24px;gap:20px}
+.st-card{padding:20px;border-radius:20px;gap:14px}
+.st-card h2,.st-card h3{font-size:18px;line-height:1.5}
+.st-next{border-color:color-mix(in srgb,var(--primary) 25%,var(--border));background:var(--surface);align-items:flex-start;gap:12px}
+.st-eyebrow{color:var(--primary);font-size:12px;font-weight:800;letter-spacing:.06em}
+.st-next h1,.st-intro h1{margin:0;color:var(--text-main);font-size:clamp(24px,4vw,30px);line-height:1.4;letter-spacing:-.025em}
+.st-next p,.st-intro p{margin:0;max-width:62ch;color:var(--text-muted);font-size:15px;line-height:1.75;overflow-wrap:anywhere}
+.st-intro{display:flex;flex-direction:column;gap:8px}
+.st-next .st-btn{margin-top:4px}
+.st-btn,.st-btn.sm,.st-chips button,.st-topic,.st-pick select,.st-det summary{min-height:44px}
+.st-btn{font-weight:700;line-height:1.5}
+.st-btn.primary,.st-chips button.on{color:var(--on-primary,#fff)}
+.st-note,.st-pick,.st-pills i,.st-badge,.st-q-top small{font-size:13px;line-height:1.65}
+.st-h{letter-spacing:.02em;font-size:14px}
+.st-stats{gap:12px}
+.st-stat{padding:16px 10px;border-radius:16px}
+.st-stat b{font-size:28px;font-variant-numeric:tabular-nums}
+.st-topic{padding:16px;border-radius:16px}
+.st-topic b{font-size:15px;line-height:1.6}
+.st-topic small{font-size:13px;line-height:1.65}
+.st-pick select{font-size:16px;line-height:1.5}
+.st-file{min-height:88px;background:var(--surface-alt);font-weight:700;line-height:1.65}
+.st-file:focus-within{outline:3px solid var(--primary);outline-offset:3px}
+.st-check{min-height:44px;padding-block:8px;line-height:1.65}
+.st-q{padding:20px;border-radius:16px;gap:12px}
+.st-opts li{padding:12px;line-height:1.65}
+.st-bulk{gap:12px;padding-top:8px;border-top:1px solid var(--border)}
+#studioRoot :is(button,a,select,summary):focus-visible{outline:3px solid var(--primary);outline-offset:3px}
+@media(max-width:480px){
+  .st-head{padding-inline:16px}
+  .st-head b{font-size:16px}
+  .st-tabs{padding-inline:12px;gap:4px}
+  .st-tabs button{padding-inline:6px;font-size:13px}
+  .st-main{padding:20px 12px;gap:16px}
+  .st-card,.st-q{padding:16px}
+  .st-next .st-btn{width:100%}
+  .st-stat{padding:12px 6px}
+  .st-stat span{font-size:12px}
+  .st-topic{align-items:flex-start;flex-direction:column}
+  .st-pills{max-width:100%;justify-content:flex-start}
+  .st-q-act .st-btn{flex:1 1 120px}
+}
+
 </style>
 <style id="v2110-admin-studio">
 /* =========================================================================
@@ -2356,6 +2408,929 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
 .ops-maint{display:flex;gap:10px;align-items:flex-start;margin:0 0 10px;padding:12px 14px;border-radius:var(--radius-md);background:var(--warning-bg);border:1.5px solid var(--warning);color:var(--text-main)}
 .ops-maint b{display:block;font-size:14px}.ops-maint small{display:block;font-size:12.5px;color:var(--text-main);margin-top:2px}
 
+
+/* Testbook-inspired exam-first home navigation — additive, existing routes only. */
+.gx-quick{grid-column:1/-1;min-width:0}
+.gx-quick .gx-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.gx-explore-note{font-size:11px;color:var(--text-muted);font-weight:600}
+.gx-quick .sj-quick{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.gx-quick .sj-quick-btn{min-width:0;min-height:76px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:10px 5px;border:1px solid var(--border);background:var(--surface);box-shadow:var(--shadow-sm);font-size:11.5px;font-weight:800;line-height:1.25;text-align:center;overflow-wrap:anywhere;transition:transform .15s ease,border-color .15s ease,background .15s ease}
+.gx-quick .sj-quick-btn span:first-child{font-size:22px;line-height:1}
+.gx-quick .sj-quick-btn span:last-child{max-width:100%}
+.gx-quick .sj-quick-btn:active{transform:scale(.97);border-color:var(--primary-border);background:var(--primary-light)}
+@media(min-width:480px){.gx-quick .sj-quick{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(min-width:720px){.gx-quick .sj-quick{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(min-width:1100px){.gx-quick .sj-quick{grid-template-columns:repeat(8,minmax(0,1fr))}}
+@media(prefers-reduced-motion:reduce){.gx-quick .sj-quick-btn{transition:none}}
+
+
+/* Subject navigation only — horizontal subject rail + expandable chapter/topic list. */
+.sn-subject-tabs{display:flex;gap:9px;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin;padding:3px 2px 12px;margin:0 0 10px;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity}
+.sn-subject-tabs::-webkit-scrollbar{height:4px}
+.sn-tab{flex:0 0 auto;min-width:116px;max-width:180px;min-height:76px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:3px;padding:10px 13px;border:1px solid var(--border);border-radius:14px;background:var(--surface);color:var(--text-main);box-shadow:var(--shadow-sm);font:inherit;text-align:left;scroll-snap-align:start;transition:border-color .15s,background .15s,transform .15s}
+.sn-tab>span:nth-child(2){font-size:13px;font-weight:850;line-height:1.3;white-space:normal}
+.sn-tab small{font-size:10px;font-weight:750;color:var(--text-muted)}
+.sn-tab-icon{font-size:17px;line-height:1.1}
+.sn-tab.on{background:var(--primary-light);border-color:var(--primary);box-shadow:0 0 0 1px var(--primary-border) inset}
+.sn-tab.on>span:nth-child(2),.sn-tab.on .sn-tab-icon{color:var(--primary)}
+.sn-topic-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:14px;box-shadow:var(--shadow-sm);min-width:0}
+.sn-panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 12px}
+.sn-panel-head h2{font-size:17px;line-height:1.35;font-weight:900;margin:0;color:var(--text-main)}
+.sn-panel-head p{font-size:12px;color:var(--text-muted);margin:3px 0 0}
+.sn-total{flex:0 0 auto;font-size:11px;font-weight:850;padding:6px 9px;border-radius:999px;background:var(--surface-alt);color:var(--text-muted);white-space:nowrap}
+.sn-chapter-list{display:flex;flex-direction:column;gap:8px}
+.sn-chapter{border:1px solid var(--border);border-radius:13px;background:var(--surface);overflow:hidden;min-width:0}
+.sn-chapter.open{border-color:var(--primary-border);background:var(--surface)}
+.sn-chapter-toggle{width:100%;min-height:62px;display:flex;align-items:center;gap:11px;padding:11px 12px;border:0;background:transparent;color:var(--text-main);font:inherit;text-align:left}
+.sn-chapter-mark{display:grid;place-items:center;flex:0 0 30px;width:30px;height:30px;border-radius:9px;background:var(--surface-alt);color:var(--primary);font-size:19px;font-weight:700}
+.sn-chapter-main{display:flex;flex:1;min-width:0;flex-direction:column;gap:3px}
+.sn-chapter-main strong{font-size:13px;line-height:1.4;font-weight:850;overflow-wrap:anywhere}
+.sn-chapter-main small{font-size:11px;color:var(--text-muted);font-weight:650}
+.sn-chevron{font-size:21px;color:var(--text-muted);padding:0 3px}
+.sn-topic-list{border-top:1px solid var(--border);padding:4px 10px;background:var(--bg-main)}
+.sn-topic{width:100%;min-height:44px;display:flex;align-items:center;gap:8px;padding:8px 5px;border:0;border-bottom:1px solid var(--border);background:transparent;color:var(--text-main);font:inherit;text-align:left}
+.sn-topic:last-child{border-bottom:0}
+.sn-topic-dot{color:var(--primary);font-size:19px;line-height:1}
+.sn-topic-label{flex:1;min-width:0;font-size:12px;font-weight:700;line-height:1.4;overflow-wrap:anywhere}
+.sn-topic-count{font-size:10px;color:var(--text-muted);white-space:nowrap;font-weight:750}
+.sn-topic>span:last-child{font-size:18px;color:var(--text-muted)}
+.sn-chapter-action{display:flex;justify-content:flex-end;padding:8px 10px;border-top:1px solid var(--border)}
+.sn-empty-topic{margin:0;padding:12px 4px;color:var(--text-muted);font-size:12px}
+@media(min-width:700px){.sn-topic-panel{padding:18px}.sn-subject-tabs{gap:11px}.sn-tab{min-width:136px}.sn-chapter-list{gap:9px}}
+@media(prefers-reduced-motion:reduce){.sn-tab{transition:none}}
+
+</style>
+<style id="action-oriented-design">
+/* Shared presentation contract for student routes, study flows and Admin Studio.
+   Loaded after historical releases; !important only resolves legacy compact rules. */
+:root {
+  --on-primary: #ffffff;
+  --app-header-height: 64px;
+  --app-content-width: 1120px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --action-height: 48px;
+  --success: #087f5b;
+  --danger: #b93835;
+}
+body.dark {
+  --on-primary: #0f172a;
+  --success: #39d9a2;
+  --danger: #ff8c89;
+}
+html,
+body {
+  line-height: 1.6;
+}
+body {
+  user-select: text;
+}
+h1,
+h2,
+h3 {
+  line-height: 1.3;
+}
+button {
+  font-weight: 650;
+}
+button,
+input,
+select,
+textarea,
+a {
+  touch-action: manipulation;
+}
+button:disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+}
+[hidden] {
+  display: none !important;
+}
+
+/* A quiet shell: settings and question bank remain in the menu. */
+#appHeader {
+  height: calc(var(--app-header-height) + var(--safe-top));
+  padding-inline: max(16px, calc((100vw - var(--app-content-width)) / 2));
+  gap: 12px;
+  background: var(--surface);
+  backdrop-filter: none;
+}
+#appHeader .header-left,
+#appHeader .header-right {
+  gap: 8px;
+}
+#appHeader .header-title {
+  max-width: none;
+  min-width: 0;
+  font-size: 16px;
+  flex: 1;
+}
+#appHeader .header-btn {
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  min-width: 44px;
+  flex: 0 0 auto;
+  font-size: 17px;
+  border-radius: 12px;
+}
+#appHeader #btnAppBack {
+  width: auto;
+  padding-inline: 10px;
+  font-size: 13px;
+}
+#appHeader #btnTheme,
+#appHeader #btnQuestionBank,
+#workspaceSwitcherBtn {
+  display: none;
+}
+#bottomNav {
+  height: 68px;
+  max-width: 560px;
+  background: var(--surface);
+  backdrop-filter: none;
+  box-shadow: var(--shadow-lg);
+}
+#bottomNav .nav-tab {
+  font-size: 12px;
+  font-weight: 650;
+  gap: 4px;
+}
+#bottomNav .nav-tab.active {
+  font-weight: 750;
+}
+#bottomNav .nav-tab-icon {
+  font-size: 18px;
+}
+#sideDrawer {
+  padding: 20px 16px;
+}
+.drawer-item {
+  min-height: 48px;
+  font-weight: 600;
+}
+.drawer-section-title {
+  margin-top: 24px;
+  font-size: 12px;
+}
+.nav-breadcrumb {
+  gap: 8px;
+  flex-wrap: wrap;
+  white-space: normal;
+  overflow: visible;
+  font-size: 13px;
+}
+.nav-breadcrumb button {
+  min-height: 44px;
+  padding: 8px 2px;
+}
+
+/* Shared controls: one treatment for primary, secondary and destructive actions. */
+.btn-nav,
+.btn-action-sm,
+.gx-btn,
+.gx-link,
+.sj-inline-link,
+.sb-back,
+.sb-restart,
+.sb-crumbs > button,
+.sh-t-name,
+.qb-practice,
+.header-btn,
+.modal-close,
+.pf-chip {
+  min-height: 44px;
+  line-height: 1.4;
+}
+.btn-nav,
+.gx-btn {
+  min-height: var(--action-height);
+  padding: 12px 18px;
+  font-size: 14px;
+  font-weight: 700;
+}
+.btn-action-sm {
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 650;
+}
+.btn-nav.primary,
+.btn-primary,
+.gx-btn:not(.ghost),
+.sh-act.primary,
+.sb-mode.selected,
+.sb-next,
+.nb-tab.active,
+.sh-chip.on,
+.sn-tab.on,
+.st-btn.primary {
+  color: var(--on-primary);
+}
+.sn-tab.on {
+  color: var(--primary);
+}
+.btn-nav.primary,
+.btn-primary,
+.gx-btn:not(.ghost),
+.sh-act.primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  box-shadow: none;
+}
+.btn-nav.danger {
+  background: var(--danger);
+  color: #fff;
+  border-color: var(--danger);
+}
+body.dark .btn-nav.danger {
+  color: #0f172a;
+}
+.gx-btn.ghost {
+  background: var(--surface);
+  color: var(--text-main);
+  border: 1px solid var(--border-strong);
+}
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not(
+    [type="hidden"]
+  ),
+select,
+textarea {
+  min-height: 48px;
+  max-width: 100%;
+  font-size: max(16px, 1em);
+  line-height: 1.5;
+  border-radius: var(--radius-md);
+  color: var(--text-main);
+  background: var(--surface);
+}
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--primary);
+}
+textarea {
+  resize: vertical;
+}
+
+/* Cards and page intros: consistent hierarchy across all content routes. */
+.grid-cards {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 16px;
+}
+.card-btn,
+.subject-card,
+.student-hero-card,
+.nb-card,
+.gx-card,
+.rv-card,
+.rs-card,
+.qb-item,
+.me-head,
+.sn-topic-panel {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  color: var(--text-main);
+  box-shadow: var(--shadow-sm);
+}
+.card-btn {
+  padding: 20px;
+  min-width: 0;
+}
+.card-btn strong {
+  font-size: 16px;
+  font-weight: 750;
+  line-height: 1.4;
+}
+.card-btn small {
+  font-size: 13px;
+  line-height: 1.6;
+}
+.student-hero-card,
+.ao-page-head {
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.student-hero-card h1 {
+  font-size: clamp(23px, 3vw, 30px);
+  font-weight: 750;
+  color: var(--text-main);
+}
+.student-hero-card p {
+  font-size: 14px;
+  color: var(--text-muted);
+  opacity: 1;
+}
+.student-hero-card .journey-pill {
+  color: var(--primary);
+  background: var(--primary-light);
+  font-size: 12px;
+  letter-spacing: 0;
+}
+.section-title {
+  margin: 24px 0 12px;
+  font-size: 18px;
+  font-weight: 750;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.ao-primary-card {
+  border-color: var(--primary-border);
+  background: var(--primary-light);
+}
+.ao-actions,
+.rs-actions,
+.ao-page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+.ao-page-actions {
+  margin-top: 20px;
+}
+.ao-primary-card .ao-actions,
+.rs-next-step .rs-actions {
+  margin-top: 16px;
+}
+.gx-empty,
+.qb-empty,
+.nb-empty {
+  padding: 20px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.tax-badge,
+.sh-tag,
+.sn-topic-count,
+.sn-tab small,
+.sn-chapter-main small,
+.node-meta,
+.nb-row-meta,
+.qb-meta,
+.me-tile,
+.gx-explore-note {
+  font-size: 12px;
+  line-height: 1.5;
+}
+.sn-tab {
+  min-width: 138px;
+}
+.sn-tab > span:nth-child(2),
+.sn-chapter-main strong {
+  font-size: 14px;
+  font-weight: 700;
+}
+.sn-topic-label {
+  font-size: 14px;
+  font-weight: 600;
+}
+.sn-topic {
+  min-height: 52px;
+}
+.sh-act {
+  min-height: 48px;
+}
+.sh-t-meta,
+.me-row-main small,
+.me-id p {
+  font-size: 13px;
+}
+.me-row {
+  min-height: 64px;
+}
+
+/* Home: match DOM order to visual order, at every breakpoint. */
+.ao-home {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+}
+.ao-home > *,
+.ao-today > *,
+.ao-detail-grid > * {
+  grid-column: auto;
+  grid-row: auto;
+  min-width: 0;
+}
+.ao-home .gx-card {
+  padding: 20px;
+}
+.ao-home .gx-hero {
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.ao-home .gx-hero h1 {
+  font-size: clamp(24px, 3vw, 30px);
+  font-weight: 750;
+}
+.ao-home .gx-hero p,
+.ao-home .gx-hero-facts {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.ao-home .gx-head {
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.ao-home .gx-head h2 {
+  font-size: 17px;
+  font-weight: 750;
+}
+.ao-home .ao-next {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  padding: 24px;
+}
+.ao-next .gx-next-icon {
+  width: 44px;
+  height: 44px;
+  font-size: 24px;
+  background: var(--surface);
+  box-shadow: none;
+}
+.ao-next .gx-next-copy h2 {
+  margin: 4px 0 8px;
+  font-size: clamp(22px, 3vw, 28px);
+  line-height: 1.3;
+  font-weight: 750;
+  color: var(--text-main);
+}
+.ao-next .gx-next-copy small {
+  font-size: 12px;
+  color: var(--primary);
+}
+.ao-next .gx-next-copy span {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+.ao-next > .gx-btn {
+  grid-column: 1 / -1;
+  width: 100%;
+  margin-top: 8px;
+  min-height: 52px;
+}
+.ao-today,
+.ao-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+.ao-home .sj-action {
+  min-height: 64px;
+}
+.ao-home .sj-action-copy small {
+  font-size: 13px;
+  line-height: 1.5;
+}
+.ao-home .gx-quick .sj-quick {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.ao-home .gx-quick .sj-quick-btn {
+  min-height: 84px;
+  padding: 12px 8px;
+  font-size: 13px;
+  font-weight: 650;
+  overflow-wrap: normal;
+}
+.ao-home .gx-search {
+  padding: 0;
+}
+.ao-details > .gx-head {
+  margin: 8px 0 16px;
+}
+.ao-home .gx-journey,
+.ao-home .gx-recent,
+.ao-home .gx-backup {
+  grid-column: 1 / -1;
+}
+
+/* Builder, revision and reading flows share the same control sizing. */
+.sb-shell {
+  max-width: 960px;
+}
+.sb-top {
+  min-height: 64px;
+  gap: 12px;
+}
+.sb-mode {
+  min-height: 100px;
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
+.sb-mode strong {
+  font-size: 17px;
+}
+.sb-mode small,
+.sb-bar-info,
+.sb-note,
+.sb-meta {
+  font-size: 13px;
+  line-height: 1.6;
+}
+.sb-bar {
+  padding-block: 16px 8px;
+  gap: 12px;
+}
+.sb-body {
+  padding-block: 20px;
+}
+.sb-crumbs {
+  padding-block: 12px;
+}
+.sb-crumbs > button,
+.sb-crumbs > span:not(.sb-crumb-sep) {
+  display: inline-flex;
+  align-items: center;
+}
+.sb-card,
+.sb-row {
+  border-radius: var(--radius-md);
+}
+.rv-card {
+  padding: 20px;
+}
+.rv-card h2 {
+  font-size: 22px;
+}
+.rv-card p,
+.rv-meta {
+  font-size: 14px;
+}
+.rs-next-step {
+  padding: 20px;
+  margin-block: 16px;
+}
+.rs-next-step h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+.rs-next-step p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+.rs-tr {
+  min-height: 44px;
+  font-size: 13px;
+}
+.rs-th {
+  font-size: 12px;
+}
+
+/* Dialogs stay scrollable, with a stable title/close affordance. */
+#modalSheet {
+  border-radius: 24px 24px 0 0;
+  background: var(--surface);
+}
+.modal-header {
+  min-height: 72px;
+  padding: 16px 20px;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.modal-header h3 {
+  font-size: 20px;
+  font-weight: 750;
+}
+.modal-close,
+#btnCloseDrawer {
+  min-width: 44px;
+  min-height: 44px;
+}
+#modalSheetBody {
+  padding: 20px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Override old !important compressed exam chrome, without changing CBT layout lifecycle. */
+.test-fixed-viewport .test-fixed-header {
+  padding: 8px 12px !important;
+  background: var(--surface) !important;
+}
+.test-fixed-viewport .test-header-row {
+  flex-wrap: wrap;
+  gap: 8px !important;
+}
+.test-fixed-viewport .cbt-one-step-back,
+.test-fixed-viewport .cbt-header-submit,
+.test-fixed-viewport .test-fixed-header .icon-btn,
+.test-fixed-viewport .question-palette-toggle,
+.test-fixed-viewport .timer-badge {
+  min-height: 44px !important;
+  min-width: 44px !important;
+  font-size: 13px !important;
+  padding: 8px !important;
+}
+.test-fixed-viewport .test-fixed-header .icon-btn {
+  width: 44px !important;
+  height: 44px !important;
+}
+.test-fixed-viewport .header-logo-box {
+  display: none;
+}
+.test-fixed-viewport .section-switcher-wrap {
+  font-size: 12px !important;
+  line-height: 1.4 !important;
+}
+.test-fixed-viewport .section-switcher {
+  font-size: 13px !important;
+  max-width: 160px !important;
+}
+.test-fixed-viewport .proctor-status {
+  display: none;
+}
+.test-fixed-viewport .cbt-compact-tools-row {
+  gap: 8px;
+  padding-top: 8px;
+}
+.test-fixed-viewport .cbt-compact-tools-row .header-actions {
+  gap: 8px;
+  padding-left: 0;
+  flex-wrap: wrap;
+}
+.test-fixed-viewport .test-scrollable-body {
+  padding: 16px !important;
+}
+.test-fixed-viewport .cbt-question-card {
+  padding: 20px !important;
+  max-width: 840px;
+  margin-inline: auto;
+}
+.test-fixed-viewport .question-stem {
+  font-size: calc(18px * var(--ui-zoom, 1)) !important;
+  line-height: 1.7 !important;
+}
+.test-fixed-viewport .question-stem .hi-stem {
+  font-size: calc(17px * var(--ui-zoom, 1)) !important;
+  line-height: 1.8 !important;
+}
+.test-fixed-viewport .opt-card {
+  min-height: 56px;
+  padding: 14px;
+}
+.test-fixed-viewport .question-palette-grid {
+  grid-template-columns: repeat(auto-fit, minmax(44px, 1fr));
+}
+.test-fixed-viewport .question-palette-grid .strip-chip {
+  min-height: 44px;
+  aspect-ratio: auto;
+  font-size: 13px;
+}
+.test-fixed-viewport .question-palette-close {
+  min-width: 44px;
+  min-height: 44px;
+}
+.test-fixed-viewport .question-palette-legend {
+  font-size: 12px;
+}
+.test-fixed-viewport .ao-cbt-footer {
+  padding: 12px 16px max(12px, var(--safe-bottom)) !important;
+  background: var(--surface);
+}
+.test-fixed-viewport .ao-cbt-footer .test-footer-inner {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 10px !important;
+}
+.test-fixed-viewport .ao-cbt-footer .ao-secondary-actions {
+  display: flex !important;
+  grid-column: 1 / -1;
+  grid-row: 2;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  overflow: visible !important;
+}
+.test-fixed-viewport .ao-cbt-footer .footer-btn {
+  min-height: 48px !important;
+  font-size: 14px !important;
+  padding: 10px 12px !important;
+  line-height: 1.4 !important;
+  word-break: normal;
+  overflow-wrap: normal !important;
+}
+.test-fixed-viewport .ao-cbt-footer .btn-nav-next {
+  color: var(--on-primary);
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.test-fixed-viewport .ao-cbt-footer .btn-nav-clear,
+.test-fixed-viewport .ao-cbt-footer .btn-nav-mark {
+  flex: 1 !important;
+  width: auto !important;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.test-fixed-viewport .ao-cbt-footer .btn-nav-mark.marked {
+  color: var(--primary);
+  background: var(--primary-light);
+  border-color: var(--primary-border);
+}
+.question-palette-grid .strip-chip.answered {
+  background: var(--success) !important;
+  color: #fff !important;
+}
+body.dark .question-palette-grid .strip-chip.answered {
+  color: #0f172a !important;
+}
+.ao-practice-actions {
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+@media (hover: hover) {
+  .card-btn:hover,
+  .sj-action:hover,
+  .sn-topic:hover,
+  .me-row:hover {
+    border-color: var(--primary-border);
+    background: var(--primary-light);
+  }
+  .btn-nav.primary:hover,
+  .gx-btn:not(.ghost):hover {
+    filter: brightness(0.94);
+  }
+}
+@media (min-width: 720px) {
+  .ao-today {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  }
+  .ao-detail-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .ao-home .gx-quick .sj-quick {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .ao-home .ao-next {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+  }
+  .ao-next > .gx-btn {
+    grid-column: auto;
+    min-width: 180px;
+    width: auto;
+  }
+  #bottomNav {
+    left: 50%;
+    right: auto;
+    width: min(560px, calc(100% - 24px));
+    transform: translateX(-50%);
+  }
+  #modalSheet {
+    border-radius: 24px;
+    bottom: 24px;
+    max-height: calc(100dvh - 48px);
+  }
+}
+@media (max-width: 480px) {
+  #appHeader {
+    padding-inline: 12px;
+    gap: 8px;
+  }
+  #appHeader .header-left,
+  #appHeader .header-right {
+    gap: 6px;
+  }
+  #appHeader .header-title {
+    font-size: 14px;
+    min-width: 0;
+    flex-basis: auto;
+  }
+  #bottomNav {
+    left: 8px;
+    right: 8px;
+    padding-inline: 2px;
+  }
+  #bottomNav .nav-tab {
+    font-size: 11px;
+  }
+  .student-hero-card,
+  .ao-page-head {
+    padding: 20px;
+  }
+  .ao-home .gx-card {
+    padding: 16px;
+  }
+  .ao-home .gx-hero {
+    padding: 4px 0;
+  }
+  .ao-home .ao-next {
+    padding: 20px;
+  }
+  .ao-home .gx-search {
+    padding: 0;
+  }
+  .ao-actions > .btn-nav,
+  .rs-next-step .btn-nav {
+    width: 100%;
+  }
+  .test-fixed-viewport .test-header-row > div:first-child {
+    flex: 1 1 100%;
+  }
+  .test-fixed-viewport .test-header-row > div:last-child {
+    flex: 1 1 100%;
+    justify-content: space-between;
+  }
+  .test-fixed-viewport .section-switcher-wrap {
+    max-width: none !important;
+  }
+  .test-fixed-viewport .section-switcher {
+    max-width: 240px !important;
+  }
+}
+@media (max-height: 580px) and (orientation: landscape) {
+  .test-fixed-viewport .test-header-row > div:first-child,
+  .test-fixed-viewport .test-header-row > div:last-child {
+    flex: 0 1 auto;
+  }
+  .test-fixed-viewport .ao-cbt-footer .test-footer-inner {
+    grid-template-columns: 1fr 2fr 1fr !important;
+  }
+  .test-fixed-viewport .ao-cbt-footer .ao-secondary-actions {
+    grid-column: auto;
+    grid-row: auto;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+    animation: none !important;
+  }
+}
+/* Explicit fixes for controls with older inline or high-specificity sizes. */
+.ao-home .ao-next {
+  background: var(--primary-light);
+  border-color: var(--primary-border);
+}
+#mainView .btn-nav {
+  min-height: 48px !important;
+}
+#mainView .gx-mini,
+#mainView .gx-seg button,
+#mainView .mr-chip,
+#mainView .filter-pill,
+#mainView .bm-btn {
+  min-height: 44px;
+}
+#mainView .bm-btn {
+  min-width: 44px;
+}
+.test-fixed-viewport .test-header-row .cbt-one-step-back,
+.test-fixed-viewport .test-header-row .timer-badge {
+  min-height: 44px !important;
+  font-size: 13px !important;
+  padding: 8px 10px !important;
+  max-width: none !important;
+}
+.test-fixed-viewport .question-stem .en-stem {
+  font-family: var(--font-ui);
+  font-weight: 600;
+}
+.test-fixed-viewport .question-stem .hi-stem {
+  font-family: var(--font-ui);
+  font-weight: 500;
+}
+.rv-hero.ao-page-head {
+  color: var(--text-main);
+}
+.rv-hero.ao-page-head p {
+  color: var(--text-muted);
+  opacity: 1;
+}
+.rv-hero.ao-page-head .journey-pill {
+  color: var(--primary);
+  background: var(--surface);
+}
+.filter-pill.active {
+  color: var(--on-primary);
+}
+.rs-next-step h2 {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+/* Section labels use the same type scale without the padding of a page intro. */
+.section-title.ao-page-head {
+  padding: 0;
+}
+
 </style>
 </head>
 <body>
@@ -2376,7 +3351,7 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
   </div>
   <div class="header-right">
     <button class="header-btn" id="btnMe" onclick="navigate('me')" aria-label="Me: progress and settings" title="Me">👤</button>
-    <button class="header-btn" onclick="navigate('taxonomy_explorer')" aria-label="Question Bank" title="Question Bank">🔎</button>
+    <button class="header-btn" id="btnQuestionBank" onclick="navigate('taxonomy_explorer')" aria-label="Question Bank" title="Question Bank">🔎</button>
     <button class="header-btn ds-btn" id="btnTextSize" onclick="openDisplaySettings()" aria-label="Display settings: language, text size, theme" title="Display">Aa</button>
     <button class="header-btn" id="btnTheme" aria-label="Toggle Theme" title="Theme">🌙</button>
   </div>
@@ -2390,28 +3365,32 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
     <button id="btnCloseDrawer" style="font-size:20px; font-weight:900;" aria-label="Close">✕</button>
   </div>
   <nav class="drawer-nav" aria-label="Main menu">
-    <div class="drawer-section-title" data-en="STUDY" data-hi="पढ़ाई">STUDY</div>
-    <button class="drawer-item" id="drwMe" onclick="navigate('me')" data-en="👤 Me (progress, settings)" data-hi="👤 मैं (progress, सेटिंग)">👤 Me (progress, settings)</button>
+    <div class="drawer-section-title" data-en="PREPARE" data-hi="तैयारी शुरू करें">PREPARE</div>
     <button class="drawer-item" id="drwHome" onclick="navigate('home')" data-en="🏠 Home" data-hi="🏠 होम">🏠 Home</button>
-    <button class="drawer-item" id="drwSubjects" onclick="navigate('subjects')" data-en="📚 Subjects" data-hi="📚 विषय">📚 Subjects</button>
+    <button class="drawer-item" id="drwExams" onclick="navigate('exam_hub')" data-en="🏛️ Exam hub" data-hi="🏛️ परीक्षा केंद्र">🏛️ Exam hub</button>
+    <button class="drawer-item" id="drwTest" onclick="navigate('test_hub')" data-en="⏱️ Mock tests" data-hi="⏱️ मॉक टेस्ट">⏱️ Mock tests</button>
+    <button class="drawer-item" id="drwPYQ" onclick="navigate('pyq_hub')" data-en="🎯 Previous year papers (PYQ)" data-hi="🎯 पिछले वर्ष के पेपर (PYQ)">🎯 Previous year papers (PYQ)</button>
+    <button class="drawer-item" id="drwSubjects" onclick="navigate('subjects')" data-en="📚 Subjects & topic practice" data-hi="📚 विषय और टॉपिक अभ्यास">📚 Subjects &amp; topic practice</button>
+
+    <div class="drawer-section-title" data-en="LEARN & PRACTICE" data-hi="सीखें और अभ्यास करें">LEARN &amp; PRACTICE</div>
     <button class="drawer-item" id="drwNativeBuilder" onclick="navigate('native_builder')" data-en="🧩 Create a test" data-hi="🧩 टेस्ट बनाएँ">🧩 Create a test</button>
-    <button class="drawer-item" id="drwTest" onclick="navigate('test_hub')" data-en="⏱️ Tests" data-hi="⏱️ टेस्ट">⏱️ Tests</button>
-    <button class="drawer-item" id="drwExams" onclick="navigate('exam_hub')" data-en="🏛️ Exams" data-hi="🏛️ परीक्षाएँ">🏛️ Exams</button>
-    <button class="drawer-item" id="drwPYQ" onclick="navigate('pyq_hub')" data-en="🎯 PYQ archive" data-hi="🎯 PYQ संग्रह">🎯 PYQ archive</button>
-    <button class="drawer-item" id="drwLibrary" onclick="navigate('digital_library')" data-en="📖 Digital library" data-hi="📖 डिजिटल लाइब्रेरी">📖 Digital library</button>
-    <div class="drawer-section-title" data-en="REVIEW" data-hi="दोहराना">REVIEW</div>
-    <button class="drawer-item" id="drwRevision" onclick="navigate('revision_hub')" data-en="🔄 Revision" data-hi="🔄 रिवीज़न">🔄 Revision</button>
-    <button class="drawer-item" onclick="navigate('mistakes')" data-en="📕 Mistake book" data-hi="📕 गलतियों की किताब">📕 Mistake book</button>
+    <button class="drawer-item" id="drwLibrary" onclick="navigate('digital_library')" data-en="📖 Study library" data-hi="📖 स्टडी लाइब्रेरी">📖 Study library</button>
     <button class="drawer-item" id="drwTaxonomy" onclick="navigate('taxonomy_explorer')" data-en="🔎 Question bank" data-hi="🔎 प्रश्न बैंक">🔎 Question bank</button>
-    <button class="drawer-item" onclick="navigate('mastery')" data-en="🎯 Mastery" data-hi="🎯 महारत">🎯 Mastery</button>
-    <div class="drawer-section-title" data-en="SETTINGS & DATA" data-hi="सेटिंग और डेटा">SETTINGS & DATA</div>
+
+    <div class="drawer-section-title" data-en="REVISE & TRACK" data-hi="दोहराएँ और प्रगति देखें">REVISE &amp; TRACK</div>
+    <button class="drawer-item" id="drwRevision" onclick="navigate('revision_hub')" data-en="🔄 Revision centre" data-hi="🔄 रिवीज़न सेंटर">🔄 Revision centre</button>
+    <button class="drawer-item" onclick="navigate('mistakes')" data-en="📕 Mistake book" data-hi="📕 गलतियों की किताब">📕 Mistake book</button>
+    <button class="drawer-item" onclick="navigate('mastery')" data-en="🎯 Topic mastery" data-hi="🎯 टॉपिक महारत">🎯 Topic mastery</button>
+    <button class="drawer-item" id="drwMe" onclick="navigate('me')" data-en="👤 My progress & settings" data-hi="👤 मेरी प्रगति और सेटिंग">👤 My progress &amp; settings</button>
+
+    <div class="drawer-section-title" data-en="APP TOOLS & DATA" data-hi="ऐप टूल्स और डेटा">APP TOOLS &amp; DATA</div>
     <button class="drawer-item" onclick="openDisplaySettings()" data-en="Aa Display (language, text size)" data-hi="Aa डिस्प्ले (भाषा, अक्षर आकार)">Aa Display (language, text size)</button>
     <a class="drawer-item admin-only" id="drwControl" href="control/" data-en="🩺 Control Room (app health)" data-hi="🩺 Control Room (ऐप की सेहत)">🩺 Control Room (app health)</a>
     <a class="drawer-item admin-only" id="drwStudio" href="admin/" data-en="🛠️ Admin Studio" data-hi="🛠️ Admin Studio">🛠️ Admin Studio</a>
     <button class="drawer-item admin-only" onclick="openImportModal()" data-en="📥 Import questions" data-hi="📥 सवाल import करें">📥 Import questions</button>
     <button class="drawer-item admin-only" onclick="openCleanup()" data-en="🧹 Data cleanup" data-hi="🧹 Data सफ़ाई">🧹 Data cleanup</button>
-    <button class="drawer-item" onclick="openHealthCheck()" data-en="🩺 Health Check" data-hi="🩺 Health Check">🩺 Health Check</button>
-    <button class="drawer-item" onclick="openBackupCenter()" data-en="💾 Backup & Restore" data-hi="💾 Backup और Restore">💾 Backup &amp; Restore</button>
+    <button class="drawer-item" onclick="openHealthCheck()" data-en="🩺 Health check" data-hi="🩺 हेल्थ चेक">🩺 Health check</button>
+    <button class="drawer-item" onclick="openBackupCenter()" data-en="💾 Backup & restore" data-hi="💾 बैकअप और रीस्टोर">💾 Backup &amp; restore</button>
     <button class="drawer-item admin-only" onclick="openServerSync()" data-en="☁️ Server (Admin)" data-hi="☁️ Server (Admin)">☁️ Server (Admin)</button>
     <button class="drawer-item" id="drwInstall" hidden onclick="pwaInstall()" data-en="📲 Install app" data-hi="📲 ऐप install करें">📲 Install app</button>
     <button class="drawer-item" onclick="openDataControlModal()" data-en="🛡️ Data control" data-hi="🛡️ डेटा नियंत्रण">🛡️ Data control</button>
@@ -2424,7 +3403,7 @@ button,a,[role="button"]{-webkit-tap-highlight-color:transparent}
 <main id="mainView"></main>
 
 <!-- 5-Tier Strict Global Bottom Navigation: Home, Subjects, PYQ, Test, Revision -->
-<nav id="bottomNav">
+<nav id="bottomNav" aria-label="Main navigation">
   <button class="nav-tab active" id="tabHome" onclick="navigate('home')" aria-label="Home">
     <span class="nav-tab-icon">🏠</span>
     <span data-en="HOME" data-hi="होम">HOME</span>
@@ -2770,11 +3749,11 @@ function openWorkspaceSwitcher(){const w=WorkspaceManager.current();openModal('�
 function switchWorkspace(id){try{if(typeof ActiveTestSession!=='undefined'&&ActiveTestSession?.sessionStatus==='ACTIVE'){openCustomToast('🔒 CBT ACTIVE — Workspace switching is locked.');return;}WorkspaceManager.switchTo(id);closeModal();if(typeof PracticeAnswerState!=='undefined')Object.keys(PracticeAnswerState).forEach(k=>delete PracticeAnswerState[k]);if(typeof PracticeSubjectiveState!=='undefined')Object.keys(PracticeSubjectiveState).forEach(k=>delete PracticeSubjectiveState[k]);navigate('home',{})}catch(e){openCustomToast('Workspace switch failed: '+e.message)}}
 function boardEnabledGuard(){return PHASE4_BOARD_ENABLED&&WorkspaceManager.current().type==='BOARD'}
 function boardCrumbs(items){return `<div class="board-breadcrumb"><button onclick="navigate('home')">🏠 Board Home</button>${items.map(x=>`<span>›</span>${x.action?`<button onclick="${x.action}">${escapeHtml(x.label)}</button>`:`<span>${escapeHtml(x.label)}</span>`}`).join('')}</div>`}
-function renderBoardDashboard(v){if(!boardEnabledGuard())return navigate('home');BoardCurriculumRegistry.sync(AppModules);const ss=BoardCurriculumRegistry.subjects();const ms=WorkspaceManager.filterModules(AppModules);const count=ms.reduce((n,m)=>n+(m.groups||[]).reduce((a,g)=>a+(g.questions||[]).length,0),0);v.innerHTML=`<div class="board-shell">${boardCrumbs([])}<div class="student-hero-card"><span class="journey-pill">🎓 BOARD / SCHOOL WORKSPACE</span><h1>CBSE Class 10 Campus</h1><p>Curriculum-driven learning • ${ss.length} Subjects • ${count} Questions</p></div><div class="section-title"><span>📚 Curriculum</span></div><div class="grid-cards">${ss.length?ss.map(x=>`<button class="card-btn board-node-card" onclick="navigate('board_chapters',{subjectId:'${x.id}'})"><strong>📘 ${escapeHtml(x.label)}</strong><span class="node-meta">${BoardCurriculumRegistry.chapters(x.id).length} Chapters</span></button>`).join(''):'<div class="card-btn"><strong>Board curriculum registry ready</strong><small>No Board curriculum/questions imported yet.</small></div>'}</div><div class="grid-cards"><button class="card-btn" onclick="navigate('board_subjects',{})"><strong>📖 Subjects</strong><small>Browse curriculum</small></button><button class="card-btn" onclick="navigate('board_subjects',{})"><strong>🔁 Curriculum Revision</strong><small>Choose a Board topic first; no global Competitive state is exposed.</small></button></div></div>`}
-function renderBoardSubjects(v){if(!boardEnabledGuard())return navigate('home');BoardCurriculumRegistry.sync(AppModules);const ss=BoardCurriculumRegistry.subjects();v.innerHTML=`<div class="board-shell">${boardCrumbs([])}<div class="section-title"><span>📚 BOARD SUBJECTS</span><button class="btn-action-sm" onclick="navigate('home')">← Board Home</button></div><div class="grid-cards">${ss.length?ss.map(x=>`<button class="card-btn board-node-card" onclick="navigate('board_chapters',{subjectId:'${x.id}'})"><strong>${escapeHtml(x.label)}</strong><span class="node-meta">${BoardCurriculumRegistry.chapters(x.id).length} Chapters</span></button>`).join(''):'<div class="card-btn"><strong>No subjects mapped</strong><small>Import Board content first.</small></div>'}</div></div>`}
-function renderBoardChapters(v,sid){if(!boardEnabledGuard())return navigate('home');BoardCurriculumRegistry.sync(AppModules);const s=BoardCurriculumRegistry.subjects().find(x=>x.id===sid);if(!s)return navigate('board_subjects',{});const cs=BoardCurriculumRegistry.chapters(sid);v.innerHTML=`<div class="board-shell">${boardCrumbs([{label:s.label}])}<div class="section-title"><span>📕 ${escapeHtml(s.label)} — CHAPTERS</span><button class="btn-action-sm" onclick="navigate('board_subjects',{})">← Subjects</button></div><div class="grid-cards">${cs.length?cs.map(c=>`<button class="card-btn board-node-card" onclick="navigate('board_topics',{chapterId:'${c.id}',subjectId:'${sid}'})"><strong>${escapeHtml(c.label)}</strong><span class="node-meta">${BoardCurriculumRegistry.topics(c.id).length} Topics</span></button>`).join(''):'<div class="card-btn"><strong>No chapters mapped</strong></div>'}</div></div>`}
-function renderBoardTopics(v,cid,sid){if(!boardEnabledGuard())return navigate('home');BoardCurriculumRegistry.sync(AppModules);const s=BoardCurriculumRegistry.subjects().find(x=>x.id===sid),c=BoardCurriculumRegistry.chapters(sid).find(x=>x.id===cid);if(!s||!c)return navigate('board_subjects',{});const ts=BoardCurriculumRegistry.topics(cid);v.innerHTML=`<div class="board-shell">${boardCrumbs([{label:s.label,action:`navigate('board_chapters',{subjectId:'${sid}'})`},{label:c.label}])}<div class="section-title"><span>📗 ${escapeHtml(c.label)} — TOPICS</span></div><div class="grid-cards">${ts.length?ts.map(t=>`<button class="card-btn board-node-card" onclick="navigate('board_topic',{topicId:'${t.id}',chapterId:'${cid}',subjectId:'${sid}'})"><strong>${escapeHtml(t.label)}</strong><span class="node-meta">${BoardCurriculumRegistry.questions({topicId:t.id}).length} Questions • ${BoardCurriculumRegistry.outcomes(t.id).length} Learning Outcomes</span></button>`).join(''):'<div class="card-btn"><strong>No topics mapped</strong></div>'}</div></div>`}
-function renderBoardTopic(v,tid,cid,sid){if(!boardEnabledGuard())return navigate('home');BoardCurriculumRegistry.sync(AppModules);const s=BoardCurriculumRegistry.subjects().find(x=>x.id===sid),c=BoardCurriculumRegistry.chapters(sid).find(x=>x.id===cid),t=BoardCurriculumRegistry.topics(cid).find(x=>x.id===tid);if(!s||!c||!t)return navigate('board_subjects',{});const qs=BoardCurriculumRegistry.questions({topicId:tid}),los=BoardCurriculumRegistry.outcomes(tid);v.innerHTML=`<div class="board-shell">${boardCrumbs([{label:s.label,action:`navigate('board_chapters',{subjectId:'${sid}'})`},{label:c.label,action:`navigate('board_topics',{chapterId:'${cid}',subjectId:'${sid}'})`},{label:t.label}])}<div class="section-title"><span>📚 ${escapeHtml(t.label)}</span></div><div class="grid-cards"><div class="card-btn board-lo-card"><strong>🎯 Learning Outcomes</strong><small>${los.length?los.map(x=>escapeHtml(x.label)).join(' • '):'No Learning Outcome IDs mapped yet.'}</small></div><div class="card-btn"><strong>📝 Questions</strong><small>${qs.length} Board questions mapped.</small>${qs.length?`<button class="btn-nav primary" style="margin-top:10px;width:100%;" onclick="startSinglePractice('${qs[0].canonicalQId}')">Start Practice →</button>`:''}</div></div></div>`}
+function renderBoardDashboard(v){if(!boardEnabledGuard())return navigate('home');BoardCurriculumRegistry.sync(AppModules);const ss=BoardCurriculumRegistry.subjects();const ms=WorkspaceManager.filterModules(AppModules);const count=ms.reduce((n,m)=>n+(m.groups||[]).reduce((a,g)=>a+(g.questions||[]).length,0),0);v.innerHTML=`<div class="board-shell">${boardCrumbs([])}<div class="student-hero-card ao-page-head"><span class="journey-pill">🎓 BOARD / SCHOOL WORKSPACE</span><h1>CBSE Class 10 Campus</h1><p>Curriculum-driven learning • ${ss.length} Subjects • ${count} Questions</p></div><div class="section-title ao-page-head"><span>📚 Curriculum</span></div><div class="grid-cards">${ss.length?ss.map(x=>`<button class="card-btn board-node-card" onclick="navigate('board_chapters',{subjectId:'${x.id}'})"><strong>📘 ${escapeHtml(x.label)}</strong><span class="node-meta">${BoardCurriculumRegistry.chapters(x.id).length} Chapters</span></button>`).join(''):'<div class="card-btn"><strong>Board curriculum registry ready</strong><small>No Board curriculum/questions imported yet.</small></div>'}</div><div class="grid-cards"><button class="card-btn" onclick="navigate('board_subjects',{})"><strong>📖 Subjects</strong><small>Browse curriculum</small></button><button class="card-btn" onclick="navigate('board_subjects',{})"><strong>🔁 Curriculum Revision</strong><small>Choose a Board topic first; no global Competitive state is exposed.</small></button></div></div>`}
+function renderBoardSubjects(v){if(!boardEnabledGuard())return navigate('home');BoardCurriculumRegistry.sync(AppModules);const ss=BoardCurriculumRegistry.subjects();v.innerHTML=`<div class="board-shell">${boardCrumbs([])}<div class="section-title ao-page-head"><span>📚 BOARD SUBJECTS</span><button class="btn-action-sm" onclick="navigate('home')">← Board Home</button></div><div class="grid-cards">${ss.length?ss.map(x=>`<button class="card-btn board-node-card" onclick="navigate('board_chapters',{subjectId:'${x.id}'})"><strong>${escapeHtml(x.label)}</strong><span class="node-meta">${BoardCurriculumRegistry.chapters(x.id).length} Chapters</span></button>`).join(''):'<div class="card-btn"><strong>No subjects mapped</strong><small>Import Board content first.</small></div>'}</div></div>`}
+function renderBoardChapters(v,sid){if(!boardEnabledGuard())return navigate('home');BoardCurriculumRegistry.sync(AppModules);const s=BoardCurriculumRegistry.subjects().find(x=>x.id===sid);if(!s)return navigate('board_subjects',{});const cs=BoardCurriculumRegistry.chapters(sid);v.innerHTML=`<div class="board-shell">${boardCrumbs([{label:s.label}])}<div class="section-title ao-page-head"><span>📕 ${escapeHtml(s.label)} — CHAPTERS</span><button class="btn-action-sm" onclick="navigate('board_subjects',{})">← Subjects</button></div><div class="grid-cards">${cs.length?cs.map(c=>`<button class="card-btn board-node-card" onclick="navigate('board_topics',{chapterId:'${c.id}',subjectId:'${sid}'})"><strong>${escapeHtml(c.label)}</strong><span class="node-meta">${BoardCurriculumRegistry.topics(c.id).length} Topics</span></button>`).join(''):'<div class="card-btn"><strong>No chapters mapped</strong></div>'}</div></div>`}
+function renderBoardTopics(v,cid,sid){if(!boardEnabledGuard())return navigate('home');BoardCurriculumRegistry.sync(AppModules);const s=BoardCurriculumRegistry.subjects().find(x=>x.id===sid),c=BoardCurriculumRegistry.chapters(sid).find(x=>x.id===cid);if(!s||!c)return navigate('board_subjects',{});const ts=BoardCurriculumRegistry.topics(cid);v.innerHTML=`<div class="board-shell">${boardCrumbs([{label:s.label,action:`navigate('board_chapters',{subjectId:'${sid}'})`},{label:c.label}])}<div class="section-title ao-page-head"><span>📗 ${escapeHtml(c.label)} — TOPICS</span></div><div class="grid-cards">${ts.length?ts.map(t=>`<button class="card-btn board-node-card" onclick="navigate('board_topic',{topicId:'${t.id}',chapterId:'${cid}',subjectId:'${sid}'})"><strong>${escapeHtml(t.label)}</strong><span class="node-meta">${BoardCurriculumRegistry.questions({topicId:t.id}).length} Questions • ${BoardCurriculumRegistry.outcomes(t.id).length} Learning Outcomes</span></button>`).join(''):'<div class="card-btn"><strong>No topics mapped</strong></div>'}</div></div>`}
+function renderBoardTopic(v,tid,cid,sid){if(!boardEnabledGuard())return navigate('home');BoardCurriculumRegistry.sync(AppModules);const s=BoardCurriculumRegistry.subjects().find(x=>x.id===sid),c=BoardCurriculumRegistry.chapters(sid).find(x=>x.id===cid),t=BoardCurriculumRegistry.topics(cid).find(x=>x.id===tid);if(!s||!c||!t)return navigate('board_subjects',{});const qs=BoardCurriculumRegistry.questions({topicId:tid}),los=BoardCurriculumRegistry.outcomes(tid);v.innerHTML=`<div class="board-shell">${boardCrumbs([{label:s.label,action:`navigate('board_chapters',{subjectId:'${sid}'})`},{label:c.label,action:`navigate('board_topics',{chapterId:'${cid}',subjectId:'${sid}'})`},{label:t.label}])}<div class="section-title ao-page-head"><span>📚 ${escapeHtml(t.label)}</span></div><div class="grid-cards"><div class="card-btn ${qs.length?'ao-primary-card':''}"><strong>📝 ${tx('Practise this topic','इस टॉपिक का अभ्यास करें')}</strong><small>${tx(`${qs.length} questions available`,`${qs.length} सवाल उपलब्ध हैं`)}</small>${qs.length?`<div class="ao-actions"><button class="btn-nav primary" style="margin-top:10px;width:100%;" onclick="startSinglePractice('${qs[0].canonicalQId}')">${tx('Start Practice','अभ्यास शुरू करें')} →</button></div>`:''}</div><div class="card-btn board-lo-card"><strong>🎯 Learning Outcomes</strong><small>${los.length?los.map(x=>escapeHtml(x.label)).join(' • '):'No Learning Outcome IDs mapped yet.'}</small></div></div></div>`}
 
 function getWorkspaceModule(moduleId){
   if (typeof CurriculumContext !== 'undefined' && CurriculumContext.isActive()) {
@@ -4366,10 +5345,10 @@ function nbApplyShellForRoute(page){
   if(header)header.style.display=hideGlobalShell?'none':'flex';
   if(bottom)bottom.style.display=hideGlobalShell?'none':'flex';
   if(main){
-    main.style.top=hardImmersive?'0':studyModeActive?'var(--safe-top)':'calc(56px + var(--safe-top))';
-    main.style.bottom=hardImmersive?'0':studyModeActive?'0':'calc(62px + var(--safe-bottom))';
-    main.style.maxWidth=hardImmersive||studyModeActive?'none':'960px';
-    main.style.padding=hardImmersive?'calc(var(--safe-top) + 12px) 14px calc(var(--safe-bottom) + 14px)':studyModeActive?'calc(var(--safe-top) + 8px) 12px calc(var(--safe-bottom) + 12px)':'14px 14px calc(22px + var(--safe-bottom))';
+    main.style.top=hardImmersive?'0':studyModeActive?'var(--safe-top)':'calc(var(--app-header-height) + var(--safe-top))';
+    main.style.bottom='0';
+    main.style.maxWidth=hardImmersive||studyModeActive?'none':'var(--app-content-width)';
+    main.style.padding=hardImmersive?'calc(var(--safe-top) + 12px) 14px calc(var(--safe-bottom) + 14px)':studyModeActive?'calc(var(--safe-top) + 8px) 12px calc(var(--safe-bottom) + 12px)':'24px 16px calc(104px + var(--safe-bottom))';
     main.style.overflow=hardImmersive?'hidden':'auto';
   }
   document.body.style.overflow=hardImmersive?'hidden':'auto';
@@ -4905,7 +5884,7 @@ function revisionCardHtml() {
   const S = RevisionSession;
   const total = S.keys.length;
   if (S.i >= total) {
-    return `<section class="rv-card rv-done"><div class="rv-emoji" aria-hidden="true">🎉</div><h2>Revision done</h2><p>${S.done} reviewed · ${S.correct} correct${S.resolved ? ` · ${S.resolved} removed from the Mistake Book` : ''}</p><p class="sj-note sj-muted">Next reviews are scheduled automatically (1, 3, 7, 14, 30 days).</p><div class="rs-actions"><button type="button" class="btn-nav primary" onclick="revisionEnd()">Back to revision</button><button type="button" class="btn-nav" onclick="RevisionSession=null;navigate('home')">Home</button></div></section>`;
+    return `<section class="rv-card rv-done"><div class="rv-emoji" aria-hidden="true">🎉</div><h2>Revision done</h2><p>${S.done} reviewed · ${S.correct} correct${S.resolved ? ` · ${S.resolved} removed from the Mistake Book` : ''}</p><p class="sj-note sj-muted">Next reviews are scheduled automatically (1, 3, 7, 14, 30 days).</p><div class="rs-actions ao-actions"><button type="button" class="btn-nav primary" onclick="revisionEnd()">Back to revision</button><button type="button" class="btn-nav" onclick="RevisionSession=null;navigate('home')">Home</button></div></section>`;
   }
   const it = revisionCurrent();
   if (!it) { setTimeout(revisionSkip, 0); return ''; }
@@ -4939,11 +5918,11 @@ function renderRevisionPage(v, moduleId) {
   const topics = moduleId ? [] : WorkspaceManager.filterModules(AppModules || []).map(m => ({ m, items: all.filter(x => x.mod.moduleId === m.moduleId) })).filter(x => x.items.length);
   v.innerHTML = `
     <div class="nav-breadcrumb"><button onclick="navigate('home')">Home</button><span class="sep">/</span>${mod ? `<button onclick="navigate('revision_hub')">Revision</button><span class="sep">/</span><span>${escapeHtml(mod.topicTitle)}</span>` : '<span>Revision</span>'}</div>
-    <section class="rv-hero">
+    <section class="rv-hero ao-page-head ao-primary-card">
       <span class="journey-pill">🔄 Spaced revision${mod ? ' · ' + escapeHtml(mod.topicTitle) : ''}</span>
       <h1>${due.length ? `${due.length} to revise today` : 'All caught up'}</h1>
       <p>${due.length ? `${dueQ} past mistake${dueQ === 1 ? '' : 's'} · ${dueF} flashcard${dueF === 1 ? '' : 's'}` : 'Nothing is due today.'}${upcoming ? ` · ${upcoming} due ${moduleId ? 'later' : 'in the next 7 days'}` : ''}</p>
-      ${due.length ? `<button type="button" class="btn-nav primary rv-start" onclick="revisionStart(${moduleId ? nbJsAttr(moduleId) : 'null'})">Start revision (${due.length}) →</button>` : ''}
+      ${due.length ? `<button type="button" class="btn-nav primary rv-start" onclick="revisionStart(${moduleId ? nbJsAttr(moduleId) : 'null'})">${tx(`Start revision (${due.length})`, `रिविज़न शुरू करें (${due.length})`)} →</button>` : ''}
     </section>
     <p class="sj-note sj-muted" style="margin:0 2px 12px;">Your wrong answers and topic flashcards come back after 1, 3, 7, 14 and 30 days, depending on how well you knew them.</p>
     ${!all.length ? `<div class="sj-empty"><strong>Nothing to revise ${mod ? 'in this topic ' : ''}yet</strong><span>Wrong answers from practice and tests become revision cards automatically.</span>${mod ? `<button type="button" class="btn-nav" onclick="navigate('practice',{moduleId:${nbJsAttr(mod.moduleId)},qIndex:0})">Practice this topic</button>` : ''}</div>` : ''}
@@ -5273,17 +6252,51 @@ function gxBackupBanner() {
   if (days !== null && days < 7) return '';
   return `<section class="gx-card gx-backup" role="status"><span aria-hidden="true">💾</span><div><strong>${days === null ? tx('Your progress is not backed up yet','आपकी progress का backup अभी नहीं है') : tx(`Last backup ${days} days ago`,`आख़िरी backup ${days} दिन पहले`)}</strong><small>${tx('All your answers live only on this device. Save a backup file so a phone change or cleared data never erases your work.','आपके सारे जवाब सिर्फ़ इसी phone में हैं। Backup file बचाएँ, ताकि phone बदलने या data साफ़ होने पर मेहनत न खोए।')}</small></div><button type="button" class="gx-btn" onclick="downloadDataSnapshot()">${tx('Back up','Backup लें')}</button></section>`;
 }
+/* Setup is a real next step: students get exam/account/sync actions, never an import dead end. */
+function sjHomeSetupAction(d) {
+  const signedIn = typeof ServerState !== 'undefined' && !!ServerState.session;
+  const cloud = typeof CloudState !== 'undefined' ? CloudState : {};
+  if (typeof profileAvailable === 'function' && profileAvailable() && !studentProfile()) return {
+    kind: 'setup', icon: '🎯', title: tx('Choose your exam and branch','अपना exam और branch चुनें'),
+    why: tx('See the right subjects and questions for your preparation.','अपनी तैयारी के सही विषय और सवाल देखें।'),
+    cta: tx('Choose my exam','अपना exam चुनें'), call: 'openProfileSheet()'
+  };
+  if (d.totalQuestions) return null;
+  if (!signedIn) return {
+    kind: 'setup', icon: '👤', title: tx('Get your study questions','पढ़ाई के सवाल पाएँ'),
+    why: tx('Sign in to download published questions and sync your progress.','प्रकाशित सवाल लाने और progress sync करने के लिए login करें।'),
+    cta: tx('Sign in','Login करें'), call: 'openAccount()'
+  };
+  if (cloud.isAdmin === true) return {
+    kind: 'setup', icon: '📥', title: tx('Prepare this workspace','यह workspace तैयार करें'),
+    why: tx('Admin accounts do not download student questions. You can import a question file here.','Admin account में छात्र के सवाल download नहीं होते। यहाँ सवालों की file import कर सकते हैं।'),
+    cta: tx('Import questions','सवाल import करें'), call: 'openImportModal()'
+  };
+  const failed = cloud.msgKind === 'bad' || cloud.msgKind === 'warn';
+  const hasSynced = !!cloud.lastContentAt;
+  return {
+    kind: 'setup', icon: '🔄', title: cloud.busy ? tx('Getting your questions…','आपके सवाल आ रहे हैं…') : failed ? tx('Reconnect your preparation','अपनी तैयारी फिर जोड़ें') : hasSynced ? tx('No questions for this selection yet','इस चुनाव के सवाल अभी नहीं हैं') : tx('Download your study questions','पढ़ाई के सवाल download करें'),
+    why: cloud.busy ? tx('You can check progress in your account.','अपने account में sync की स्थिति देखें।') : failed ? tx('The last sync did not finish. Check your connection and try again.','पिछला sync पूरा नहीं हुआ। Internet जाँचें और फिर कोशिश करें।') : hasSynced ? tx('Check another exam or sync again for newly published questions.','दूसरा exam देखें या नए प्रकाशित सवालों के लिए फिर sync करें।') : tx('Sync your account to get the latest published questions.','नए प्रकाशित सवाल पाने के लिए अपना account sync करें।'),
+    cta: cloud.busy ? tx('View sync','Sync देखें') : failed ? tx('Retry sync','Sync फिर करें') : hasSynced ? tx('Browse exams','Exam देखें') : tx('Sync questions','सवाल sync करें'),
+    call: cloud.busy ? 'openAccount()' : hasSynced && !failed ? "navigate('exam_hub')" : 'sjHomeSync()'
+  };
+}
+async function sjHomeSync() {
+  await cloudSync('manual');
+  if (Route?.page === 'home') renderView();
+}
 function sjNextActions(d) {
+  const setup = sjHomeSetupAction(d);
+  if (setup) return [setup];
   const actions = [];
   const firstModule = d.modules[0] || null;
   const due = reviewDue();
-  if (d.resume) actions.push({ icon: '▶', title: tx(`Resume ${d.resume.module.topicTitle}`,`${d.resume.module.topicTitle} जारी रखें`), why: tx(`You were at question ${d.resume.qIndex + 1} in practice this session.`,`आप practice में सवाल ${d.resume.qIndex + 1} पर थे।`), cta: tx('Resume','जारी रखें'), call: `navigate('practice',{moduleId:${nbJsAttr(d.resume.module.moduleId)},qIndex:${d.resume.qIndex}})` });
+  if (d.resume) actions.push({ kind: 'resume', icon: '▶', title: tx(`Resume ${d.resume.module.topicTitle}`,`${d.resume.module.topicTitle} जारी रखें`), why: tx(`You were at question ${d.resume.qIndex + 1} in practice this session.`,`आप practice में सवाल ${d.resume.qIndex + 1} पर थे।`), cta: tx('Resume','जारी रखें'), call: `navigate('practice',{moduleId:${nbJsAttr(d.resume.module.moduleId)},qIndex:${d.resume.qIndex}})` });
   if (due.length) actions.push({ icon: '🔄', title: tx(`Revise ${due.length} card${due.length === 1 ? '' : 's'}`,`${due.length} card दोहराएँ`), why: tx('They are due today on your spaced schedule.','आपके revision schedule के हिसाब से आज बाकी हैं।'), cta: tx('Revise','दोहराएँ'), call: `navigate('revision_hub');revisionStart(null)` });
   const weak = (typeof profileVisible==='function'?profileVisible:(x=>x))(WorkspaceManager.filterModules(AppModules || [])).map(m => ({ m, x: masteryFor(m.moduleId) })).filter(o => o.x.enough && o.x.score < 0.7).sort((a, b) => a.x.score - b.x.score)[0];
   if (weak) actions.push({ icon: '🎯', title: tx(`10-question test: ${weak.m.topicTitle}`,`10 सवाल का test: ${weak.m.topicTitle}`), why: tx(`Your recent accuracy here is ${Math.round(weak.x.score * 100)}% — your weakest topic.`,`यहाँ हाल की accuracy ${Math.round(weak.x.score * 100)}% है — सबसे कमज़ोर topic।`), cta: tx('Start','शुरू'), call: `sjTopicTest(${nbJsAttr(weak.m.moduleId)})` });
   else { const wt = d.weakTopics.find(t => t.count >= 2 && getWorkspaceModule(t.moduleId)); if (wt) actions.push({ icon: '🎯', title: tx(`10-question test: ${wt.topic}`,`10 सवाल का test: ${wt.topic}`), why: tx(`${wt.count} unresolved mistakes in this topic.`,`इस topic में ${wt.count} गलतियाँ बाकी।`), cta: tx('Start','शुरू'), call: `sjTopicTest(${nbJsAttr(wt.moduleId)})` }); }
-  if (!d.totalQuestions) actions.push({ icon: '📥', title: tx('Add questions','सवाल जोड़ें'), why: tx('This workspace has no questions yet. Import a question file to begin.','इस workspace में अभी सवाल नहीं हैं। शुरू करने के लिए सवालों की file import करें।'), cta: 'Import', call: `openImportModal()` });
-  else if (StudySettings.dailyGoal && d.answered < StudySettings.dailyGoal) actions.push({ icon: '⚡', title: tx('Daily mini test (10 questions)','आज का mini test (10 सवाल)'), why: tx(`${StudySettings.dailyGoal - d.answered} questions left for today's goal.`,`आज के लक्ष्य के ${StudySettings.dailyGoal - d.answered} सवाल बाकी।`), cta: tx('Start','शुरू'), call: `sjMiniTest()` });
+  if (StudySettings.dailyGoal && d.answered < StudySettings.dailyGoal) actions.push({ icon: '⚡', title: tx('Daily mini test (10 questions)','आज का mini test (10 सवाल)'), why: tx(`${StudySettings.dailyGoal - d.answered} questions left for today's goal.`,`आज के लक्ष्य के ${StudySettings.dailyGoal - d.answered} सवाल बाकी।`), cta: tx('Start','शुरू'), call: `sjMiniTest()` });
   else if (!d.resultsToday.length) actions.push({ icon: '⚡', title: tx('Daily mini test (10 questions)','आज का mini test (10 सवाल)'), why: tx('Mistakes and weak topics first, then new questions.','पहले गलतियाँ और कमज़ोर topics, फिर नए सवाल।'), cta: tx('Start','शुरू'), call: `sjMiniTest()` });
   if (firstModule && !d.resume && !d.answered) actions.push({ icon: '✍️', title: tx(`Practise ${firstModule.topicTitle}`,`${firstModule.topicTitle} की practice`), why: tx('No answers yet today.','आज अभी कोई जवाब नहीं।'), cta: tx('Start','शुरू'), call: `navigate('practice',{moduleId:${nbJsAttr(firstModule.moduleId)},qIndex:0})` });
   if (d.results.length) actions.push({ icon: '📜', title: tx('Open your test history','अपनी test history खोलें'), why: tx(`${d.results.length} submitted test${d.results.length === 1 ? '' : 's'} saved on this device.`,`इस phone में ${d.results.length} test सहेजे हैं।`), cta: tx('Open','खोलें'), call: `openTestHistoryModal()` });
@@ -5315,38 +6328,36 @@ function renderHomePage(v) {
   const recent = [];
   d.results.slice(0, 3).forEach(r => recent.push({ icon: '⏱️', title: `Test · ${r.topicTitle || 'Custom Test'}`, meta: `Score ${Number(r.score) || 0}/${Number(r.total) || 0} · ${Number(r.accuracy) || 0}% · ${sjFormatWhen(r.ts)}`, call: `openStoredResult(${nbJsAttr(r.id)})` }));
   d.imports.slice(0, 2).forEach(h => { const w = h.committedAt ? new Date(h.committedAt) : null; recent.push({ icon: '📥', title: `Imported · ${h.topicTitle || h.sourceFile || 'Questions'}`, meta: `${Number(h.committedQuestions) || 0} questions · ${w && !isNaN(w) ? w.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : 'date unknown'}`, call: `openDataControlModal()` }); });
+  // Testbook-inspired exam-first navigation; every tile targets an existing, working route.
+  // Features without a real data source (live classes/current affairs/AI doubt chat) are intentionally not faked.
   const quick = [
-    { icon: '✍️', label: 'Practice', call: practiceCall },
-    { icon: '🧩', label: tx('Test Builder','Test बनाएँ'), call: `navigate('native_builder')` },
-    { icon: '🗂️', label: tx('Question Bank','प्रश्न बैंक'), call: `navigate('taxonomy_explorer')` },
-    { icon: '🔄', label: tx('Revision','दोहराई'), call: `navigate('revision_hub')` },
-    { icon: '⏱️', label: tx('CBT Tests','CBT Test'), call: `navigate('test_hub')` },
-    { icon: '📕', label: tx('Mistakes','गलतियाँ'), call: `navigate('mistakes')` },
-    { icon: '📜', label: 'Test History', call: `openTestHistoryModal()` },
-    { icon: '🏆', label: tx('Mastery','महारत'), call: `navigate('mastery')` }
+    { icon: '🏛️', label: tx('Exams','परीक्षाएँ'), call: `navigate('exam_hub')` },
+    { icon: '⏱️', label: tx('Mock tests','मॉक टेस्ट'), call: `navigate('test_hub')` },
+    { icon: '🎯', label: tx('PYQ papers','PYQ पेपर'), call: `navigate('pyq_hub')` },
+    { icon: '✍️', label: tx('Topic practice','टॉपिक अभ्यास'), call: `navigate('subjects')` },
+    { icon: '🧩', label: tx('Test builder','टेस्ट बनाएँ'), call: `navigate('native_builder')` },
+    { icon: '📖', label: tx('Study library','स्टडी लाइब्रेरी'), call: `navigate('digital_library')` },
+    { icon: '🔎', label: tx('Question bank','प्रश्न बैंक'), call: `navigate('taxonomy_explorer')` },
+    { icon: '🔄', label: tx('Revision','दोहराई'), call: `navigate('revision_hub')` }
   ];
 
-  v.innerHTML = `<div class="sj-dash gx">
+  v.innerHTML = `<div class="sj-dash gx ao-home">
     <section class="gx-card gx-hero" aria-labelledby="sjHeroTitle">
       <div class="gx-hero-top">${typeof profileHeroChip === 'function' ? profileHeroChip(examLine) : `<span class="gx-pill">🏛️ ${examLine}</span>`}</div>
       <h1 id="sjHeroTitle">${greeting}</h1>
-      <p>${d.totalQuestions ? tx(`${d.totalQuestions} questions · ${d.subjects.length} subject${d.subjects.length === 1 ? '' : 's'} · ${d.modules.length} topic${d.modules.length === 1 ? '' : 's'} in ${escapeHtml(d.workspace.name)}`,`${d.totalQuestions} सवाल · ${d.subjects.length} विषय · ${d.modules.length} topic — ${escapeHtml(d.workspace.name)}`) : tx(`No questions in ${escapeHtml(d.workspace.name)} yet. Import a question file to start.`,`${escapeHtml(d.workspace.name)} में अभी सवाल नहीं हैं। शुरू करने के लिए file import करें।`)}</p>
+      <p>${d.totalQuestions ? tx(`${d.totalQuestions} questions · ${d.subjects.length} subject${d.subjects.length === 1 ? '' : 's'} · ${d.modules.length} topic${d.modules.length === 1 ? '' : 's'} in ${escapeHtml(d.workspace.name)}`,`${d.totalQuestions} सवाल · ${d.subjects.length} विषय · ${d.modules.length} topic — ${escapeHtml(d.workspace.name)}`) : tx('Your preparation starts with one clear next step.','अपनी तैयारी एक आसान अगले कदम से शुरू करें।')}</p>
       <div class="gx-hero-facts">
         <span>🔥 <b>${s.streak}</b> ${tx('day streak','दिन लगातार')}</span>
         ${daysLeft !== null ? (daysLeft >= 0 ? `<span>📅 <b>${daysLeft}</b> ${tx(`day${daysLeft === 1 ? '' : 's'} to exam`,'दिन exam में')}${perDay ? tx(` · ~${perDay} new questions/day covers the bank`,` · रोज़ ~${perDay} नए सवाल से पूरा bank हो जाएगा`) : ''}</span>` : `<span>📅 ${tx('Exam date has passed','Exam की तारीख निकल गई')}</span>`) : `<button type="button" class="gx-link" onclick="sjOpenGoalSettings()">📅 ${tx('Add exam date','Exam की तारीख जोड़ें')}</button>`}
       </div>
     </section>
-    <section class="gx-card gx-search"><div class="search-box-wrap" style="margin:0;"><span class="search-icon">🔍</span><input type="search" class="search-input" id="inpGlobalSearch" aria-label="Search questions" placeholder="सवाल नंबर, परीक्षा (SSC, NTPC, JE), टॉपिक सर्च करें..." oninput="onGlobalSearch(this.value)"></div><div id="globalSearchResults"></div></section>
-    ${primary ? `<section class="gx-card gx-next" aria-label="Next best action"><div class="gx-next-icon" aria-hidden="true">${primary.icon}</div><div class="gx-next-copy"><small>${tx('Next best action','अगला सबसे अच्छा काम')}</small><strong>${escapeHtml(primary.title)}</strong><span>${escapeHtml(primary.why)}</span></div><button type="button" class="gx-btn" onclick="${primary.call}">${escapeHtml(primary.cta)} →</button></section>` : ''}
-    <section class="gx-card gx-continue" aria-labelledby="sjContinueH"><div class="gx-head"><h2 id="sjContinueH">${tx('Continue','जारी रखें')}</h2></div>
-      ${d.resume ? `<div class="sj-resume"><div><strong>${escapeHtml(d.resume.module.topicTitle)}</strong><span>${escapeHtml(subjectDisplayName(d.resume.module.subject))} · Practice · ${tx('Question','सवाल')} ${d.resume.qIndex + 1} / ${sjModuleQuestionCount(d.resume.module)}</span></div><button type="button" class="gx-btn" onclick="${practiceCall}">${tx('Resume →','जारी रखें →')}</button></div>`
-        : `<div class="gx-empty"><strong>${tx('No unfinished activity','कोई अधूरा काम नहीं')}</strong><span>${tx('Practice you leave mid-way appears here.','बीच में छोड़ी practice यहाँ दिखेगी।')}</span>${actions.length > 1 ? '' : (firstModule ? `<button type="button" class="gx-btn ghost" onclick="${practiceCall}">${tx('Practise','Practice:')} ${escapeHtml(firstModule.topicTitle)}</button>` : `<button type="button" class="gx-btn ghost" onclick="openImportModal()">${tx('Import questions','सवाल import करें')}</button>`)}</div>`}
-      ${actions.length > 1 ? `<div class="sj-actions-list">${actions.slice(1).map(a => `<button type="button" class="sj-action" onclick="${a.call}"><span aria-hidden="true">${a.icon}</span><span class="sj-action-copy"><strong>${escapeHtml(a.title)}</strong><small>${escapeHtml(a.why)}</small></span><span class="sj-action-go" aria-hidden="true">›</span></button>`).join('')}</div>` : ''}
-    </section>
-    <section class="gx-card gx-quick"><div class="gx-head"><h2>${tx('Quick actions','जल्दी के काम')}</h2></div><div class="sj-quick">${quick.map(q => `<button type="button" class="sj-quick-btn" ${q.call ? `onclick="${q.call}"` : 'disabled aria-disabled="true" title="No questions available"'}><span aria-hidden="true">${q.icon}</span>${escapeHtml(q.label)}</button>`).join('')}</div></section>
+    ${primary ? `<section class="gx-card gx-next ao-next" ${primary.kind === 'setup' ? 'data-home-setup="true"' : ''} aria-labelledby="sjNextHeading"><div class="gx-next-icon" aria-hidden="true">${primary.icon}</div><div class="gx-next-copy"><small>${tx('Your next step','आपका अगला कदम')}</small><h2 id="sjNextHeading">${escapeHtml(primary.title)}</h2><span>${escapeHtml(primary.why)}</span></div><button type="button" class="gx-btn" onclick="${primary.call}">${escapeHtml(primary.cta)} →</button></section>` : ''}
+    ${actions.length > 1 ? `<section class="gx-card gx-continue ao-followups" aria-labelledby="sjContinueH"><div class="gx-head"><h2 id="sjContinueH">${tx('Also for you','आपके लिए और')}</h2></div><div class="sj-actions-list">${actions.slice(1).map(a => `<button type="button" class="sj-action" onclick="${a.call}"><span aria-hidden="true">${a.icon}</span><span class="sj-action-copy"><strong>${escapeHtml(a.title)}</strong><small>${escapeHtml(a.why)}</small></span><span class="sj-action-go" aria-hidden="true">›</span></button>`).join('')}</div></section>` : ''}
+    <div class="ao-today">${gxGoalWidget(d)}${gxTodayWidget(d)}</div>
+    <section class="gx-card gx-quick" aria-labelledby="sjExploreHeading"><div class="gx-head"><h2 id="sjExploreHeading">${tx('Explore preparation','तैयारी के विकल्प')}</h2><span class="gx-explore-note">${tx('Everything you need, in one place','तैयारी के सारे साधन एक जगह')}</span></div><div class="sj-quick">${quick.map(q => `<button type="button" class="sj-quick-btn" onclick="${q.call}"><span aria-hidden="true">${q.icon}</span><span>${escapeHtml(q.label)}</span></button>`).join('')}</div></section>
+    <section class="gx-card gx-search"><div class="search-box-wrap" style="margin:0;"><span class="search-icon">🔍</span><input type="search" class="search-input" id="inpGlobalSearch" aria-label="${tx('Search questions','सवाल खोजें')}" placeholder="${tx('Search question number, exam or topic…','सवाल नंबर, परीक्षा या टॉपिक खोजें…')}" oninput="onGlobalSearch(this.value)"></div><div id="globalSearchResults"></div></section>
+    <section class="ao-details" aria-labelledby="sjDetailsHeading"><div class="gx-head"><h2 id="sjDetailsHeading">${tx('Progress & study tools','Progress और पढ़ाई के साधन')}</h2><span class="gx-explore-note">${tx('Review your progress and plan ahead','अपनी progress देखें और आगे की तैयारी करें')}</span></div><div class="ao-detail-grid">
     ${gxSubjectWidget()}
-    ${gxGoalWidget(d)}
-    ${gxTodayWidget(d)}
     ${gxRevisionWidget()}
     <section class="gx-card gx-attn"><div class="gx-head"><h2>${tx('Needs attention','ध्यान दें')}</h2><button type="button" class="gx-link" onclick="navigate('mastery')">${tx('Mastery','महारत')}</button></div>
       ${weakTopics.length ? `<div class="sj-recent">${weakTopics.map(o => `<div class="gx-attn-row"><span class="gx-attn-txt"><strong>${escapeHtml(o.m.topicTitle)}</strong><small>${o.x.enough ? tx(`${Math.round(o.x.score * 100)}% recent accuracy`,`हाल की accuracy ${Math.round(o.x.score * 100)}%`) : tx(`${o.x.answered} answers`,`${o.x.answered} जवाब`)}${o.mis ? tx(` · ${o.mis} mistake${o.mis === 1 ? '' : 's'}`,` · ${o.mis} गलतियाँ`) : ''}</small></span><button type="button" class="gx-btn ghost" onclick="sjTopicTest(${nbJsAttr(o.m.moduleId)})">${tx('10-Q test','10 सवाल test')}</button></div>`).join('')}</div>`
@@ -5363,6 +6374,7 @@ function renderHomePage(v) {
       ${recent.length ? `<div class="sj-recent">${recent.map(r => `<button type="button" class="sj-action" onclick="${r.call}"><span aria-hidden="true">${r.icon}</span><span class="sj-action-copy"><strong>${escapeHtml(r.title)}</strong><small>${escapeHtml(r.meta)}</small></span><span class="sj-action-go" aria-hidden="true">›</span></button>`).join('')}</div>` : `<div class="gx-empty"><strong>${tx('Nothing yet','अभी कुछ नहीं')}</strong><span>${tx('Imports and submitted tests appear here.','Import और दिए गए test यहाँ दिखेंगे।')}</span></div>`}
     </section>
     ${gxBackupBanner()}
+    </div></section>
   </div>`;
   pomoPaint();
 }
@@ -5525,44 +6537,62 @@ function nbSubjectGroups() {
   });
   return Array.from(map.values()).filter(g => g.qs > 0).sort((a, b) => b.qs - a.qs);
 }
+/* Subject navigation redesign — scoped only to the Subjects catalog. */
+let SubjectNavState = { selected: '', expanded: '' };
+function shSelectCatalogSubject(key) {
+  SubjectNavState.selected = String(key || '');
+  SubjectNavState.expanded = '';
+  renderView();
+}
+function shToggleCatalogChapter(key) {
+  SubjectNavState.expanded = SubjectNavState.expanded === key ? '' : key;
+  renderView();
+}
 function renderSubjectsCatalog(v) {
   const groups = nbSubjectGroups();
   const total = groups.reduce((n, g) => n + g.qs, 0);
+  if (!groups.some(g => g.key === SubjectNavState.selected)) SubjectNavState.selected = groups[0]?.key || '';
+  const selected = groups.find(g => g.key === SubjectNavState.selected) || null;
+  const chapters = selected ? Array.from(selected.chapters.entries()).map(([id, name]) => {
+    const mods = selected.mods.filter(m => String(m.chapter || '').trim().toLowerCase() === String(name).trim().toLowerCase());
+    return { id: String(id), name, mods, qs: mods.reduce((n, m) => n + nbModuleQCount(m), 0) };
+  }) : [];
+  const subjectTabs = groups.map(g => {
+    const active = selected && g.key === selected.key;
+    const k = g.key.toLowerCase();
+    return `<button type="button" class="sn-tab ${active ? 'on' : ''}" aria-pressed="${!!active}" onclick="shSelectCatalogSubject(${nbJsAttr(g.key)})">
+      <span class="sn-tab-icon" aria-hidden="true">${SUBJECT_ICONS[k] || '📘'}</span>
+      <span>${escapeHtml(subjectLabel(g.key))}</span><small>${g.qs} ${tx('Qs', 'सवाल')}</small>
+    </button>`;
+  }).join('');
+  const chapterRows = chapters.map(c => {
+    const open = SubjectNavState.expanded === c.id;
+    const topicRows = c.mods.map(m => {
+      const topic = String(m.topicTitle || m.topic || '').trim();
+      const subtopic = String(m.subtopic || '').trim();
+      const label = [topic, subtopic].filter((x, i, a) => x && a.indexOf(x) === i).join(' › ') || tx('Open topic', 'टॉपिक खोलें');
+      return `<button type="button" class="sn-topic" onclick="navigate('chapter', {subject:${nbJsAttr(selected.key)}, chapter:${nbJsAttr(c.name)}})">
+        <span class="sn-topic-dot" aria-hidden="true">•</span><span class="sn-topic-label">${escapeHtml(label)}</span><span class="sn-topic-count">${nbModuleQCount(m)} ${tx('Qs', 'सवाल')}</span><span aria-hidden="true">›</span>
+      </button>`;
+    }).join('');
+    return `<section class="sn-chapter ${open ? 'open' : ''}">
+      <button type="button" class="sn-chapter-toggle" aria-expanded="${!!open}" onclick="shToggleCatalogChapter(${nbJsAttr(c.id)})">
+        <span class="sn-chapter-mark" aria-hidden="true">${open ? '−' : '+'}</span>
+        <span class="sn-chapter-main"><strong>${escapeHtml(c.name)}</strong><small>${c.mods.length} ${tx('topics', 'टॉपिक')} · ${c.qs} ${tx('questions', 'सवाल')}</small></span>
+        <span class="sn-chevron" aria-hidden="true">${open ? '⌄' : '›'}</span>
+      </button>
+      ${open ? `<div class="sn-topic-list">${topicRows || `<p class="sn-empty-topic">${tx('No topics available yet.', 'अभी कोई टॉपिक उपलब्ध नहीं है।')}</p>`}</div><div class="sn-chapter-action"><button type="button" class="btn-action-sm" onclick="navigate('chapter', {subject:${nbJsAttr(selected.key)}, chapter:${nbJsAttr(c.name)}})">${tx('Open chapter', 'अध्याय खोलें')} →</button></div>` : ''}
+    </section>`;
+  }).join('');
   v.innerHTML = `
-    <div class="nav-breadcrumb"><button onclick="navigate('home')">${tx('Home', 'होम')}</button><span class="sep">/</span><span>${tx('Subjects', 'विषय')}</span></div>
-    <div class="sc-head">
-      <div><h1>${tx('Subjects', 'विषय')}</h1><p>${groups.length ? tx(`${groups.length} subject${groups.length === 1 ? '' : 's'} · ${total} questions in this workspace`, `${groups.length} विषय · इस workspace में ${total} सवाल`) : tx('No questions imported yet', 'अभी कोई सवाल import नहीं हुआ')}</p></div>
+    <div class="nav-breadcrumb"><button type="button" onclick="navigate('home')">${tx('Home', 'होम')}</button><span class="sep">/</span><span>${tx('Subjects', 'विषय')}</span></div>
+    <div class="sc-head"><div><h1>${tx('Subjects', 'विषय')}</h1><p>${groups.length ? tx(`${groups.length} subjects · ${total} questions in this workspace`, `${groups.length} विषय · इस workspace में ${total} सवाल`) : tx('No questions imported yet', 'अभी कोई सवाल import नहीं हुआ')}</p></div>
       <button type="button" class="btn-action-sm" onclick="navigate('taxonomy_explorer')">🔎 ${tx('Question Bank', 'प्रश्न बैंक')}</button>
     </div>
-    ${groups.length ? `<div class="sc-grid">${groups.map(g => {
-      const k = g.key.toLowerCase(); const chs = Array.from(g.chapters.values());
-      return `<button type="button" class="sc-card" onclick="navigate('subject', {subject:${nbJsAttr(g.key)}})">
-        <span class="sc-icon" aria-hidden="true">${SUBJECT_ICONS[k] || '📘'}</span>
-        <span class="sc-body"><strong>${escapeHtml(subjectLabel(g.key))}</strong>
-          <span class="sc-counts">${tx(`${g.qs} questions · ${chs.length} chapter${chs.length === 1 ? '' : 's'} · ${g.mods.length} topic${g.mods.length === 1 ? '' : 's'}`, `${g.qs} सवाल · ${chs.length} अध्याय · ${g.mods.length} टॉपिक`)}</span>
-          <span class="sc-chips">${chs.slice(0, 4).map(c => `<span>${escapeHtml(c)}</span>`).join('')}${chs.length > 4 ? `<span>+${chs.length - 4}</span>` : ''}</span>
-          ${nbAccuracyLine(nbSubjectAccuracy(g.key))}</span>
-        <span class="sc-go" aria-hidden="true">›</span></button>`;
-    }).join('')}</div>` : `<div class="sc-empty"><strong>${tx('Nothing to show yet', 'अभी दिखाने को कुछ नहीं')}</strong><span>${tx('Import a topic file to see its subjects here.', 'Topic file import करें, उसके विषय यहाँ दिखेंगे।')}</span><button type="button" class="btn-nav primary" onclick="openImportModal()">${tx('Import questions', 'सवाल import करें')}</button></div>`}`;
-}
-function renderSubjectPage(v, subject) {
-  const key = String(subject || '').trim().toLowerCase();
-  const mods = (typeof profileVisible==='function'?profileVisible:(x=>x))(CurriculumContext.filterModules(AppModules)).filter(m => String(m.subject || '').trim().toLowerCase() === key && nbModuleQCount(m) > 0);
-  const chapters = new Map();
-  mods.forEach(m => { const ch = String(m.chapter || '').trim(); if (!ch) return; const c = chapters.get(ch.toLowerCase()) || { name: ch, mods: [], qs: 0 }; c.mods.push(m); c.qs += nbModuleQCount(m); chapters.set(ch.toLowerCase(), c); });
-  const list = Array.from(chapters.values());
-  const name = subjectLabel(subject);
-  v.innerHTML = `
-    <div class="nav-breadcrumb"><button onclick="navigate('home')">${tx('Home', 'होम')}</button><span class="sep">/</span><button onclick="navigate('subjects')">${tx('Subjects', 'विषय')}</button><span class="sep">/</span><span>${escapeHtml(name)}</span></div>
-    <div class="sc-head"><div><h1>${escapeHtml(name)}</h1><p>${tx(`${list.length} chapter${list.length === 1 ? '' : 's'} with questions`, `सवालों वाले ${list.length} अध्याय`)}</p></div>
-      <button type="button" class="btn-action-sm" onclick="navigate('subjects')">← ${tx('Subjects', 'विषय')}</button></div>
-    ${list.length ? `<div class="sc-grid">${list.map(c => `<button type="button" class="sc-card" onclick="navigate('chapter', {subject:${nbJsAttr(subject)}, chapter:${nbJsAttr(c.name)}})">
-        <span class="sc-body"><strong>${escapeHtml(c.name)}</strong>
-          <span class="sc-counts">${tx(`${c.qs} questions · ${c.mods.length} topic${c.mods.length === 1 ? '' : 's'}`, `${c.qs} सवाल · ${c.mods.length} टॉपिक`)}</span>
-          <span class="sc-chips">${c.mods.slice(0, 4).map(m => `<span>${escapeHtml(m.topicTitle || m.topic || '')}</span>`).join('')}${c.mods.length > 4 ? `<span>+${c.mods.length - 4}</span>` : ''}</span>
-          ${nbAccuracyLine(nbChapterAccuracy(c.mods))}</span>
-        <span class="sc-go" aria-hidden="true">›</span></button>`).join('')}</div>`
-    : `<div class="sc-empty"><strong>${tx('No chapters with questions', 'सवालों वाला कोई अध्याय नहीं')}</strong><span>${tx('Import a topic for this subject to start.', 'शुरू करने के लिए इस विषय का topic import करें।')}</span><button type="button" class="btn-nav primary" onclick="openImportModal()">${tx('Import questions', 'सवाल import करें')}</button></div>`}`;
+    ${groups.length ? `<nav class="sn-subject-tabs" aria-label="${tx('Main subjects', 'मुख्य विषय')}" role="tablist">${subjectTabs}</nav>
+      <section class="sn-topic-panel"><div class="sn-panel-head"><div><h2>${selected ? escapeHtml(subjectLabel(selected.key)) : tx('Choose a subject', 'विषय चुनें')}</h2><p>${selected ? tx('Choose a chapter to expand its topics.', 'टॉपिक्स देखने के लिए अध्याय खोलें।') : ''}</p></div>${selected ? `<span class="sn-total">${selected.qs} ${tx('questions', 'सवाल')}</span>` : ''}</div>
+        ${chapters.length ? `<div class="sn-chapter-list">${chapterRows}</div>` : `<div class="sc-empty"><strong>${tx('No chapters with questions', 'सवालों वाला कोई अध्याय नहीं')}</strong><span>${tx('Import a topic for this subject to start.', 'शुरू करने के लिए इस विषय का topic import करें।')}</span><button type="button" class="btn-nav primary" onclick="openImportModal()">${tx('Import questions', 'सवाल import करें')}</button></div>`}
+      </section>` : `<div class="sc-empty"><strong>${tx('Nothing to show yet', 'अभी दिखाने को कुछ नहीं')}</strong><span>${tx('Import a topic file to see its subjects here.', 'Topic file import करें, उसके विषय यहाँ दिखेंगे।')}</span><button type="button" class="btn-nav primary" onclick="openImportModal()">${tx('Import questions', 'सवाल import करें')}</button></div>`}`;
 }
 
 /* ---------- Question Bank ---------- */
@@ -6898,7 +7928,7 @@ function profileClear() { profileApply(null); }
 /* Gentle prompt on Home for a logged-in student who has not chosen yet (never blocks the screen) */
 function profileHomePrompt() {
   if (Route?.page !== 'home' || !profileAvailable() || studentProfile()) return;
-  const v = document.getElementById('mainView'); if (!v || v.querySelector('.pf-prompt')) return;
+  const v = document.getElementById('mainView'); if (!v || v.querySelector('.pf-prompt, [data-home-setup]')) return;
   const el = document.createElement('button'); el.type = 'button'; el.className = 'pf-prompt'; el.onclick = openProfileSheet;
   el.innerHTML = `<span class="pf-ico" aria-hidden="true">🎯</span><span style="flex:1"><b>${tx('Choose your exam and branch','अपना exam और branch चुनें')}</b><small>${tx('Then only your questions appear — no other branch mixed in.','फिर सिर्फ़ आपके सवाल दिखेंगे — दूसरी branch के नहीं।')}</small></span><span aria-hidden="true">›</span>`;
   v.prepend(el);
@@ -7161,8 +8191,8 @@ function resultEnhance(v, res) {
       <div class="sj-recent">${items.map(x => { const a = res.answers?.[resultKeyFor(res, x.q)]; const st = !a ? 'Skipped' : String(a).toUpperCase() === String(x.q.answer || '').toUpperCase() ? 'Correct' : 'Wrong'; return `<div class="sj-action" style="cursor:default"><span aria-hidden="true">⏱️</span><span class="sj-action-copy"><strong>Q.${x.i + 1} · ${resultFormatSec(x.sec)}</strong><small>${st} · ${escapeHtml((x.q.QUESTION_EN || x.q.QUESTION_HI || '').slice(0, 80))}</small></span></div>`; }).join('')}</div></section>`;
   }
   const wrongN = resultWrongIds(res).length;
-  const actionsHtml = `<div class="rs-actions"><button type="button" class="btn-nav primary" onclick="resultRetake()">↻ Retake this test</button>${wrongN ? `<button type="button" class="btn-nav" onclick="resultRetryWrong()">✗ Retry ${wrongN} wrong answer${wrongN === 1 ? '' : 's'}</button>` : ''}</div>`;
-  const anchor = v.querySelector('.goals-grid');
+  const actionsHtml = `<section class="rs-card ao-primary-card rs-next-step"><h2>${tx('Your next step', 'अब अगला कदम')}</h2><p class="sj-note">${wrongN ? tx(`Practise the ${wrongN} questions you missed in this test.`, `इस टेस्ट के ${wrongN} गलत सवालों का फिर अभ्यास करें।`) : tx('Try this test again, or read the solutions below.', 'यह टेस्ट फिर दें, या नीचे हल पढ़ें।')}</p><div class="rs-actions ao-actions">${wrongN ? `<button type="button" class="btn-nav primary" onclick="resultRetryWrong()">✗ ${tx(`Retry ${wrongN} wrong answer${wrongN === 1 ? '' : 's'}`, `${wrongN} गलत सवाल फिर हल करें`)}</button>` : ''}<button type="button" class="btn-nav ${wrongN ? '' : 'primary'}" onclick="resultRetake()">↻ ${tx('Retake this test', 'यह टेस्ट फिर दें')}</button></div></section>`;
+  const anchor = v.querySelector('.rs-score');
   if (anchor) anchor.insertAdjacentHTML('afterend', actionsHtml + compareHtml + (subjRows.length > 1 || res.sessionContractVersion === 1 ? subjHtml : '') + timeHtml);
   // Time chip on each solution card
   if (secs) {
@@ -7999,14 +9029,15 @@ function renderCompetitiveDashboard(v) {
   const mods = competitiveModules(ctx);
   v.innerHTML = `<div class="competitive-shell">
     <div class="nav-breadcrumb"><button onclick="navigate('home')">Home</button><span class="sep">/</span><span>Competitive Exam Hub</span></div>
-    <div class="student-hero-card"><span class="journey-pill">🏆 COMPETITIVE EXAM WORKSPACE</span><h1>${escapeHtml(exam?.examName || 'Competitive Exams')}</h1><p>Exam → Year → Subject → Chapter → Topic → Practice / CBT</p></div>
-    <div class="section-title"><span>1 • Exam</span></div>
+    <div class="student-hero-card ao-page-head"><span class="journey-pill">🏆 COMPETITIVE EXAM WORKSPACE</span><h1>${escapeHtml(exam?.examName || 'Competitive Exams')}</h1><p>Exam → Year → Subject → Chapter → Topic → Practice / CBT</p></div>
+    ${mods.length ? `<section class="ao-primary-card"><h2>${tx('Continue with your subjects', 'अपने विषयों से आगे बढ़ें')}</h2><p>${tx('Practise topics for your selected exam and year.', 'चुनी गई परीक्षा और वर्ष के टॉपिक का अभ्यास करें।')}</p><div class="ao-actions"><button type="button" class="btn-nav primary" onclick="navigate('competitive_subjects')">${tx('Choose a subject', 'विषय चुनें')} →</button></div></section>` : ''}
+    <div class="section-title ao-page-head"><span>1 • Exam</span></div>
     <div class="grid-cards">${exams.map(ex=>`<button class="card-btn" onclick="setCompetitiveContext('${ex.examId}', '${Array.from(ex.years||[])[0]||'2024'}')"><strong>🏛️ ${escapeHtml(ex.examName)}</strong><small>${escapeHtml(ex.category||'Competitive Exam')} • ${ex.questionCount||0} Questions</small></button>`).join('')}</div>
-    <div class="section-title"><span>2 • Year</span></div>
+    <div class="section-title ao-page-head"><span>2 • Year</span></div>
     <div class="grid-cards">${years.length?years.map(y=>`<button class="card-btn" onclick="setCompetitiveContext('${exam.examId}', '${String(y).replace(/'/g,"\\'")}')"><strong>📅 ${escapeHtml(y)}</strong><small>Open ${escapeHtml(exam.examName)} ${escapeHtml(y)}</small></button>`).join(''):'<div class="card-btn"><strong>No year registered</strong></div>'}</div>
-    <div class="section-title"><span>3 • Subject</span></div>
+    <div class="section-title ao-page-head"><span>3 • Subject</span></div>
     <div class="grid-cards">${Array.from(new Set(mods.map(m=>m.subject||m.subjectTitle||'Subject'))).map(subject=>`<button class="card-btn" onclick="navigate('competitive_chapters',{subject:'${String(subject).replace(/'/g,"\'")}'})"><strong>📘 ${escapeHtml(subject)}</strong><small>Open chapters</small></button>`).join('') || '<div class="card-btn"><strong>No subjects in selected context</strong><small>Choose another exam/year or import scoped questions.</small></div>'}</div>
-    <div class="grid-cards"><button class="card-btn" onclick="navigate('competitive_subjects')"><strong>📚 Browse Subjects</strong><small>Continue through the Competitive hierarchy.</small></button><button class="card-btn" onclick="navigate('test_hub')"><strong>🧪 CBT Assessment</strong><small>Launch the existing CBT controller.</small></button></div>
+    <div class="grid-cards"><button class="card-btn" onclick="navigate('test_hub')"><strong>🧪 CBT Assessment</strong><small>Launch the existing CBT controller.</small></button></div>
   </div>`;
 }
 function setCompetitiveContext(examId, year) { UserState.selectedExam = examId; UserState.selectedYear = String(year || ''); saveUserState(); navigate('competitive_hub'); }
@@ -8096,17 +9127,17 @@ function getMathsParentChapter(chapter,subject=''){
 function competitiveScopedModulesFor(examId = null, year = null) { return competitiveModules(CompetitiveContext.current(examId || UserState?.selectedExam || null, year || UserState?.selectedYear || null)); }
 function renderCompetitiveSubjects(v) {
   const mods = competitiveScopedModulesFor(); const subjects = Array.from(new Set(mods.map(m=>m.subject||m.subjectTitle||'Subject')));
-  v.innerHTML = `<div class="nav-breadcrumb"><button onclick="navigate('competitive_hub')">Competitive Hub</button><span class="sep">/</span><span>Subjects</span></div><div class="section-title"><span>📚 ${escapeHtml(UserState?.selectedExam||'EXAM')} • ${escapeHtml(UserState?.selectedYear||'YEAR')} • Subjects</span></div><div class="grid-cards">${subjects.map(s=>`<button class="card-btn" onclick="navigate('competitive_chapters',{subject:'${String(s).replace(/'/g,"\\'")}'})"><strong>📘 ${escapeHtml(s)}</strong><small>Open chapters →</small></button>`).join('') || '<div class="card-btn"><strong>No subjects found</strong></div>'}</div>`;
+  v.innerHTML = `<div class="nav-breadcrumb"><button onclick="navigate('competitive_hub')">Competitive Hub</button><span class="sep">/</span><span>Subjects</span></div><div class="section-title ao-page-head"><span>📚 ${escapeHtml(UserState?.selectedExam||'EXAM')} • ${escapeHtml(UserState?.selectedYear||'YEAR')} • Subjects</span></div><div class="grid-cards">${subjects.map(s=>`<button class="card-btn" onclick="navigate('competitive_chapters',{subject:'${String(s).replace(/'/g,"\\'")}'})"><strong>📘 ${escapeHtml(s)}</strong><small>Open chapters →</small></button>`).join('') || '<div class="card-btn"><strong>No subjects found</strong></div>'}</div>`;
 }
 function renderCompetitiveChapters(v, subject) {
   const mods = competitiveScopedModulesFor().filter(m=>(m.subject||m.subjectTitle||'')===subject); const chapters=Array.from(new Set(mods.map(m=>getMathsParentChapter(m.chapter||m.topicTitle||'General',m.subject||subject))));
-  v.innerHTML = `<div class="nav-breadcrumb"><button onclick="navigate('competitive_subjects')">Subjects</button><span class="sep">/</span><span>${escapeHtml(subject)}</span></div><div class="section-title"><span>📖 Chapters</span></div><div class="grid-cards">${chapters.map(c=>`<button class="card-btn" onclick="navigate('competitive_topics',{subject:'${String(subject).replace(/'/g,"\\'")}',chapter:'${String(c).replace(/'/g,"\\'")}'})"><strong>📖 ${escapeHtml(c)}</strong><small>Open topics →</small></button>`).join('') || '<div class="card-btn"><strong>No chapters found</strong></div>'}</div>`;
+  v.innerHTML = `<div class="nav-breadcrumb"><button onclick="navigate('competitive_subjects')">Subjects</button><span class="sep">/</span><span>${escapeHtml(subject)}</span></div><div class="section-title ao-page-head"><span>📖 Chapters</span></div><div class="grid-cards">${chapters.map(c=>`<button class="card-btn" onclick="navigate('competitive_topics',{subject:'${String(subject).replace(/'/g,"\\'")}',chapter:'${String(c).replace(/'/g,"\\'")}'})"><strong>📖 ${escapeHtml(c)}</strong><small>Open topics →</small></button>`).join('') || '<div class="card-btn"><strong>No chapters found</strong></div>'}</div>`;
 }
 function renderCompetitiveTopics(v, subject, chapter) {
   const mods=competitiveScopedModulesFor().filter(m=>(m.subject||m.subjectTitle||'')===subject && getMathsParentChapter(m.chapter||m.topicTitle||'General',m.subject||subject)===chapter);
-  v.innerHTML = `<div class="nav-breadcrumb"><button onclick="navigate('competitive_chapters',{subject:'${String(subject).replace(/'/g,"\\'")}'})">${escapeHtml(subject)}</button><span class="sep">/</span><span>${escapeHtml(chapter)}</span></div><div class="section-title"><span>🧩 Topics</span></div><div class="grid-cards">${mods.map(m=>`<button class="card-btn" onclick="navigate('competitive_topic',{moduleId:'${String(m.moduleId).replace(/'/g,"\\'")}'})"><strong>🎯 ${escapeHtml(m.topicTitle||'Topic')}</strong><small>Practice / CBT →</small></button>`).join('') || '<div class="card-btn"><strong>No topics found</strong></div>'}</div>`;
+  v.innerHTML = `<div class="nav-breadcrumb"><button onclick="navigate('competitive_chapters',{subject:'${String(subject).replace(/'/g,"\\'")}'})">${escapeHtml(subject)}</button><span class="sep">/</span><span>${escapeHtml(chapter)}</span></div><div class="section-title ao-page-head"><span>🧩 Topics</span></div><div class="grid-cards">${mods.map(m=>`<button class="card-btn" onclick="navigate('competitive_topic',{moduleId:'${String(m.moduleId).replace(/'/g,"\\'")}'})"><strong>🎯 ${escapeHtml(m.topicTitle||'Topic')}</strong><small>Practice / CBT →</small></button>`).join('') || '<div class="card-btn"><strong>No topics found</strong></div>'}</div>`;
 }
-function renderCompetitiveTopic(v, moduleId) { const mod=getWorkspaceModule(moduleId); if(!mod || !CompetitiveContext.matchesModule(mod)) return navigate('competitive_hub'); v.innerHTML=`<div class="nav-breadcrumb"><button onclick="navigate('competitive_subjects')">Subjects</button><span class="sep">/</span><span>${escapeHtml(mod.topicTitle||'Topic')}</span></div><div class="student-hero-card"><span class="journey-pill">🎯 TOPIC</span><h1>${escapeHtml(mod.topicTitle||'Topic')}</h1><p>${escapeHtml(mod.subjectTitle||mod.subject||'Subject')} • ${escapeHtml(mod.chapter||'Chapter')} • ${escapeHtml(mod.examId||UserState.selectedExam||'Exam')} • ${escapeHtml(mod.examYear||UserState.selectedYear||'Year')}</p></div><div class="grid-cards"><button class="card-btn" onclick="navigate('practice',{moduleId:'${String(mod.moduleId).replace(/'/g,"\\'")}',qIndex:0})"><strong>📝 Practice</strong><small>Open practice mode</small></button><button class="card-btn" onclick="initTestSession('${String(mod.moduleId).replace(/'/g,"\\'")}','${String(mod.groups?.[0]?.groupId||'').replace(/'/g,"\\'")}',0)"><strong>🧪 CBT</strong><small>Start exam simulation</small></button></div>`; }
+function renderCompetitiveTopic(v, moduleId) { const mod=getWorkspaceModule(moduleId); if(!mod || !CompetitiveContext.matchesModule(mod)) return navigate('competitive_hub'); v.innerHTML=`<div class="nav-breadcrumb"><button onclick="navigate('competitive_subjects')">Subjects</button><span class="sep">/</span><span>${escapeHtml(mod.topicTitle||'Topic')}</span></div><div class="student-hero-card ao-page-head"><span class="journey-pill">🎯 TOPIC</span><h1>${escapeHtml(mod.topicTitle||'Topic')}</h1><p>${escapeHtml(mod.subjectTitle||mod.subject||'Subject')} • ${escapeHtml(mod.chapter||'Chapter')} • ${escapeHtml(mod.examId||UserState.selectedExam||'Exam')} • ${escapeHtml(mod.examYear||UserState.selectedYear||'Year')}</p></div><div class="grid-cards"><button class="card-btn" onclick="navigate('practice',{moduleId:'${String(mod.moduleId).replace(/'/g,"\\'")}',qIndex:0})"><strong>📝 Practice</strong><small>Open practice mode</small></button><button class="card-btn" onclick="initTestSession('${String(mod.moduleId).replace(/'/g,"\\'")}','${String(mod.groups?.[0]?.groupId||'').replace(/'/g,"\\'")}',0)"><strong>🧪 CBT</strong><small>Start exam simulation</small></button></div>`; }
 
 /* =========================================================================
    5. PAGE RENDERING MODULES
@@ -8379,15 +9410,15 @@ function renderUniversalExamHub(v) {
       <span>Universal Exam Hub</span>
     </div>
 
-    <div class="student-hero-card">
-      <span class="journey-pill">🏛️ One Universal Exam Architecture</span>
-      <h1>Universal Exam Matrix</h1>
-      <p>Seamlessly routes SSC, SSC JE, RRB, NTPC, UPSC, BPSC and future exams without manual redesign.</p>
+    <div class="student-hero-card ao-page-head">
+      <span class="journey-pill">🎯 ${tx('Choose your exam', 'अपनी परीक्षा चुनें')}</span>
+      <h1>${tx('What are you preparing for?', 'आप किस परीक्षा की तैयारी कर रहे हैं?')}</h1>
+      <p>${tx('Choose an exam to find subjects, previous-year questions and practice tests.', 'विषय, पिछले वर्षों के सवाल और अभ्यास टेस्ट देखने के लिए परीक्षा चुनें।')}</p>
     </div>
 
-    <div class="section-title">
+    <div class="section-title ao-page-head">
       <span>Registered Exam Frameworks (${allExams.length} Exams • ${totalQuestions} Questions)</span>
-      <div style="display:flex;gap:6px;"><button class="btn-action-sm" onclick="navigate('competitive_hub')">🏆 Competitive Hub</button><button class="btn-action-sm" onclick="openImportModal()">+ Import New Exam</button></div>
+      <div style="display:flex;gap:6px;"><button class="btn-action-sm" onclick="navigate('competitive_hub')">🏆 Competitive Hub</button>${ServerState?.isAdmin === true ? '<button class="btn-action-sm" onclick="openImportModal()">+ Import New Exam</button>' : ''}</div>
     </div>
 
     <div class="grid-cards" style="margin-bottom:20px;">
@@ -8404,7 +9435,7 @@ function renderUniversalExamHub(v) {
             Years: <b>${Array.from(ex.years).join(', ')}</b> • Marking: <b>${ex.markingScheme}</b>
           </div>
           <div style="margin-top:12px; display:flex; gap:6px;">
-            <button class="btn-action-sm" style="background:var(--primary); color:#fff; width:100%; justify-content:center;">Open Exam Profile ➔</button>
+            <button class="btn-action-sm" style="background:var(--primary); color:var(--on-primary); width:100%; justify-content:center;">Open Exam Profile ➔</button>
           </div>
         </div>
       `).join('')}
@@ -8426,26 +9457,27 @@ function renderExamProfile(v, examId) {
       <span>${exam.examName}</span>
     </div>
 
-    <div class="student-hero-card">
+    <div class="student-hero-card ao-page-head">
       <span class="journey-pill">🎓 Active Exam Profile</span>
       <h1>${exam.examName} (${exam.examBoard})</h1>
       <p>${exam.category} • Marking: ${exam.markingScheme} • Standard Duration: ${exam.defaultDurationMinutes} Mins</p>
     </div>
 
-    <div class="section-title">
-      <span>Universal Exam Profile Actions</span>
+    <div class="section-title ao-page-head">
+      <span>${tx('Choose your next step', 'अपना अगला कदम चुनें')}</span>
       <span class="tax-badge exam">${exam.questionCount} Questions Loaded</span>
     </div>
 
     <div class="grid-cards" style="margin-bottom:20px;">
+      <div class="card-btn ao-primary-card" onclick="navigate('subjects')">
+        <strong>📖 ${tx('Start with a subject', 'विषय से शुरुआत करें')}</strong>
+        <small>Chapters and topics that have questions</small>
+      </div>
       <div class="card-btn" onclick="navigate('syllabus', {examId:'${exam.examId}'})">
         <strong>📚 Syllabus sections</strong>
         <small>Sections listed for this exam</small>
       </div>
-      <div class="card-btn" onclick="navigate('subjects')">
-        <strong>📖 Subjects</strong>
-        <small>Chapters and topics that have questions</small>
-      </div>
+
       <div class="card-btn" onclick="setTaxonomyFilter('examId', '${exam.examId}'); navigate('taxonomy_explorer');">
         <strong>📅 Years & PYQ Archive</strong>
         <small>Papers from ${Array.from(exam.years).join(', ')} with shift filters</small>
@@ -8478,7 +9510,7 @@ function renderSyllabusMatrix(v, examId) {
       <span>Syllabus Matrix</span>
     </div>
 
-    <div class="section-title">
+    <div class="section-title ao-page-head">
       <span>${exam.examName.toUpperCase()} — SYLLABUS SECTIONS</span>
       <button class="btn-action-sm" onclick="navigate('exam_profile', {examId:'${exam.examId}'})">← Exam Profile</button>
     </div>
@@ -8515,7 +9547,7 @@ function renderChapterPage(v, subject, chapter) {
       <span>${chapter}</span>
     </div>
 
-    <div class="section-title">
+    <div class="section-title ao-page-head">
       <span>${chapter.toUpperCase()} — TOPICS</span>
       <button class="btn-action-sm" onclick="navigate('subject', {subject:'${subject}'})">← Chapters</button>
     </div>
@@ -8558,17 +9590,27 @@ function renderTopicHubPage(v, moduleId) {
       <span>${mod.topicTitle}</span>
     </div>
 
-    <div class="student-hero-card">
+    <div class="student-hero-card ao-page-head">
       <span class="journey-pill">📍 TOPIC: ${mod.topicTitle.toUpperCase()}</span>
       <h1>${mod.topicTitle} Hub</h1>
       <p>${sjM.enough ? `Mastery: ${Math.round(sjM.score * 100)}% (${sjM.level})` : `Mastery: shown after ${MASTERY_MIN_ANSWERS} answers (${sjM.answered} so far)`} • ${mod.groups.length} Groups • ${totalQuestions} Questions</p>
     </div>
 
-    <div class="section-title">
+    <div class="section-title ao-page-head">
       <span>🎯 अभी क्या करना है? (Choose Mode for this Topic)</span>
     </div>
 
     <div class="intent-matrix-grid">
+      <div class="intent-tile practice ao-primary-card" onclick="navigate('practice', {moduleId:'${mod.moduleId}', qIndex:0})">
+        <div>
+          <div class="intent-tile-header">
+            <span class="intent-tile-title">✏️ ${tx('START PRACTICE', 'अभ्यास शुरू करें')}</span>
+            <span>📝</span>
+          </div>
+          <div class="intent-tile-desc">${tx('Work through this topic with hints and instant solutions.', 'संकेत और तुरंत हल के साथ इस टॉपिक का अभ्यास करें।')}</div>
+        </div>
+        <div class="intent-tile-action" style="color:#10b981;">${tx('Practise this topic', 'इस टॉपिक का अभ्यास करें')} ➔</div>
+      </div>
       <div class="intent-tile learn" onclick="navigate('learn', {moduleId:'${mod.moduleId}'})">
         <div>
           <div class="intent-tile-header">
@@ -8591,16 +9633,6 @@ function renderTopicHubPage(v, moduleId) {
         <div class="intent-tile-action" style="color:#8b5cf6;">Flip Cards ➔</div>
       </div>
 
-      <div class="intent-tile practice" onclick="navigate('practice', {moduleId:'${mod.moduleId}', qIndex:0})">
-        <div>
-          <div class="intent-tile-header">
-            <span class="intent-tile-title">✏️ PRACTICE</span>
-            <span>📝</span>
-          </div>
-          <div class="intent-tile-desc">Active problem drill with hints, scratchpad & instant solutions.</div>
-        </div>
-        <div class="intent-tile-action" style="color:#10b981;">Solve Drills ➔</div>
-      </div>
 
       <div class="intent-tile class" onclick="navigate('class', {moduleId:'${mod.moduleId}'})">
         <div>
@@ -8647,12 +9679,12 @@ function renderTopicHubPage(v, moduleId) {
       </div>
     </div>
 
-    <div class="section-title">
+    <div class="section-title ao-page-head">
       <span>🔬 Subtopic & Concept Breakdown</span>
     </div>
     <div class="grid-cards" style="margin-bottom:20px;">${topicSubtopicCardsHtml(mod) || '<div class="card-btn"><strong>No subtopics recorded</strong></div>'}</div>
 
-    <div class="section-title">
+    <div class="section-title ao-page-head">
       <span>📁 Practice / CBT Groups (${mod.groups.length})</span>
     </div>
     <div class="grid-cards">
@@ -8692,13 +9724,13 @@ function renderSubtopicConceptPage(v, moduleId, subtopic) {
       <span>${subtopic}</span>
     </div>
 
-    <div class="student-hero-card">
+    <div class="student-hero-card ao-page-head">
       <span class="journey-pill">🔬 SUBTOPIC LAYER</span>
       <h1>${subtopic}</h1>
       <p>Theory → Practice → Numerical → PYQ</p>
     </div>
 
-    <div class="section-title">
+    <div class="section-title ao-page-head">
       <span>Concept Modes</span>
       <button class="btn-action-sm" onclick="navigate('topic', {moduleId:'${mod.moduleId}'})">← Topic Hub</button>
     </div>
@@ -8751,9 +9783,10 @@ function launchFilteredDrill() {
 function renderGlobalPYQHub(v) { renderUniversalExamHub(v); }
 function renderGlobalTestHub(v) {
   const resume = UserState.resumeState;
-  const curriculumModules = CurriculumContext.filterModules(AppModules);
-  const resumeMod = resume?.moduleId ? CurriculumContext.module(resume.moduleId) : null;
-  const mod = resumeMod || curriculumModules[1] || curriculumModules[0];
+  const curriculumModules = CurriculumContext.filterModules(AppModules).filter(m => m.groups?.[0]?.questions?.length);
+  const resumeMod = resume?.moduleId ? curriculumModules.find(m => m.moduleId === resume.moduleId) : null;
+  const mod = resumeMod || curriculumModules[0];
+  const exam = mod ? UniversalExamRegistry.registry.get(mod.examId || mod.groups[0].questions[0]?.metadata?.examId) : null;
 
   v.innerHTML = `
     <div class="nav-breadcrumb">
@@ -8762,29 +9795,29 @@ function renderGlobalTestHub(v) {
       <span>CBT Assessment Center</span>
     </div>
 
-    <div class="student-hero-card">
+    <div class="student-hero-card ao-page-head">
       <span class="journey-pill">⏱️ Real Exam Simulation</span>
       <h1>Computer-Based Test (CBT)</h1>
       <p>Exam-style screen with timer, question palette and full scorecard. +1 per correct answer, no negative marking.</p>
     </div>
 
-    <div class="resume-action-card">
+    ${mod ? `<div class="resume-action-card ao-primary-card">
       <div class="resume-info">
         <span class="resume-badge">🎯 READY ASSESSMENT</span>
         <div class="resume-title">${mod.topicTitle} — ${mod.groups[0]?.title || 'G-01'}</div>
-        <div class="resume-subtitle">30 Mins • ${mod.groups[0]?.questions.length || 20} Questions • Official Pattern</div>
+        <div class="resume-subtitle">${Number(exam?.defaultDurationMinutes) || 30} ${tx('Mins', 'मिनट')} • ${mod.groups[0].questions.length} ${tx('Questions', 'सवाल')}</div>
       </div>
       <button class="btn-nav primary" style="min-height:40px; padding:8px 14px; font-size:13px;" onclick="initTestSession('${mod.moduleId}', '${mod.groups[0]?.groupId || ''}', 0, null, {curriculumContext:true})">
-        Start Test ➔
+        ${tx('Start Test', 'टेस्ट शुरू करें')} ➔
       </button>
-    </div>
+    </div>` : `<div class="sj-empty"><strong>${tx('No tests available yet', 'अभी कोई टेस्ट उपलब्ध नहीं है')}</strong><span>${tx('Choose your exam and sync its questions to start.', 'शुरू करने के लिए अपनी परीक्षा चुनें और सवाल सिंक करें।')}</span><button type="button" class="btn-nav primary" onclick="navigate('me')">${tx('Open exam settings', 'परीक्षा सेटिंग खोलें')} →</button></div>`}
 
     <button type="button" class="card-btn" style="width:100%;margin-bottom:12px;" onclick="openTestHistoryModal()">
       <strong>📜 Test History (${LearningHistory.resultsForWorkspace().length})</strong>
       <small>Open any test you submitted earlier, with answers and solutions.</small>
     </button>
 
-    <div class="section-title">
+    <div class="section-title ao-page-head">
       <span>Available Assessment Test Groups</span>
     </div>
 
@@ -8831,7 +9864,7 @@ function renderLearnEngine(v, moduleId) {
       <span>Learn</span>
     </div>
 
-    <div class="section-title">
+    <div class="section-title ao-page-head">
       <span>📖 LEARN — ${mod.topicTitle.toUpperCase()}</span>
       <button class="btn-action-sm" onclick="navigate('topic', {moduleId:'${mod.moduleId}'})">← Topic Hub</button>
     </div>
@@ -8844,7 +9877,7 @@ ${escapeHtml(mod.theoryNotes || "No notes have been added for this topic yet. Us
       </div>
     </div>
 
-    <div class="section-title">
+    <div class="section-title ao-page-head">
       <span>💡 Concept Check</span>
     </div>
     ${learnConceptCheckHtml(mod)}
@@ -9020,7 +10053,7 @@ function renderPracticeEngine(v, moduleId, qIndex, customQuestions = null) {
       <span>Practice</span>
     </div>
 
-    <div class="section-title">
+    <div class="section-title ao-page-head">
       <div>
         <span>✏️ PRACTICE (Q.${q.originalQNo} • ${qIndex + 1}/${allQs.length})</span>
         <div style="display:flex; gap:4px; margin-top:4px; flex-wrap:wrap;">
@@ -9066,9 +10099,9 @@ function renderPracticeEngine(v, moduleId, qIndex, customQuestions = null) {
       ` : ''}
     </div>
 
-    <div style="display:flex; gap:10px;">
+    <div class="ao-actions ao-practice-actions" style="display:flex; gap:10px;">
       <button class="btn-nav" ${qIndex === 0 ? 'disabled' : ''} onclick="ActiveHintStep=0; navigate('practice', {moduleId:'${moduleId}', qIndex:${qIndex - 1}})">← Previous</button>
-      <button class="btn-nav primary" style="flex:1.4;" ${qIndex === allQs.length - 1 ? 'disabled' : ''} onclick="ActiveHintStep=0; navigate('practice', {moduleId:'${moduleId}', qIndex:${qIndex + 1}})">Next Problem →</button>
+      ${qIndex === allQs.length - 1 ? `<button class="btn-nav primary" style="flex:1.4;" onclick="ActiveHintStep=0; navigate('topic', {moduleId:'${moduleId}'})">${tx('Back to topic', 'टॉपिक पर वापस जाएँ')} →</button>` : `<button class="btn-nav primary" style="flex:1.4;" onclick="ActiveHintStep=0; navigate('practice', {moduleId:'${moduleId}', qIndex:${qIndex + 1}})">${tx('Next question', 'अगला सवाल')} →</button>`}
     </div>
   `;
 }
@@ -9366,10 +10399,10 @@ function renderTestPage(v, moduleId, groupId, qIndex) {
             ${typeof cbtConfidenceRow==='function'?cbtConfidenceRow(q, qIndex):''}
         </div>
       </div>
-      <div class="test-fixed-footer">
+      <div class="test-fixed-footer ao-cbt-footer">
         <div class="test-footer-inner">
           <button class="footer-btn btn-nav-prev" ${qIndex === 0 ? 'disabled style="opacity:0.3; pointer-events:none;"' : ''} onclick="switchQuestion(${qIndex - 1})" aria-label="Previous Question">← Previous</button>
-          <div style="display:flex; gap:12px; align-items:center;">
+          <div class="ao-secondary-actions" style="display:flex; gap:12px; align-items:center;">
              <button class="footer-btn btn-nav-clear" onclick="clearOption(${qIndex})">Clear</button>
              <button class="footer-btn btn-nav-mark ${isMarked ? 'marked' : ''}" onclick="toggleMarkReview(${qIndex})"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256" style="margin-right:3px;"><path d="M192,24H96A16,16,0,0,0,80,40V56H64A16,16,0,0,0,48,72V224a8,8,0,0,0,12.65,6.51L112,193.83l51.36,36.68A8,8,0,0,0,176,224V184h16a16,16,0,0,0,16-16V40A16,16,0,0,0,192,24ZM160,206.17l-43.35-31a8,8,0,0,0-9.3,0L64,206.17V72H160Zm32-38.17V72a16,16,0,0,0-16-16H96V40h96Z"></path></svg> Mark for Review</button>
           </div>
@@ -9536,7 +10569,7 @@ function renderResultPage(v,res){
     });
   }
   const topicPerformanceHtml=[...topicStats].map(([label,x])=>`<div class="nb-row"><span class="nb-row-main"><span class="nb-row-title">${escapeHtml(label)}</span><span class="nb-row-meta">${x.correct} correct · ${x.wrong} incorrect · ${x.unanswered} unanswered</span></span><span class="nb-count">${x.total} Q</span></div>`).join('');
-  v.innerHTML=`<div class="nav-breadcrumb"><button onclick="navigate('home')">Home</button><span class="sep">/</span><button onclick="navigate('test_hub')">CBT Assessment</button><span class="sep">/</span><span>Result</span></div><div class="section-title"><span>📊 ${tx('RESULT','परिणाम')}</span><button class="btn-action-sm" onclick="navigate('home')">🏠 ${tx('Home','होम')}</button></div>${typeof resultSoftLanding==='function'?resultSoftLanding(res):''}<div class="student-hero-card rs-score" style="text-align:center;"><h1 style="font-size:32px;">${res.score} / ${res.total}</h1><p style="font-size:14px;font-weight:700;color:var(--text-main);">Score in ${escapeHtml(res.topicTitle||'Custom Test')} • ${escapeHtml(res.groupTitle||'')}</p></div>${typeof resultWhatIf==='function'?resultWhatIf(res, keyFor):''}${typeof resultTimeCard==='function'?resultTimeCard(res, keyFor):''}<div class="goals-grid" style="margin-bottom:16px;"><div class="goal-box"><small>ACCURACY</small><strong style="color:var(--primary);">${res.accuracy}%</strong></div><div class="goal-box"><small>CORRECT</small><strong style="color:var(--success);">${res.correct}</strong></div><div class="goal-box"><small>WRONG</small><strong style="color:var(--danger);">${res.wrong}</strong></div><div class="goal-box"><small>SKIPPED</small><strong>${res.unattempted}</strong></div></div>${isCustom?`<section class="nb-panel"><h3>Performance by subject / topic</h3>${topicPerformanceHtml||'<p class="nb-row-meta">No topic performance data is available.</p>'}</section><p class="nb-row-meta">Topic-level figures come from this submitted question sequence. Mixed-topic mastery-map updates are not assigned to an arbitrary anchor topic.</p>`:''}<div class="nba-banner"><div><span style="font-size:10px;font-weight:900;color:var(--accent-cyan);text-transform:uppercase;">Next Step</span><div style="font-size:13px;font-weight:800;color:var(--text-main);">${res.wrong>0?`Revise your ${res.wrong} mistakes in the Mistake Book.`:'Review your results or create another test.'}</div></div><button class="btn-nav primary" style="min-height:38px;font-size:12px;padding:6px 12px;" onclick="${res.wrong>0?"navigate('mistakes')":"navigate('native_builder')"}">${res.wrong>0?'Review Mistakes ➔':'Create Another Test ➔'}</button></div><div class="section-title"><span>Detailed Question Solutions</span></div>${solutionsHtml}`;
+  v.innerHTML=`<div class="nav-breadcrumb"><button onclick="navigate('home')">Home</button><span class="sep">/</span><button onclick="navigate('test_hub')">CBT Assessment</button><span class="sep">/</span><span>Result</span></div><div class="section-title ao-page-head"><span>📊 ${tx('RESULT','परिणाम')}</span><button class="btn-action-sm" onclick="navigate('home')">🏠 ${tx('Home','होम')}</button></div>${typeof resultSoftLanding==='function'?resultSoftLanding(res):''}<div class="student-hero-card rs-score" style="text-align:center;"><h1 style="font-size:32px;">${res.score} / ${res.total}</h1><p style="font-size:14px;font-weight:700;color:var(--text-main);">Score in ${escapeHtml(res.topicTitle||'Custom Test')} • ${escapeHtml(res.groupTitle||'')}</p></div>${typeof resultWhatIf==='function'?resultWhatIf(res, keyFor):''}${typeof resultTimeCard==='function'?resultTimeCard(res, keyFor):''}<div class="goals-grid" style="margin-bottom:16px;"><div class="goal-box"><small>ACCURACY</small><strong style="color:var(--primary);">${res.accuracy}%</strong></div><div class="goal-box"><small>CORRECT</small><strong style="color:var(--success);">${res.correct}</strong></div><div class="goal-box"><small>WRONG</small><strong style="color:var(--danger);">${res.wrong}</strong></div><div class="goal-box"><small>SKIPPED</small><strong>${res.unattempted}</strong></div></div>${isCustom?`<section class="nb-panel"><h3>Performance by subject / topic</h3>${topicPerformanceHtml||'<p class="nb-row-meta">No topic performance data is available.</p>'}</section><p class="nb-row-meta">Topic-level figures come from this submitted question sequence. Mixed-topic mastery-map updates are not assigned to an arbitrary anchor topic.</p>`:''}<div class="section-title ao-page-head"><span>Detailed Question Solutions</span></div>${solutionsHtml}`;
   try { resultEnhance(v, res); } catch (e) { console.warn('[Result] enhance failed', e); }
 }
 
@@ -9587,7 +10620,7 @@ function renderMistakeBookPage(v) {
 
   v.innerHTML = `
     <div class="nav-breadcrumb"><button onclick="navigate('home')">Home</button><span class="sep">/</span><button onclick="navigate('revision_hub')">Revision</button><span class="sep">/</span><span>Mistake Book</span></div>
-    <div class="section-title"><span>❌ MISTAKE BOOK (${list.length})</span><button class="btn-action-sm" onclick="navigate('home')">← Home</button></div>
+    <div class="section-title ao-page-head"><span>❌ MISTAKE BOOK (${list.length})</span><button class="btn-action-sm" onclick="navigate('home')">← Home</button></div>
     ${competitiveEnabledGuard() ? `<div class="mb-scope" role="group" aria-label="Which mistakes to show">
       <button type="button" class="filter-pill ${!MistakeViewState.allExams ? 'active' : ''}" aria-pressed="${!MistakeViewState.allExams}" onclick="setMistakeView('allExams', false)">${escapeHtml(examLabel)} (${scopedCount})</button>
       <button type="button" class="filter-pill ${MistakeViewState.allExams ? 'active' : ''}" aria-pressed="${MistakeViewState.allExams}" onclick="setMistakeView('allExams', true)">All exams (${workspaceCount})</button>
@@ -9784,16 +10817,16 @@ function renderSubjectPage(v, subject) {
           ? `<button type="button" class="sh-t-name sm" onclick="navigate('topic', {moduleId:${nbJsAttr(m.moduleId)}})">${tx('Open topic', 'टॉपिक खोलें')} ›</button>`
           : `<button type="button" class="sh-t-name" onclick="navigate('topic', {moduleId:${nbJsAttr(m.moduleId)}})">${escapeHtml(m.topicTitle || m.topic || '')}</button>`}
           <span class="sh-t-meta">${st.pyq ? '<span class="sh-tag pyq">PYQ</span>' : ''}${st.weak ? `<span class="sh-tag weak">${tx('Weak', 'कमज़ोर')}</span>` : ''}${tx(`${st.done}/${st.total} done`, `${st.done}/${st.total} हुए`)}${st.acc != null ? ` · ${Math.round(st.acc * 100)}%` : ''}</span></div>
-        <div class="sh-acts">
+        <div class="sh-acts ao-actions">
+          <button type="button" class="sh-act primary" onclick="navigate('practice', {moduleId:${nbJsAttr(m.moduleId)}, qIndex:0})">✍️ ${tx('Practice', 'अभ्यास')}</button>
           <button type="button" class="sh-act" onclick="navigate('learn', {moduleId:${nbJsAttr(m.moduleId)}})">📖 ${tx('Learn', 'सीखें')}</button>
-          <button type="button" class="sh-act" onclick="navigate('practice', {moduleId:${nbJsAttr(m.moduleId)}, qIndex:0})">✍️ ${tx('Practice', 'अभ्यास')}</button>
-          <button type="button" class="sh-act primary" onclick="sjTopicTest(${nbJsAttr(m.moduleId)})">⏱️ ${tx('Test', 'टेस्ट')}</button>
+          <button type="button" class="sh-act" onclick="sjTopicTest(${nbJsAttr(m.moduleId)})">⏱️ ${tx('Test', 'टेस्ट')}</button>
         </div></div>`).join('')}</div>
     </details>`;
   };
   v.innerHTML = `
     <div class="nav-breadcrumb"><button onclick="navigate('home')">${tx('Home', 'होम')}</button><span class="sep">/</span><button onclick="navigate('subjects')">${tx('Subjects', 'विषय')}</button><span class="sep">/</span><span>${escapeHtml(name)}</span></div>
-    <div class="sc-head"><div><h1>${escapeHtml(name)}</h1><p>${tx(`${all.length} chapter${all.length === 1 ? '' : 's'} · ${mods.length} topics`, `${all.length} अध्याय · ${mods.length} टॉपिक`)}</p></div>
+    <div class="sc-head ao-page-head"><div><h1>${escapeHtml(name)}</h1><p>${tx(`${all.length} chapter${all.length === 1 ? '' : 's'} · ${mods.length} topics`, `${all.length} अध्याय · ${mods.length} टॉपिक`)}</p></div>
       <button type="button" class="btn-action-sm" onclick="navigate('subjects')">← ${tx('Subjects', 'विषय')}</button></div>
     <div class="sh-chips" role="group" aria-label="${tx('Filter topics', 'टॉपिक छाँटें')}">${chips}</div>
     ${shown.length ? `<div class="sh-list">${shown.map(chapterHtml).join('')}</div>`
@@ -9835,7 +10868,7 @@ function renderMePage(v) {
   const tile = (b, l) => `<span class="me-tile"><b>${b}</b>${l}</span>`;
   const row = (ico, label, sub, on) => `<button type="button" class="me-row" onclick="${on}"><span class="me-ico" aria-hidden="true">${ico}</span><span class="me-row-main"><b>${label}</b>${sub ? `<small>${sub}</small>` : ''}</span><span aria-hidden="true">›</span></button>`;
   v.innerHTML = `
-    <section class="me-head">
+    <section class="me-head ao-page-head">
       <span class="me-avatar" aria-hidden="true">${escapeHtml(String(nameTxt).trim().charAt(0).toUpperCase() || '?')}</span>
       <div class="me-id"><h1>${escapeHtml(nameTxt)}</h1><p>${s ? escapeHtml(s.email || '') : tx('Not logged in — progress stays on this phone only', 'Login नहीं — progress सिर्फ़ इस phone में')}</p></div>
       <button type="button" class="btn-action-sm" onclick="openAccount()">${s ? tx('Account', 'Account') : tx('Login', 'Login')}</button>
@@ -10332,8 +11365,9 @@ function studioPaint() {
   if (ServerState.isAdmin !== true) { root.innerHTML = `${head}<main class="st-main">${msg}${prog || '<div class="st-msg">⏳ जाँच रहे हैं…</div>'}${Studio.msgKind === 'bad' ? '<button class="st-btn" onclick="location.reload()">फिर कोशिश करें</button>' : ''}</main>`; return; }
   const tabs = [['home', '📊', 'सारांश'], ['import', '📥', 'Import'], ['review', '👀', 'Review']];
   const nav = `<nav class="st-tabs" role="tablist">${tabs.map(([id, ic, l]) => `<button role="tab" aria-selected="${Studio.tab === id}" class="${Studio.tab === id ? 'on' : ''}" onclick="studioTab('${id}')">${ic} ${l}</button>`).join('')}</nav>`;
+  const intro = Studio.tab === 'import' ? '<div class="st-intro"><span class="st-eyebrow">सवाल जोड़ें</span><h1>Import → जाँच → Draft</h1><p>पहले file जाँचें, फिर तैयार सवाल server पर भेजें।</p></div>' : Studio.tab === 'review' ? '<div class="st-intro"><span class="st-eyebrow">सवालों की गुणवत्ता</span><h1>Review और publish</h1><p>Topic चुनें, सवाल जाँचें, फिर students के लिए publish करें।</p></div>' : '';
   const body = Studio.tab === 'import' ? studioImportHtml() : Studio.tab === 'review' ? studioReviewHtml() : studioHomeHtml();
-  root.innerHTML = `${head}${nav}<main class="st-main">${msg}${prog}${body}</main>`;
+  root.innerHTML = `${head}${nav}<main class="st-main">${msg}${prog}${intro}${body}</main>`;
 }
 function studioTab(t) { Studio.tab = t; Studio.msg = ''; if (t === 'review' && Studio.review.topicId && !Studio.review.rows.length) studioLoadTopic(Studio.review.topicId); studioPaint(); window.scrollTo(0, 0); }
 
@@ -10341,13 +11375,24 @@ function studioTab(t) { Studio.tab = t; Studio.msg = ''; if (t === 'review' && S
 function studioHomeHtml() {
   const c = studioCounts(Studio.qIndex);
   const list = studioTopicStats();
-  return `<section class="st-stats">
+  const next = list.find(x => x.c.draft || x.c.reviewed);
+  const action = next
+    ? `<button class="st-btn primary" onclick="studioOpenTopic('${escapeHtml(next.t.id)}')">👀 सवाल जाँचना शुरू करें ›</button>`
+    : '<button class="st-btn primary" onclick="studioTab(\'import\')">📥 नई file import करें ›</button>';
+  return `<section class="st-card st-next">
+      <span class="st-eyebrow">अगला कदम</span>
+      <h1>${next ? 'सवाल तैयार करें, फिर publish करें' : 'अगला question set जोड़ें'}</h1>
+      <p>${next ? `${c.draft + c.reviewed} सवाल review / publish के लिए बाकी हैं। शुरुआत ${escapeHtml(next.t.title)} से करें।` : 'एक file चुनें, सवाल जाँचें और सुरक्षित तरीके से Draft में जोड़ें।'}</p>
+      ${action}
+      <span class="st-note">Students को सिर्फ़ Published सवाल दिखते हैं।</span>
+    </section>
+    <section class="st-stats" aria-label="सवालों की स्थिति">
       <div class="st-stat draft"><b>${c.draft}</b><span>📝 Draft</span></div>
       <div class="st-stat reviewed"><b>${c.reviewed}</b><span>👀 Reviewed</span></div>
       <div class="st-stat published"><b>${c.published}</b><span>✅ Published</span></div>
     </section>
     <p class="st-note">Students को सिर्फ़ ✅ Published सवाल दिखते हैं।${c.hidden ? ` ${c.hidden} सवाल छिपाए गए हैं।` : ''} कुल ${c.total} सवाल, ${list.length} topics।</p>
-    <div class="st-row"><button class="st-btn primary" onclick="studioTab('import')">📥 नई file import करें</button><button class="st-btn" onclick="studioLoad()" ${Studio.busy ? 'disabled' : ''}>↻ ताज़ा करें</button></div>
+    <div class="st-row"><button class="st-btn" onclick="studioTab('import')">📥 नई file import करें</button><button class="st-btn" onclick="studioLoad()" ${Studio.busy ? 'disabled' : ''}>↻ ताज़ा करें</button></div>
     <h3 class="st-h">Topics</h3>
     <div class="st-list">${list.map(({ t, c }) => `<button class="st-topic" onclick="studioOpenTopic('${escapeHtml(t.id)}')">
       <span><b>${escapeHtml(t.title)}</b><small>${escapeHtml(subjectDisplayName(t.subject))} · ${escapeHtml(t.chapter || '')}${t.exam_id ? ' · ' + escapeHtml(Studio.exams.get(t.exam_id) || t.exam_id) : ''}${t.year ? ' ' + t.year : ''}</small></span>

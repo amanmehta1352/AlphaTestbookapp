@@ -264,17 +264,51 @@ function gxBackupBanner() {
   if (days !== null && days < 7) return '';
   return `<section class="gx-card gx-backup" role="status"><span aria-hidden="true">💾</span><div><strong>${days === null ? tx('Your progress is not backed up yet','आपकी progress का backup अभी नहीं है') : tx(`Last backup ${days} days ago`,`आख़िरी backup ${days} दिन पहले`)}</strong><small>${tx('All your answers live only on this device. Save a backup file so a phone change or cleared data never erases your work.','आपके सारे जवाब सिर्फ़ इसी phone में हैं। Backup file बचाएँ, ताकि phone बदलने या data साफ़ होने पर मेहनत न खोए।')}</small></div><button type="button" class="gx-btn" onclick="downloadDataSnapshot()">${tx('Back up','Backup लें')}</button></section>`;
 }
+/* Setup is a real next step: students get exam/account/sync actions, never an import dead end. */
+function sjHomeSetupAction(d) {
+  const signedIn = typeof ServerState !== 'undefined' && !!ServerState.session;
+  const cloud = typeof CloudState !== 'undefined' ? CloudState : {};
+  if (typeof profileAvailable === 'function' && profileAvailable() && !studentProfile()) return {
+    kind: 'setup', icon: '🎯', title: tx('Choose your exam and branch','अपना exam और branch चुनें'),
+    why: tx('See the right subjects and questions for your preparation.','अपनी तैयारी के सही विषय और सवाल देखें।'),
+    cta: tx('Choose my exam','अपना exam चुनें'), call: 'openProfileSheet()'
+  };
+  if (d.totalQuestions) return null;
+  if (!signedIn) return {
+    kind: 'setup', icon: '👤', title: tx('Get your study questions','पढ़ाई के सवाल पाएँ'),
+    why: tx('Sign in to download published questions and sync your progress.','प्रकाशित सवाल लाने और progress sync करने के लिए login करें।'),
+    cta: tx('Sign in','Login करें'), call: 'openAccount()'
+  };
+  if (cloud.isAdmin === true) return {
+    kind: 'setup', icon: '📥', title: tx('Prepare this workspace','यह workspace तैयार करें'),
+    why: tx('Admin accounts do not download student questions. You can import a question file here.','Admin account में छात्र के सवाल download नहीं होते। यहाँ सवालों की file import कर सकते हैं।'),
+    cta: tx('Import questions','सवाल import करें'), call: 'openImportModal()'
+  };
+  const failed = cloud.msgKind === 'bad' || cloud.msgKind === 'warn';
+  const hasSynced = !!cloud.lastContentAt;
+  return {
+    kind: 'setup', icon: '🔄', title: cloud.busy ? tx('Getting your questions…','आपके सवाल आ रहे हैं…') : failed ? tx('Reconnect your preparation','अपनी तैयारी फिर जोड़ें') : hasSynced ? tx('No questions for this selection yet','इस चुनाव के सवाल अभी नहीं हैं') : tx('Download your study questions','पढ़ाई के सवाल download करें'),
+    why: cloud.busy ? tx('You can check progress in your account.','अपने account में sync की स्थिति देखें।') : failed ? tx('The last sync did not finish. Check your connection and try again.','पिछला sync पूरा नहीं हुआ। Internet जाँचें और फिर कोशिश करें।') : hasSynced ? tx('Check another exam or sync again for newly published questions.','दूसरा exam देखें या नए प्रकाशित सवालों के लिए फिर sync करें।') : tx('Sync your account to get the latest published questions.','नए प्रकाशित सवाल पाने के लिए अपना account sync करें।'),
+    cta: cloud.busy ? tx('View sync','Sync देखें') : failed ? tx('Retry sync','Sync फिर करें') : hasSynced ? tx('Browse exams','Exam देखें') : tx('Sync questions','सवाल sync करें'),
+    call: cloud.busy ? 'openAccount()' : hasSynced && !failed ? "navigate('exam_hub')" : 'sjHomeSync()'
+  };
+}
+async function sjHomeSync() {
+  await cloudSync('manual');
+  if (Route?.page === 'home') renderView();
+}
 function sjNextActions(d) {
+  const setup = sjHomeSetupAction(d);
+  if (setup) return [setup];
   const actions = [];
   const firstModule = d.modules[0] || null;
   const due = reviewDue();
-  if (d.resume) actions.push({ icon: '▶', title: tx(`Resume ${d.resume.module.topicTitle}`,`${d.resume.module.topicTitle} जारी रखें`), why: tx(`You were at question ${d.resume.qIndex + 1} in practice this session.`,`आप practice में सवाल ${d.resume.qIndex + 1} पर थे।`), cta: tx('Resume','जारी रखें'), call: `navigate('practice',{moduleId:${nbJsAttr(d.resume.module.moduleId)},qIndex:${d.resume.qIndex}})` });
+  if (d.resume) actions.push({ kind: 'resume', icon: '▶', title: tx(`Resume ${d.resume.module.topicTitle}`,`${d.resume.module.topicTitle} जारी रखें`), why: tx(`You were at question ${d.resume.qIndex + 1} in practice this session.`,`आप practice में सवाल ${d.resume.qIndex + 1} पर थे।`), cta: tx('Resume','जारी रखें'), call: `navigate('practice',{moduleId:${nbJsAttr(d.resume.module.moduleId)},qIndex:${d.resume.qIndex}})` });
   if (due.length) actions.push({ icon: '🔄', title: tx(`Revise ${due.length} card${due.length === 1 ? '' : 's'}`,`${due.length} card दोहराएँ`), why: tx('They are due today on your spaced schedule.','आपके revision schedule के हिसाब से आज बाकी हैं।'), cta: tx('Revise','दोहराएँ'), call: `navigate('revision_hub');revisionStart(null)` });
   const weak = (typeof profileVisible==='function'?profileVisible:(x=>x))(WorkspaceManager.filterModules(AppModules || [])).map(m => ({ m, x: masteryFor(m.moduleId) })).filter(o => o.x.enough && o.x.score < 0.7).sort((a, b) => a.x.score - b.x.score)[0];
   if (weak) actions.push({ icon: '🎯', title: tx(`10-question test: ${weak.m.topicTitle}`,`10 सवाल का test: ${weak.m.topicTitle}`), why: tx(`Your recent accuracy here is ${Math.round(weak.x.score * 100)}% — your weakest topic.`,`यहाँ हाल की accuracy ${Math.round(weak.x.score * 100)}% है — सबसे कमज़ोर topic।`), cta: tx('Start','शुरू'), call: `sjTopicTest(${nbJsAttr(weak.m.moduleId)})` });
   else { const wt = d.weakTopics.find(t => t.count >= 2 && getWorkspaceModule(t.moduleId)); if (wt) actions.push({ icon: '🎯', title: tx(`10-question test: ${wt.topic}`,`10 सवाल का test: ${wt.topic}`), why: tx(`${wt.count} unresolved mistakes in this topic.`,`इस topic में ${wt.count} गलतियाँ बाकी।`), cta: tx('Start','शुरू'), call: `sjTopicTest(${nbJsAttr(wt.moduleId)})` }); }
-  if (!d.totalQuestions) actions.push({ icon: '📥', title: tx('Add questions','सवाल जोड़ें'), why: tx('This workspace has no questions yet. Import a question file to begin.','इस workspace में अभी सवाल नहीं हैं। शुरू करने के लिए सवालों की file import करें।'), cta: 'Import', call: `openImportModal()` });
-  else if (StudySettings.dailyGoal && d.answered < StudySettings.dailyGoal) actions.push({ icon: '⚡', title: tx('Daily mini test (10 questions)','आज का mini test (10 सवाल)'), why: tx(`${StudySettings.dailyGoal - d.answered} questions left for today's goal.`,`आज के लक्ष्य के ${StudySettings.dailyGoal - d.answered} सवाल बाकी।`), cta: tx('Start','शुरू'), call: `sjMiniTest()` });
+  if (StudySettings.dailyGoal && d.answered < StudySettings.dailyGoal) actions.push({ icon: '⚡', title: tx('Daily mini test (10 questions)','आज का mini test (10 सवाल)'), why: tx(`${StudySettings.dailyGoal - d.answered} questions left for today's goal.`,`आज के लक्ष्य के ${StudySettings.dailyGoal - d.answered} सवाल बाकी।`), cta: tx('Start','शुरू'), call: `sjMiniTest()` });
   else if (!d.resultsToday.length) actions.push({ icon: '⚡', title: tx('Daily mini test (10 questions)','आज का mini test (10 सवाल)'), why: tx('Mistakes and weak topics first, then new questions.','पहले गलतियाँ और कमज़ोर topics, फिर नए सवाल।'), cta: tx('Start','शुरू'), call: `sjMiniTest()` });
   if (firstModule && !d.resume && !d.answered) actions.push({ icon: '✍️', title: tx(`Practise ${firstModule.topicTitle}`,`${firstModule.topicTitle} की practice`), why: tx('No answers yet today.','आज अभी कोई जवाब नहीं।'), cta: tx('Start','शुरू'), call: `navigate('practice',{moduleId:${nbJsAttr(firstModule.moduleId)},qIndex:0})` });
   if (d.results.length) actions.push({ icon: '📜', title: tx('Open your test history','अपनी test history खोलें'), why: tx(`${d.results.length} submitted test${d.results.length === 1 ? '' : 's'} saved on this device.`,`इस phone में ${d.results.length} test सहेजे हैं।`), cta: tx('Open','खोलें'), call: `openTestHistoryModal()` });
@@ -319,27 +353,23 @@ function renderHomePage(v) {
     { icon: '🔄', label: tx('Revision','दोहराई'), call: `navigate('revision_hub')` }
   ];
 
-  v.innerHTML = `<div class="sj-dash gx">
+  v.innerHTML = `<div class="sj-dash gx ao-home">
     <section class="gx-card gx-hero" aria-labelledby="sjHeroTitle">
       <div class="gx-hero-top">${typeof profileHeroChip === 'function' ? profileHeroChip(examLine) : `<span class="gx-pill">🏛️ ${examLine}</span>`}</div>
       <h1 id="sjHeroTitle">${greeting}</h1>
-      <p>${d.totalQuestions ? tx(`${d.totalQuestions} questions · ${d.subjects.length} subject${d.subjects.length === 1 ? '' : 's'} · ${d.modules.length} topic${d.modules.length === 1 ? '' : 's'} in ${escapeHtml(d.workspace.name)}`,`${d.totalQuestions} सवाल · ${d.subjects.length} विषय · ${d.modules.length} topic — ${escapeHtml(d.workspace.name)}`) : tx(`No questions in ${escapeHtml(d.workspace.name)} yet. Import a question file to start.`,`${escapeHtml(d.workspace.name)} में अभी सवाल नहीं हैं। शुरू करने के लिए file import करें।`)}</p>
+      <p>${d.totalQuestions ? tx(`${d.totalQuestions} questions · ${d.subjects.length} subject${d.subjects.length === 1 ? '' : 's'} · ${d.modules.length} topic${d.modules.length === 1 ? '' : 's'} in ${escapeHtml(d.workspace.name)}`,`${d.totalQuestions} सवाल · ${d.subjects.length} विषय · ${d.modules.length} topic — ${escapeHtml(d.workspace.name)}`) : tx('Your preparation starts with one clear next step.','अपनी तैयारी एक आसान अगले कदम से शुरू करें।')}</p>
       <div class="gx-hero-facts">
         <span>🔥 <b>${s.streak}</b> ${tx('day streak','दिन लगातार')}</span>
         ${daysLeft !== null ? (daysLeft >= 0 ? `<span>📅 <b>${daysLeft}</b> ${tx(`day${daysLeft === 1 ? '' : 's'} to exam`,'दिन exam में')}${perDay ? tx(` · ~${perDay} new questions/day covers the bank`,` · रोज़ ~${perDay} नए सवाल से पूरा bank हो जाएगा`) : ''}</span>` : `<span>📅 ${tx('Exam date has passed','Exam की तारीख निकल गई')}</span>`) : `<button type="button" class="gx-link" onclick="sjOpenGoalSettings()">📅 ${tx('Add exam date','Exam की तारीख जोड़ें')}</button>`}
       </div>
     </section>
-    <section class="gx-card gx-search"><div class="search-box-wrap" style="margin:0;"><span class="search-icon">🔍</span><input type="search" class="search-input" id="inpGlobalSearch" aria-label="Search questions" placeholder="सवाल नंबर, परीक्षा (SSC, NTPC, JE), टॉपिक सर्च करें..." oninput="onGlobalSearch(this.value)"></div><div id="globalSearchResults"></div></section>
-    <section class="gx-card gx-quick" aria-labelledby="sjExploreHeading"><div class="gx-head"><h2 id="sjExploreHeading">${tx('Explore preparation','तैयारी के विकल्प')}</h2><span class="gx-explore-note">${tx('Choose what you want to do next','अगला कदम चुनें')}</span></div><div class="sj-quick">${quick.map(q => `<button type="button" class="sj-quick-btn" onclick="${q.call}"><span aria-hidden="true">${q.icon}</span><span>${escapeHtml(q.label)}</span></button>`).join('')}</div></section>
-    ${primary ? `<section class="gx-card gx-next" aria-label="Next best action"><div class="gx-next-icon" aria-hidden="true">${primary.icon}</div><div class="gx-next-copy"><small>${tx('Next best action','अगला सबसे अच्छा काम')}</small><strong>${escapeHtml(primary.title)}</strong><span>${escapeHtml(primary.why)}</span></div><button type="button" class="gx-btn" onclick="${primary.call}">${escapeHtml(primary.cta)} →</button></section>` : ''}
-    <section class="gx-card gx-continue" aria-labelledby="sjContinueH"><div class="gx-head"><h2 id="sjContinueH">${tx('Continue','जारी रखें')}</h2></div>
-      ${d.resume ? `<div class="sj-resume"><div><strong>${escapeHtml(d.resume.module.topicTitle)}</strong><span>${escapeHtml(subjectDisplayName(d.resume.module.subject))} · Practice · ${tx('Question','सवाल')} ${d.resume.qIndex + 1} / ${sjModuleQuestionCount(d.resume.module)}</span></div><button type="button" class="gx-btn" onclick="${practiceCall}">${tx('Resume →','जारी रखें →')}</button></div>`
-        : `<div class="gx-empty"><strong>${tx('No unfinished activity','कोई अधूरा काम नहीं')}</strong><span>${tx('Practice you leave mid-way appears here.','बीच में छोड़ी practice यहाँ दिखेगी।')}</span>${actions.length > 1 ? '' : (firstModule ? `<button type="button" class="gx-btn ghost" onclick="${practiceCall}">${tx('Practise','Practice:')} ${escapeHtml(firstModule.topicTitle)}</button>` : `<button type="button" class="gx-btn ghost" onclick="openImportModal()">${tx('Import questions','सवाल import करें')}</button>`)}</div>`}
-      ${actions.length > 1 ? `<div class="sj-actions-list">${actions.slice(1).map(a => `<button type="button" class="sj-action" onclick="${a.call}"><span aria-hidden="true">${a.icon}</span><span class="sj-action-copy"><strong>${escapeHtml(a.title)}</strong><small>${escapeHtml(a.why)}</small></span><span class="sj-action-go" aria-hidden="true">›</span></button>`).join('')}</div>` : ''}
-    </section>
+    ${primary ? `<section class="gx-card gx-next ao-next" ${primary.kind === 'setup' ? 'data-home-setup="true"' : ''} aria-labelledby="sjNextHeading"><div class="gx-next-icon" aria-hidden="true">${primary.icon}</div><div class="gx-next-copy"><small>${tx('Your next step','आपका अगला कदम')}</small><h2 id="sjNextHeading">${escapeHtml(primary.title)}</h2><span>${escapeHtml(primary.why)}</span></div><button type="button" class="gx-btn" onclick="${primary.call}">${escapeHtml(primary.cta)} →</button></section>` : ''}
+    ${actions.length > 1 ? `<section class="gx-card gx-continue ao-followups" aria-labelledby="sjContinueH"><div class="gx-head"><h2 id="sjContinueH">${tx('Also for you','आपके लिए और')}</h2></div><div class="sj-actions-list">${actions.slice(1).map(a => `<button type="button" class="sj-action" onclick="${a.call}"><span aria-hidden="true">${a.icon}</span><span class="sj-action-copy"><strong>${escapeHtml(a.title)}</strong><small>${escapeHtml(a.why)}</small></span><span class="sj-action-go" aria-hidden="true">›</span></button>`).join('')}</div></section>` : ''}
+    <div class="ao-today">${gxGoalWidget(d)}${gxTodayWidget(d)}</div>
+    <section class="gx-card gx-quick" aria-labelledby="sjExploreHeading"><div class="gx-head"><h2 id="sjExploreHeading">${tx('Explore preparation','तैयारी के विकल्प')}</h2><span class="gx-explore-note">${tx('Everything you need, in one place','तैयारी के सारे साधन एक जगह')}</span></div><div class="sj-quick">${quick.map(q => `<button type="button" class="sj-quick-btn" onclick="${q.call}"><span aria-hidden="true">${q.icon}</span><span>${escapeHtml(q.label)}</span></button>`).join('')}</div></section>
+    <section class="gx-card gx-search"><div class="search-box-wrap" style="margin:0;"><span class="search-icon">🔍</span><input type="search" class="search-input" id="inpGlobalSearch" aria-label="${tx('Search questions','सवाल खोजें')}" placeholder="${tx('Search question number, exam or topic…','सवाल नंबर, परीक्षा या टॉपिक खोजें…')}" oninput="onGlobalSearch(this.value)"></div><div id="globalSearchResults"></div></section>
+    <section class="ao-details" aria-labelledby="sjDetailsHeading"><div class="gx-head"><h2 id="sjDetailsHeading">${tx('Progress & study tools','Progress और पढ़ाई के साधन')}</h2><span class="gx-explore-note">${tx('Review your progress and plan ahead','अपनी progress देखें और आगे की तैयारी करें')}</span></div><div class="ao-detail-grid">
     ${gxSubjectWidget()}
-    ${gxGoalWidget(d)}
-    ${gxTodayWidget(d)}
     ${gxRevisionWidget()}
     <section class="gx-card gx-attn"><div class="gx-head"><h2>${tx('Needs attention','ध्यान दें')}</h2><button type="button" class="gx-link" onclick="navigate('mastery')">${tx('Mastery','महारत')}</button></div>
       ${weakTopics.length ? `<div class="sj-recent">${weakTopics.map(o => `<div class="gx-attn-row"><span class="gx-attn-txt"><strong>${escapeHtml(o.m.topicTitle)}</strong><small>${o.x.enough ? tx(`${Math.round(o.x.score * 100)}% recent accuracy`,`हाल की accuracy ${Math.round(o.x.score * 100)}%`) : tx(`${o.x.answered} answers`,`${o.x.answered} जवाब`)}${o.mis ? tx(` · ${o.mis} mistake${o.mis === 1 ? '' : 's'}`,` · ${o.mis} गलतियाँ`) : ''}</small></span><button type="button" class="gx-btn ghost" onclick="sjTopicTest(${nbJsAttr(o.m.moduleId)})">${tx('10-Q test','10 सवाल test')}</button></div>`).join('')}</div>`
@@ -356,6 +386,7 @@ function renderHomePage(v) {
       ${recent.length ? `<div class="sj-recent">${recent.map(r => `<button type="button" class="sj-action" onclick="${r.call}"><span aria-hidden="true">${r.icon}</span><span class="sj-action-copy"><strong>${escapeHtml(r.title)}</strong><small>${escapeHtml(r.meta)}</small></span><span class="sj-action-go" aria-hidden="true">›</span></button>`).join('')}</div>` : `<div class="gx-empty"><strong>${tx('Nothing yet','अभी कुछ नहीं')}</strong><span>${tx('Imports and submitted tests appear here.','Import और दिए गए test यहाँ दिखेंगे।')}</span></div>`}
     </section>
     ${gxBackupBanner()}
+    </div></section>
   </div>`;
   pomoPaint();
 }

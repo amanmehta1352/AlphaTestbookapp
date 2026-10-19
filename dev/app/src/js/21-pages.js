@@ -269,15 +269,15 @@ function renderUniversalExamHub(v) {
       <span>Universal Exam Hub</span>
     </div>
 
-    <div class="student-hero-card">
-      <span class="journey-pill">🏛️ One Universal Exam Architecture</span>
-      <h1>Universal Exam Matrix</h1>
-      <p>Seamlessly routes SSC, SSC JE, RRB, NTPC, UPSC, BPSC and future exams without manual redesign.</p>
+    <div class="student-hero-card ao-page-head">
+      <span class="journey-pill">🎯 ${tx('Choose your exam', 'अपनी परीक्षा चुनें')}</span>
+      <h1>${tx('What are you preparing for?', 'आप किस परीक्षा की तैयारी कर रहे हैं?')}</h1>
+      <p>${tx('Choose an exam to find subjects, previous-year questions and practice tests.', 'विषय, पिछले वर्षों के सवाल और अभ्यास टेस्ट देखने के लिए परीक्षा चुनें।')}</p>
     </div>
 
-    <div class="section-title">
+    <div class="section-title ao-page-head">
       <span>Registered Exam Frameworks (${allExams.length} Exams • ${totalQuestions} Questions)</span>
-      <div style="display:flex;gap:6px;"><button class="btn-action-sm" onclick="navigate('competitive_hub')">🏆 Competitive Hub</button><button class="btn-action-sm" onclick="openImportModal()">+ Import New Exam</button></div>
+      <div style="display:flex;gap:6px;"><button class="btn-action-sm" onclick="navigate('competitive_hub')">🏆 Competitive Hub</button>${ServerState?.isAdmin === true ? '<button class="btn-action-sm" onclick="openImportModal()">+ Import New Exam</button>' : ''}</div>
     </div>
 
     <div class="grid-cards" style="margin-bottom:20px;">
@@ -294,7 +294,7 @@ function renderUniversalExamHub(v) {
             Years: <b>${Array.from(ex.years).join(', ')}</b> • Marking: <b>${ex.markingScheme}</b>
           </div>
           <div style="margin-top:12px; display:flex; gap:6px;">
-            <button class="btn-action-sm" style="background:var(--primary); color:#fff; width:100%; justify-content:center;">Open Exam Profile ➔</button>
+            <button class="btn-action-sm" style="background:var(--primary); color:var(--on-primary); width:100%; justify-content:center;">Open Exam Profile ➔</button>
           </div>
         </div>
       `).join('')}
@@ -316,26 +316,27 @@ function renderExamProfile(v, examId) {
       <span>${exam.examName}</span>
     </div>
 
-    <div class="student-hero-card">
+    <div class="student-hero-card ao-page-head">
       <span class="journey-pill">🎓 Active Exam Profile</span>
       <h1>${exam.examName} (${exam.examBoard})</h1>
       <p>${exam.category} • Marking: ${exam.markingScheme} • Standard Duration: ${exam.defaultDurationMinutes} Mins</p>
     </div>
 
-    <div class="section-title">
-      <span>Universal Exam Profile Actions</span>
+    <div class="section-title ao-page-head">
+      <span>${tx('Choose your next step', 'अपना अगला कदम चुनें')}</span>
       <span class="tax-badge exam">${exam.questionCount} Questions Loaded</span>
     </div>
 
     <div class="grid-cards" style="margin-bottom:20px;">
+      <div class="card-btn ao-primary-card" onclick="navigate('subjects')">
+        <strong>📖 ${tx('Start with a subject', 'विषय से शुरुआत करें')}</strong>
+        <small>Chapters and topics that have questions</small>
+      </div>
       <div class="card-btn" onclick="navigate('syllabus', {examId:'${exam.examId}'})">
         <strong>📚 Syllabus sections</strong>
         <small>Sections listed for this exam</small>
       </div>
-      <div class="card-btn" onclick="navigate('subjects')">
-        <strong>📖 Subjects</strong>
-        <small>Chapters and topics that have questions</small>
-      </div>
+
       <div class="card-btn" onclick="setTaxonomyFilter('examId', '${exam.examId}'); navigate('taxonomy_explorer');">
         <strong>📅 Years & PYQ Archive</strong>
         <small>Papers from ${Array.from(exam.years).join(', ')} with shift filters</small>
@@ -368,7 +369,7 @@ function renderSyllabusMatrix(v, examId) {
       <span>Syllabus Matrix</span>
     </div>
 
-    <div class="section-title">
+    <div class="section-title ao-page-head">
       <span>${exam.examName.toUpperCase()} — SYLLABUS SECTIONS</span>
       <button class="btn-action-sm" onclick="navigate('exam_profile', {examId:'${exam.examId}'})">← Exam Profile</button>
     </div>
@@ -405,7 +406,7 @@ function renderChapterPage(v, subject, chapter) {
       <span>${chapter}</span>
     </div>
 
-    <div class="section-title">
+    <div class="section-title ao-page-head">
       <span>${chapter.toUpperCase()} — TOPICS</span>
       <button class="btn-action-sm" onclick="navigate('subject', {subject:'${subject}'})">← Chapters</button>
     </div>
@@ -448,17 +449,27 @@ function renderTopicHubPage(v, moduleId) {
       <span>${mod.topicTitle}</span>
     </div>
 
-    <div class="student-hero-card">
+    <div class="student-hero-card ao-page-head">
       <span class="journey-pill">📍 TOPIC: ${mod.topicTitle.toUpperCase()}</span>
       <h1>${mod.topicTitle} Hub</h1>
       <p>${sjM.enough ? `Mastery: ${Math.round(sjM.score * 100)}% (${sjM.level})` : `Mastery: shown after ${MASTERY_MIN_ANSWERS} answers (${sjM.answered} so far)`} • ${mod.groups.length} Groups • ${totalQuestions} Questions</p>
     </div>
 
-    <div class="section-title">
+    <div class="section-title ao-page-head">
       <span>🎯 अभी क्या करना है? (Choose Mode for this Topic)</span>
     </div>
 
     <div class="intent-matrix-grid">
+      <div class="intent-tile practice ao-primary-card" onclick="navigate('practice', {moduleId:'${mod.moduleId}', qIndex:0})">
+        <div>
+          <div class="intent-tile-header">
+            <span class="intent-tile-title">✏️ ${tx('START PRACTICE', 'अभ्यास शुरू करें')}</span>
+            <span>📝</span>
+          </div>
+          <div class="intent-tile-desc">${tx('Work through this topic with hints and instant solutions.', 'संकेत और तुरंत हल के साथ इस टॉपिक का अभ्यास करें।')}</div>
+        </div>
+        <div class="intent-tile-action" style="color:#10b981;">${tx('Practise this topic', 'इस टॉपिक का अभ्यास करें')} ➔</div>
+      </div>
       <div class="intent-tile learn" onclick="navigate('learn', {moduleId:'${mod.moduleId}'})">
         <div>
           <div class="intent-tile-header">
@@ -481,16 +492,6 @@ function renderTopicHubPage(v, moduleId) {
         <div class="intent-tile-action" style="color:#8b5cf6;">Flip Cards ➔</div>
       </div>
 
-      <div class="intent-tile practice" onclick="navigate('practice', {moduleId:'${mod.moduleId}', qIndex:0})">
-        <div>
-          <div class="intent-tile-header">
-            <span class="intent-tile-title">✏️ PRACTICE</span>
-            <span>📝</span>
-          </div>
-          <div class="intent-tile-desc">Active problem drill with hints, scratchpad & instant solutions.</div>
-        </div>
-        <div class="intent-tile-action" style="color:#10b981;">Solve Drills ➔</div>
-      </div>
 
       <div class="intent-tile class" onclick="navigate('class', {moduleId:'${mod.moduleId}'})">
         <div>
@@ -537,12 +538,12 @@ function renderTopicHubPage(v, moduleId) {
       </div>
     </div>
 
-    <div class="section-title">
+    <div class="section-title ao-page-head">
       <span>🔬 Subtopic & Concept Breakdown</span>
     </div>
     <div class="grid-cards" style="margin-bottom:20px;">${topicSubtopicCardsHtml(mod) || '<div class="card-btn"><strong>No subtopics recorded</strong></div>'}</div>
 
-    <div class="section-title">
+    <div class="section-title ao-page-head">
       <span>📁 Practice / CBT Groups (${mod.groups.length})</span>
     </div>
     <div class="grid-cards">
@@ -582,13 +583,13 @@ function renderSubtopicConceptPage(v, moduleId, subtopic) {
       <span>${subtopic}</span>
     </div>
 
-    <div class="student-hero-card">
+    <div class="student-hero-card ao-page-head">
       <span class="journey-pill">🔬 SUBTOPIC LAYER</span>
       <h1>${subtopic}</h1>
       <p>Theory → Practice → Numerical → PYQ</p>
     </div>
 
-    <div class="section-title">
+    <div class="section-title ao-page-head">
       <span>Concept Modes</span>
       <button class="btn-action-sm" onclick="navigate('topic', {moduleId:'${mod.moduleId}'})">← Topic Hub</button>
     </div>
@@ -641,9 +642,10 @@ function launchFilteredDrill() {
 function renderGlobalPYQHub(v) { renderUniversalExamHub(v); }
 function renderGlobalTestHub(v) {
   const resume = UserState.resumeState;
-  const curriculumModules = CurriculumContext.filterModules(AppModules);
-  const resumeMod = resume?.moduleId ? CurriculumContext.module(resume.moduleId) : null;
-  const mod = resumeMod || curriculumModules[1] || curriculumModules[0];
+  const curriculumModules = CurriculumContext.filterModules(AppModules).filter(m => m.groups?.[0]?.questions?.length);
+  const resumeMod = resume?.moduleId ? curriculumModules.find(m => m.moduleId === resume.moduleId) : null;
+  const mod = resumeMod || curriculumModules[0];
+  const exam = mod ? UniversalExamRegistry.registry.get(mod.examId || mod.groups[0].questions[0]?.metadata?.examId) : null;
 
   v.innerHTML = `
     <div class="nav-breadcrumb">
@@ -652,29 +654,29 @@ function renderGlobalTestHub(v) {
       <span>CBT Assessment Center</span>
     </div>
 
-    <div class="student-hero-card">
+    <div class="student-hero-card ao-page-head">
       <span class="journey-pill">⏱️ Real Exam Simulation</span>
       <h1>Computer-Based Test (CBT)</h1>
       <p>Exam-style screen with timer, question palette and full scorecard. +1 per correct answer, no negative marking.</p>
     </div>
 
-    <div class="resume-action-card">
+    ${mod ? `<div class="resume-action-card ao-primary-card">
       <div class="resume-info">
         <span class="resume-badge">🎯 READY ASSESSMENT</span>
         <div class="resume-title">${mod.topicTitle} — ${mod.groups[0]?.title || 'G-01'}</div>
-        <div class="resume-subtitle">30 Mins • ${mod.groups[0]?.questions.length || 20} Questions • Official Pattern</div>
+        <div class="resume-subtitle">${Number(exam?.defaultDurationMinutes) || 30} ${tx('Mins', 'मिनट')} • ${mod.groups[0].questions.length} ${tx('Questions', 'सवाल')}</div>
       </div>
       <button class="btn-nav primary" style="min-height:40px; padding:8px 14px; font-size:13px;" onclick="initTestSession('${mod.moduleId}', '${mod.groups[0]?.groupId || ''}', 0, null, {curriculumContext:true})">
-        Start Test ➔
+        ${tx('Start Test', 'टेस्ट शुरू करें')} ➔
       </button>
-    </div>
+    </div>` : `<div class="sj-empty"><strong>${tx('No tests available yet', 'अभी कोई टेस्ट उपलब्ध नहीं है')}</strong><span>${tx('Choose your exam and sync its questions to start.', 'शुरू करने के लिए अपनी परीक्षा चुनें और सवाल सिंक करें।')}</span><button type="button" class="btn-nav primary" onclick="navigate('me')">${tx('Open exam settings', 'परीक्षा सेटिंग खोलें')} →</button></div>`}
 
     <button type="button" class="card-btn" style="width:100%;margin-bottom:12px;" onclick="openTestHistoryModal()">
       <strong>📜 Test History (${LearningHistory.resultsForWorkspace().length})</strong>
       <small>Open any test you submitted earlier, with answers and solutions.</small>
     </button>
 
-    <div class="section-title">
+    <div class="section-title ao-page-head">
       <span>Available Assessment Test Groups</span>
     </div>
 

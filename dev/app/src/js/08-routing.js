@@ -536,10 +536,10 @@ function nbApplyShellForRoute(page){
   if(header)header.style.display=hideGlobalShell?'none':'flex';
   if(bottom)bottom.style.display=hideGlobalShell?'none':'flex';
   if(main){
-    main.style.top=hardImmersive?'0':studyModeActive?'var(--safe-top)':'calc(56px + var(--safe-top))';
-    main.style.bottom=hardImmersive?'0':studyModeActive?'0':'calc(62px + var(--safe-bottom))';
-    main.style.maxWidth=hardImmersive||studyModeActive?'none':'960px';
-    main.style.padding=hardImmersive?'calc(var(--safe-top) + 12px) 14px calc(var(--safe-bottom) + 14px)':studyModeActive?'calc(var(--safe-top) + 8px) 12px calc(var(--safe-bottom) + 12px)':'14px 14px calc(22px + var(--safe-bottom))';
+    main.style.top=hardImmersive?'0':studyModeActive?'var(--safe-top)':'calc(var(--app-header-height) + var(--safe-top))';
+    main.style.bottom='0';
+    main.style.maxWidth=hardImmersive||studyModeActive?'none':'var(--app-content-width)';
+    main.style.padding=hardImmersive?'calc(var(--safe-top) + 12px) 14px calc(var(--safe-bottom) + 14px)':studyModeActive?'calc(var(--safe-top) + 8px) 12px calc(var(--safe-bottom) + 12px)':'24px 16px calc(104px + var(--safe-bottom))';
     main.style.overflow=hardImmersive?'hidden':'auto';
   }
   document.body.style.overflow=hardImmersive?'hidden':'auto';

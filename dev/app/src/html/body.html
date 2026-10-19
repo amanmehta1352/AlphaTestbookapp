@@ -16,7 +16,7 @@
   </div>
   <div class="header-right">
     <button class="header-btn" id="btnMe" onclick="navigate('me')" aria-label="Me: progress and settings" title="Me">👤</button>
-    <button class="header-btn" onclick="navigate('taxonomy_explorer')" aria-label="Question Bank" title="Question Bank">🔎</button>
+    <button class="header-btn" id="btnQuestionBank" onclick="navigate('taxonomy_explorer')" aria-label="Question Bank" title="Question Bank">🔎</button>
     <button class="header-btn ds-btn" id="btnTextSize" onclick="openDisplaySettings()" aria-label="Display settings: language, text size, theme" title="Display">Aa</button>
     <button class="header-btn" id="btnTheme" aria-label="Toggle Theme" title="Theme">🌙</button>
   </div>
@@ -68,7 +68,7 @@
 <main id="mainView"></main>
 
 <!-- 5-Tier Strict Global Bottom Navigation: Home, Subjects, PYQ, Test, Revision -->
-<nav id="bottomNav">
+<nav id="bottomNav" aria-label="Main navigation">
   <button class="nav-tab active" id="tabHome" onclick="navigate('home')" aria-label="Home">
     <span class="nav-tab-icon">🏠</span>
     <span data-en="HOME" data-hi="होम">HOME</span>

@@ -162,7 +162,7 @@ function revisionCardHtml() {
   const S = RevisionSession;
   const total = S.keys.length;
   if (S.i >= total) {
-    return `<section class="rv-card rv-done"><div class="rv-emoji" aria-hidden="true">🎉</div><h2>Revision done</h2><p>${S.done} reviewed · ${S.correct} correct${S.resolved ? ` · ${S.resolved} removed from the Mistake Book` : ''}</p><p class="sj-note sj-muted">Next reviews are scheduled automatically (1, 3, 7, 14, 30 days).</p><div class="rs-actions"><button type="button" class="btn-nav primary" onclick="revisionEnd()">Back to revision</button><button type="button" class="btn-nav" onclick="RevisionSession=null;navigate('home')">Home</button></div></section>`;
+    return `<section class="rv-card rv-done"><div class="rv-emoji" aria-hidden="true">🎉</div><h2>Revision done</h2><p>${S.done} reviewed · ${S.correct} correct${S.resolved ? ` · ${S.resolved} removed from the Mistake Book` : ''}</p><p class="sj-note sj-muted">Next reviews are scheduled automatically (1, 3, 7, 14, 30 days).</p><div class="rs-actions ao-actions"><button type="button" class="btn-nav primary" onclick="revisionEnd()">Back to revision</button><button type="button" class="btn-nav" onclick="RevisionSession=null;navigate('home')">Home</button></div></section>`;
   }
   const it = revisionCurrent();
   if (!it) { setTimeout(revisionSkip, 0); return ''; }
@@ -196,11 +196,11 @@ function renderRevisionPage(v, moduleId) {
   const topics = moduleId ? [] : WorkspaceManager.filterModules(AppModules || []).map(m => ({ m, items: all.filter(x => x.mod.moduleId === m.moduleId) })).filter(x => x.items.length);
   v.innerHTML = `
     <div class="nav-breadcrumb"><button onclick="navigate('home')">Home</button><span class="sep">/</span>${mod ? `<button onclick="navigate('revision_hub')">Revision</button><span class="sep">/</span><span>${escapeHtml(mod.topicTitle)}</span>` : '<span>Revision</span>'}</div>
-    <section class="rv-hero">
+    <section class="rv-hero ao-page-head ao-primary-card">
       <span class="journey-pill">🔄 Spaced revision${mod ? ' · ' + escapeHtml(mod.topicTitle) : ''}</span>
       <h1>${due.length ? `${due.length} to revise today` : 'All caught up'}</h1>
       <p>${due.length ? `${dueQ} past mistake${dueQ === 1 ? '' : 's'} · ${dueF} flashcard${dueF === 1 ? '' : 's'}` : 'Nothing is due today.'}${upcoming ? ` · ${upcoming} due ${moduleId ? 'later' : 'in the next 7 days'}` : ''}</p>
-      ${due.length ? `<button type="button" class="btn-nav primary rv-start" onclick="revisionStart(${moduleId ? nbJsAttr(moduleId) : 'null'})">Start revision (${due.length}) →</button>` : ''}
+      ${due.length ? `<button type="button" class="btn-nav primary rv-start" onclick="revisionStart(${moduleId ? nbJsAttr(moduleId) : 'null'})">${tx(`Start revision (${due.length})`, `रिविज़न शुरू करें (${due.length})`)} →</button>` : ''}
     </section>
     <p class="sj-note sj-muted" style="margin:0 2px 12px;">Your wrong answers and topic flashcards come back after 1, 3, 7, 14 and 30 days, depending on how well you knew them.</p>
     ${!all.length ? `<div class="sj-empty"><strong>Nothing to revise ${mod ? 'in this topic ' : ''}yet</strong><span>Wrong answers from practice and tests become revision cards automatically.</span>${mod ? `<button type="button" class="btn-nav" onclick="navigate('practice',{moduleId:${nbJsAttr(mod.moduleId)},qIndex:0})">Practice this topic</button>` : ''}</div>` : ''}

@@ -102,7 +102,7 @@ with sync_playwright() as p:
     rec('subject hub: "Unfinished" filter keeps only started topics', pg.evaluate("[...document.querySelectorAll('.sh-t-meta')].every(e=>!/^0\\//.test(e.textContent.replace(/PYQ|Weak|कमज़ोर/g,'').trim()))"))
     pg.evaluate("shSetFilter('all')"); pg.wait_for_timeout(150)
     rec('subject hub: no sideways scroll at 360px', pg.evaluate(OVER))
-    pg.locator('.sh-ch[open] .sh-act.primary').first.click(); pg.wait_for_timeout(400)
+    pg.locator('.sh-ch[open] .sh-act[onclick^="sjTopicTest"]').first.click(); pg.wait_for_timeout(400)
     rec('subject hub: Test button opens the CBT room', pg.locator('#cbtViewport').count() == 1)
     pg.evaluate("ActiveTestSession.sessionStatus='DONE'; clearCbtRecoveryState(); ActiveTestSession=null; navigate('home')"); pg.wait_for_timeout(200)
     # Me screen

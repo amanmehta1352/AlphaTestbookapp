@@ -192,8 +192,8 @@ function resultEnhance(v, res) {
       <div class="sj-recent">${items.map(x => { const a = res.answers?.[resultKeyFor(res, x.q)]; const st = !a ? 'Skipped' : String(a).toUpperCase() === String(x.q.answer || '').toUpperCase() ? 'Correct' : 'Wrong'; return `<div class="sj-action" style="cursor:default"><span aria-hidden="true">⏱️</span><span class="sj-action-copy"><strong>Q.${x.i + 1} · ${resultFormatSec(x.sec)}</strong><small>${st} · ${escapeHtml((x.q.QUESTION_EN || x.q.QUESTION_HI || '').slice(0, 80))}</small></span></div>`; }).join('')}</div></section>`;
   }
   const wrongN = resultWrongIds(res).length;
-  const actionsHtml = `<div class="rs-actions"><button type="button" class="btn-nav primary" onclick="resultRetake()">↻ Retake this test</button>${wrongN ? `<button type="button" class="btn-nav" onclick="resultRetryWrong()">✗ Retry ${wrongN} wrong answer${wrongN === 1 ? '' : 's'}</button>` : ''}</div>`;
-  const anchor = v.querySelector('.goals-grid');
+  const actionsHtml = `<section class="rs-card ao-primary-card rs-next-step"><h2>${tx('Your next step', 'अब अगला कदम')}</h2><p class="sj-note">${wrongN ? tx(`Practise the ${wrongN} questions you missed in this test.`, `इस टेस्ट के ${wrongN} गलत सवालों का फिर अभ्यास करें।`) : tx('Try this test again, or read the solutions below.', 'यह टेस्ट फिर दें, या नीचे हल पढ़ें।')}</p><div class="rs-actions ao-actions">${wrongN ? `<button type="button" class="btn-nav primary" onclick="resultRetryWrong()">✗ ${tx(`Retry ${wrongN} wrong answer${wrongN === 1 ? '' : 's'}`, `${wrongN} गलत सवाल फिर हल करें`)}</button>` : ''}<button type="button" class="btn-nav ${wrongN ? '' : 'primary'}" onclick="resultRetake()">↻ ${tx('Retake this test', 'यह टेस्ट फिर दें')}</button></div></section>`;
+  const anchor = v.querySelector('.rs-score');
   if (anchor) anchor.insertAdjacentHTML('afterend', actionsHtml + compareHtml + (subjRows.length > 1 || res.sessionContractVersion === 1 ? subjHtml : '') + timeHtml);
   // Time chip on each solution card
   if (secs) {
