@@ -13055,6 +13055,8 @@ renderUniversalExamHub = function(v) {
     UniversalExamRegistry.getAllExams = originalGetAllExams;
   }
 
+  const breadcrumb = v.querySelector('.nav-breadcrumb');
+  if (breadcrumb) breadcrumb.classList.add('exam-hub-page');
   const hero = v.querySelector('.student-hero-card');
   if (hero) {
     const note = document.createElement('p');
