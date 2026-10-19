@@ -187,6 +187,68 @@ with sync_playwright() as p:
         page.evaluate('initTestSession = window.__originalTestLaunch;void 0')
     rec('No browser errors across hubs and the complete test/retry flow', not errors, errors)
 
+    # Background completion must refresh the next step even without changed content.
+    sync_page = browser.new_page()
+    sync_page.route('https://**/*', lambda route: route.abort())
+    sync_page.goto(Path(APP).as_uri())
+    sync_page.wait_for_selector('.ao-home')
+    sync_results = sync_page.evaluate("""async () => {
+        const original = {session: ServerState.session, cloud: {...CloudState},
+            ensure: Server.ensureFresh, pull: cloudPullContent, progress: cloudSyncProgress, save: cloudSaveState};
+        try {
+            AppModules=[]; synchronizeTaxonomyEngine(); UserState.resumeState=null;
+            ServerState.session={user_id:'qa-sync',email:'qa@example.invalid'};
+            Object.assign(CloudState,{userId:'qa-sync',isAdmin:false,profileIndex:null,lastContentAt:null,msgKind:'',busy:false});
+            cloudPullContent=async()=>({changed:false});
+            cloudSyncProgress=async()=>({up:0,down:0,downTests:0});
+            cloudSaveState=async()=>{};
+            const outcomes=[];
+            for (const fail of [false,true]) {
+                let finish;
+                Server.ensureFresh=()=>new Promise((resolve,reject)=>{finish=()=>fail?reject(new Error('QA sync failure')):resolve();});
+                const running=cloudSync('auto');
+                renderView();
+                const busy=document.querySelector('.ao-next h2').textContent.includes('Getting your questions');
+                finish(); await running;
+                const card=document.querySelector('.ao-next');
+                outcomes.push(busy && !CloudState.busy && !card.textContent.includes('Getting your questions') &&
+                    card.querySelector('button').textContent.includes(fail?'Retry sync':'Sync questions'));
+            }
+            return outcomes;
+        } finally {
+            ServerState.session=original.session; Object.assign(CloudState,original.cloud);
+            Server.ensureFresh=original.ensure; cloudPullContent=original.pull;
+            cloudSyncProgress=original.progress; cloudSaveState=original.save;
+        }
+    }""")
+    rec('Unchanged background sync replaces the busy Home action', sync_results[0])
+    rec('Failed background sync replaces the busy Home action with retry', sync_results[1])
+    sync_page.close()
+
+    # Studio next-step and topic-list handlers must preserve punctuation in topic IDs.
+    studio = browser.new_page()
+    studio.route('https://**/*', lambda route: route.abort())
+    studio.goto((Path(APP).parent / 'admin' / 'index.html').as_uri())
+    studio.wait_for_selector('#studioRoot')
+    studio.evaluate("""() => {
+        window.__studioInjected=false;
+        const id="topic');window.__studioInjected=true;//\\tail";
+        Studio.topics=[{id,title:'QA topic'}];
+        Studio.qIndex=[{topic_id:id,status:'draft',is_active:true}];
+        document.getElementById('studioRoot').innerHTML=studioHomeHtml();
+        window.__originalStudioOpen=studioOpenTopic;
+        studioOpenTopic=id=>{window.__capturedStudioTopic=id;};
+    }""")
+    try:
+        for selector, label in [('.st-next button','next step'),('.st-topic','topic list')]:
+            studio.evaluate('window.__capturedStudioTopic=null')
+            studio.locator(selector).click()
+            rec(f'Studio {label} preserves the quoted topic ID',
+                studio.evaluate('!window.__studioInjected && window.__capturedStudioTopic===Studio.topics[0].id'))
+    finally:
+        studio.evaluate('studioOpenTopic=window.__originalStudioOpen;void 0')
+    studio.close()
+
     # Check effective text contrast, including the hint's opacity, in both dark modes.
     control = browser.new_page()
     control.set_content('<div class="cmd-q">Question <small>Command hint</small></div><button class="chip on">Active</button>')

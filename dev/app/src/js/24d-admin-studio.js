@@ -90,7 +90,7 @@ function studioHomeHtml() {
   const list = studioTopicStats();
   const next = list.find(x => x.c.draft || x.c.reviewed);
   const action = next
-    ? `<button class="st-btn primary" onclick="studioOpenTopic('${escapeHtml(next.t.id)}')">👀 सवाल जाँचना शुरू करें ›</button>`
+    ? `<button class="st-btn primary" onclick="studioOpenTopic(${nbJsAttr(next.t.id)})">👀 सवाल जाँचना शुरू करें ›</button>`
     : '<button class="st-btn primary" onclick="studioTab(\'import\')">📥 नई file import करें ›</button>';
   return `<section class="st-card st-next">
       <span class="st-eyebrow">अगला कदम</span>
@@ -107,7 +107,7 @@ function studioHomeHtml() {
     <p class="st-note">Students को सिर्फ़ ✅ Published सवाल दिखते हैं।${c.hidden ? ` ${c.hidden} सवाल छिपाए गए हैं।` : ''} कुल ${c.total} सवाल, ${list.length} topics।</p>
     <div class="st-row"><button class="st-btn" onclick="studioTab('import')">📥 नई file import करें</button><button class="st-btn" onclick="studioLoad()" ${Studio.busy ? 'disabled' : ''}>↻ ताज़ा करें</button></div>
     <h3 class="st-h">Topics</h3>
-    <div class="st-list">${list.map(({ t, c }) => `<button class="st-topic" onclick="studioOpenTopic('${escapeHtml(t.id)}')">
+    <div class="st-list">${list.map(({ t, c }) => `<button class="st-topic" onclick="studioOpenTopic(${nbJsAttr(t.id)})">
       <span><b>${escapeHtml(t.title)}</b><small>${escapeHtml(subjectDisplayName(t.subject))} · ${escapeHtml(t.chapter || '')}${t.exam_id ? ' · ' + escapeHtml(Studio.exams.get(t.exam_id) || t.exam_id) : ''}${t.year ? ' ' + t.year : ''}</small></span>
       <span class="st-pills">${c.draft ? `<i class="draft">📝 ${c.draft}</i>` : ''}${c.reviewed ? `<i class="reviewed">👀 ${c.reviewed}</i>` : ''}<i class="published">✅ ${c.published}</i></span></button>`).join('') || '<p class="st-note">Server पर अभी कोई सवाल नहीं।</p>'}</div>`;
 }

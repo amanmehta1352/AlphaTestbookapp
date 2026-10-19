@@ -184,12 +184,15 @@ async function cloudSync(reason = 'manual') {
       CloudState.userId = uid; CloudState.email = ServerState.session.email || CloudState.email; CloudState.lastSyncAt = new Date().toISOString();
       CloudState.msg = `✓ Sync हो गया${content?.changed ? ` · ${content.questions} सवाल server से आए` : ''}${prog.up ? ` · ${prog.up} जवाब भेजे` : ''}${prog.down ? ` · ${prog.down} पुराने जवाब वापस आए` : ''}`; CloudState.msgKind = 'good';
       await cloudSaveState();
-      if (content?.changed || prog.down || prog.downTests) { try { renderView(); } catch (_) {} }
+      if (Route.page !== 'home' && (content?.changed || prog.down || prog.downTests)) { try { renderView(); } catch (_) {} }
       return { content, prog };
     } catch (e) {
       CloudState.msg = (reason === 'auto' ? 'Sync बाद में होगा: ' : '') + e.message; CloudState.msgKind = e.network ? 'warn' : 'bad';
       return null;
-    } finally { CloudState.busy = false; CloudSyncRunning = null; cloudPaint(); refreshStudyFeedback(); }
+    } finally {
+      CloudState.busy = false; CloudSyncRunning = null; cloudPaint(); refreshStudyFeedback();
+      if (Route.page === 'home') { try { renderView(); } catch (_) {} }
+    }
   })();
   return CloudSyncRunning;
 }
