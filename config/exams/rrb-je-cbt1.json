@@ -1,0 +1,5 @@
+{"slug":"rrb-je-cbt1","name_en":"RRB JE — CBT 1","name_hi":"आरआरबी जेई — सीबीटी 1","level":"diploma",
+ "branches":["mechanical","civil","electrical","electronics","computer"],
+ "pattern":{"questions":100,"minutes":90,"marks_per_q":1,"negative_per_wrong":0.3333,
+  "sections":["maths","reasoning","general-science","general-awareness"]},
+ "source_policy":"official paper / response sheet + official answer key only"}

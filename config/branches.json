@@ -1,0 +1,7 @@
+[
+ {"slug":"mechanical","name_en":"Mechanical","name_hi":"मैकेनिकल"},
+ {"slug":"civil","name_en":"Civil","name_hi":"सिविल"},
+ {"slug":"electrical","name_en":"Electrical","name_hi":"इलेक्ट्रिकल"},
+ {"slug":"electronics","name_en":"Electronics & Communication","name_hi":"इलेक्ट्रॉनिक्स और संचार"},
+ {"slug":"computer","name_en":"Computer / IT","name_hi":"कंप्यूटर / आईटी"}
+]

@@ -1,0 +1,9 @@
+name: Tests
+on: [push, pull_request]
+jobs:
+  t:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-16 || sudo apt-get install -y -qq postgresql
+      - run: sudo python3 tests/run_all.py
