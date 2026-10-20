@@ -1,0 +1,5046 @@
+{
+ "at": "2026-10-20T09:28:39+00:00",
+ "repo": "amanmehta1352/AlphaTestbookapp",
+ "site_url": "https://amanmehta1352.github.io/AlphaTestbookapp/",
+ "schema": 2,
+ "site": {
+  "url": "https://amanmehta1352.github.io/AlphaTestbookapp/",
+  "ok": true,
+  "ms": 396,
+  "version": "V3.5.0",
+  "size_kb": 878,
+  "sw_cache": "mtb-shell-v21-rb",
+  "admin_ok": true,
+  "control_ok": true,
+  "source_version": "V3.5.0"
+ },
+ "github": {
+  "workflows": [
+   {
+    "file": "tests.yml",
+    "label": "✅ Tests",
+    "what": "हर बदलाव पर ऐप के सारे tests",
+    "kind": "test",
+    "robot": null,
+    "page": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/workflows/tests.yml",
+    "cron": [],
+    "after": [],
+    "manual": true,
+    "push": true,
+    "concurrency": "tests-${{ github.ref }}",
+    "timeout": 60,
+    "next_run": null,
+    "runs_30d": 40,
+    "success": 12,
+    "failure": 7,
+    "cancelled": 21,
+    "skipped": 0,
+    "success_rate": 63,
+    "avg_min": 2.4,
+    "minutes_30d": 95,
+    "retries": 0,
+    "last_conclusion": "failure",
+    "last_at": "2026-10-20T09:28:22Z",
+    "last_url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39400875984",
+    "last_id": 39400875984,
+    "last_event": "push",
+    "last_success_at": "2026-10-19T11:35:34Z",
+    "last_failure_at": "2026-10-20T09:28:22Z",
+    "running": false,
+    "history": [
+     {
+      "c": "failure",
+      "at": "2026-10-20T09:28:05Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39400875984",
+      "ev": "push",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-19T11:31:02Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39245196151",
+      "ev": "pull_request",
+      "n": 1
+     },
+     {
+      "c": "failure",
+      "at": "2026-10-19T11:15:56Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39243387906",
+      "ev": "pull_request",
+      "n": 1
+     },
+     {
+      "c": "failure",
+      "at": "2026-10-19T11:00:23Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39241485976",
+      "ev": "pull_request",
+      "n": 1
+     },
+     {
+      "c": "failure",
+      "at": "2026-10-19T10:53:29Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39240679250",
+      "ev": "pull_request",
+      "n": 1
+     },
+     {
+      "c": "cancelled",
+      "at": "2026-10-19T10:53:24Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39240670475",
+      "ev": "pull_request",
+      "n": 1
+     },
+     {
+      "c": "cancelled",
+      "at": "2026-10-19T10:52:54Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39240608644",
+      "ev": "pull_request",
+      "n": 1
+     },
+     {
+      "c": "cancelled",
+      "at": "2026-10-19T10:51:49Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39240479256",
+      "ev": "pull_request",
+      "n": 1
+     },
+     {
+      "c": "cancelled",
+      "at": "2026-10-19T10:51:37Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39240455267",
+      "ev": "pull_request",
+      "n": 1
+     },
+     {
+      "c": "cancelled",
+      "at": "2026-10-19T10:50:31Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39240327010",
+      "ev": "pull_request",
+      "n": 1
+     },
+     {
+      "c": "cancelled",
+      "at": "2026-10-19T10:50:26Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39240316150",
+      "ev": "pull_request",
+      "n": 1
+     },
+     {
+      "c": "cancelled",
+      "at": "2026-10-19T10:50:08Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39240279453",
+      "ev": "pull_request",
+      "n": 1
+     }
+    ],
+    "error_log": "FAIL migration appliespsql: error: /home/runner/work/AlphaTestbookapp/AlphaTestbookapp/db/migrations/0001_core.sql: Permission denied\n##[error]Process completed with exit code 1.",
+    "diagnosis": {
+     "cause": "कोई test fail — code में गड़बड़",
+     "fix": "Claude को run का link भेजें: \"fail test ठीक करो\"",
+     "risk": "मध्यम",
+     "ask_claude": "✅ Tests fail हुआ: कोई test fail — code में गड़बड़. Control Room देखकर ठीक करो (backup लेकर, tests चलाकर)."
+    }
+   },
+   {
+    "file": "pyq-robot.yml",
+    "label": "🤖 PYQ Robot",
+    "what": "PDF links से नए PYQ (draft)",
+    "kind": "robot",
+    "robot": "pyq",
+    "page": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/workflows/pyq-robot.yml",
+    "cron": [],
+    "after": [],
+    "manual": true,
+    "push": false,
+    "concurrency": "pyq-robot",
+    "timeout": 90,
+    "next_run": null,
+    "runs_30d": 13,
+    "success": 6,
+    "failure": 5,
+    "cancelled": 2,
+    "skipped": 0,
+    "success_rate": 55,
+    "avg_min": 3.1,
+    "minutes_30d": 40,
+    "retries": 2,
+    "last_conclusion": "success",
+    "last_at": "2026-10-18T19:21:30Z",
+    "last_url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39157656142",
+    "last_id": 39157656142,
+    "last_event": "workflow_dispatch",
+    "last_success_at": "2026-10-18T19:21:30Z",
+    "last_failure_at": "2026-10-18T14:52:49Z",
+    "running": false,
+    "history": [
+     {
+      "c": "success",
+      "at": "2026-10-18T19:11:58Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39157656142",
+      "ev": "workflow_dispatch",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-18T18:19:49Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39153658219",
+      "ev": "workflow_dispatch",
+      "n": 1
+     },
+     {
+      "c": "failure",
+      "at": "2026-10-18T14:52:05Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39137914179",
+      "ev": "workflow_dispatch",
+      "n": 1
+     },
+     {
+      "c": "failure",
+      "at": "2026-10-18T14:47:45Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39137589458",
+      "ev": "workflow_dispatch",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-18T05:37:46Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39101199495",
+      "ev": "workflow_dispatch",
+      "n": 1
+     },
+     {
+      "c": "failure",
+      "at": "2026-10-17T19:13:25Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39061517503",
+      "ev": "workflow_dispatch",
+      "n": 2
+     },
+     {
+      "c": "cancelled",
+      "at": "2026-10-17T19:13:22Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39061513217",
+      "ev": "workflow_dispatch",
+      "n": 1
+     },
+     {
+      "c": "cancelled",
+      "at": "2026-10-17T19:13:18Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39061509571",
+      "ev": "workflow_dispatch",
+      "n": 1
+     },
+     {
+      "c": "failure",
+      "at": "2026-10-17T19:13:16Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39061506274",
+      "ev": "workflow_dispatch",
+      "n": 1
+     },
+     {
+      "c": "failure",
+      "at": "2026-10-17T12:09:22Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39031410363",
+      "ev": "workflow_dispatch",
+      "n": 3
+     },
+     {
+      "c": "success",
+      "at": "2026-10-16T13:08:28Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/38905579364",
+      "ev": "workflow_dispatch",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-16T12:59:33Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/38904462869",
+      "ev": "workflow_dispatch",
+      "n": 1
+     }
+    ]
+   },
+   {
+    "file": "hindi-robot.yml",
+    "label": "🌐 Hindi Robot",
+    "what": "English सवालों में Hindi",
+    "kind": "robot",
+    "robot": "hindi",
+    "page": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/workflows/hindi-robot.yml",
+    "cron": [],
+    "after": [],
+    "manual": true,
+    "push": false,
+    "concurrency": "hindi-robot",
+    "timeout": 300,
+    "next_run": null,
+    "runs_30d": 15,
+    "success": 7,
+    "failure": 0,
+    "cancelled": 8,
+    "skipped": 0,
+    "success_rate": 100,
+    "avg_min": 12.4,
+    "minutes_30d": 185,
+    "retries": 0,
+    "last_conclusion": "success",
+    "last_at": "2026-10-18T13:21:52Z",
+    "last_url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39130941263",
+    "last_id": 39130941263,
+    "last_event": "workflow_dispatch",
+    "last_success_at": "2026-10-18T13:21:52Z",
+    "last_failure_at": null,
+    "running": false,
+    "history": [
+     {
+      "c": "success",
+      "at": "2026-10-18T13:18:07Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39130941263",
+      "ev": "workflow_dispatch",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-18T09:09:45Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39114242933",
+      "ev": "workflow_dispatch",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-18T05:53:54Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39102130482",
+      "ev": "workflow_run",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-17T13:49:52Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39038172779",
+      "ev": "workflow_dispatch",
+      "n": 1
+     },
+     {
+      "c": "cancelled",
+      "at": "2026-10-17T13:49:20Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39038138324",
+      "ev": "workflow_dispatch",
+      "n": 1
+     },
+     {
+      "c": "cancelled",
+      "at": "2026-10-17T13:49:18Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39038136459",
+      "ev": "workflow_dispatch",
+      "n": 1
+     },
+     {
+      "c": "cancelled",
+      "at": "2026-10-17T13:49:16Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39038134027",
+      "ev": "workflow_dispatch",
+      "n": 1
+     },
+     {
+      "c": "cancelled",
+      "at": "2026-10-17T13:49:14Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39038132255",
+      "ev": "workflow_dispatch",
+      "n": 1
+     },
+     {
+      "c": "cancelled",
+      "at": "2026-10-17T13:49:12Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39038129954",
+      "ev": "workflow_dispatch",
+      "n": 1
+     },
+     {
+      "c": "cancelled",
+      "at": "2026-10-17T13:49:09Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39038127128",
+      "ev": "workflow_dispatch",
+      "n": 1
+     },
+     {
+      "c": "cancelled",
+      "at": "2026-10-17T13:49:07Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39038123976",
+      "ev": "workflow_dispatch",
+      "n": 1
+     },
+     {
+      "c": "cancelled",
+      "at": "2026-10-17T13:49:04Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39038120569",
+      "ev": "workflow_dispatch",
+      "n": 1
+     }
+    ]
+   },
+   {
+    "file": "tag-robot.yml",
+    "label": "🏷️ Tag Robot",
+    "what": "Mixed सवाल chapter में",
+    "kind": "robot",
+    "robot": "tag",
+    "page": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/workflows/tag-robot.yml",
+    "cron": [],
+    "after": [],
+    "manual": true,
+    "push": false,
+    "concurrency": "tag-robot",
+    "timeout": 30,
+    "next_run": null,
+    "runs_30d": 7,
+    "success": 6,
+    "failure": 0,
+    "cancelled": 1,
+    "skipped": 0,
+    "success_rate": 100,
+    "avg_min": 1.5,
+    "minutes_30d": 11,
+    "retries": 0,
+    "last_conclusion": "success",
+    "last_at": "2026-10-18T05:55:16Z",
+    "last_url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39102130490",
+    "last_id": 39102130490,
+    "last_event": "workflow_run",
+    "last_success_at": "2026-10-18T05:55:16Z",
+    "last_failure_at": null,
+    "running": false,
+    "history": [
+     {
+      "c": "success",
+      "at": "2026-10-18T05:53:54Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39102130490",
+      "ev": "workflow_run",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-17T15:34:35Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39045651350",
+      "ev": "workflow_dispatch",
+      "n": 1
+     },
+     {
+      "c": "cancelled",
+      "at": "2026-10-17T15:34:33Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39045648747",
+      "ev": "workflow_dispatch",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-17T15:34:31Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39045646293",
+      "ev": "workflow_dispatch",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-17T06:39:33Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39010723947",
+      "ev": "workflow_dispatch",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-16T13:40:25Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/38909661637",
+      "ev": "workflow_dispatch",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-16T13:38:26Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/38909404025",
+      "ev": "workflow_dispatch",
+      "n": 1
+     }
+    ]
+   },
+   {
+    "file": "key-check-robot.yml",
+    "label": "🔑 Key-check Robot",
+    "what": "answer key की जाँच",
+    "kind": "robot",
+    "robot": "keycheck",
+    "page": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/workflows/key-check-robot.yml",
+    "cron": [],
+    "after": [],
+    "manual": true,
+    "push": false,
+    "concurrency": "key-check-robot",
+    "timeout": 120,
+    "next_run": null,
+    "runs_30d": 14,
+    "success": 10,
+    "failure": 3,
+    "cancelled": 1,
+    "skipped": 0,
+    "success_rate": 77,
+    "avg_min": 4.0,
+    "minutes_30d": 57,
+    "retries": 1,
+    "last_conclusion": "failure",
+    "last_at": "2026-10-18T21:20:44Z",
+    "last_url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39159744869",
+    "last_id": 39159744869,
+    "last_event": "workflow_dispatch",
+    "last_success_at": "2026-10-18T19:50:55Z",
+    "last_failure_at": "2026-10-18T21:20:44Z",
+    "running": false,
+    "history": [
+     {
+      "c": "failure",
+      "at": "2026-10-18T19:39:12Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39159744869",
+      "ev": "workflow_dispatch",
+      "n": 2
+     },
+     {
+      "c": "success",
+      "at": "2026-10-18T19:39:10Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39159742726",
+      "ev": "workflow_dispatch",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-18T05:53:54Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39102130479",
+      "ev": "workflow_run",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-17T15:36:09Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39045764397",
+      "ev": "workflow_dispatch",
+      "n": 1
+     },
+     {
+      "c": "cancelled",
+      "at": "2026-10-17T15:36:07Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39045762345",
+      "ev": "workflow_dispatch",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-17T15:36:05Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39045760233",
+      "ev": "workflow_dispatch",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-17T03:46:25Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39000058676",
+      "ev": "workflow_dispatch",
+      "n": 1
+     },
+     {
+      "c": "failure",
+      "at": "2026-10-17T03:43:27Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/38999870040",
+      "ev": "push",
+      "n": 1
+     },
+     {
+      "c": "failure",
+      "at": "2026-10-17T03:43:26Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/38999869521",
+      "ev": "push",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-16T18:30:00Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/38947802718",
+      "ev": "workflow_dispatch",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-16T18:25:00Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/38947166276",
+      "ev": "workflow_dispatch",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-16T17:12:49Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/38937936470",
+      "ev": "workflow_dispatch",
+      "n": 1
+     }
+    ],
+    "error_log": "##[group]Run set -euo pipefail\n\u001b[36;1mset -euo pipefail\u001b[0m\nshell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}\n##[error]Process completed with exit code 2.\n(node:2101) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilit\n##[group]Run python3 dev/tools/ops/opslib.py record keycheck \"failure\"\n\u001b[36;1mpython3 dev/tools/ops/opslib.py record keycheck \"failure\"\u001b[0m",
+    "diagnosis": {
+     "cause": "कोई library install नहीं हुई / version बदला",
+     "fix": "Claude: version pin करो",
+     "risk": "मध्यम",
+     "ask_claude": "🔑 Key-check Robot fail हुआ: कोई library install नहीं हुई / version बदला. Control Room देखकर ठीक करो (backup लेकर, tests चलाकर)."
+    }
+   },
+   {
+    "file": "backup-robot.yml",
+    "label": "💾 Backup Robot",
+    "what": "रोज़ पूरा backup + जाँच",
+    "kind": "robot",
+    "robot": "backup",
+    "page": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/workflows/backup-robot.yml",
+    "cron": [
+     "7 21 * * *"
+    ],
+    "after": [],
+    "manual": true,
+    "push": false,
+    "concurrency": "backup-robot",
+    "timeout": 15,
+    "next_run": "2026-10-20T21:07+00:00",
+    "runs_30d": 4,
+    "success": 4,
+    "failure": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "success_rate": 100,
+    "avg_min": 0.2,
+    "minutes_30d": 1,
+    "retries": 0,
+    "last_conclusion": "success",
+    "last_at": "2026-10-20T00:17:45Z",
+    "last_url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39346764407",
+    "last_id": 39346764407,
+    "last_event": "schedule",
+    "last_success_at": "2026-10-20T00:17:45Z",
+    "last_failure_at": null,
+    "running": false,
+    "history": [
+     {
+      "c": "success",
+      "at": "2026-10-20T00:17:32Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39346764407",
+      "ev": "schedule",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-18T23:05:25Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39175026802",
+      "ev": "schedule",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-17T23:04:53Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39077616790",
+      "ev": "schedule",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-17T03:43:29Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/38999872352",
+      "ev": "workflow_dispatch",
+      "n": 1
+     }
+    ]
+   },
+   {
+    "file": "health-robot.yml",
+    "label": "🩺 Health Robot",
+    "what": "यह रिपोर्ट",
+    "kind": "system",
+    "robot": "health",
+    "page": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/workflows/health-robot.yml",
+    "cron": [
+     "23 */2 * * *"
+    ],
+    "after": [
+     "Tests",
+     "PYQ Robot",
+     "Hindi Robot",
+     "Tag Robot",
+     "Key-check Robot",
+     "Backup Robot",
+     "Rollback",
+     "Design Audit",
+     "Smoke Test",
+     "Selective Restore"
+    ],
+    "manual": true,
+    "push": false,
+    "concurrency": "health-robot",
+    "timeout": 15,
+    "next_run": "2026-10-20T10:23+00:00",
+    "runs_30d": 40,
+    "success": 29,
+    "failure": 0,
+    "cancelled": 10,
+    "skipped": 0,
+    "success_rate": 100,
+    "avg_min": 1.0,
+    "minutes_30d": 39,
+    "retries": 0,
+    "last_conclusion": "success",
+    "last_at": "2026-10-20T05:02:48Z",
+    "last_url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39372682971",
+    "last_id": 39372682971,
+    "last_event": "schedule",
+    "last_success_at": "2026-10-20T05:02:48Z",
+    "last_failure_at": null,
+    "running": true,
+    "history": [
+     {
+      "c": "in_progress",
+      "at": "2026-10-20T09:28:24Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39400913951",
+      "ev": "workflow_run",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-20T05:01:43Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39372682971",
+      "ev": "schedule",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-20T00:17:47Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39346787719",
+      "ev": "workflow_run",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-19T23:48:38Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39343843057",
+      "ev": "schedule",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-19T20:00:34Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39315689585",
+      "ev": "schedule",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-19T14:24:44Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39268699208",
+      "ev": "workflow_dispatch",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-19T13:39:09Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39261969523",
+      "ev": "schedule",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-19T12:25:37Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39251961713",
+      "ev": "workflow_run",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-19T12:08:44Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39249770097",
+      "ev": "workflow_run",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-19T11:50:10Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39247512952",
+      "ev": "workflow_dispatch",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-19T11:49:45Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39247460537",
+      "ev": "workflow_run",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-19T11:49:03Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39247379212",
+      "ev": "workflow_run",
+      "n": 1
+     }
+    ]
+   },
+   {
+    "file": "ops-robot.yml",
+    "label": "⚙️ Ops Robot",
+    "what": "Control Room के बटनों का काम",
+    "kind": "system",
+    "robot": "ops",
+    "page": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/workflows/ops-robot.yml",
+    "cron": [
+     "*/10 * * * *"
+    ],
+    "after": [],
+    "manual": true,
+    "push": false,
+    "concurrency": "ops-robot",
+    "timeout": 12,
+    "next_run": "2026-10-20T09:30+00:00",
+    "runs_30d": 24,
+    "success": 24,
+    "failure": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "success_rate": 100,
+    "avg_min": 0.6,
+    "minutes_30d": 14,
+    "retries": 0,
+    "last_conclusion": "success",
+    "last_at": "2026-10-20T07:28:28Z",
+    "last_url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39386710602",
+    "last_id": 39386710602,
+    "last_event": "schedule",
+    "last_success_at": "2026-10-20T07:28:28Z",
+    "last_failure_at": null,
+    "running": false,
+    "history": [
+     {
+      "c": "success",
+      "at": "2026-10-20T07:28:14Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39386710602",
+      "ev": "schedule",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-20T02:03:53Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39356868053",
+      "ev": "schedule",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-19T23:35:39Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39342537133",
+      "ev": "schedule",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-19T20:06:01Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39316464944",
+      "ev": "schedule",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-19T14:24:36Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39268679234",
+      "ev": "schedule",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-19T06:51:04Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39212308602",
+      "ev": "schedule",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-19T01:38:43Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39186295771",
+      "ev": "schedule",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-18T23:31:38Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39176889922",
+      "ev": "schedule",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-18T21:20:15Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39167382907",
+      "ev": "schedule",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-18T18:56:13Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39156442577",
+      "ev": "schedule",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-18T16:36:59Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39145810246",
+      "ev": "schedule",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-18T13:17:58Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39130931133",
+      "ev": "schedule",
+      "n": 1
+     }
+    ]
+   },
+   {
+    "file": "rollback.yml",
+    "label": "⏪ Rollback",
+    "what": "पुराने version पर वापस",
+    "kind": "system",
+    "robot": null,
+    "page": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/workflows/rollback.yml",
+    "cron": [],
+    "after": [],
+    "manual": true,
+    "push": false,
+    "concurrency": "rollback",
+    "timeout": 10,
+    "next_run": null,
+    "runs_30d": 1,
+    "success": 1,
+    "failure": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "success_rate": 100,
+    "avg_min": 0.2,
+    "minutes_30d": 0,
+    "retries": 0,
+    "last_conclusion": "success",
+    "last_at": "2026-10-19T20:00:56Z",
+    "last_url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39315716433",
+    "last_id": 39315716433,
+    "last_event": "workflow_dispatch",
+    "last_success_at": "2026-10-19T20:00:56Z",
+    "last_failure_at": null,
+    "running": false,
+    "history": [
+     {
+      "c": "success",
+      "at": "2026-10-19T20:00:45Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39315716433",
+      "ev": "workflow_dispatch",
+      "n": 1
+     }
+    ]
+   },
+   {
+    "file": "design-audit.yml",
+    "label": "🎨 Design Audit",
+    "what": "हर screen की design जाँच",
+    "kind": "robot",
+    "robot": "design",
+    "page": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/workflows/design-audit.yml",
+    "cron": [
+     "11 1 * * 1"
+    ],
+    "after": [],
+    "manual": true,
+    "push": false,
+    "concurrency": "design-audit",
+    "timeout": 25,
+    "next_run": "2026-10-26T01:11+00:00",
+    "runs_30d": 2,
+    "success": 2,
+    "failure": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "success_rate": 100,
+    "avg_min": 1.4,
+    "minutes_30d": 3,
+    "retries": 0,
+    "last_conclusion": "success",
+    "last_at": "2026-10-19T06:09:32Z",
+    "last_url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39208167599",
+    "last_id": 39208167599,
+    "last_event": "schedule",
+    "last_success_at": "2026-10-19T06:09:32Z",
+    "last_failure_at": null,
+    "running": false,
+    "history": [
+     {
+      "c": "success",
+      "at": "2026-10-19T06:08:08Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39208167599",
+      "ev": "schedule",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-17T06:39:12Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39010703701",
+      "ev": "workflow_dispatch",
+      "n": 1
+     }
+    ]
+   },
+   {
+    "file": "smoke.yml",
+    "label": "🔥 Smoke Test",
+    "what": "release के बाद live जाँच",
+    "kind": "test",
+    "robot": null,
+    "page": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/workflows/smoke.yml",
+    "cron": [],
+    "after": [
+     "Tests"
+    ],
+    "manual": true,
+    "push": false,
+    "concurrency": "smoke",
+    "timeout": 25,
+    "next_run": null,
+    "runs_30d": 23,
+    "success": 15,
+    "failure": 0,
+    "cancelled": 0,
+    "skipped": 8,
+    "success_rate": 100,
+    "avg_min": 0.5,
+    "minutes_30d": 10,
+    "retries": 0,
+    "last_conclusion": "success",
+    "last_at": "2026-10-19T11:49:44Z",
+    "last_url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39247379190",
+    "last_id": 39247379190,
+    "last_event": "workflow_run",
+    "last_success_at": "2026-10-19T11:49:44Z",
+    "last_failure_at": null,
+    "running": false,
+    "history": [
+     {
+      "c": "success",
+      "at": "2026-10-19T11:49:03Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39247379190",
+      "ev": "workflow_run",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-19T10:25:47Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39237393496",
+      "ev": "workflow_run",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-19T05:47:31Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39206364928",
+      "ev": "workflow_run",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-19T04:59:51Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39202253853",
+      "ev": "workflow_run",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-18T18:45:10Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39155597181",
+      "ev": "workflow_run",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-18T13:04:40Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39129966869",
+      "ev": "workflow_run",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-18T11:20:36Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39122846702",
+      "ev": "workflow_run",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-18T11:09:58Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39122130893",
+      "ev": "workflow_run",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-18T10:38:56Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39120079397",
+      "ev": "workflow_run",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-18T06:08:46Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39103002926",
+      "ev": "workflow_run",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-18T05:57:01Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39102303383",
+      "ev": "workflow_run",
+      "n": 1
+     },
+     {
+      "c": "success",
+      "at": "2026-10-18T05:48:46Z",
+      "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39101835984",
+      "ev": "workflow_run",
+      "n": 1
+     }
+    ]
+   },
+   {
+    "file": "selective-restore.yml",
+    "label": "🧩 Selective Restore",
+    "what": "सिर्फ़ खराब हिस्सा वापस",
+    "kind": "system",
+    "robot": null,
+    "page": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/workflows/selective-restore.yml",
+    "cron": [],
+    "after": [],
+    "manual": true,
+    "push": false,
+    "concurrency": "selective-restore",
+    "timeout": 60,
+    "next_run": null,
+    "runs_30d": 0,
+    "success": 0,
+    "failure": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "success_rate": null,
+    "avg_min": null,
+    "minutes_30d": 0,
+    "retries": 0,
+    "last_conclusion": null,
+    "last_at": null,
+    "last_url": null,
+    "last_id": null,
+    "last_event": null,
+    "last_success_at": null,
+    "last_failure_at": null,
+    "running": false,
+    "history": []
+   }
+  ],
+  "issues": 5,
+  "branches": [
+   "audit/app-stability-2026-10-18",
+   "audit/full-app-arrangement-2026-10-18",
+   "coderabbit/action-oriented-design",
+   "coderabbit/app-navigation-consistency",
+   "coderabbit/mobile-design-refresh",
+   "control-room-design-preview-v341",
+   "data-robots",
+   "design/home-dashboard-60-30-10-preview",
+   "design-v3",
+   "docs/data-architecture-audit",
+   "feat/diploma-multi-exam-selection",
+   "feat/glass-dashboard-live-charts",
+   "feat/home-dashboard-601010-live",
+   "feat/qualification-first-exam-hub",
+   "feat/rrb-je-bilingual-import",
+   "feat/rrb-je-pdf-parser",
+   "feat/testbook-inspired-navigation-home",
+   "feature/subject-horizontal-navigation",
+   "fix/control-room-stale-task-warnings",
+   "fix/keycheck-gemini-toggle",
+   "fix/mobile-tap-targets-audit",
+   "fix/pyq-dry-run-downstream-gates",
+   "fix/pyq-robot-pipeline",
+   "fix/pyq-robot-safe-http-path",
+   "fix/pyq-robot-test-dependency",
+   "fix/rrb-je-branch-subject-routing",
+   "fix/student-question-sync-feedback",
+   "fix/testbook-quick-action-regression",
+   "foundation",
+   "main"
+  ],
+  "latest_commit": {
+   "sha": "23cef6f",
+   "msg": "⏪ Rollback live app to V3.5.0 (84191ed) — Control Room",
+   "at": "2026-10-19T20:00:53Z",
+   "url": "https://github.com/amanmehta1352/AlphaTestbookapp/commit/23cef6faacde7ddcc8a48ee10d50e50cbbc6ae5f"
+  },
+  "releases": [
+   {
+    "sha": "23cef6f",
+    "full": "23cef6faacde7ddcc8a48ee10d50e50cbbc6ae5f",
+    "version": "V3.5.0",
+    "msg": "⏪ Rollback live app to V3.5.0 (84191ed) — Control Room",
+    "at": "2026-10-19T20:00:53Z",
+    "tests": "none",
+    "url": "https://github.com/amanmehta1352/AlphaTestbookapp/commit/23cef6faacde7ddcc8a48ee10d50e50cbbc6ae5f"
+   },
+   {
+    "sha": "b7ce130",
+    "full": "b7ce1304edde7abe6803f6dbb07bad06d40901e4",
+    "version": "",
+    "msg": "fix: align Home DOM order with focus column",
+    "at": "2026-10-19T11:28:36Z",
+    "tests": "success",
+    "url": "https://github.com/amanmehta1352/AlphaTestbookapp/commit/b7ce1304edde7abe6803f6dbb07bad06d40901e4"
+   },
+   {
+    "sha": "5741c79",
+    "full": "5741c79a1c2f190dcb4036351338467ceb4ef27e",
+    "version": "",
+    "msg": "fix: keep daily goal before Home shortcuts",
+    "at": "2026-10-19T11:21:34Z",
+    "tests": "none",
+    "url": "https://github.com/amanmehta1352/AlphaTestbookapp/commit/5741c79a1c2f190dcb4036351338467ceb4ef27e"
+   },
+   {
+    "sha": "f9511b2",
+    "full": "f9511b214c3fc7599517c4382a69b02ea356ddd6",
+    "version": "",
+    "msg": "fix: preserve Home primary action reading order",
+    "at": "2026-10-19T11:15:48Z",
+    "tests": "failure",
+    "url": "https://github.com/amanmehta1352/AlphaTestbookapp/commit/f9511b214c3fc7599517c4382a69b02ea356ddd6"
+   },
+   {
+    "sha": "ef22db2",
+    "full": "ef22db23da2d87d9edad8c47a9dfdc0f17b3d55c",
+    "version": "",
+    "msg": "Regenerate student HTML for live 60/30/10 Home layout",
+    "at": "2026-10-19T10:59:19Z",
+    "tests": "none",
+    "url": "https://github.com/amanmehta1352/AlphaTestbookapp/commit/ef22db23da2d87d9edad8c47a9dfdc0f17b3d55c"
+   },
+   {
+    "sha": "84191ed",
+    "full": "84191ed6bb0abcce18963a4b1ce1c4b4713705eb",
+    "version": "",
+    "msg": "Refresh Home after background sync and safely launch Studio topics",
+    "at": "2026-10-19T05:19:29Z",
+    "tests": "success",
+    "url": "https://github.com/amanmehta1352/AlphaTestbookapp/commit/84191ed6bb0abcce18963a4b1ce1c4b4713705eb"
+   },
+   {
+    "sha": "8cac907",
+    "full": "8cac907581fc2f01cb2eeb4e6d365d5e240f486b",
+    "version": "",
+    "msg": "Merge current mobile improvements and finish topic review fixes",
+    "at": "2026-10-19T05:06:21Z",
+    "tests": "success",
+    "url": "https://github.com/amanmehta1352/AlphaTestbookapp/commit/8cac907581fc2f01cb2eeb4e6d365d5e240f486b"
+   },
+   {
+    "sha": "cec16f1",
+    "full": "cec16f1c77badaa3324dea0ee12b2d7442f49218",
+    "version": "",
+    "msg": "Prevent deferred focus from returning to closed dialogs",
+    "at": "2026-10-19T04:46:42Z",
+    "tests": "success",
+    "url": "https://github.com/amanmehta1352/AlphaTestbookapp/commit/cec16f1c77badaa3324dea0ee12b2d7442f49218"
+   },
+   {
+    "sha": "a9cccaf",
+    "full": "a9cccaf35177b1b022ff6a870b6396336c6c5d4a",
+    "version": "",
+    "msg": "Document routing, study UI, test builder, and build helpers",
+    "at": "2026-10-19T04:41:46Z",
+    "tests": "success",
+    "url": "https://github.com/amanmehta1352/AlphaTestbookapp/commit/a9cccaf35177b1b022ff6a870b6396336c6c5d4a"
+   },
+   {
+    "sha": "7b3f88a",
+    "full": "7b3f88a64c788f4ba03ab953fea04552bd396e4f",
+    "version": "",
+    "msg": "Translate account description for English mode",
+    "at": "2026-10-19T04:36:59Z",
+    "tests": "success",
+    "url": "https://github.com/amanmehta1352/AlphaTestbookapp/commit/7b3f88a64c788f4ba03ab953fea04552bd396e4f"
+   },
+   {
+    "sha": "1c104ae",
+    "full": "1c104ae8dfd05345ac0fbabd82358d783e0155eb",
+    "version": "",
+    "msg": "Escape assessment titles and serialize launch identifiers",
+    "at": "2026-10-19T04:35:00Z",
+    "tests": "failure",
+    "url": "https://github.com/amanmehta1352/AlphaTestbookapp/commit/1c104ae8dfd05345ac0fbabd82358d783e0155eb"
+   },
+   {
+    "sha": "173591d",
+    "full": "173591dc2f3cf52b07f02e89b864af8a98af1db0",
+    "version": "",
+    "msg": "Fix test hub group selection and Control Room text contrast",
+    "at": "2026-10-19T04:18:10Z",
+    "tests": "success",
+    "url": "https://github.com/amanmehta1352/AlphaTestbookapp/commit/173591dc2f3cf52b07f02e89b864af8a98af1db0"
+   },
+   {
+    "sha": "3786fe2",
+    "full": "3786fe2b91857b9324b847757db6eab1e8e296b0",
+    "version": "",
+    "msg": "fix: keep release builds in sync and finish mobile design priorities",
+    "at": "2026-10-19T04:16:30Z",
+    "tests": "none",
+    "url": "https://github.com/amanmehta1352/AlphaTestbookapp/commit/3786fe2b91857b9324b847757db6eab1e8e296b0"
+   },
+   {
+    "sha": "67512fa",
+    "full": "67512fa88a746aa1791ba658f9f53c07ba617230",
+    "version": "",
+    "msg": "Fix modal focus race and navigation review findings",
+    "at": "2026-10-19T04:08:15Z",
+    "tests": "failure",
+    "url": "https://github.com/amanmehta1352/AlphaTestbookapp/commit/67512fa88a746aa1791ba658f9f53c07ba617230"
+   },
+   {
+    "sha": "f494af1",
+    "full": "f494af1e9cf340bee3f6281abf1753b1815ee1a2",
+    "version": "",
+    "msg": "Apply action-oriented design across student and admin screens",
+    "at": "2026-10-19T04:02:23Z",
+    "tests": "success",
+    "url": "https://github.com/amanmehta1352/AlphaTestbookapp/commit/f494af1e9cf340bee3f6281abf1753b1815ee1a2"
+   }
+  ],
+  "pages": {
+   "status": "built",
+   "url": "https://amanmehta1352.github.io/AlphaTestbookapp/"
+  },
+  "rate_limit": {
+   "remaining": 4993,
+   "limit": 5000
+  }
+ },
+ "tests": {
+  "at": "2026-10-19T11:35:30+00:00",
+  "suites": [
+   {
+    "suite": "test_build",
+    "ok": true,
+    "passed": 8,
+    "failed": 0,
+    "fails": [],
+    "errors": []
+   },
+   {
+    "suite": "test_u1_reg",
+    "ok": true,
+    "passed": 63,
+    "failed": 0,
+    "fails": [],
+    "errors": []
+   },
+   {
+    "suite": "test_u2_v4",
+    "ok": true,
+    "passed": 72,
+    "failed": 0,
+    "fails": [],
+    "errors": []
+   },
+   {
+    "suite": "test_u3",
+    "ok": true,
+    "passed": 34,
+    "failed": 0,
+    "fails": [],
+    "errors": []
+   },
+   {
+    "suite": "test_u4a",
+    "ok": true,
+    "passed": 34,
+    "failed": 0,
+    "fails": [],
+    "errors": []
+   },
+   {
+    "suite": "test_u4b",
+    "ok": true,
+    "passed": 33,
+    "failed": 0,
+    "fails": [],
+    "errors": []
+   },
+   {
+    "suite": "test_u4c",
+    "ok": true,
+    "passed": 36,
+    "failed": 0,
+    "fails": [],
+    "errors": []
+   },
+   {
+    "suite": "test_u5",
+    "ok": true,
+    "passed": 44,
+    "failed": 0,
+    "fails": [],
+    "errors": []
+   },
+   {
+    "suite": "test_a",
+    "ok": true,
+    "passed": 52,
+    "failed": 0,
+    "fails": [],
+    "errors": []
+   },
+   {
+    "suite": "test_c1",
+    "ok": true,
+    "passed": 28,
+    "failed": 0,
+    "fails": [],
+    "errors": []
+   },
+   {
+    "suite": "test_c2",
+    "ok": true,
+    "passed": 25,
+    "failed": 0,
+    "fails": [],
+    "errors": []
+   },
+   {
+    "suite": "test_f1",
+    "ok": true,
+    "passed": 18,
+    "failed": 0,
+    "fails": [],
+    "errors": []
+   },
+   {
+    "suite": "test_clean",
+    "ok": true,
+    "passed": 26,
+    "failed": 0,
+    "fails": [],
+    "errors": []
+   },
+   {
+    "suite": "test_pwa",
+    "ok": true,
+    "passed": 9,
+    "failed": 0,
+    "fails": [],
+    "errors": []
+   },
+   {
+    "suite": "test_defaults",
+    "ok": true,
+    "passed": 15,
+    "failed": 0,
+    "fails": [],
+    "errors": []
+   },
+   {
+    "suite": "test_sql_v2",
+    "ok": true,
+    "passed": 15,
+    "failed": 0,
+    "fails": [],
+    "errors": []
+   },
+   {
+    "suite": "test_studio",
+    "ok": true,
+    "passed": 30,
+    "failed": 0,
+    "fails": [],
+    "errors": []
+   },
+   {
+    "suite": "test_robot",
+    "ok": true,
+    "passed": 10,
+    "failed": 0,
+    "fails": [],
+    "errors": []
+   },
+   {
+    "suite": "test_hindi",
+    "ok": true,
+    "passed": 11,
+    "failed": 0,
+    "fails": [],
+    "errors": []
+   },
+   {
+    "suite": "test_tagger",
+    "ok": true,
+    "passed": 6,
+    "failed": 0,
+    "fails": [],
+    "errors": []
+   },
+   {
+    "suite": "test_profile",
+    "ok": true,
+    "passed": 15,
+    "failed": 0,
+    "fails": [],
+    "errors": []
+   },
+   {
+    "suite": "test_v3",
+    "ok": true,
+    "passed": 64,
+    "failed": 0,
+    "fails": [],
+    "errors": []
+   },
+   {
+    "suite": "test_design",
+    "ok": true,
+    "passed": 41,
+    "failed": 0,
+    "fails": [],
+    "errors": []
+   },
+   {
+    "suite": "test_mobile_design",
+    "ok": true,
+    "passed": 52,
+    "failed": 0,
+    "fails": [],
+    "errors": []
+   },
+   {
+    "suite": "test_navigation",
+    "ok": true,
+    "passed": 47,
+    "failed": 0,
+    "fails": [],
+    "errors": []
+   },
+   {
+    "suite": "test_keycheck",
+    "ok": true,
+    "passed": 25,
+    "failed": 0,
+    "fails": [],
+    "errors": []
+   },
+   {
+    "suite": "test_health",
+    "ok": true,
+    "passed": 11,
+    "failed": 0,
+    "fails": [],
+    "errors": []
+   },
+   {
+    "suite": "test_ops",
+    "ok": true,
+    "passed": 86,
+    "failed": 0,
+    "fails": [],
+    "errors": []
+   }
+  ],
+  "passed": 910,
+  "failed_suites": [],
+  "run_url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39245196151",
+  "conclusion": "success",
+  "sha": "b7ce130",
+  "run_at": "2026-10-19T11:35:34Z"
+ },
+ "keycheck": {
+  "at": "2026-10-18T21:20:44Z",
+  "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39159744869",
+  "by_code": {
+   "A2": 4,
+   "A3": 15
+  },
+  "total": 19,
+  "sample": [
+   {
+    "id": "Q-not-provided-in-source-maths-profit-and-loss-1193",
+    "code": "A2",
+    "msg": "दो options एक जैसे — जवाब साफ़ नहीं"
+   },
+   {
+    "id": "Q-pending-not-recovered-verified-in-this-batch-check-authoritative-pdf-science-animal-kingdom-zoology-31",
+    "code": "A2",
+    "msg": "दो options एक जैसे — जवाब साफ़ नहीं"
+   },
+   {
+    "id": "Q-pending-not-recovered-verified-in-this-batch-check-authoritative-pdf-science-animal-kingdom-zoology-44",
+    "code": "A2",
+    "msg": "दो options एक जैसे — जवाब साफ़ नहीं"
+   },
+   {
+    "id": "Q-rrb-group-d-maths-percentage-890",
+    "code": "A3",
+    "msg": "सवाल का text बहुत छोटा/कटा हुआ"
+   },
+   {
+    "id": "Q-rrb-group-d-maths-percentage-891",
+    "code": "A3",
+    "msg": "सवाल का text बहुत छोटा/कटा हुआ"
+   },
+   {
+    "id": "Q-rrb-group-d-maths-percentage-892",
+    "code": "A3",
+    "msg": "सवाल का text बहुत छोटा/कटा हुआ"
+   },
+   {
+    "id": "Q-rrb-group-d-maths-percentage-894",
+    "code": "A3",
+    "msg": "सवाल का text बहुत छोटा/कटा हुआ"
+   },
+   {
+    "id": "Q-rrb-group-d-maths-percentage-895",
+    "code": "A3",
+    "msg": "सवाल का text बहुत छोटा/कटा हुआ"
+   },
+   {
+    "id": "Q-rrb-group-d-maths-percentage-897",
+    "code": "A3",
+    "msg": "सवाल का text बहुत छोटा/कटा हुआ"
+   },
+   {
+    "id": "Q-rrb-group-d-maths-percentage-898",
+    "code": "A3",
+    "msg": "सवाल का text बहुत छोटा/कटा हुआ"
+   },
+   {
+    "id": "Q-rrb-group-d-maths-percentage-899",
+    "code": "A3",
+    "msg": "सवाल का text बहुत छोटा/कटा हुआ"
+   },
+   {
+    "id": "Q-rrb-group-d-maths-percentage-900",
+    "code": "A3",
+    "msg": "सवाल का text बहुत छोटा/कटा हुआ"
+   },
+   {
+    "id": "Q-rrb-group-d-maths-profit-and-loss-901",
+    "code": "A3",
+    "msg": "सवाल का text बहुत छोटा/कटा हुआ"
+   },
+   {
+    "id": "Q-rrb-group-d-maths-profit-and-loss-902",
+    "code": "A3",
+    "msg": "सवाल का text बहुत छोटा/कटा हुआ"
+   },
+   {
+    "id": "Q-rrb-group-d-maths-profit-and-loss-903",
+    "code": "A3",
+    "msg": "सवाल का text बहुत छोटा/कटा हुआ"
+   }
+  ]
+ },
+ "supabase": {
+  "ok": true,
+  "ms": 6425,
+  "questions": {
+   "total": 5977,
+   "live": 4673,
+   "draft": 1024,
+   "reviewed": 2,
+   "hidden": 333,
+   "pyq_live": 3625,
+   "practice_live": 1048,
+   "no_hindi_live": 12,
+   "untagged_live": 1581,
+   "broken_live": 0,
+   "dup_options_live": 0,
+   "no_expl_live": 3625,
+   "added_7d": 5977,
+   "by_subject": {
+    "general-awareness": 1363,
+    "maths": 996,
+    "reasoning": 841,
+    "civil-engineering": 722,
+    "mechanical-engineering": 364,
+    "electrical-engineering": 335,
+    "science": 52
+   },
+   "problem_ids": {
+    "broken": [],
+    "dup_options": []
+   },
+   "quality_by_subject": {
+    "general-awareness": {
+     "live": 1363,
+     "untagged": 1014,
+     "no_expl": 1363,
+     "hidden": 1,
+     "no_hindi": 1
+    },
+    "maths": {
+     "hidden": 275,
+     "live": 996
+    },
+    "reasoning": {
+     "live": 841,
+     "no_expl": 841,
+     "hidden": 50,
+     "untagged": 25,
+     "no_hindi": 8
+    },
+    "civil-engineering": {
+     "live": 722,
+     "no_expl": 722,
+     "untagged": 219,
+     "hidden": 4,
+     "no_hindi": 1
+    },
+    "mechanical-engineering": {
+     "live": 364,
+     "no_expl": 364,
+     "untagged": 71,
+     "no_hindi": 1
+    },
+    "electrical-engineering": {
+     "live": 335,
+     "untagged": 252,
+     "no_expl": 335,
+     "hidden": 1,
+     "no_hindi": 1
+    },
+    "science": {
+     "hidden": 2,
+     "live": 52
+    },
+    "mixed": {
+     "pending": 971
+    }
+   }
+  },
+  "students": {
+   "total": 4,
+   "new_7d": 4,
+   "active_1d": 1,
+   "active_7d": 3,
+   "answers_1d": 23,
+   "answers_7d": 77,
+   "accuracy_7d": 29,
+   "tests_7d": 14,
+   "admins": 1,
+   "trend": [
+    {
+     "day": "2026-10-07",
+     "active": 0,
+     "answers": 0,
+     "tests": 0
+    },
+    {
+     "day": "2026-10-08",
+     "active": 0,
+     "answers": 0,
+     "tests": 0
+    },
+    {
+     "day": "2026-10-09",
+     "active": 0,
+     "answers": 0,
+     "tests": 0
+    },
+    {
+     "day": "2026-10-10",
+     "active": 0,
+     "answers": 0,
+     "tests": 0
+    },
+    {
+     "day": "2026-10-11",
+     "active": 0,
+     "answers": 0,
+     "tests": 0
+    },
+    {
+     "day": "2026-10-12",
+     "active": 0,
+     "answers": 0,
+     "tests": 0
+    },
+    {
+     "day": "2026-10-13",
+     "active": 0,
+     "answers": 0,
+     "tests": 0
+    },
+    {
+     "day": "2026-10-14",
+     "active": 0,
+     "answers": 0,
+     "tests": 0
+    },
+    {
+     "day": "2026-10-15",
+     "active": 0,
+     "answers": 0,
+     "tests": 0
+    },
+    {
+     "day": "2026-10-16",
+     "active": 3,
+     "answers": 42,
+     "tests": 9
+    },
+    {
+     "day": "2026-10-17",
+     "active": 1,
+     "answers": 7,
+     "tests": 2
+    },
+    {
+     "day": "2026-10-18",
+     "active": 1,
+     "answers": 1,
+     "tests": 1
+    },
+    {
+     "day": "2026-10-19",
+     "active": 1,
+     "answers": 27,
+     "tests": 2
+    },
+    {
+     "day": "2026-10-20",
+     "active": 0,
+     "answers": 0,
+     "tests": 0
+    }
+   ],
+   "subject_accuracy_7d": {
+    "general-awareness": {
+     "answers": 28,
+     "accuracy": 32
+    },
+    "maths": {
+     "answers": 25,
+     "accuracy": 20
+    },
+    "mechanical-engineering": {
+     "answers": 15,
+     "accuracy": 33
+    },
+    "civil-engineering": {
+     "answers": 6,
+     "accuracy": 33
+    },
+    "reasoning": {
+     "answers": 3,
+     "accuracy": 33
+    }
+   }
+  },
+  "db": {
+   "auth": {
+    "users": 4,
+    "admins": 1,
+    "new_24h": 0,
+    "signins_24h": 0
+   },
+   "perf": {
+    "slow": 18,
+    "calls": 48429,
+    "mean_ms": 6.19
+   },
+   "exact": {
+    "topics": 60,
+    "results": 14,
+    "attempts": 77,
+    "profiles": 4,
+    "bookmarks": 1,
+    "questions": 5977
+   },
+   "tables": {
+    "exams": {
+     "rows": 59,
+     "bytes": 65536
+    },
+    "admins": {
+     "rows": -1,
+     "bytes": 32768
+    },
+    "topics": {
+     "rows": 57,
+     "bytes": 73728
+    },
+    "results": {
+     "rows": -1,
+     "bytes": 122880
+    },
+    "attempts": {
+     "rows": 54,
+     "bytes": 139264
+    },
+    "ops_runs": {
+     "rows": 51,
+     "bytes": 81920
+    },
+    "profiles": {
+     "rows": -1,
+     "bytes": 32768
+    },
+    "bookmarks": {
+     "rows": -1,
+     "bytes": 32768
+    },
+    "ops_audit": {
+     "rows": 1244,
+     "bytes": 843776
+    },
+    "ops_tasks": {
+     "rows": 16,
+     "bytes": 237568
+    },
+    "questions": {
+     "rows": 5479,
+     "bytes": 10051584
+    },
+    "ops_events": {
+     "rows": 631,
+     "bytes": 229376
+    },
+    "ops_requests": {
+     "rows": 26,
+     "bytes": 32768
+    },
+    "ops_settings": {
+     "rows": 22,
+     "bytes": 32768
+    },
+    "review_cards": {
+     "rows": -1,
+     "bytes": 16384
+    },
+    "ops_incidents": {
+     "rows": 25,
+     "bytes": 81920
+    },
+    "import_batches": {
+     "rows": -1,
+     "bytes": 65536
+    },
+    "ops_client_errors": {
+     "rows": -1,
+     "bytes": 81920
+    }
+   },
+   "backups": {
+    "count": 7,
+    "last_at": "2026-10-20T00:17:39.521454+00:00",
+    "last_verified": "2026-10-20T00:17:42.616885+00:00"
+   },
+   "db_bytes": 54646451,
+   "audit_24h": 76,
+   "integrity": {
+    "bad_answer": 0,
+    "duplicate_live": 220,
+    "orphan_attempts": 0,
+    "orphan_questions": 0,
+    "no_explanation_live": 3625
+   },
+   "connections": 7,
+   "backup_bytes": 29589504,
+   "storage_bytes": 474278,
+   "storage_files": 1,
+   "client_errors_24h": 0
+  },
+  "settings": {
+   "robots.paused": false,
+   "data.frozen": false,
+   "publish.auto": false,
+   "robot.pyq.enabled": true,
+   "robot.hindi.enabled": true,
+   "robot.tag.enabled": true,
+   "robot.keycheck.enabled": true,
+   "robot.backup.enabled": true,
+   "robot.health.enabled": true,
+   "maintenance": {
+    "on": false,
+    "message": ""
+   },
+   "tag.min_prob": 0.55,
+   "tag.min_cv": 0.8,
+   "keycheck.gemini_limit": 150,
+   "backup.keep": 14,
+   "alerts.issue": true,
+   "quality.min_text": 8,
+   "retry.auto": true,
+   "retry.max": 1,
+   "robot.ops.enabled": true,
+   "robot.design.enabled": true,
+   "finance.assumptions": {
+    "price": 99,
+    "fee_pct": 2,
+    "gst_pct": 18,
+    "conversion": 3,
+    "refund_pct": 1,
+    "ai_per_user": 0,
+    "fixed_monthly": 0,
+    "infra_per_user": 0
+   },
+   "ops.lease": {
+    "by": "released",
+    "until": "2026-10-20T09:28:32Z"
+   }
+  },
+  "settings_meta": {
+   "robots.paused": {
+    "label": "सारे robots रोको (Global pause)",
+    "note": "true = कोई robot server नहीं बदलेगा; Tests/Health चलते रहेंगे",
+    "at": "2026-10-17T03:18:10.742477+00:00",
+    "by": ""
+   },
+   "data.frozen": {
+    "label": "Data बदलना बंद (Freeze)",
+    "note": "true = PYQ/Hindi/Tag robots server पर कुछ नहीं लिखेंगे",
+    "at": "2026-10-17T03:18:10.742477+00:00",
+    "by": ""
+   },
+   "publish.auto": {
+    "label": "Auto-publish",
+    "note": "false = हर publish इंसान करेगा",
+    "at": "2026-10-17T03:18:10.742477+00:00",
+    "by": ""
+   },
+   "robot.pyq.enabled": {
+    "label": "🤖 PYQ Robot चालू",
+    "note": null,
+    "at": "2026-10-17T03:18:10.742477+00:00",
+    "by": ""
+   },
+   "robot.hindi.enabled": {
+    "label": "🌐 Hindi Robot चालू",
+    "note": null,
+    "at": "2026-10-17T03:18:10.742477+00:00",
+    "by": ""
+   },
+   "robot.tag.enabled": {
+    "label": "🏷️ Tag Robot चालू",
+    "note": null,
+    "at": "2026-10-17T03:18:10.742477+00:00",
+    "by": ""
+   },
+   "robot.keycheck.enabled": {
+    "label": "🔑 Key-check Robot चालू",
+    "note": null,
+    "at": "2026-10-17T03:18:10.742477+00:00",
+    "by": ""
+   },
+   "robot.backup.enabled": {
+    "label": "💾 Backup Robot चालू",
+    "note": null,
+    "at": "2026-10-17T03:18:10.742477+00:00",
+    "by": ""
+   },
+   "robot.health.enabled": {
+    "label": "🩺 Health Robot चालू",
+    "note": null,
+    "at": "2026-10-17T03:18:10.742477+00:00",
+    "by": ""
+   },
+   "maintenance": {
+    "label": "Maintenance mode",
+    "note": "on = ऐप में ऊपर संदेश दिखेगा",
+    "at": "2026-10-17T03:18:10.742477+00:00",
+    "by": ""
+   },
+   "tag.min_prob": {
+    "label": "Tag Robot: कम से कम भरोसा",
+    "note": "0.5–0.95",
+    "at": "2026-10-17T03:18:10.742477+00:00",
+    "by": ""
+   },
+   "tag.min_cv": {
+    "label": "Tag Robot: subject की कम से कम सटीकता",
+    "note": "0.6–0.99",
+    "at": "2026-10-17T03:18:10.742477+00:00",
+    "by": ""
+   },
+   "keycheck.gemini_limit": {
+    "label": "Key-check: Gemini सवाल प्रति run",
+    "note": "free सीमा",
+    "at": "2026-10-17T03:18:10.742477+00:00",
+    "by": ""
+   },
+   "backup.keep": {
+    "label": "कितने backup रखें",
+    "note": "3–60",
+    "at": "2026-10-17T03:18:10.742477+00:00",
+    "by": ""
+   },
+   "alerts.issue": {
+    "label": "लाल होने पर GitHub issue",
+    "note": null,
+    "at": "2026-10-17T03:18:10.742477+00:00",
+    "by": ""
+   },
+   "quality.min_text": {
+    "label": "सवाल का कम से कम text (अक्षर)",
+    "note": "इससे छोटा = टूटा",
+    "at": "2026-10-17T03:18:10.742477+00:00",
+    "by": ""
+   },
+   "retry.auto": {
+    "label": "Auto-retry (कम जोखिम वाले robots)",
+    "note": "fail होने पर 1 बार अपने-आप दोबारा",
+    "at": "2026-10-17T06:11:53.520379+00:00",
+    "by": ""
+   },
+   "retry.max": {
+    "label": "Auto-retry: कितनी बार",
+    "note": "1–3",
+    "at": "2026-10-17T06:11:53.520379+00:00",
+    "by": ""
+   },
+   "robot.ops.enabled": {
+    "label": "⚙️ Ops Robot चालू",
+    "note": "बंद = Control Room के काम रुकेंगे",
+    "at": "2026-10-17T06:11:53.520379+00:00",
+    "by": ""
+   },
+   "robot.design.enabled": {
+    "label": "🎨 Design Audit Robot चालू",
+    "note": null,
+    "at": "2026-10-17T06:11:53.520379+00:00",
+    "by": ""
+   },
+   "finance.assumptions": {
+    "label": "Finance: मान्यताएँ",
+    "note": "सिर्फ़ अनुमान",
+    "at": "2026-10-17T06:11:53.520379+00:00",
+    "by": ""
+   },
+   "ops.lease": {
+    "label": "Ops worker lease (internal)",
+    "note": "एक समय पर एक worker",
+    "at": "2026-10-20T09:28:34.258164+00:00",
+    "by": "ops-robot"
+   }
+  },
+  "backups": [
+   {
+    "id": 7,
+    "at": "2026-10-20T00:17:39.521454+00:00",
+    "kind": "auto",
+    "note": "",
+    "questions": 5977,
+    "students": 4,
+    "size_kb": 2127,
+    "verified": "ok",
+    "verified_at": "2026-10-20T00:17:42.616885+00:00"
+   },
+   {
+    "id": 6,
+    "at": "2026-10-18T23:05:33.120955+00:00",
+    "kind": "auto",
+    "note": "",
+    "questions": 5977,
+    "students": 4,
+    "size_kb": 2125,
+    "verified": "ok",
+    "verified_at": "2026-10-18T23:05:36.418575+00:00"
+   },
+   {
+    "id": 5,
+    "at": "2026-10-17T23:05:01.718931+00:00",
+    "kind": "auto",
+    "note": "",
+    "questions": 5006,
+    "students": 4,
+    "size_kb": 1762,
+    "verified": "ok",
+    "verified_at": "2026-10-17T23:05:04.526592+00:00"
+   },
+   {
+    "id": 4,
+    "at": "2026-10-17T09:17:37.791097+00:00",
+    "kind": "manual",
+    "note": "before pyq upload bucket",
+    "questions": 5006,
+    "students": 4,
+    "size_kb": 1755,
+    "verified": null,
+    "verified_at": null
+   },
+   {
+    "id": 3,
+    "at": "2026-10-17T06:09:08.256727+00:00",
+    "kind": "pre-migration",
+    "note": "before V5 (CEO command center)",
+    "questions": 5006,
+    "students": 4,
+    "size_kb": 1751,
+    "verified": "ok",
+    "verified_at": "2026-10-17T06:39:37.989374+00:00"
+   },
+   {
+    "id": 2,
+    "at": "2026-10-17T03:43:38.094489+00:00",
+    "kind": "auto",
+    "note": "",
+    "questions": 5006,
+    "students": 4,
+    "size_kb": 1751,
+    "verified": "ok",
+    "verified_at": "2026-10-17T03:43:40.239136+00:00"
+   },
+   {
+    "id": 1,
+    "at": "2026-10-17T03:19:53.068911+00:00",
+    "kind": "manual",
+    "note": "first backup (Control Room setup)",
+    "questions": 5006,
+    "students": 4,
+    "size_kb": 1751,
+    "verified": "ok",
+    "verified_at": "2026-10-17T03:19:58.321481+00:00"
+   }
+  ],
+  "requests": [
+   {
+    "id": 37,
+    "action": "rollback",
+    "target": "",
+    "status": "sent",
+    "result": "rollback robot शुरू (84191ed)",
+    "at": "2026-10-19T15:37:12.993244+00:00",
+    "done_at": "2026-10-19T20:00:45+00:00"
+   },
+   {
+    "id": 36,
+    "action": "run",
+    "target": "health-robot.yml",
+    "status": "sent",
+    "result": "health-robot.yml शुरू किया",
+    "at": "2026-10-19T14:21:34.028903+00:00",
+    "done_at": "2026-10-19T14:24:45+00:00"
+   },
+   {
+    "id": 35,
+    "action": "run",
+    "target": "health-robot.yml",
+    "status": "sent",
+    "result": "health-robot.yml शुरू किया",
+    "at": "2026-10-19T11:49:32.325627+00:00",
+    "done_at": "2026-10-19T11:50:11+00:00"
+   },
+   {
+    "id": 34,
+    "action": "run",
+    "target": "key-check-robot.yml",
+    "status": "sent",
+    "result": "key-check-robot.yml शुरू किया",
+    "at": "2026-10-18T19:01:02.282815+00:00",
+    "done_at": "2026-10-18T19:39:12+00:00"
+   },
+   {
+    "id": 33,
+    "action": "run",
+    "target": "key-check-robot.yml",
+    "status": "sent",
+    "result": "key-check-robot.yml शुरू किया",
+    "at": "2026-10-18T18:58:59.572304+00:00",
+    "done_at": "2026-10-18T19:39:10+00:00"
+   },
+   {
+    "id": 32,
+    "action": "run",
+    "target": "hindi-robot.yml",
+    "status": "sent",
+    "result": "hindi-robot.yml शुरू किया",
+    "at": "2026-10-18T13:16:23.540182+00:00",
+    "done_at": "2026-10-18T13:18:07+00:00"
+   },
+   {
+    "id": 31,
+    "action": "run",
+    "target": "health-robot.yml",
+    "status": "sent",
+    "result": "health-robot.yml शुरू किया",
+    "at": "2026-10-18T10:28:54.103845+00:00",
+    "done_at": "2026-10-18T10:32:36+00:00"
+   },
+   {
+    "id": 30,
+    "action": "run",
+    "target": "health-robot.yml",
+    "status": "rejected",
+    "result": "duplicate — यही काम पहले से कतार में था",
+    "at": "2026-10-18T07:46:01.846719+00:00",
+    "done_at": "2026-10-18T09:09:46+00:00"
+   },
+   {
+    "id": 29,
+    "action": "run",
+    "target": "hindi-robot.yml",
+    "status": "sent",
+    "result": "hindi-robot.yml शुरू किया",
+    "at": "2026-10-18T07:22:08.891663+00:00",
+    "done_at": "2026-10-18T09:09:45+00:00"
+   },
+   {
+    "id": 28,
+    "action": "run",
+    "target": "health-robot.yml",
+    "status": "rejected",
+    "result": "duplicate — यही काम पहले से कतार में था",
+    "at": "2026-10-18T07:06:54.111552+00:00",
+    "done_at": "2026-10-18T09:09:43+00:00"
+   },
+   {
+    "id": 27,
+    "action": "run",
+    "target": "health-robot.yml",
+    "status": "sent",
+    "result": "health-robot.yml शुरू किया",
+    "at": "2026-10-18T06:57:47.132161+00:00",
+    "done_at": "2026-10-18T09:09:42+00:00"
+   },
+   {
+    "id": 26,
+    "action": "run",
+    "target": "smoke.yml",
+    "status": "sent",
+    "result": "smoke.yml शुरू किया",
+    "at": "2026-10-18T04:50:54.848503+00:00",
+    "done_at": "2026-10-18T04:57:17+00:00"
+   },
+   {
+    "id": 25,
+    "action": "run",
+    "target": "health-robot.yml",
+    "status": "rejected",
+    "result": "duplicate — यही काम पहले से कतार में था",
+    "at": "2026-10-18T04:26:06.911003+00:00",
+    "done_at": "2026-10-18T04:43:40+00:00"
+   },
+   {
+    "id": 24,
+    "action": "run",
+    "target": "health-robot.yml",
+    "status": "sent",
+    "result": "health-robot.yml शुरू किया",
+    "at": "2026-10-18T04:22:26.747458+00:00",
+    "done_at": "2026-10-18T04:43:39+00:00"
+   },
+   {
+    "id": 23,
+    "action": "run",
+    "target": "health-robot.yml",
+    "status": "sent",
+    "result": "health-robot.yml शुरू किया",
+    "at": "2026-10-17T21:38:28.822124+00:00",
+    "done_at": "2026-10-17T22:26:42+00:00"
+   }
+  ],
+  "robot_runs": {
+   "backup": {
+    "runs": 4,
+    "ok": 4,
+    "processed": 22815,
+    "changed": 4,
+    "last": {
+     "at": "2026-10-20T00:17:43+00:00",
+     "ok": true,
+     "processed": 6216,
+     "changed": 1,
+     "note": "💾 Backup #7 · जाँच: ok · सवाल 5977 · students 4 · जवाब 77 · टेस्ट 14"
+    }
+   },
+   "ops": {
+    "runs": 10,
+    "ok": 10,
+    "processed": 34,
+    "changed": 29,
+    "last": {
+     "at": "2026-10-19T14:24:49+00:00",
+     "ok": true,
+     "processed": 1,
+     "changed": 1,
+     "note": "1 requests · 0 task steps · 0 auto-retries"
+    }
+   },
+   "design": {
+    "runs": 2,
+    "ok": 2,
+    "processed": 146,
+    "changed": 0,
+    "last": {
+     "at": "2026-10-19T06:09:28+00:00",
+     "ok": true,
+     "processed": 73,
+     "changed": 0,
+     "note": "- Sideways scroll: 0 []"
+    }
+   },
+   "keycheck": {
+    "runs": 7,
+    "ok": 5,
+    "processed": 1136,
+    "changed": 0,
+    "last": {
+     "at": "2026-10-18T21:20:41+00:00",
+     "ok": false,
+     "processed": null,
+     "changed": null,
+     "note": "failure"
+    }
+   },
+   "pyq": {
+    "runs": 11,
+    "ok": 3,
+    "processed": 30,
+    "changed": 971,
+    "last": {
+     "at": "2026-10-18T19:21:26+00:00",
+     "ok": true,
+     "processed": 10,
+     "changed": 0,
+     "note": "10 papers, 0 failed (dry run)"
+    }
+   },
+   "hindi": {
+    "runs": 48,
+    "ok": 48,
+    "processed": 150,
+    "changed": 6,
+    "last": {
+     "at": "2026-10-18T13:21:48+00:00",
+     "ok": true,
+     "processed": 6,
+     "changed": 0,
+     "note": "shard 7/8"
+    }
+   },
+   "tag": {
+    "runs": 4,
+    "ok": 4,
+    "processed": 7133,
+    "changed": 84,
+    "last": {
+     "at": "2026-10-18T05:55:13+00:00",
+     "ok": true,
+     "processed": 2480,
+     "changed": 0,
+     "note": "success"
+    }
+   }
+  },
+  "audit": [
+   {
+    "id": 1372,
+    "at": "2026-10-20T09:28:34.258164+00:00",
+    "table": "ops_settings",
+    "row": "ops.lease",
+    "action": "UPDATE",
+    "actor": "ops-robot",
+    "reason": "",
+    "fields": [
+     "value"
+    ]
+   },
+   {
+    "id": 1371,
+    "at": "2026-10-20T09:28:32.983955+00:00",
+    "table": "ops_settings",
+    "row": "ops.lease",
+    "action": "UPDATE",
+    "actor": "ops-robot",
+    "reason": "",
+    "fields": [
+     "value"
+    ]
+   },
+   {
+    "id": 1370,
+    "at": "2026-10-20T07:28:24.223044+00:00",
+    "table": "ops_settings",
+    "row": "ops.lease",
+    "action": "UPDATE",
+    "actor": "ops-robot",
+    "reason": "",
+    "fields": [
+     "value"
+    ]
+   },
+   {
+    "id": 1369,
+    "at": "2026-10-20T07:28:23.176056+00:00",
+    "table": "ops_settings",
+    "row": "ops.lease",
+    "action": "UPDATE",
+    "actor": "ops-robot",
+    "reason": "",
+    "fields": [
+     "value"
+    ]
+   },
+   {
+    "id": 1368,
+    "at": "2026-10-20T05:01:52.067026+00:00",
+    "table": "ops_settings",
+    "row": "ops.lease",
+    "action": "UPDATE",
+    "actor": "ops-robot",
+    "reason": "",
+    "fields": [
+     "value"
+    ]
+   },
+   {
+    "id": 1367,
+    "at": "2026-10-20T05:01:51.404188+00:00",
+    "table": "ops_settings",
+    "row": "ops.lease",
+    "action": "UPDATE",
+    "actor": "ops-robot",
+    "reason": "",
+    "fields": [
+     "value"
+    ]
+   },
+   {
+    "id": 1366,
+    "at": "2026-10-20T02:04:03.936027+00:00",
+    "table": "ops_settings",
+    "row": "ops.lease",
+    "action": "UPDATE",
+    "actor": "ops-robot",
+    "reason": "",
+    "fields": [
+     "value"
+    ]
+   },
+   {
+    "id": 1365,
+    "at": "2026-10-20T02:04:02.789823+00:00",
+    "table": "ops_settings",
+    "row": "ops.lease",
+    "action": "UPDATE",
+    "actor": "ops-robot",
+    "reason": "",
+    "fields": [
+     "value"
+    ]
+   },
+   {
+    "id": 1364,
+    "at": "2026-10-20T00:17:55.109249+00:00",
+    "table": "ops_settings",
+    "row": "ops.lease",
+    "action": "UPDATE",
+    "actor": "ops-robot",
+    "reason": "",
+    "fields": [
+     "value"
+    ]
+   },
+   {
+    "id": 1363,
+    "at": "2026-10-20T00:17:54.11005+00:00",
+    "table": "ops_settings",
+    "row": "ops.lease",
+    "action": "UPDATE",
+    "actor": "ops-robot",
+    "reason": "",
+    "fields": [
+     "value"
+    ]
+   },
+   {
+    "id": 1362,
+    "at": "2026-10-19T23:48:46.874533+00:00",
+    "table": "ops_settings",
+    "row": "ops.lease",
+    "action": "UPDATE",
+    "actor": "ops-robot",
+    "reason": "",
+    "fields": [
+     "value"
+    ]
+   },
+   {
+    "id": 1361,
+    "at": "2026-10-19T23:48:46.405071+00:00",
+    "table": "ops_settings",
+    "row": "ops.lease",
+    "action": "UPDATE",
+    "actor": "ops-robot",
+    "reason": "",
+    "fields": [
+     "value"
+    ]
+   },
+   {
+    "id": 1360,
+    "at": "2026-10-19T23:35:50.964076+00:00",
+    "table": "ops_settings",
+    "row": "ops.lease",
+    "action": "UPDATE",
+    "actor": "ops-robot",
+    "reason": "",
+    "fields": [
+     "value"
+    ]
+   },
+   {
+    "id": 1359,
+    "at": "2026-10-19T23:35:49.622823+00:00",
+    "table": "ops_settings",
+    "row": "ops.lease",
+    "action": "UPDATE",
+    "actor": "ops-robot",
+    "reason": "",
+    "fields": [
+     "value"
+    ]
+   },
+   {
+    "id": 1358,
+    "at": "2026-10-19T20:06:10.612009+00:00",
+    "table": "ops_settings",
+    "row": "ops.lease",
+    "action": "UPDATE",
+    "actor": "ops-robot",
+    "reason": "",
+    "fields": [
+     "value"
+    ]
+   },
+   {
+    "id": 1357,
+    "at": "2026-10-19T20:06:09.727137+00:00",
+    "table": "ops_settings",
+    "row": "ops.lease",
+    "action": "UPDATE",
+    "actor": "ops-robot",
+    "reason": "",
+    "fields": [
+     "value"
+    ]
+   },
+   {
+    "id": 1356,
+    "at": "2026-10-19T20:00:47.402731+00:00",
+    "table": "ops_settings",
+    "row": "ops.lease",
+    "action": "UPDATE",
+    "actor": "ops-robot",
+    "reason": "",
+    "fields": [
+     "value"
+    ]
+   },
+   {
+    "id": 1355,
+    "at": "2026-10-19T20:00:46.324932+00:00",
+    "table": "ops_settings",
+    "row": "ops.lease",
+    "action": "UPDATE",
+    "actor": "ops-robot",
+    "reason": "",
+    "fields": [
+     "value"
+    ]
+   },
+   {
+    "id": 1354,
+    "at": "2026-10-19T14:24:57.145094+00:00",
+    "table": "ops_settings",
+    "row": "ops.lease",
+    "action": "UPDATE",
+    "actor": "ops-robot",
+    "reason": "",
+    "fields": [
+     "value"
+    ]
+   },
+   {
+    "id": 1353,
+    "at": "2026-10-19T14:24:55.950171+00:00",
+    "table": "ops_settings",
+    "row": "ops.lease",
+    "action": "UPDATE",
+    "actor": "ops-robot",
+    "reason": "",
+    "fields": [
+     "value"
+    ]
+   },
+   {
+    "id": 1352,
+    "at": "2026-10-19T14:24:47.496564+00:00",
+    "table": "ops_settings",
+    "row": "ops.lease",
+    "action": "UPDATE",
+    "actor": "ops-robot",
+    "reason": "",
+    "fields": [
+     "value"
+    ]
+   },
+   {
+    "id": 1351,
+    "at": "2026-10-19T14:24:45.979231+00:00",
+    "table": "ops_settings",
+    "row": "ops.lease",
+    "action": "UPDATE",
+    "actor": "ops-robot",
+    "reason": "",
+    "fields": [
+     "value"
+    ]
+   },
+   {
+    "id": 1350,
+    "at": "2026-10-19T13:39:18.702472+00:00",
+    "table": "ops_settings",
+    "row": "ops.lease",
+    "action": "UPDATE",
+    "actor": "ops-robot",
+    "reason": "",
+    "fields": [
+     "value"
+    ]
+   },
+   {
+    "id": 1349,
+    "at": "2026-10-19T13:39:18.215727+00:00",
+    "table": "ops_settings",
+    "row": "ops.lease",
+    "action": "UPDATE",
+    "actor": "ops-robot",
+    "reason": "",
+    "fields": [
+     "value"
+    ]
+   },
+   {
+    "id": 1348,
+    "at": "2026-10-19T12:25:46.903595+00:00",
+    "table": "ops_settings",
+    "row": "ops.lease",
+    "action": "UPDATE",
+    "actor": "ops-robot",
+    "reason": "",
+    "fields": [
+     "value"
+    ]
+   }
+  ],
+  "imports": [
+   {
+    "id": "ROBOT-1792302825916-27479B",
+    "title": "RRB JE 2019 · 29 May 2019 Shift 3",
+    "url": "https://docs.aglasem.com/view/0dcb0c78-aab7-11e9-aa89-02f21f5619c4",
+    "at": "2026-10-18T05:53:46.975459+00:00",
+    "added": 82,
+    "report": {
+     "added": 82,
+     "title": "RRB JE 2019 · 29 May 2019 Shift 3",
+     "skipped": {
+      "review required: bilingual_options_missing_language": 8,
+      "review required: missing_question_text,bilingual_options_missing_language": 10
+     },
+     "subjects": {
+      "mixed": 82
+     },
+     "extracted": 82,
+     "source_ref": "RRB JE 2019 29 May 2019 Shift 3 · RRB JE Question Paper with Answers for 29 May 2019 Exam Shift 3 - Download PDF | AglaSem · bilingual answer-key PDF",
+     "already_on_server": 0
+    },
+    "now": {
+     "total": 82,
+     "pending": 82,
+     "untagged": 82
+    }
+   },
+   {
+    "id": "ROBOT-1792302742812-B62451",
+    "title": "RRB JE 2019 · 29 May 2019 Shift 2",
+    "url": "https://docs.aglasem.com/view/0a55cb32-aab7-11e9-b55e-02f21f5619c4",
+    "at": "2026-10-18T05:52:23.355511+00:00",
+    "added": 87,
+    "report": {
+     "added": 87,
+     "title": "RRB JE 2019 · 29 May 2019 Shift 2",
+     "skipped": {
+      "review required: bilingual_options_missing_language": 6,
+      "review required: missing_question_text,bilingual_options_missing_language": 5,
+      "review required: missing_question_text,bilingual_question_missing_language,bilingual_options_missing_language": 2
+     },
+     "subjects": {
+      "mixed": 87
+     },
+     "extracted": 87,
+     "source_ref": "RRB JE 2019 29 May 2019 Shift 2 · RRB JE Question Paper with Answers for 29 May 2019 Exam Shift 2 - Download PDF | AglaSem · bilingual answer-key PDF",
+     "already_on_server": 0
+    },
+    "now": {
+     "total": 87,
+     "pending": 87,
+     "untagged": 87
+    }
+   },
+   {
+    "id": "ROBOT-1792302659719-FC6926",
+    "title": "RRB JE 2019 · 28 May 2019 Shift 2",
+    "url": "https://docs.aglasem.com/view/ff2518ee-aab6-11e9-99ba-02f21f5619c4",
+    "at": "2026-10-18T05:51:00.761769+00:00",
+    "added": 82,
+    "report": {
+     "added": 82,
+     "title": "RRB JE 2019 · 28 May 2019 Shift 2",
+     "skipped": {
+      "review required: bilingual_options_missing_language": 9,
+      "review required: missing_question_text,bilingual_options_missing_language": 8,
+      "review required: missing_question_text,bilingual_question_missing_language": 1
+     },
+     "subjects": {
+      "mixed": 82
+     },
+     "extracted": 82,
+     "source_ref": "RRB JE 2019 28 May 2019 Shift 2 · RRB JE Question Paper with Answers for 28 May 2019 Exam Shift 2 - Download PDF | AglaSem · bilingual answer-key PDF",
+     "already_on_server": 0
+    },
+    "now": {
+     "total": 82,
+     "pending": 82,
+     "untagged": 82
+    }
+   },
+   {
+    "id": "ROBOT-1792302584864-5E42F8",
+    "title": "RRB JE 2019 · 28 May 2019 Shift 1",
+    "url": "https://docs.aglasem.com/view/fcd7ef8a-aab6-11e9-9771-02f21f5619c4",
+    "at": "2026-10-18T05:49:45.650944+00:00",
+    "added": 82,
+    "report": {
+     "added": 82,
+     "title": "RRB JE 2019 · 28 May 2019 Shift 1",
+     "skipped": {
+      "review required: bilingual_options_missing_language": 8,
+      "review required: bilingual_question_missing_language": 2,
+      "review required: missing_question_text,bilingual_options_missing_language": 5,
+      "review required: answer_key_ocr_disagreement,bilingual_options_missing_language": 1,
+      "review required: missing_question_text,bilingual_question_missing_language,bilingual_options_missing_language": 2
+     },
+     "subjects": {
+      "mixed": 82
+     },
+     "extracted": 82,
+     "source_ref": "RRB JE 2019 28 May 2019 Shift 1 · RRB JE Question Paper with Answers for 28 May 2019 Exam Shift 1 - Download PDF | AglaSem · bilingual answer-key PDF",
+     "already_on_server": 0
+    },
+    "now": {
+     "total": 82,
+     "pending": 82,
+     "untagged": 82
+    }
+   },
+   {
+    "id": "ROBOT-1792302510914-D6B0FD",
+    "title": "RRB JE 2019 · 27 May 2019 Shift 1",
+    "url": "https://docs.aglasem.com/view/054a68dc-aab7-11e9-ba0e-02f21f5619c4",
+    "at": "2026-10-18T05:48:31.998937+00:00",
+    "added": 80,
+    "report": {
+     "added": 80,
+     "title": "RRB JE 2019 · 27 May 2019 Shift 1",
+     "skipped": {
+      "review required: bilingual_options_missing_language": 11,
+      "review required: missing_question_text,bilingual_options_missing_language": 5,
+      "review required: missing_question_text,bilingual_question_missing_language,bilingual_options_missing_language": 4
+     },
+     "subjects": {
+      "mixed": 80
+     },
+     "extracted": 80,
+     "source_ref": "RRB JE 2019 27 May 2019 Shift 1 · RRB JE Question Paper with Answers for 27 May 2019 Exam Shift 1 - Download PDF | AglaSem · bilingual answer-key PDF",
+     "already_on_server": 0
+    },
+    "now": {
+     "total": 80,
+     "pending": 80,
+     "untagged": 80
+    }
+   },
+   {
+    "id": "ROBOT-1792302439113-8D8783",
+    "title": "RRB JE 2019 · 26 May 2019 Shift 2",
+    "url": "https://docs.aglasem.com/view/fc365634-aab6-11e9-b4fa-02f21f5619c4",
+    "at": "2026-10-18T05:47:20.212719+00:00",
+    "added": 85,
+    "report": {
+     "added": 85,
+     "title": "RRB JE 2019 · 26 May 2019 Shift 2",
+     "skipped": {
+      "review required: answer_key_unavailable_or_dropped": 1,
+      "review required: bilingual_options_missing_language": 7,
+      "review required: missing_question_text,bilingual_options_missing_language": 3,
+      "review required: missing_question_text,bilingual_question_missing_language,bilingual_options_missing_language": 4
+     },
+     "subjects": {
+      "mixed": 85
+     },
+     "extracted": 85,
+     "source_ref": "RRB JE 2019 26 May 2019 Shift 2 · RRB JE Question Paper with Answers for 26 May 2019 Exam Shift 2 - Download PDF | AglaSem · bilingual answer-key PDF",
+     "already_on_server": 0
+    },
+    "now": {
+     "total": 85,
+     "pending": 85,
+     "untagged": 85
+    }
+   },
+   {
+    "id": "ROBOT-1792302361630-DDFC04",
+    "title": "RRB JE 2019 · 26 May 2019 Shift 1",
+    "url": "https://docs.aglasem.com/view/f48869f4-aab6-11e9-8826-02f21f5619c4",
+    "at": "2026-10-18T05:46:02.650325+00:00",
+    "added": 82,
+    "report": {
+     "added": 82,
+     "title": "RRB JE 2019 · 26 May 2019 Shift 1",
+     "skipped": {
+      "review required: answer_key_unavailable_or_dropped": 1,
+      "review required: bilingual_options_missing_language": 7,
+      "review required: bilingual_question_missing_language": 2,
+      "review required: missing_question_text,bilingual_options_missing_language": 7,
+      "review required: missing_question_text,bilingual_question_missing_language,bilingual_options_missing_language": 1
+     },
+     "subjects": {
+      "mixed": 82
+     },
+     "extracted": 82,
+     "source_ref": "RRB JE 2019 26 May 2019 Shift 1 · RRB JE Question Paper with Answers for 26 May 2019 Exam Shift 1 - Download PDF | AglaSem · bilingual answer-key PDF",
+     "already_on_server": 0
+    },
+    "now": {
+     "total": 82,
+     "pending": 82,
+     "untagged": 82
+    }
+   },
+   {
+    "id": "ROBOT-1792302286866-E17E7C",
+    "title": "RRB JE 2019 · 25 May 2019 Shift 3",
+    "url": "https://docs.aglasem.com/view/f5e69c58-aab6-11e9-a672-02f21f5619c4",
+    "at": "2026-10-18T05:44:47.714573+00:00",
+    "added": 73,
+    "report": {
+     "added": 73,
+     "title": "RRB JE 2019 · 25 May 2019 Shift 3",
+     "skipped": {
+      "review required: missing_question_text": 1,
+      "review required: hindi_text_encoding_suspect": 1,
+      "review required: bilingual_options_missing_language": 16,
+      "review required: bilingual_question_missing_language": 1,
+      "review required: missing_question_text,bilingual_options_missing_language": 2,
+      "review required: bilingual_options_missing_language,hindi_text_encoding_suspect": 1,
+      "review required: bilingual_question_missing_language,hindi_text_encoding_suspect": 1,
+      "review required: bilingual_question_missing_language,bilingual_options_missing_language": 1,
+      "review required: missing_question_text,bilingual_question_missing_language,bilingual_options_missing_language": 3
+     },
+     "subjects": {
+      "mixed": 73
+     },
+     "extracted": 73,
+     "source_ref": "RRB JE 2019 25 May 2019 Shift 3 · RRB JE Question Paper with Answers for 25 May 2019 Exam Shift 3 - Download PDF | AglaSem · bilingual answer-key PDF",
+     "already_on_server": 0
+    },
+    "now": {
+     "total": 73,
+     "pending": 73,
+     "untagged": 73
+    }
+   },
+   {
+    "id": "ROBOT-1792302217065-99A722",
+    "title": "RRB JE 2019 · 25 May 2019 Shift 1",
+    "url": "https://docs.aglasem.com/view/dd11042a-aab6-11e9-a8cd-02f21f5619c4",
+    "at": "2026-10-18T05:43:38.447219+00:00",
+    "added": 83,
+    "report": {
+     "added": 83,
+     "title": "RRB JE 2019 · 25 May 2019 Shift 1",
+     "skipped": {
+      "review required: bilingual_options_missing_language": 6,
+      "review required: missing_question_text,bilingual_options_missing_language": 10,
+      "review required: missing_question_text,bilingual_question_missing_language,bilingual_options_missing_language": 1
+     },
+     "subjects": {
+      "mixed": 83
+     },
+     "extracted": 83,
+     "source_ref": "RRB JE 2019 25 May 2019 Shift 1 · RRB JE Question Paper with Answers for 25 May 2019 Exam Shift 1 - Download PDF | AglaSem · bilingual answer-key PDF",
+     "already_on_server": 0
+    },
+    "now": {
+     "total": 83,
+     "pending": 83,
+     "untagged": 83
+    }
+   },
+   {
+    "id": "ROBOT-1792302142481-A66EC2",
+    "title": "RRB JE 2019 · 24 May 2019 Shift 1",
+    "url": "https://docs.aglasem.com/view/dcb05986-aab6-11e9-9a6b-02f21f5619c4",
+    "at": "2026-10-18T05:42:23.093797+00:00",
+    "added": 83,
+    "report": {
+     "added": 83,
+     "title": "RRB JE 2019 · 24 May 2019 Shift 1",
+     "skipped": {
+      "review required: answer_key_unavailable_or_dropped": 1,
+      "review required: bilingual_options_missing_language": 8,
+      "review required: missing_question_text,bilingual_options_missing_language": 6,
+      "review required: missing_question_text,bilingual_question_missing_language,bilingual_options_missing_language": 2
+     },
+     "subjects": {
+      "mixed": 83
+     },
+     "extracted": 83,
+     "source_ref": "RRB JE 2019 24 May 2019 Shift 1 · RRB JE Question Paper with Answers for 24 May 2019 Exam Shift 1 - Download PDF | AglaSem · bilingual answer-key PDF",
+     "already_on_server": 0
+    },
+    "now": {
+     "total": 83,
+     "pending": 83,
+     "untagged": 83
+    }
+   },
+   {
+    "id": "ROBOT-1792302066822-2034D5",
+    "title": "RRB JE 2019 · 23 May 2019 Shift 1",
+    "url": "https://docs.aglasem.com/view/d138da4c-aab6-11e9-86ae-02f21f5619c4",
+    "at": "2026-10-18T05:41:08.224223+00:00",
+    "added": 68,
+    "report": {
+     "added": 68,
+     "title": "RRB JE 2019 · 23 May 2019 Shift 1",
+     "skipped": {
+      "review required: bilingual_options_missing_language": 21,
+      "review required: missing_question_text,bilingual_options_missing_language": 7,
+      "review required: bilingual_question_missing_language,bilingual_options_missing_language": 1,
+      "review required: missing_question_text,bilingual_question_missing_language,bilingual_options_missing_language": 3
+     },
+     "subjects": {
+      "mixed": 68
+     },
+     "extracted": 68,
+     "source_ref": "RRB JE 2019 23 May 2019 Shift 1 · RRB JE Question Paper with Answers for 23 May 2019 Exam Shift 1 - Download PDF | AglaSem · bilingual answer-key PDF",
+     "already_on_server": 0
+    },
+    "now": {
+     "total": 68,
+     "pending": 68,
+     "untagged": 68
+    }
+   },
+   {
+    "id": "ROBOT-1792301994015-1D6D23",
+    "title": "RRB JE 2019 · 22 May 2019 Shift 1",
+    "url": "https://docs.aglasem.com/view/d8be4568-aab6-11e9-aac7-02f21f5619c4",
+    "at": "2026-10-18T05:39:55.473168+00:00",
+    "added": 84,
+    "report": {
+     "added": 84,
+     "title": "RRB JE 2019 · 22 May 2019 Shift 1",
+     "skipped": {
+      "review required: answer_key_ocr_disagreement": 2,
+      "review required: hindi_text_encoding_suspect": 1,
+      "review required: bilingual_options_missing_language": 7,
+      "review required: missing_question_text,bilingual_options_missing_language": 5,
+      "review required: answer_key_ocr_disagreement,bilingual_options_missing_language": 1
+     },
+     "subjects": {
+      "mixed": 84
+     },
+     "extracted": 84,
+     "source_ref": "RRB JE 2019 22 May 2019 Shift 1 · RRB JE Question Paper with Answers for 22 May 2019 Exam Shift 1 - Download PDF | AglaSem · bilingual answer-key PDF",
+     "already_on_server": 0
+    },
+    "now": {
+     "total": 84,
+     "pending": 84,
+     "untagged": 84
+    }
+   },
+   {
+    "id": "ROBOT-1792156293284-AA30B2",
+    "title": "SSC JE 2018 Mechanical · 27 Sep 2019 Shift 2",
+    "url": null,
+    "at": "2026-10-16T13:11:34.35313+00:00",
+    "added": 79,
+    "report": null,
+    "now": {
+     "total": 79,
+     "live": 79,
+     "untagged": 49
+    }
+   },
+   {
+    "id": "ROBOT-1792156282763-012EBB",
+    "title": "SSC JE 2018 Mechanical · 27 Sep 2019 Shift 1",
+    "url": null,
+    "at": "2026-10-16T13:11:23.786946+00:00",
+    "added": 80,
+    "report": null,
+    "now": {
+     "total": 80,
+     "hidden": 12,
+     "untagged": 77,
+     "no_hindi": 9,
+     "live": 68
+    }
+   },
+   {
+    "id": "ROBOT-1792156272127-E5D00B",
+    "title": "SSC JE 2018 Mechanical · 25 Sep 2019 Shift 2",
+    "url": null,
+    "at": "2026-10-16T13:11:13.187864+00:00",
+    "added": 84,
+    "report": null,
+    "now": {
+     "total": 84,
+     "live": 84,
+     "untagged": 49
+    }
+   },
+   {
+    "id": "ROBOT-1792156261868-7F1A10",
+    "title": "SSC JE 2018 Electrical · 26 Sep 2019 Shift 2",
+    "url": null,
+    "at": "2026-10-16T13:11:02.554178+00:00",
+    "added": 82,
+    "report": null,
+    "now": {
+     "total": 82,
+     "live": 82,
+     "untagged": 48
+    }
+   },
+   {
+    "id": "ROBOT-1792156247719-D92410",
+    "title": "SSC JE 2018 Electrical · 26 Sep 2019 Shift 1",
+    "url": null,
+    "at": "2026-10-16T13:10:51.784909+00:00",
+    "added": 83,
+    "report": null,
+    "now": {
+     "total": 83,
+     "live": 83,
+     "untagged": 51
+    }
+   },
+   {
+    "id": "ROBOT-1792156237291-D906D3",
+    "title": "SSC JE 2019 Mechanical · 11 Dec 2020 Shift 1",
+    "url": null,
+    "at": "2026-10-16T13:10:38.768782+00:00",
+    "added": 49,
+    "report": null,
+    "now": {
+     "total": 49,
+     "live": 49,
+     "untagged": 49,
+     "no_hindi": 1
+    }
+   },
+   {
+    "id": "ROBOT-1792156227756-EE6948",
+    "title": "SSC JE 2019 Electrical · 29 Oct 2020 Shift 2",
+    "url": null,
+    "at": "2026-10-16T13:10:28.501187+00:00",
+    "added": 49,
+    "report": null,
+    "now": {
+     "total": 49,
+     "live": 49,
+     "untagged": 49
+    }
+   },
+   {
+    "id": "ROBOT-1792156216121-440E04",
+    "title": "SSC JE 2019 Electrical · 10 Dec 2020 Shift 2",
+    "url": null,
+    "at": "2026-10-16T13:10:16.821257+00:00",
+    "added": 49,
+    "report": null,
+    "now": {
+     "total": 49,
+     "live": 49,
+     "untagged": 49
+    }
+   },
+   {
+    "id": "ROBOT-1792156205886-D7ACF0",
+    "title": "SSC JE 2019 Civil · 29 Oct 2020 Shift 1",
+    "url": null,
+    "at": "2026-10-16T13:10:06.965242+00:00",
+    "added": 49,
+    "report": null,
+    "now": {
+     "total": 49,
+     "live": 49,
+     "untagged": 49
+    }
+   },
+   {
+    "id": "ROBOT-1792156195818-820710",
+    "title": "SSC JE 2020 Mechanical · 22 Mar 2021 Shift 1",
+    "url": null,
+    "at": "2026-10-16T13:09:56.865125+00:00",
+    "added": 87,
+    "report": null,
+    "now": {
+     "total": 87,
+     "live": 87,
+     "untagged": 52
+    }
+   },
+   {
+    "id": "ROBOT-1792156185255-7644A0",
+    "title": "SSC JE 2019 Electrical · 28 Oct 2020 Shift 1",
+    "url": null,
+    "at": "2026-10-16T13:09:45.991064+00:00",
+    "added": 49,
+    "report": null,
+    "now": {
+     "total": 49,
+     "live": 49,
+     "untagged": 49
+    }
+   },
+   {
+    "id": "ROBOT-1792156171842-D4A5B7",
+    "title": "SSC JE 2020 Electrical · 24 Mar 2021 Shift 1",
+    "url": null,
+    "at": "2026-10-16T13:09:33.680118+00:00",
+    "added": 84,
+    "report": null,
+    "now": {
+     "total": 84,
+     "live": 84,
+     "untagged": 50
+    }
+   },
+   {
+    "id": "ROBOT-1792155699837-CBDAC3",
+    "title": "SSC JE 2023 Mechanical · 11 Oct 2023 Shift 2",
+    "url": null,
+    "at": "2026-10-16T13:01:40.729964+00:00",
+    "added": 178,
+    "report": null,
+    "now": {
+     "total": 178,
+     "live": 178,
+     "untagged": 85
+    }
+   }
+  ],
+  "sources": [
+   {
+    "source": "Unknown",
+    "total": 1325,
+    "hidden": 277,
+    "live": 1048,
+    "no_hindi": 1
+   },
+   {
+    "source": "SSC JE 2024 Civil Paper I",
+    "total": 731,
+    "live": 727,
+    "hidden": 4
+   },
+   {
+    "source": "SSC JE 2023 Civil Paper I",
+    "total": 712,
+    "hidden": 39,
+    "live": 673,
+    "no_hindi": 10
+   },
+   {
+    "source": "SSC JE 2023 Electrical Paper I",
+    "total": 515,
+    "live": 515,
+    "no_hindi": 1
+   },
+   {
+    "source": "SSC JE 2024 Mechanical Paper I",
+    "total": 374,
+    "live": 374,
+    "no_hindi": 1
+   },
+   {
+    "source": "SSC JE 2023 Mechanical Paper I",
+    "total": 348,
+    "live": 348,
+    "no_hindi": 1
+   },
+   {
+    "source": "SSC JE 2018 Mechanical Paper I",
+    "total": 243,
+    "hidden": 12,
+    "live": 231,
+    "no_hindi": 9
+   },
+   {
+    "source": "SSC JE 2024 Electrical Paper I",
+    "total": 177,
+    "live": 176,
+    "hidden": 1
+   },
+   {
+    "source": "SSC JE 2018 Electrical Paper I",
+    "total": 165,
+    "live": 165
+   },
+   {
+    "source": "SSC JE 2019 Electrical Paper I",
+    "total": 147,
+    "live": 147
+   },
+   {
+    "source": "SSC JE 2020 Mechanical Paper I",
+    "total": 87,
+    "live": 87
+   },
+   {
+    "source": "RRB JE 2019 29 May 2019 Shift 2",
+    "total": 87,
+    "pending": 87
+   },
+   {
+    "source": "RRB JE 2019 26 May 2019 Shift 2",
+    "total": 85,
+    "pending": 85
+   },
+   {
+    "source": "SSC JE 2020 Electrical Paper I",
+    "total": 84,
+    "live": 84
+   },
+   {
+    "source": "RRB JE 2019 22 May 2019 Shift 1",
+    "total": 84,
+    "pending": 84
+   },
+   {
+    "source": "RRB JE 2019 24 May 2019 Shift 1",
+    "total": 83,
+    "pending": 83
+   },
+   {
+    "source": "RRB JE 2019 25 May 2019 Shift 1",
+    "total": 83,
+    "pending": 83
+   },
+   {
+    "source": "RRB JE 2019 26 May 2019 Shift 1",
+    "total": 82,
+    "pending": 82
+   },
+   {
+    "source": "RRB JE 2019 28 May 2019 Shift 1",
+    "total": 82,
+    "pending": 82
+   },
+   {
+    "source": "RRB JE 2019 28 May 2019 Shift 2",
+    "total": 82,
+    "pending": 82
+   },
+   {
+    "source": "RRB JE 2019 29 May 2019 Shift 3",
+    "total": 82,
+    "pending": 82
+   },
+   {
+    "source": "RRB JE 2019 27 May 2019 Shift 1",
+    "total": 80,
+    "pending": 80
+   },
+   {
+    "source": "RRB JE 2019 25 May 2019 Shift 3",
+    "total": 73,
+    "pending": 73
+   },
+   {
+    "source": "RRB JE 2019 23 May 2019 Shift 1",
+    "total": 68,
+    "pending": 68
+   },
+   {
+    "source": "SSC JE 2019 Mechanical Paper I",
+    "total": 49,
+    "live": 49,
+    "no_hindi": 1
+   },
+   {
+    "source": "SSC JE 2019 Civil Paper I",
+    "total": 49,
+    "live": 49
+   }
+  ],
+  "tasks": {
+   "by_status": {
+    "completed": 8,
+    "failed": 9,
+    "cancelled": 2
+   },
+   "recent": [
+    {
+     "id": 19,
+     "title": "📦 PYQ import: 1 links (dry run)",
+     "intent": "import",
+     "status": "completed",
+     "risk": "medium",
+     "mode": "execute",
+     "created_at": "2026-10-18T19:16:01.29577+00:00",
+     "updated_at": "2026-10-18T19:39:15+00:00",
+     "started_at": "2026-10-18T19:39:14+00:00",
+     "finished_at": "2026-10-18T19:39:15+00:00",
+     "retry_count": 0
+    },
+    {
+     "id": 18,
+     "title": "📦 PYQ import: 1 links",
+     "intent": "import",
+     "status": "failed",
+     "risk": "medium",
+     "mode": "execute",
+     "created_at": "2026-10-17T18:40:42.546177+00:00",
+     "updated_at": "2026-10-17T19:13:47+00:00",
+     "started_at": "2026-10-17T19:13:24+00:00",
+     "finished_at": "2026-10-17T19:13:47+00:00",
+     "retry_count": 0
+    },
+    {
+     "id": 17,
+     "title": "🔧 अपने-आप ठीक होने वाली चीज़ें",
+     "intent": "fix",
+     "status": "failed",
+     "risk": "low",
+     "mode": "execute",
+     "created_at": "2026-10-17T15:58:04.298319+00:00",
+     "updated_at": "2026-10-17T17:20:32+00:00",
+     "started_at": "2026-10-17T17:20:31+00:00",
+     "finished_at": "2026-10-17T17:20:32+00:00",
+     "retry_count": 0
+    },
+    {
+     "id": 16,
+     "title": "📦 PYQ import: 1 links",
+     "intent": "import",
+     "status": "completed",
+     "risk": "medium",
+     "mode": "execute",
+     "created_at": "2026-10-17T12:34:25.54323+00:00",
+     "updated_at": "2026-10-17T15:41:47+00:00",
+     "started_at": "2026-10-17T13:49:50+00:00",
+     "finished_at": "2026-10-17T15:41:47+00:00",
+     "retry_count": 0
+    },
+    {
+     "id": 15,
+     "title": "📦 PYQ import: 1 links",
+     "intent": "import",
+     "status": "failed",
+     "risk": "medium",
+     "mode": "execute",
+     "created_at": "2026-10-17T12:34:16.669525+00:00",
+     "updated_at": "2026-10-17T13:49:50+00:00",
+     "started_at": "2026-10-17T13:49:19+00:00",
+     "finished_at": "2026-10-17T13:49:50+00:00",
+     "retry_count": 0
+    },
+    {
+     "id": 14,
+     "title": "📦 PYQ import: 1 links",
+     "intent": "import",
+     "status": "failed",
+     "risk": "medium",
+     "mode": "execute",
+     "created_at": "2026-10-17T12:34:11.319144+00:00",
+     "updated_at": "2026-10-17T13:49:48+00:00",
+     "started_at": "2026-10-17T13:49:16+00:00",
+     "finished_at": "2026-10-17T13:49:48+00:00",
+     "retry_count": 0
+    },
+    {
+     "id": 13,
+     "title": "📦 PYQ import: 1 links",
+     "intent": "import",
+     "status": "failed",
+     "risk": "medium",
+     "mode": "execute",
+     "created_at": "2026-10-17T12:34:09.954249+00:00",
+     "updated_at": "2026-10-17T13:49:48+00:00",
+     "started_at": "2026-10-17T13:49:15+00:00",
+     "finished_at": "2026-10-17T13:49:48+00:00",
+     "retry_count": 0
+    },
+    {
+     "id": 12,
+     "title": "📦 PYQ import: 1 links",
+     "intent": "import",
+     "status": "failed",
+     "risk": "medium",
+     "mode": "execute",
+     "created_at": "2026-10-17T12:34:03.4558+00:00",
+     "updated_at": "2026-10-17T13:49:46+00:00",
+     "started_at": "2026-10-17T13:49:13+00:00",
+     "finished_at": "2026-10-17T13:49:46+00:00",
+     "retry_count": 0
+    },
+    {
+     "id": 11,
+     "title": "📦 PYQ import: 1 links",
+     "intent": "import",
+     "status": "failed",
+     "risk": "medium",
+     "mode": "execute",
+     "created_at": "2026-10-17T12:34:01.382604+00:00",
+     "updated_at": "2026-10-17T13:49:45+00:00",
+     "started_at": "2026-10-17T13:49:10+00:00",
+     "finished_at": "2026-10-17T13:49:45+00:00",
+     "retry_count": 0
+    },
+    {
+     "id": 10,
+     "title": "📦 PYQ import: 1 links",
+     "intent": "import",
+     "status": "failed",
+     "risk": "medium",
+     "mode": "execute",
+     "created_at": "2026-10-17T12:33:55.501296+00:00",
+     "updated_at": "2026-10-17T13:49:44+00:00",
+     "started_at": "2026-10-17T13:49:08+00:00",
+     "finished_at": "2026-10-17T13:49:44+00:00",
+     "retry_count": 0
+    },
+    {
+     "id": 9,
+     "title": "📦 PYQ import: 1 links",
+     "intent": "import",
+     "status": "failed",
+     "risk": "medium",
+     "mode": "execute",
+     "created_at": "2026-10-17T12:33:53.870553+00:00",
+     "updated_at": "2026-10-17T13:49:43+00:00",
+     "started_at": "2026-10-17T13:49:04+00:00",
+     "finished_at": "2026-10-17T13:49:43+00:00",
+     "retry_count": 0
+    },
+    {
+     "id": 8,
+     "title": "📦 PYQ import: 1 links",
+     "intent": "import",
+     "status": "completed",
+     "risk": "medium",
+     "mode": "execute",
+     "created_at": "2026-10-17T12:33:48.94209+00:00",
+     "updated_at": "2026-10-17T15:41:47+00:00",
+     "started_at": "2026-10-17T13:49:02+00:00",
+     "finished_at": "2026-10-17T15:41:47+00:00",
+     "retry_count": 0
+    },
+    {
+     "id": 7,
+     "title": "📦 PYQ import: 1 links",
+     "intent": "import",
+     "status": "completed",
+     "risk": "medium",
+     "mode": "execute",
+     "created_at": "2026-10-17T12:33:41.378058+00:00",
+     "updated_at": "2026-10-17T15:41:46+00:00",
+     "started_at": "2026-10-17T13:48:59+00:00",
+     "finished_at": "2026-10-17T15:41:46+00:00",
+     "retry_count": 0
+    },
+    {
+     "id": 6,
+     "title": "📦 PYQ import: 1 links (dry run)",
+     "intent": "import",
+     "status": "completed",
+     "risk": "medium",
+     "mode": "execute",
+     "created_at": "2026-10-17T12:30:50.129331+00:00",
+     "updated_at": "2026-10-17T13:48:59+00:00",
+     "started_at": "2026-10-17T13:48:58+00:00",
+     "finished_at": "2026-10-17T13:48:59+00:00",
+     "retry_count": 0
+    },
+    {
+     "id": 5,
+     "title": "📦 PYQ dry run: Mechanical-and-Allied-Engineering-Shift-02.pdf",
+     "intent": "import",
+     "status": "cancelled",
+     "risk": "medium",
+     "mode": "execute",
+     "created_at": "2026-10-17T09:38:58.80801+00:00",
+     "updated_at": "2026-10-17T12:44:23.927789+00:00",
+     "started_at": "2026-10-17T12:09:19+00:00",
+     "finished_at": "2026-10-17T12:44:23.927789+00:00",
+     "retry_count": 1
+    }
+   ],
+   "stuck": []
+  },
+  "usage_stats": {
+   "days": 14,
+   "daily": [
+    {
+     "day": "2026-10-17",
+     "users": 2,
+     "events": 94
+    },
+    {
+     "day": "2026-10-18",
+     "users": 2,
+     "events": 333
+    },
+    {
+     "day": "2026-10-19",
+     "users": 1,
+     "events": 254
+    }
+   ],
+   "pages": {
+    "me": {
+     "users": 1,
+     "views": 6,
+     "avg_ms": 9375
+    },
+    "pyq": {
+     "users": 1,
+     "views": 1,
+     "avg_ms": 1547
+    },
+    "home": {
+     "users": 2,
+     "views": 164,
+     "avg_ms": 7598
+    },
+    "test": {
+     "users": 2,
+     "views": 13,
+     "avg_ms": 10929
+    },
+    "learn": {
+     "users": 1,
+     "views": 1,
+     "avg_ms": 17198
+    },
+    "topic": {
+     "users": 2,
+     "views": 10,
+     "avg_ms": 4702
+    },
+    "(away)": {
+     "users": 2,
+     "views": 34,
+     "avg_ms": 603017
+    },
+    "result": {
+     "users": 2,
+     "views": 4,
+     "avg_ms": 18849
+    },
+    "chapter": {
+     "users": 1,
+     "views": 5,
+     "avg_ms": 2022
+    },
+    "mastery": {
+     "users": 2,
+     "views": 2,
+     "avg_ms": 9234
+    },
+    "pyq_hub": {
+     "users": 1,
+     "views": 3,
+     "avg_ms": 5285
+    },
+    "subject": {
+     "users": 2,
+     "views": 20,
+     "avg_ms": 10844
+    },
+    "exam_hub": {
+     "users": 2,
+     "views": 114,
+     "avg_ms": 2148
+    },
+    "mistakes": {
+     "users": 1,
+     "views": 2,
+     "avg_ms": 5986
+    },
+    "practice": {
+     "users": 2,
+     "views": 7,
+     "avg_ms": 36205
+    },
+    "subjects": {
+     "users": 2,
+     "views": 154,
+     "avg_ms": 2507
+    },
+    "test_hub": {
+     "users": 2,
+     "views": 58,
+     "avg_ms": 1296
+    },
+    "exam_profile": {
+     "users": 1,
+     "views": 5,
+     "avg_ms": 3088
+    },
+    "revision_hub": {
+     "users": 2,
+     "views": 50,
+     "avg_ms": 3714
+    },
+    "native_builder": {
+     "users": 1,
+     "views": 3,
+     "avg_ms": 9658
+    },
+    "competitive_hub": {
+     "users": 1,
+     "views": 2,
+     "avg_ms": 8613
+    },
+    "digital_library": {
+     "users": 1,
+     "views": 1,
+     "avg_ms": 1785
+    },
+    "taxonomy_explorer": {
+     "users": 1,
+     "views": 4,
+     "avg_ms": 3574
+    },
+    "competitive_subjects": {
+     "users": 1,
+     "views": 1,
+     "avg_ms": 15017
+    }
+   },
+   "events": {
+    "view": {
+     "count": 664,
+     "users": 2
+    },
+    "test:start": {
+     "count": 13,
+     "users": 2
+    },
+    "test:submit": {
+     "count": 4,
+     "users": 2
+    }
+   },
+   "cohorts": {
+    "new_users": 2,
+    "returning_users": 0
+   },
+   "funnel_test": {
+    "results": 14,
+    "started": 13,
+    "submitted": 4
+   },
+   "inactive_users": 1
+  },
+  "roles": {
+   "owner": 1
+  },
+  "queue": {
+   "avg_wait_min": 57.2,
+   "max_wait_min": 263.5,
+   "stuck": [],
+   "queued": 0
+  },
+  "incidents": [
+   {
+    "id": 26,
+    "key": "wf-tests.yml",
+    "severity": "major",
+    "area": "Tests",
+    "title": "✅ Tests पिछली बार fail हुआ — कोई test fail — code में गड़बड़",
+    "suggestion": "Claude को run का link भेजें: \"fail test ठीक करो\"",
+    "status": "resolved",
+    "opened_at": "2026-10-19T12:09:44.451598+00:00",
+    "last_seen": "2026-10-19T13:39:23.81546+00:00",
+    "resolved_at": "2026-10-19T14:25:01.862314+00:00",
+    "seen_count": 3
+   },
+   {
+    "id": 25,
+    "key": "tests-failed",
+    "severity": "major",
+    "area": "Tests",
+    "title": "3 test suite fail: test_c2, test_studio, test_design",
+    "suggestion": "Claude: \"fail tests ठीक करो\"",
+    "status": "resolved",
+    "opened_at": "2026-10-19T10:58:59.379623+00:00",
+    "last_seen": "2026-10-19T11:26:41.107239+00:00",
+    "resolved_at": "2026-10-19T11:35:48.724747+00:00",
+    "seen_count": 4
+   },
+   {
+    "id": 24,
+    "key": "wf-tests.yml",
+    "severity": "major",
+    "area": "Tests",
+    "title": "✅ Tests पिछली बार fail हुआ — कोई test fail — code में गड़बड़",
+    "suggestion": "Claude को run का link भेजें: \"fail test ठीक करो\"",
+    "status": "resolved",
+    "opened_at": "2026-10-19T10:58:58.734636+00:00",
+    "last_seen": "2026-10-19T11:26:41.107239+00:00",
+    "resolved_at": "2026-10-19T11:35:48.724747+00:00",
+    "seen_count": 4
+   },
+   {
+    "id": 23,
+    "key": "tests-failed",
+    "severity": "major",
+    "area": "Tests",
+    "title": "2 test suite fail: test_studio, test_design",
+    "suggestion": "Claude: \"fail tests ठीक करो\"",
+    "status": "resolved",
+    "opened_at": "2026-10-19T10:49:02.912872+00:00",
+    "last_seen": "2026-10-19T10:49:19.48029+00:00",
+    "resolved_at": "2026-10-19T10:50:41.065276+00:00",
+    "seen_count": 2
+   },
+   {
+    "id": 22,
+    "key": "wf-tests.yml",
+    "severity": "major",
+    "area": "Tests",
+    "title": "✅ Tests पिछली बार fail हुआ — कोई test fail — code में गड़बड़",
+    "suggestion": "Claude को run का link भेजें: \"fail test ठीक करो\"",
+    "status": "resolved",
+    "opened_at": "2026-10-19T10:38:58.54586+00:00",
+    "last_seen": "2026-10-19T10:38:58.54586+00:00",
+    "resolved_at": "2026-10-19T10:40:17.227671+00:00",
+    "seen_count": 1
+   },
+   {
+    "id": 21,
+    "key": "wf-tests.yml",
+    "severity": "major",
+    "area": "Tests",
+    "title": "✅ Tests पिछली बार fail हुआ — कोई test fail — code में गड़बड़",
+    "suggestion": "Claude को run का link भेजें: \"fail test ठीक करो\"",
+    "status": "resolved",
+    "opened_at": "2026-10-19T10:36:30.36275+00:00",
+    "last_seen": "2026-10-19T10:36:30.36275+00:00",
+    "resolved_at": "2026-10-19T10:37:08.054911+00:00",
+    "seen_count": 1
+   },
+   {
+    "id": 20,
+    "key": "tests-failed",
+    "severity": "major",
+    "area": "Tests",
+    "title": "1 test suite fail: test_design",
+    "suggestion": "Claude: \"fail tests ठीक करो\"",
+    "status": "resolved",
+    "opened_at": "2026-10-19T04:40:47.284102+00:00",
+    "last_seen": "2026-10-19T04:40:47.284102+00:00",
+    "resolved_at": "2026-10-19T04:41:39.261203+00:00",
+    "seen_count": 1
+   },
+   {
+    "id": 19,
+    "key": "wf-tests.yml",
+    "severity": "major",
+    "area": "Tests",
+    "title": "✅ Tests पिछली बार fail हुआ — कोई test fail — code में गड़बड़",
+    "suggestion": "Claude को run का link भेजें: \"fail test ठीक करो\"",
+    "status": "resolved",
+    "opened_at": "2026-10-19T04:40:46.720058+00:00",
+    "last_seen": "2026-10-19T04:40:46.720058+00:00",
+    "resolved_at": "2026-10-19T04:41:39.261203+00:00",
+    "seen_count": 1
+   },
+   {
+    "id": 18,
+    "key": "tests-failed",
+    "severity": "major",
+    "area": "Tests",
+    "title": "1 test suite fail: test_mobile_design",
+    "suggestion": "Claude: \"fail tests ठीक करो\"",
+    "status": "resolved",
+    "opened_at": "2026-10-19T04:13:51.435438+00:00",
+    "last_seen": "2026-10-19T04:20:56.221087+00:00",
+    "resolved_at": "2026-10-19T04:22:55.857743+00:00",
+    "seen_count": 2
+   },
+   {
+    "id": 17,
+    "key": "wf-tests.yml",
+    "severity": "major",
+    "area": "Tests",
+    "title": "✅ Tests पिछली बार fail हुआ — कोई test fail — code में गड़बड़",
+    "suggestion": "Claude को run का link भेजें: \"fail test ठीक करो\"",
+    "status": "resolved",
+    "opened_at": "2026-10-19T04:13:50.508824+00:00",
+    "last_seen": "2026-10-19T04:13:50.508824+00:00",
+    "resolved_at": "2026-10-19T04:20:56.221087+00:00",
+    "seen_count": 1
+   },
+   {
+    "id": 16,
+    "key": "tests-failed",
+    "severity": "major",
+    "area": "Tests",
+    "title": "1 test suite fail: test_mobile_design",
+    "suggestion": "Claude: \"fail tests ठीक करो\"",
+    "status": "resolved",
+    "opened_at": "2026-10-19T04:00:09.138349+00:00",
+    "last_seen": "2026-10-19T04:00:09.138349+00:00",
+    "resolved_at": "2026-10-19T04:10:31.634678+00:00",
+    "seen_count": 1
+   },
+   {
+    "id": 15,
+    "key": "wf-tests.yml",
+    "severity": "major",
+    "area": "Tests",
+    "title": "✅ Tests पिछली बार fail हुआ — कोई test fail — code में गड़बड़",
+    "suggestion": "Claude को run का link भेजें: \"fail test ठीक करो\"",
+    "status": "resolved",
+    "opened_at": "2026-10-19T04:00:07.593444+00:00",
+    "last_seen": "2026-10-19T04:00:07.593444+00:00",
+    "resolved_at": "2026-10-19T04:10:31.634678+00:00",
+    "seen_count": 1
+   },
+   {
+    "id": 14,
+    "key": "wf-key-check-robot.yml",
+    "severity": "major",
+    "area": "Robots",
+    "title": "🔑 Key-check Robot पिछली बार fail हुआ — कोई library install नहीं हुई / version बदला",
+    "suggestion": "Claude: version pin करो",
+    "status": "open",
+    "opened_at": "2026-10-18T22:29:48.101377+00:00",
+    "last_seen": "2026-10-20T05:01:55.567012+00:00",
+    "resolved_at": null,
+    "seen_count": 52
+   },
+   {
+    "id": 13,
+    "key": "wf-pyq-robot.yml",
+    "severity": "major",
+    "area": "Robots",
+    "title": "🤖 PYQ Robot पिछली बार fail हुआ — PDF का format अलग / scan वाला",
+    "suggestion": "दूसरा link दें या Claude को paper भेजें",
+    "status": "resolved",
+    "opened_at": "2026-10-18T14:50:02.864532+00:00",
+    "last_seen": "2026-10-18T16:00:08.494721+00:00",
+    "resolved_at": "2026-10-18T18:21:44.114955+00:00",
+    "seen_count": 3
+   },
+   {
+    "id": 12,
+    "key": "tests-failed",
+    "severity": "major",
+    "area": "Tests",
+    "title": "1 test suite fail: test_u5",
+    "suggestion": "Claude: \"fail tests ठीक करो\"",
+    "status": "resolved",
+    "opened_at": "2026-10-18T11:43:52.598811+00:00",
+    "last_seen": "2026-10-18T11:43:52.598811+00:00",
+    "resolved_at": "2026-10-18T11:57:04.635705+00:00",
+    "seen_count": 1
+   },
+   {
+    "id": 11,
+    "key": "wf-tests.yml",
+    "severity": "major",
+    "area": "Tests",
+    "title": "✅ Tests पिछली बार fail हुआ — कोई test fail — code में गड़बड़",
+    "suggestion": "Claude को run का link भेजें: \"fail test ठीक करो\"",
+    "status": "resolved",
+    "opened_at": "2026-10-18T11:43:52.091849+00:00",
+    "last_seen": "2026-10-18T11:43:52.091849+00:00",
+    "resolved_at": "2026-10-18T11:57:04.635705+00:00",
+    "seen_count": 1
+   },
+   {
+    "id": 10,
+    "key": "tests-failed",
+    "severity": "major",
+    "area": "Tests",
+    "title": "1 test suite fail: test_v3",
+    "suggestion": "Claude: \"fail tests ठीक करो\"",
+    "status": "resolved",
+    "opened_at": "2026-10-18T11:15:55.783101+00:00",
+    "last_seen": "2026-10-18T11:15:55.783101+00:00",
+    "resolved_at": "2026-10-18T11:20:48.836445+00:00",
+    "seen_count": 1
+   },
+   {
+    "id": 9,
+    "key": "wf-tests.yml",
+    "severity": "major",
+    "area": "Tests",
+    "title": "✅ Tests पिछली बार fail हुआ — कोई test fail — code में गड़बड़",
+    "suggestion": "Claude को run का link भेजें: \"fail test ठीक करो\"",
+    "status": "resolved",
+    "opened_at": "2026-10-18T11:15:55.506412+00:00",
+    "last_seen": "2026-10-18T11:15:55.506412+00:00",
+    "resolved_at": "2026-10-18T11:20:48.836445+00:00",
+    "seen_count": 1
+   },
+   {
+    "id": 8,
+    "key": "tests-failed",
+    "severity": "major",
+    "area": "Tests",
+    "title": "1 test suite fail: test_u1_reg",
+    "suggestion": "Claude: \"fail tests ठीक करो\"",
+    "status": "resolved",
+    "opened_at": "2026-10-18T06:22:01.158764+00:00",
+    "last_seen": "2026-10-18T09:09:56.649304+00:00",
+    "resolved_at": "2026-10-18T10:32:43.096379+00:00",
+    "seen_count": 2
+   },
+   {
+    "id": 7,
+    "key": "wf-tests.yml",
+    "severity": "major",
+    "area": "Tests",
+    "title": "✅ Tests पिछली बार fail हुआ — कोई test fail — code में गड़बड़",
+    "suggestion": "Claude को run का link भेजें: \"fail test ठीक करो\"",
+    "status": "resolved",
+    "opened_at": "2026-10-18T06:22:00.482315+00:00",
+    "last_seen": "2026-10-18T09:09:56.649304+00:00",
+    "resolved_at": "2026-10-18T10:32:43.096379+00:00",
+    "seen_count": 2
+   },
+   {
+    "id": 6,
+    "key": "wf-pyq-robot.yml",
+    "severity": "major",
+    "area": "Robots",
+    "title": "🤖 PYQ Robot पिछली बार fail हुआ — कोई library install नहीं हुई / version बदला",
+    "suggestion": "Claude: version pin करो",
+    "status": "resolved",
+    "opened_at": "2026-10-17T19:15:37.283537+00:00",
+    "last_seen": "2026-10-18T05:51:26.659242+00:00",
+    "resolved_at": "2026-10-18T05:54:05.26144+00:00",
+    "seen_count": 22
+   },
+   {
+    "id": 5,
+    "key": "wf-pyq-robot.yml",
+    "severity": "major",
+    "area": "Robots",
+    "title": "🤖 PYQ Robot पिछली बार fail हुआ — अनजान वजह",
+    "suggestion": "Claude को run का link भेजें",
+    "status": "resolved",
+    "opened_at": "2026-10-17T18:23:39.144123+00:00",
+    "last_seen": "2026-10-17T18:23:39.144123+00:00",
+    "resolved_at": "2026-10-17T19:13:52.347288+00:00",
+    "seen_count": 1
+   },
+   {
+    "id": 4,
+    "key": "tests-failed",
+    "severity": "major",
+    "area": "Tests",
+    "title": "1 test suite fail: test_robot",
+    "suggestion": "Claude: \"fail tests ठीक करो\"",
+    "status": "resolved",
+    "opened_at": "2026-10-17T18:22:40.38546+00:00",
+    "last_seen": "2026-10-18T05:34:31.748777+00:00",
+    "resolved_at": "2026-10-18T05:40:42.125079+00:00",
+    "seen_count": 19
+   },
+   {
+    "id": 3,
+    "key": "wf-tests.yml",
+    "severity": "major",
+    "area": "Tests",
+    "title": "✅ Tests पिछली बार fail हुआ — कोई test fail — code में गड़बड़",
+    "suggestion": "Claude को run का link भेजें: \"fail test ठीक करो\"",
+    "status": "resolved",
+    "opened_at": "2026-10-17T18:22:39.703289+00:00",
+    "last_seen": "2026-10-18T05:34:31.748777+00:00",
+    "resolved_at": "2026-10-18T05:40:42.125079+00:00",
+    "seen_count": 19
+   },
+   {
+    "id": 2,
+    "key": "wf-pyq-robot.yml",
+    "severity": "major",
+    "area": "Robots",
+    "title": "🤖 PYQ Robot पिछली बार fail हुआ — अनजान वजह",
+    "suggestion": "Claude को run का link भेजें",
+    "status": "resolved",
+    "opened_at": "2026-10-17T13:50:56.704445+00:00",
+    "last_seen": "2026-10-17T18:18:31.167127+00:00",
+    "resolved_at": "2026-10-17T18:21:53.808676+00:00",
+    "seen_count": 8
+   },
+   {
+    "id": 1,
+    "key": "wf-key-check-robot.yml",
+    "severity": "major",
+    "area": "Robots",
+    "title": "🔑 Key-check Robot पिछली बार fail हुआ — अनजान वजह",
+    "suggestion": "Claude को run का link भेजें",
+    "status": "resolved",
+    "opened_at": "2026-10-17T03:44:21.781309+00:00",
+    "last_seen": "2026-10-17T03:47:33.994322+00:00",
+    "resolved_at": "2026-10-17T03:51:07.283218+00:00",
+    "seen_count": 2
+   }
+  ],
+  "client_errors": [
+   {
+    "at": "2026-10-19T05:10:46.922863+00:00",
+    "v": "V3.4.6",
+    "page": "test_hub",
+    "msg": "Uncaught TypeError: Cannot read properties of undefined (reading 'topicTitle')"
+   },
+   {
+    "at": "2026-10-18T10:47:27.108887+00:00",
+    "v": "V3.4.1",
+    "page": "test_hub",
+    "msg": "Uncaught TypeError: Cannot read properties of undefined (reading 'topicTitle')"
+   },
+   {
+    "at": "2026-10-18T10:46:14.969991+00:00",
+    "v": "V3.4.1",
+    "page": "test_hub",
+    "msg": "Uncaught TypeError: Cannot read properties of undefined (reading 'topicTitle')"
+   },
+   {
+    "at": "2026-10-18T10:44:52.448034+00:00",
+    "v": "V3.4.1",
+    "page": "test_hub",
+    "msg": "Uncaught TypeError: Cannot read properties of undefined (reading 'topicTitle')"
+   },
+   {
+    "at": "2026-10-18T10:44:36.538751+00:00",
+    "v": "V3.4.1",
+    "page": "test_hub",
+    "msg": "Uncaught TypeError: Cannot read properties of undefined (reading 'topicTitle')"
+   },
+   {
+    "at": "2026-10-18T10:29:52.512785+00:00",
+    "v": "V3.4.1",
+    "page": "test_hub",
+    "msg": "Uncaught TypeError: Cannot read properties of undefined (reading 'topicTitle')"
+   },
+   {
+    "at": "2026-10-18T07:48:50.949875+00:00",
+    "v": "V3.4.1",
+    "page": "test_hub",
+    "msg": "Uncaught TypeError: Cannot read properties of undefined (reading 'topicTitle')"
+   },
+   {
+    "at": "2026-10-18T07:48:01.718666+00:00",
+    "v": "V3.4.1",
+    "page": "test_hub",
+    "msg": "Uncaught TypeError: Cannot read properties of undefined (reading 'topicTitle')"
+   },
+   {
+    "at": "2026-10-18T07:13:45.084558+00:00",
+    "v": "V3.4.1",
+    "page": "test_hub",
+    "msg": "Uncaught TypeError: Cannot read properties of undefined (reading 'topicTitle')"
+   },
+   {
+    "at": "2026-10-18T07:01:34.756313+00:00",
+    "v": "V3.4.1",
+    "page": "test_hub",
+    "msg": "Uncaught TypeError: Cannot read properties of undefined (reading 'topicTitle')"
+   },
+   {
+    "at": "2026-10-18T06:56:40.671352+00:00",
+    "v": "V3.4.1",
+    "page": "test_hub",
+    "msg": "Uncaught TypeError: Cannot read properties of undefined (reading 'topicTitle')"
+   }
+  ]
+ },
+ "security": {
+  "anon": {
+   "questions": "बंद",
+   "profiles": "बंद",
+   "attempts": "बंद",
+   "results": "बंद",
+   "bookmarks": "बंद",
+   "review_cards": "बंद",
+   "admins": "बंद",
+   "ops_audit": "बंद",
+   "ops_requests": "बंद",
+   "ops_incidents": "बंद",
+   "ops_client_errors": "बंद",
+   "ops_runs": "बंद",
+   "import_batches": "बंद"
+  },
+  "secrets": [],
+  "publishable_only": true
+ },
+ "design": {
+  "audit": {
+   "screens": 73,
+   "overflow": [],
+   "small_taps": 3,
+   "low_contrast": 5,
+   "overlap": 256,
+   "page_errors": [],
+   "hindi_font": [
+    "True"
+   ],
+   "broken": [],
+   "ok": true,
+   "target": "live",
+   "at": "2026-10-19T06:08:45Z",
+   "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39208167599",
+   "worst": [
+    {
+     "route": "control-room",
+     "size": "phone-360",
+     "theme": "light",
+     "small": 3,
+     "lowc": 5,
+     "overflow": false,
+     "samples": [
+      "19 अक्टू॰, 05:50 am · 19 4.5",
+      "19 अक्टू॰, 06:23 am · 14 4.5",
+      "A:खोलो ›",
+      "A:खोलो ›"
+     ]
+    },
+    {
+     "route": "home",
+     "size": "phone-360",
+     "theme": "light",
+     "small": 0,
+     "lowc": 0,
+     "overflow": false,
+     "samples": []
+    },
+    {
+     "route": "subjects",
+     "size": "phone-360",
+     "theme": "light",
+     "small": 0,
+     "lowc": 0,
+     "overflow": false,
+     "samples": []
+    },
+    {
+     "route": "test_hub",
+     "size": "phone-360",
+     "theme": "light",
+     "small": 0,
+     "lowc": 0,
+     "overflow": false,
+     "samples": []
+    },
+    {
+     "route": "revision_hub",
+     "size": "phone-360",
+     "theme": "light",
+     "small": 0,
+     "lowc": 0,
+     "overflow": false,
+     "samples": []
+    },
+    {
+     "route": "exam_hub",
+     "size": "phone-360",
+     "theme": "light",
+     "small": 0,
+     "lowc": 0,
+     "overflow": false,
+     "samples": []
+    },
+    {
+     "route": "native_builder",
+     "size": "phone-360",
+     "theme": "light",
+     "small": 0,
+     "lowc": 0,
+     "overflow": false,
+     "samples": []
+    },
+    {
+     "route": "me",
+     "size": "phone-360",
+     "theme": "light",
+     "small": 0,
+     "lowc": 0,
+     "overflow": false,
+     "samples": []
+    }
+   ]
+  },
+  "smoke": {
+   "want": "V3.5.0",
+   "at": "2026-10-19T11:49:34Z",
+   "checks": [
+    {
+     "name": "live version = code version",
+     "ok": true,
+     "detail": "live V3.5.0 · code V3.5.0"
+    },
+    {
+     "name": "app opens",
+     "ok": true,
+     "detail": "ठीक"
+    },
+    {
+     "name": "admin studio opens",
+     "ok": true,
+     "detail": "ठीक"
+    },
+    {
+     "name": "control room opens",
+     "ok": true,
+     "detail": "ठीक"
+    }
+   ],
+   "ok": true,
+   "url": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39247379190"
+  },
+  "history": [
+   {
+    "sha": "b7ce130",
+    "full": "b7ce1304edde7abe6803f6dbb07bad06d40901e4",
+    "msg": "fix: align Home DOM order with focus column",
+    "at": "2026-10-19T11:28:36Z",
+    "url": "https://github.com/amanmehta1352/AlphaTestbookapp/commit/b7ce1304edde7abe6803f6dbb07bad06d40901e4",
+    "files": [
+     "dev/app/src/css/20-home-dashboard-601010.css",
+     "dev/app/src/js/24e-home-dashboard-601010.js"
+    ],
+    "sections": [
+     "20-home-dashboard-601010.css",
+     "24e-home-dashboard-601010.js"
+    ]
+   },
+   {
+    "sha": "5741c79",
+    "full": "5741c79a1c2f190dcb4036351338467ceb4ef27e",
+    "msg": "fix: keep daily goal before Home shortcuts",
+    "at": "2026-10-19T11:21:34Z",
+    "url": "https://github.com/amanmehta1352/AlphaTestbookapp/commit/5741c79a1c2f190dcb4036351338467ceb4ef27e",
+    "files": [
+     "dev/app/src/js/24e-home-dashboard-601010.js"
+    ],
+    "sections": [
+     "24e-home-dashboard-601010.js"
+    ]
+   },
+   {
+    "sha": "f9511b2",
+    "full": "f9511b214c3fc7599517c4382a69b02ea356ddd6",
+    "msg": "fix: preserve Home primary action reading order",
+    "at": "2026-10-19T11:15:48Z",
+    "url": "https://github.com/amanmehta1352/AlphaTestbookapp/commit/f9511b214c3fc7599517c4382a69b02ea356ddd6",
+    "files": [
+     "dev/app/src/js/24e-home-dashboard-601010.js"
+    ],
+    "sections": [
+     "24e-home-dashboard-601010.js"
+    ]
+   },
+   {
+    "sha": "0dc684a",
+    "full": "0dc684a4db177ad011e07b014fec87471a04481a",
+    "msg": "Arrange live Home components into 60/30/10 layout",
+    "at": "2026-10-19T10:58:10Z",
+    "url": "https://github.com/amanmehta1352/AlphaTestbookapp/commit/0dc684a4db177ad011e07b014fec87471a04481a",
+    "files": [
+     "dev/app/src/js/24e-home-dashboard-601010.js"
+    ],
+    "sections": [
+     "24e-home-dashboard-601010.js"
+    ]
+   },
+   {
+    "sha": "3a05a34",
+    "full": "3a05a3401fc9e2edcf10f8b155551f55ae334f59",
+    "msg": "Add responsive 60/30/10 Home layout styles",
+    "at": "2026-10-19T10:58:07Z",
+    "url": "https://github.com/amanmehta1352/AlphaTestbookapp/commit/3a05a3401fc9e2edcf10f8b155551f55ae334f59",
+    "files": [
+     "dev/app/src/css/20-home-dashboard-601010.css"
+    ],
+    "sections": [
+     "20-home-dashboard-601010.css"
+    ]
+   },
+   {
+    "sha": "84191ed",
+    "full": "84191ed6bb0abcce18963a4b1ce1c4b4713705eb",
+    "msg": "Refresh Home after background sync and safely launch Studio topics",
+    "at": "2026-10-19T05:19:29Z",
+    "url": "https://github.com/amanmehta1352/AlphaTestbookapp/commit/84191ed6bb0abcce18963a4b1ce1c4b4713705eb",
+    "files": [
+     "dev/app/src/js/17-cloud-account.js",
+     "dev/app/src/js/24d-admin-studio.js"
+    ],
+    "sections": [
+     "Admin Studio",
+     "Login, sync, maintenance"
+    ]
+   },
+   {
+    "sha": "8cac907",
+    "full": "8cac907581fc2f01cb2eeb4e6d365d5e240f486b",
+    "msg": "Merge current mobile improvements and finish topic review fixes",
+    "at": "2026-10-19T05:06:21Z",
+    "url": "https://github.com/amanmehta1352/AlphaTestbookapp/commit/8cac907581fc2f01cb2eeb4e6d365d5e240f486b",
+    "files": [
+     "dev/app/src/css/18-v3-design.css",
+     "dev/app/src/html/body.html",
+     "dev/app/src/js/00-ui-icons.js",
+     "dev/app/src/js/08-routing.js",
+     "dev/app/src/js/11-dashboard.js",
+     "dev/app/src/js/12-display-a11y-subjects-qb.js",
+     "dev/app/src/js/17-cloud-account.js",
+     "dev/app/src/js/17b-student-profile.js",
+     "dev/app/src/js/17c-ops-client.js",
+     "dev/app/src/js/17d-study-feedback.js",
+     "dev/app/src/js/19-smart-builder.js",
+     "dev/app/src/js/21-pages.js",
+     "dev/app/src/js/22d-v3-hub-me.js"
+    ],
+    "sections": [
+     "00-ui-icons.js",
+     "17d-study-feedback.js",
+     "App shell (HTML)",
+     "Design system / theme",
+     "Exam/branch profile",
+     "Home dashboard",
+     "Login, sync, maintenance",
+     "Subject hub · Me · Speed check"
+    ]
+   },
+   {
+    "sha": "cec16f1",
+    "full": "cec16f1c77badaa3324dea0ee12b2d7442f49218",
+    "msg": "Prevent deferred focus from returning to closed dialogs",
+    "at": "2026-10-19T04:46:42Z",
+    "url": "https://github.com/amanmehta1352/AlphaTestbookapp/commit/cec16f1c77badaa3324dea0ee12b2d7442f49218",
+    "files": [
+     "dev/app/src/js/12-display-a11y-subjects-qb.js"
+    ],
+    "sections": [
+     "Subjects, topics, pages"
+    ]
+   },
+   {
+    "sha": "a9cccaf",
+    "full": "a9cccaf35177b1b022ff6a870b6396336c6c5d4a",
+    "msg": "Document routing, study UI, test builder, and build helpers",
+    "at": "2026-10-19T04:41:46Z",
+    "url": "https://github.com/amanmehta1352/AlphaTestbookapp/commit/a9cccaf35177b1b022ff6a870b6396336c6c5d4a",
+    "files": [
+     "dev/app/src/js/00-ui-icons.js",
+     "dev/app/src/js/08-routing.js",
+     "dev/app/src/js/11-dashboard.js",
+     "dev/app/src/js/12-display-a11y-subjects-qb.js",
+     "dev/app/src/js/17-cloud-account.js",
+     "dev/app/src/js/17d-study-feedback.js",
+     "dev/app/src/js/19-smart-builder.js",
+     "dev/app/src/js/22d-v3-hub-me.js"
+    ],
+    "sections": [
+     "00-ui-icons.js",
+     "17d-study-feedback.js",
+     "Home dashboard",
+     "Login, sync, maintenance",
+     "Subject hub · Me · Speed check",
+     "Subjects, topics, pages",
+     "Test builder + navigation"
+    ]
+   },
+   {
+    "sha": "7b3f88a",
+    "full": "7b3f88a64c788f4ba03ab953fea04552bd396e4f",
+    "msg": "Translate account description for English mode",
+    "at": "2026-10-19T04:36:59Z",
+    "url": "https://github.com/amanmehta1352/AlphaTestbookapp/commit/7b3f88a64c788f4ba03ab953fea04552bd396e4f",
+    "files": [
+     "dev/app/src/html/head-01.html",
+     "dev/app/src/js/17-cloud-account.js"
+    ],
+    "sections": [
+     "App shell (HTML)",
+     "Login, sync, maintenance"
+    ]
+   },
+   {
+    "sha": "1c104ae",
+    "full": "1c104ae8dfd05345ac0fbabd82358d783e0155eb",
+    "msg": "Escape assessment titles and serialize launch identifiers",
+    "at": "2026-10-19T04:35:00Z",
+    "url": "https://github.com/amanmehta1352/AlphaTestbookapp/commit/1c104ae8dfd05345ac0fbabd82358d783e0155eb",
+    "files": [
+     "dev/app/src/js/21-pages.js"
+    ],
+    "sections": [
+     "Subjects, topics, pages"
+    ]
+   },
+   {
+    "sha": "173591d",
+    "full": "173591dc2f3cf52b07f02e89b864af8a98af1db0",
+    "msg": "Fix test hub group selection and Control Room text contrast",
+    "at": "2026-10-19T04:18:10Z",
+    "url": "https://github.com/amanmehta1352/AlphaTestbookapp/commit/173591dc2f3cf52b07f02e89b864af8a98af1db0",
+    "files": [
+     "control/cr.css",
+     "dev/app/src/js/21-pages.js"
+    ],
+    "sections": [
+     "Control Room",
+     "Subjects, topics, pages"
+    ]
+   }
+  ],
+  "files": [
+   {
+    "path": "dev/app/src/css/01-base.css",
+    "section": "Design system / theme"
+   },
+   {
+    "path": "dev/app/src/css/02-v2-3-2-deep-functional-repair.css",
+    "section": "Design system / theme"
+   },
+   {
+    "path": "dev/app/src/css/03-v233-compact-layout-repair.css",
+    "section": "Design system / theme"
+   },
+   {
+    "path": "dev/app/src/css/04-v236-student-journey-dashboard.css",
+    "section": "Design system / theme"
+   },
+   {
+    "path": "dev/app/src/css/05-v237-update1.css",
+    "section": "Design system / theme"
+   },
+   {
+    "path": "dev/app/src/css/06-v238-smart-builder.css",
+    "section": "Design system / theme"
+   },
+   {
+    "path": "dev/app/src/css/07-v239-cbt-subjects-results.css",
+    "section": "Design system / theme"
+   },
+   {
+    "path": "dev/app/src/css/08-v240-update4.css",
+    "section": "Design system / theme"
+   },
+   {
+    "path": "dev/app/src/css/09-v240-update4-b.css",
+    "section": "Design system / theme"
+   },
+   {
+    "path": "dev/app/src/css/10-v240-update4-c.css",
+    "section": "10-v240-update4-c.css"
+   },
+   {
+    "path": "dev/app/src/css/11-v241-update5.css",
+    "section": "11-v241-update5.css"
+   },
+   {
+    "path": "dev/app/src/css/12-v250-phase-a.css",
+    "section": "12-v250-phase-a.css"
+   },
+   {
+    "path": "dev/app/src/css/13-v260-server.css",
+    "section": "13-v260-server.css"
+   },
+   {
+    "path": "dev/app/src/css/14-v270-account.css",
+    "section": "14-v270-account.css"
+   },
+   {
+    "path": "dev/app/src/css/16-v280-foundation.css",
+    "section": "16-v280-foundation.css"
+   },
+   {
+    "path": "dev/app/src/css/17-admin-studio.css",
+    "section": "Admin Studio"
+   },
+   {
+    "path": "dev/app/src/css/18-v3-design.css",
+    "section": "Design system / theme"
+   },
+   {
+    "path": "dev/app/src/css/19-action-oriented.css",
+    "section": "19-action-oriented.css"
+   },
+   {
+    "path": "dev/app/src/css/20-home-dashboard-601010.css",
+    "section": "20-home-dashboard-601010.css"
+   },
+   {
+    "path": "dev/app/src/js/00-boot-navigate.js",
+    "section": "00-boot-navigate.js"
+   },
+   {
+    "path": "dev/app/src/js/00-ui-icons.js",
+    "section": "00-ui-icons.js"
+   },
+   {
+    "path": "dev/app/src/js/01-globals.js",
+    "section": "01-globals.js"
+   },
+   {
+    "path": "dev/app/src/js/02-taxonomy-core.js",
+    "section": "02-taxonomy-core.js"
+   },
+   {
+    "path": "dev/app/src/js/03-workspace.js",
+    "section": "03-workspace.js"
+   },
+   {
+    "path": "dev/app/src/js/04-builtin-dataset.js",
+    "section": "04-builtin-dataset.js"
+   },
+   {
+    "path": "dev/app/src/js/05-storage.js",
+    "section": "05-storage.js"
+   },
+   {
+    "path": "dev/app/src/js/06-sync-index.js",
+    "section": "06-sync-index.js"
+   },
+   {
+    "path": "dev/app/src/js/06b-data-core.js",
+    "section": "06b-data-core.js"
+   },
+   {
+    "path": "dev/app/src/js/07-competitive-context.js",
+    "section": "07-competitive-context.js"
+   },
+   {
+    "path": "dev/app/src/js/08-routing.js",
+    "section": "Test builder + navigation"
+   },
+   {
+    "path": "dev/app/src/js/09-learning-data.js",
+    "section": "Revision + learning data"
+   },
+   {
+    "path": "dev/app/src/js/10-revision.js",
+    "section": "Revision + learning data"
+   },
+   {
+    "path": "dev/app/src/js/11-dashboard.js",
+    "section": "Home dashboard"
+   },
+   {
+    "path": "dev/app/src/js/12-display-a11y-subjects-qb.js",
+    "section": "Subjects, topics, pages"
+   },
+   {
+    "path": "dev/app/src/js/13-import-engine.js",
+    "section": "13-import-engine.js"
+   },
+   {
+    "path": "dev/app/src/js/14-data-safety.js",
+    "section": "14-data-safety.js"
+   },
+   {
+    "path": "dev/app/src/js/15-server-admin.js",
+    "section": "15-server-admin.js"
+   },
+   {
+    "path": "dev/app/src/js/16-pwa.js",
+    "section": "16-pwa.js"
+   },
+   {
+    "path": "dev/app/src/js/17-cloud-account.js",
+    "section": "Login, sync, maintenance"
+   },
+   {
+    "path": "dev/app/src/js/17b-student-profile.js",
+    "section": "Exam/branch profile"
+   },
+   {
+    "path": "dev/app/src/js/17c-ops-client.js",
+    "section": "Login, sync, maintenance"
+   },
+   {
+    "path": "dev/app/src/js/17d-study-feedback.js",
+    "section": "17d-study-feedback.js"
+   },
+   {
+    "path": "dev/app/src/js/18-cbt-subjects-results.js",
+    "section": "CBT test room + result"
+   },
+   {
+    "path": "dev/app/src/js/19-smart-builder.js",
+    "section": "Test builder + navigation"
+   },
+   {
+    "path": "dev/app/src/js/20-competitive-hierarchy.js",
+    "section": "20-competitive-hierarchy.js"
+   },
+   {
+    "path": "dev/app/src/js/21-pages.js",
+    "section": "Subjects, topics, pages"
+   },
+   {
+    "path": "dev/app/src/js/22-study-engines.js",
+    "section": "CBT test room + result"
+   },
+   {
+    "path": "dev/app/src/js/22b-cbt-confidence.js",
+    "section": "CBT test room + result"
+   },
+   {
+    "path": "dev/app/src/js/22c-cbt-tools.js",
+    "section": "CBT test room + result"
+   },
+   {
+    "path": "dev/app/src/js/22d-v3-hub-me.js",
+    "section": "Subject hub · Me · Speed check"
+   },
+   {
+    "path": "dev/app/src/js/22e-ops-events.js",
+    "section": "22e-ops-events.js"
+   },
+   {
+    "path": "dev/app/src/js/23-search.js",
+    "section": "23-search.js"
+   },
+   {
+    "path": "dev/app/src/js/24-import-ui.js",
+    "section": "24-import-ui.js"
+   },
+   {
+    "path": "dev/app/src/js/24b-health.js",
+    "section": "24b-health.js"
+   },
+   {
+    "path": "dev/app/src/js/24c-cleanup.js",
+    "section": "24c-cleanup.js"
+   },
+   {
+    "path": "dev/app/src/js/24d-admin-studio.js",
+    "section": "Admin Studio"
+   },
+   {
+    "path": "dev/app/src/js/24e-home-dashboard-601010.js",
+    "section": "24e-home-dashboard-601010.js"
+   },
+   {
+    "path": "dev/app/src/js/25-modals-boot.js",
+    "section": "25-modals-boot.js"
+   },
+   {
+    "path": "dev/app/src/html/body.html",
+    "section": "App shell (HTML)"
+   },
+   {
+    "path": "dev/app/src/html/head-00.html",
+    "section": "App shell (HTML)"
+   },
+   {
+    "path": "dev/app/src/html/head-01.html",
+    "section": "App shell (HTML)"
+   },
+   {
+    "path": "dev/app/src/html/head-03.html",
+    "section": "App shell (HTML)"
+   },
+   {
+    "path": "dev/app/src/html/head-04.html",
+    "section": "App shell (HTML)"
+   },
+   {
+    "path": "dev/app/src/html/head-05.html",
+    "section": "App shell (HTML)"
+   },
+   {
+    "path": "dev/app/src/html/head-06.html",
+    "section": "App shell (HTML)"
+   },
+   {
+    "path": "dev/app/src/html/head-07.html",
+    "section": "App shell (HTML)"
+   },
+   {
+    "path": "dev/app/src/html/head-08.html",
+    "section": "App shell (HTML)"
+   },
+   {
+    "path": "dev/app/src/html/head-09.html",
+    "section": "App shell (HTML)"
+   },
+   {
+    "path": "dev/app/src/html/head-10.html",
+    "section": "App shell (HTML)"
+   },
+   {
+    "path": "dev/app/src/html/head-11.html",
+    "section": "App shell (HTML)"
+   },
+   {
+    "path": "dev/app/src/html/head-12.html",
+    "section": "App shell (HTML)"
+   },
+   {
+    "path": "dev/app/src/html/head-13.html",
+    "section": "App shell (HTML)"
+   },
+   {
+    "path": "dev/app/src/html/head-14.html",
+    "section": "App shell (HTML)"
+   },
+   {
+    "path": "dev/app/src/html/tail.html",
+    "section": "tail.html"
+   },
+   {
+    "path": "control/cr-command.js",
+    "section": "Control Room"
+   },
+   {
+    "path": "control/cr.css",
+    "section": "Control Room"
+   },
+   {
+    "path": "control/cr.js",
+    "section": "Control Room"
+   },
+   {
+    "path": "control/index.html",
+    "section": "Control Room"
+   }
+  ]
+ },
+ "usage": {
+  "db_bytes": 54646451,
+  "storage_bytes": 474278,
+  "backup_bytes": 29589504,
+  "db_pct": 10.4,
+  "storage_pct": 0.0,
+  "actions_minutes_30d": 455,
+  "actions_runs_30d": 183,
+  "actions_by_workflow": {
+   "✅ Tests": 95,
+   "🤖 PYQ Robot": 40,
+   "🌐 Hindi Robot": 185,
+   "🏷️ Tag Robot": 11,
+   "🔑 Key-check Robot": 57,
+   "💾 Backup Robot": 1,
+   "🩺 Health Robot": 39,
+   "⚙️ Ops Robot": 14,
+   "⏪ Rollback": 0,
+   "🎨 Design Audit": 3,
+   "🔥 Smoke Test": 10,
+   "🧩 Selective Restore": 0
+  },
+  "api": {
+   "remaining": 4993,
+   "limit": 5000
+  },
+  "cost_note": "Public repo: GitHub Actions मुफ़्त · Supabase Free plan (500 MB DB, 1 GB storage) · Gemini free tier · अनुमानित खर्च ₹0/महीना"
+ },
+ "overall": "bad",
+ "checks": [
+  {
+   "id": "wf-tests.yml",
+   "area": "Tests",
+   "level": "bad",
+   "msg": "✅ Tests पिछली बार fail हुआ — कोई test fail — code में गड़बड़",
+   "todo": "Claude को run का link भेजें: \"fail test ठीक करो\"",
+   "link": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39400875984",
+   "source": "test-summary artifact",
+   "checked_at": "2026-10-20T09:28:39+00:00",
+   "diagnosis": {
+    "cause": "कोई test fail — code में गड़बड़",
+    "fix": "Claude को run का link भेजें: \"fail test ठीक करो\"",
+    "risk": "मध्यम",
+    "ask_claude": "✅ Tests fail हुआ: कोई test fail — code में गड़बड़. Control Room देखकर ठीक करो (backup लेकर, tests चलाकर)."
+   }
+  },
+  {
+   "id": "wf-key-check-robot.yml",
+   "area": "Robots",
+   "level": "bad",
+   "msg": "🔑 Key-check Robot पिछली बार fail हुआ — कोई library install नहीं हुई / version बदला",
+   "todo": "Claude: version pin करो",
+   "link": "https://github.com/amanmehta1352/AlphaTestbookapp/actions/runs/39159744869",
+   "source": "GitHub Actions API",
+   "checked_at": "2026-10-20T09:28:39+00:00",
+   "diagnosis": {
+    "cause": "कोई library install नहीं हुई / version बदला",
+    "fix": "Claude: version pin करो",
+    "risk": "मध्यम",
+    "ask_claude": "🔑 Key-check Robot fail हुआ: कोई library install नहीं हुई / version बदला. Control Room देखकर ठीक करो (backup लेकर, tests चलाकर)."
+   }
+  },
+  {
+   "id": "q-pending",
+   "area": "सवाल",
+   "level": "warn",
+   "msg": "1026 सवाल publish का इंतज़ार कर रहे",
+   "todo": "Control Room → Publish queue",
+   "link": "https://amanmehta1352.github.io/AlphaTestbookapp/control/#publish",
+   "source": "Supabase questions",
+   "checked_at": "2026-10-20T09:28:39+00:00"
+  },
+  {
+   "id": "q-untagged",
+   "area": "सवाल",
+   "level": "warn",
+   "msg": "1581 live सवाल अभी 'Mixed' में (chapter नहीं)",
+   "todo": "Tag Robot चलाओ या Claude को बोलो",
+   "link": "",
+   "source": "Supabase questions",
+   "checked_at": "2026-10-20T09:28:39+00:00"
+  },
+  {
+   "id": "db-dupe",
+   "area": "Database",
+   "level": "warn",
+   "msg": "220 live सवाल duplicate (एक जैसा text + options)",
+   "todo": "Control Room → सवाल → Duplicate",
+   "link": "",
+   "source": "ops_db_stats()",
+   "checked_at": "2026-10-20T09:28:39+00:00"
+  },
+  {
+   "id": "tasks-failed",
+   "area": "Tasks",
+   "level": "warn",
+   "msg": "9 task fail हुए (हाल के 40 में)",
+   "todo": "Control Room → Tasks → Retry",
+   "link": "",
+   "source": "ops_tasks",
+   "checked_at": "2026-10-20T09:28:39+00:00"
+  },
+  {
+   "id": "gh-issues",
+   "area": "GitHub",
+   "level": "warn",
+   "msg": "5 खुले issue",
+   "todo": "GitHub → Issues देखो",
+   "link": "https://github.com/amanmehta1352/AlphaTestbookapp/issues",
+   "source": "GitHub API",
+   "checked_at": "2026-10-20T09:28:39+00:00"
+  },
+  {
+   "id": "site-up",
+   "area": "ऐप",
+   "level": "ok",
+   "msg": "Live ऐप चालू · V3.5.0 · 396 ms",
+   "todo": "",
+   "link": "",
+   "source": "live site (HTTP)",
+   "checked_at": "2026-10-20T09:28:39+00:00"
+  },
+  {
+   "id": "wf-run-health-robot.yml",
+   "area": "Robots",
+   "level": "ok",
+   "msg": "🩺 Health Robot अभी चल रहा है",
+   "todo": "",
+   "link": "",
+   "source": "GitHub Actions API",
+   "checked_at": "2026-10-20T09:28:39+00:00"
+  },
+  {
+   "id": "tests-ok",
+   "area": "Tests",
+   "level": "ok",
+   "msg": "28 test suites · 910 checks पास",
+   "todo": "",
+   "link": "",
+   "source": "test-summary artifact",
+   "checked_at": "2026-10-20T09:28:39+00:00"
+  },
+  {
+   "id": "db-up",
+   "area": "Server",
+   "level": "ok",
+   "msg": "Server चालू · 4673 सवाल live · 6425 ms",
+   "todo": "",
+   "link": "",
+   "source": "Supabase (service key)",
+   "checked_at": "2026-10-20T09:28:39+00:00"
+  },
+  {
+   "id": "students",
+   "area": "Students",
+   "level": "ok",
+   "msg": "4 students · 7 दिन में 3 active · 77 जवाब · 14 टेस्ट",
+   "todo": "",
+   "link": "",
+   "source": "Supabase attempts/results",
+   "checked_at": "2026-10-20T09:28:39+00:00"
+  },
+  {
+   "id": "backup-ok",
+   "area": "Backup",
+   "level": "ok",
+   "msg": "Backup 9 घंटे पहले · कुल 7 · आख़िरी जाँच ठीक",
+   "todo": "",
+   "link": "",
+   "source": "backup.snapshots",
+   "checked_at": "2026-10-20T09:28:39+00:00"
+  },
+  {
+   "id": "smoke-ok",
+   "area": "Deploy",
+   "level": "ok",
+   "msg": "Deploy के बाद smoke test पास (V3.5.0)",
+   "todo": "",
+   "link": "",
+   "source": "smoke artifact",
+   "checked_at": "2026-10-20T09:28:39+00:00"
+  },
+  {
+   "id": "sec-anon-ok",
+   "area": "Security",
+   "level": "ok",
+   "msg": "13 private tables बिना login के बंद",
+   "todo": "",
+   "link": "",
+   "source": "anon probe + repo scan",
+   "checked_at": "2026-10-20T09:28:39+00:00"
+  }
+ ],
+ "incidents_sync": "2 open",
+ "issue": "open",
+ "next_check": "2026-10-20T10:23+00:00"
+}
